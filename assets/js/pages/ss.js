@@ -8,6 +8,25 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
     .forEach((element) => element.remove());
 
+  // Older saved snapshots kept the URL variable on the small link wrapper.
+  // Promote it to the result panel so the editor outline matches the click area.
+  document.querySelectorAll(".success-story__result > .story-link-variable[data-nstarter-variable-section]")
+    .forEach((wrapper) => {
+      const resultPanel = wrapper.parentElement;
+      const link = wrapper.querySelector(":scope > a[data-nstarter-variable-output]");
+      if (!resultPanel || !link) return;
+
+      [...wrapper.attributes].forEach((attribute) => {
+        if (attribute.name.startsWith("data-nstarter-variable-")) {
+          resultPanel.setAttribute(attribute.name, attribute.value);
+        }
+      });
+
+      resultPanel.classList.add("story-link-variable");
+      resultPanel.insertBefore(link, wrapper);
+      wrapper.remove();
+    });
+
   const revealObserver = !reducedMotion && "IntersectionObserver" in window
     ? new IntersectionObserver((entries, observer) => {
       entries.forEach((entry) => {
