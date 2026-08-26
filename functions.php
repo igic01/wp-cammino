@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.0.1' );
+define( 'NSTARTER_VERSION', '1.0.2' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -36,7 +36,7 @@ function cammino_enqueue_child_styles(): void {
 	);
 }
 
-add_action( 'wp_enqueue_scripts', 'cammino_enqueue_visual_page_assets', 20 );
+add_action( 'wp_enqueue_scripts', 'cammino_enqueue_visual_page_assets', 1000 );
 
 /**
  * Load the reusable Cammino foundation and the selected page's own assets.

@@ -5,7 +5,7 @@
   src: url("../fonts/fredoka-400.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
@@ -13,7 +13,7 @@
   src: url("../fonts/fredoka-500.ttf") format("truetype");
   font-style: normal;
   font-weight: 500;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
@@ -21,7 +21,7 @@
   src: url("../fonts/fredoka-600.ttf") format("truetype");
   font-style: normal;
   font-weight: 600;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
@@ -29,7 +29,7 @@
   src: url("../fonts/fredoka-700.ttf") format("truetype");
   font-style: normal;
   font-weight: 700;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
@@ -91,6 +91,28 @@ body {
   font-size: 1rem;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Keep Elementor/global theme typography from replacing Cammino's local fonts. */
+body.about-page,
+body.about-page #nstarter-snapshot {
+  font-family: var(--font-body) !important;
+}
+
+body.about-page #nstarter-snapshot h1,
+body.about-page #nstarter-snapshot h2,
+body.about-page #nstarter-snapshot h3,
+body.about-page #nstarter-snapshot h4,
+body.about-page #nstarter-snapshot h5,
+body.about-page #nstarter-snapshot h6,
+body.about-page #nstarter-snapshot h1 *,
+body.about-page #nstarter-snapshot h2 *,
+body.about-page #nstarter-snapshot h3 *,
+body.about-page #nstarter-snapshot h4 *,
+body.about-page #nstarter-snapshot h5 *,
+body.about-page #nstarter-snapshot h6 *,
+body.about-page #nstarter-snapshot .identity-number {
+  font-family: var(--font-display) !important;
 }
 
 body.nav-open {

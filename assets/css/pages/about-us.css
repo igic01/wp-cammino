@@ -59,10 +59,15 @@
 
 .about-hero {
   position: relative;
-  min-height: 900px;
-  padding: clamp(10rem, 15vw, 12rem) 0 clamp(6rem, 10vw, 9rem);
+  min-height: 0;
+  padding: clamp(6.75rem, 9vw, 8rem) 0 clamp(2.75rem, 5vw, 4.5rem);
   overflow: hidden;
   background: transparent;
+}
+
+/* Older saved snapshots can still contain this removed source label. */
+.about-hero__copy > .section-label {
+  display: none;
 }
 
 .about-hero__grid {
@@ -90,7 +95,7 @@
 
 .about-hero__visual {
   position: relative;
-  min-height: 590px;
+  min-height: 520px;
 }
 
 .about-hero__image {
@@ -852,9 +857,9 @@
 }
 
 @media (max-width: 760px) {
-  .about-hero { min-height: 0; }
+  .about-hero { padding-block: 6.75rem 3rem; }
   .about-hero h1 { font-size: clamp(3.2rem, 14vw, 4.5rem); }
-  .about-hero__visual { min-height: 500px; }
+  .about-hero__visual { min-height: 460px; }
   .about-hero__image { inset: 2.5rem 0.5rem 2rem; }
   .floating-path--top { right: 0; }
   .floating-path--bottom { left: 0; }
@@ -883,7 +888,8 @@
 }
 
 @media (max-width: 560px) {
-  .about-hero__visual { min-height: 420px; }
+  .about-hero { padding-block: 6.25rem 2.5rem; }
+  .about-hero__visual { min-height: 390px; }
   .about-hero__image { inset: 2.5rem 0 1.5rem; border-width: 5px; }
 
   .floating-path {

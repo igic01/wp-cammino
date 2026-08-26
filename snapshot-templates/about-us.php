@@ -38,7 +38,6 @@ $cammino_asset_url   = NSTARTER_URL . '/assets';
     <section class="about-hero" aria-labelledby="about-title">
       <div class="container about-hero__grid">
         <div class="about-hero__copy" data-about-reveal="left">
-          <p class="section-label"><i class="fa-solid fa-shoe-prints" aria-hidden="true"></i> Kto sme</p>
           <h1 id="about-title">Spoločne kráčame k <em>pozitívnej zmene</em></h1>
           <p>OZ Cammino je občianske združenie, ktoré vytvára priestor pre stretnutia, učenie a osobný rast. Prostredníctvom projektov, workshopov a komunitných aktivít podporujeme rozvoj zručností, solidarity a spolupráce medzi ľuďmi rôzneho veku.</p>
           <p>Našou víziou je spoločnosť, v ktorej majú mladí ľudia príležitosť rozvíjať svoj potenciál, zapájať sa do života komunity a aktívne prispievať k pozitívnej zmene vo svojom okolí.</p>
