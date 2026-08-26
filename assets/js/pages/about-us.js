@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
+    .forEach((element) => element.remove());
+
   const header = document.querySelector("[data-header]");
   const nav = document.querySelector("[data-nav]");
   const navToggle = document.querySelector("[data-nav-toggle]");

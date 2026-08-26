@@ -5,34 +5,9 @@
  * @package Cammino
  */
 
-$cammino_home_url    = home_url( '/' );
-$cammino_current_url = get_permalink( $nstarter_post_id );
-$cammino_asset_url   = NSTARTER_URL . '/assets';
+$cammino_asset_url = NSTARTER_URL . '/assets';
 ?>
   <a class="skip-link" href="#main-content">Preskočiť na obsah</a>
-
-  <header class="site-header" data-header>
-    <div class="container header-inner">
-      <a class="brand" href="<?php echo esc_url( $cammino_home_url ); ?>" aria-label="Cammino – domov">
-        <img src="<?php echo esc_url( $cammino_asset_url . '/logos/long_logo.svg' ); ?>" alt="Cammino" width="1666" height="297">
-      </a>
-
-      <button class="nav-toggle" type="button" aria-label="Otvoriť menu" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
-        <i class="fa-solid fa-bars" aria-hidden="true"></i>
-      </button>
-
-      <nav class="site-nav" id="site-nav" aria-label="Hlavná navigácia" data-nav>
-        <a href="<?php echo esc_url( $cammino_home_url ); ?>">Domov</a>
-        <a class="is-active" href="<?php echo esc_url( $cammino_current_url ); ?>" aria-current="page">O nás</a>
-        <a href="<?php echo esc_url( home_url( '/ss/' ) ); ?>">Príbehy</a>
-        <a href="<?php echo esc_url( home_url( '/news/#events' ) ); ?>">Podujatia</a>
-        <a href="<?php echo esc_url( home_url( '/news/' ) ); ?>">Novinky</a>
-        <a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Kontakt</a>
-        <a class="language-link" href="#" lang="en" aria-label="Switch to English">EN</a>
-        <a class="button button--small button--coral nav-donate" href="<?php echo esc_url( home_url( '/donate/' ) ); ?>">Prispieť <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
-      </nav>
-    </div>
-  </header>
 
   <main id="main-content">
     <section class="about-hero" aria-labelledby="about-title">
@@ -195,47 +170,3 @@ $cammino_asset_url   = NSTARTER_URL . '/assets';
       </div>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <div class="container footer-main">
-      <div class="footer-brand">
-        <a class="brand brand--footer" href="<?php echo esc_url( $cammino_home_url ); ?>" aria-label="Cammino – domov">
-          <img src="<?php echo esc_url( $cammino_asset_url . '/logos/long_logo.svg' ); ?>" alt="Cammino" width="1666" height="297">
-        </a>
-        <p>Pomáhame mladým ľuďom nájsť cestu k vzdelaniu, práci a samostatnej budúcnosti.</p>
-        <div class="social-links" aria-label="Sociálne siete">
-          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
-          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
-          <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
-        </div>
-      </div>
-      <div class="footer-links">
-        <h2>Cammino</h2>
-        <a href="<?php echo esc_url( $cammino_current_url ); ?>">O nás</a>
-        <a href="<?php echo esc_url( home_url( '/ss/' ) ); ?>">Príbehy úspechov</a>
-        <a href="<?php echo esc_url( home_url( '/#events' ) ); ?>">Podujatia</a>
-        <a href="<?php echo esc_url( home_url( '/news/' ) ); ?>">Novinky</a>
-      </div>
-      <div class="footer-links">
-        <h2>Zapojte sa</h2>
-        <a href="<?php echo esc_url( home_url( '/donate/' ) ); ?>">Podporte nás</a>
-        <a href="#">Pre firmy</a>
-        <a href="#">Dobrovoľníctvo</a>
-        <a href="#">Pošlite nám príbeh</a>
-      </div>
-      <div class="footer-contact">
-        <h2>Zostaňme v kontakte</h2>
-        <a href="mailto:management@ozcammino.sk">management@ozcammino.sk</a>
-        <p>Miletičova 7, Bratislava</p>
-        <form class="newsletter" action="#" method="post">
-          <label class="sr-only" for="about-footer-email">Váš e-mail</label>
-          <input id="about-footer-email" type="email" name="email" placeholder="Váš e-mail" required>
-          <button type="submit" aria-label="Prihlásiť sa na odber"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-        </form>
-      </div>
-    </div>
-    <div class="container footer-bottom">
-      <p>© <span data-year></span> Cammino. Každý krok má zmysel.</p>
-      <div><a href="#">Ochrana súkromia</a><a href="#">Cookies</a></div>
-    </div>
-  </footer>
