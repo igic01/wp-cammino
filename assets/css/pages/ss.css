@@ -289,6 +289,7 @@
 .story-photo:first-child:hover figcaption { background: var(--color-apricot); transform: translateY(-7px) rotate(-1deg); }
 
 .success-story__result {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -300,6 +301,20 @@
   color: var(--color-plum);
   background: rgba(255, 253, 249, .8);
   box-shadow: 0 12px 30px rgba(80, 45, 54, .07);
+}
+
+.stories-page:not(.nstarter-editor-preview) .success-story__result,
+.nstarter-editor-preview.nstarter-mode-interaction .success-story__result {
+  cursor: pointer;
+}
+
+.stories-page:not(.nstarter-editor-preview) .story-link-variable > a::after,
+.nstarter-editor-preview.nstarter-mode-interaction .story-link-variable > a::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  content: "";
 }
 
 .success-story__result > span:first-child {
@@ -317,6 +332,7 @@
 .success-story__result p strong { font-family: var(--font-display); font-size: 1.18rem; }
 .story-link-variable { display: inline-flex; }
 .story-link-variable > a { display: inline-flex; align-items: center; gap: .65rem; font-size: .82rem; font-weight: 700; }
+.story-link-variable > a:focus-visible { outline: 3px solid var(--color-coral); outline-offset: 5px; }
 .story-link-variable > a i { transition: transform 350ms ease; }
 .story-link-variable > a:hover i { transform: translateX(7px); }
 
