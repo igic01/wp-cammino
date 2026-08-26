@@ -62,7 +62,9 @@ Card copy and images remain editable through the normal Text and Media modes.
 1. Create or edit a normal WordPress post and use its title, excerpt, featured
    image, categories, and block-editor content as usual. Every post automatically
    uses the shared Cammino single-post design. The same design is also available
-   explicitly as **Cammino Article** in the post's Template selector.
+   explicitly as **Cammino Article** in the post's Template selector. With the
+   default template, only the post's own content is rendered. On an empty post,
+   **Cammino Article** additionally renders the complete reference article body.
 2. To place it under **Podujatia**, make its slug start with `event-` or
    `podujatie-`, for example `event-komunitny-den`. Every other slug places the
    post under **Novinky**.

@@ -19,11 +19,37 @@ $cammino_news_url   = cammino_get_news_page_url();
 $cammino_category   = cammino_get_post_category( $cammino_post_id );
 $cammino_minutes    = cammino_get_reading_minutes( $cammino_post_id );
 $cammino_image      = cammino_get_post_image_url( $cammino_post_id, 'full' );
+$cammino_is_article_template = CAMMINO_ARTICLE_TEMPLATE === get_page_template_slug( $cammino_post_id );
 $cammino_timestamp  = 'event' === $cammino_placement
 	? cammino_get_event_timestamp( $cammino_post_id )
 	: (int) get_post_timestamp( $cammino_post );
-$cammino_type_label = 'event' === $cammino_placement ? 'Podujatie' : 'Článok';
-$cammino_content    = apply_filters( 'the_content', (string) get_post_field( 'post_content', $cammino_post_id ) );
+$cammino_type_label  = 'event' === $cammino_placement ? 'Podujatie' : 'Článok';
+$cammino_sticker     = 'event' === $cammino_placement || ! $cammino_is_article_template
+	? $cammino_type_label
+	: 'Každý talent potrebuje priestor';
+$cammino_raw_content = (string) get_post_field( 'post_content', $cammino_post_id );
+$cammino_deck        = has_excerpt( $cammino_post )
+	? get_the_excerpt( $cammino_post )
+	: ( $cammino_is_article_template ? 'Od prvého neistého návrhu až po vlastnú výstavu v komunitnom centre' : '' );
+$cammino_caption     = '';
+$cammino_thumbnail   = get_post_thumbnail_id( $cammino_post_id );
+
+if ( $cammino_thumbnail ) {
+	$cammino_caption = (string) wp_get_attachment_caption( $cammino_thumbnail );
+}
+
+if ( '' === $cammino_caption && $cammino_is_article_template ) {
+	$cammino_caption = 'Tvorivý workshop v komunitnom centre Cammino';
+}
+
+if (
+	$cammino_is_article_template
+	&& cammino_is_post_content_empty( $cammino_raw_content )
+) {
+	$cammino_raw_content = cammino_get_article_starter_content();
+}
+
+$cammino_content = apply_filters( 'the_content', $cammino_raw_content );
 $cammino_related    = get_posts(
 	array(
 		'post_type'           => 'post',
@@ -59,8 +85,8 @@ $cammino_related    = get_posts(
 					<span class="article-tag"><?php echo esc_html( $cammino_category['name'] ); ?></span>
 				</div>
 				<h1 data-article-reveal="up" data-delay="120"><?php echo cammino_format_display_title( get_the_title( $cammino_post ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
-				<?php if ( has_excerpt( $cammino_post ) ) : ?>
-					<p class="article-deck" data-article-reveal="up" data-delay="180"><?php echo esc_html( get_the_excerpt( $cammino_post ) ); ?></p>
+				<?php if ( '' !== $cammino_deck ) : ?>
+					<p class="article-deck" data-article-reveal="up" data-delay="180"><?php echo esc_html( $cammino_deck ); ?></p>
 				<?php endif; ?>
 				<div class="article-byline" data-article-reveal="up" data-delay="240">
 					<span class="author-avatar" aria-hidden="true"><i class="fa-solid fa-pen-nib"></i></span>
@@ -75,8 +101,11 @@ $cammino_related    = get_posts(
 			<div class="container article-cover" data-article-reveal="scale">
 				<div class="article-cover__frame">
 					<img src="<?php echo esc_url( $cammino_image ); ?>" alt="<?php echo esc_attr( get_the_title( $cammino_post ) ); ?>" width="1600" height="1000">
-					<button class="cover-sticker" type="button" data-cover-sticker><i class="fa-solid <?php echo 'event' === $cammino_placement ? 'fa-calendar-days' : 'fa-star'; ?>" aria-hidden="true"></i> <?php echo esc_html( $cammino_type_label ); ?></button>
+					<button class="cover-sticker" type="button" data-cover-sticker><i class="fa-solid <?php echo 'event' === $cammino_placement ? 'fa-calendar-days' : 'fa-star'; ?>" aria-hidden="true"></i> <?php echo esc_html( $cammino_sticker ); ?></button>
 				</div>
+				<?php if ( '' !== $cammino_caption ) : ?>
+					<p class="image-caption"><?php echo esc_html( $cammino_caption ); ?></p>
+				<?php endif; ?>
 			</div>
 
 			<div class="container article-layout">
@@ -91,8 +120,6 @@ $cammino_related    = get_posts(
 				<div class="article-content" data-article-reveal="up">
 					<?php if ( '' !== trim( wp_strip_all_tags( $cammino_content ) ) ) : ?>
 						<?php echo $cammino_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					<?php else : ?>
-						<p>Obsah pripravujeme.</p>
 					<?php endif; ?>
 				</div>
 			</div>

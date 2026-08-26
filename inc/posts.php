@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 const CAMMINO_EVENT_DATE_META     = '_cammino_event_date';
 const CAMMINO_EVENT_LOCATION_META = '_cammino_event_location';
 const CAMMINO_EVENT_STATUS_META   = '_cammino_event_status';
+const CAMMINO_ARTICLE_TEMPLATE    = 'templates/single-post.php';
 
 /**
  * Return the supported Cammino post destinations.
@@ -226,6 +227,104 @@ function cammino_get_reading_minutes( int $post_id ): int {
 	$words   = preg_match_all( '/[\p{L}\p{N}]+/u', $text, $matches );
 
 	return max( 1, (int) ceil( ( false === $words ? 0 : $words ) / 200 ) );
+}
+
+/**
+ * Return the editable Gutenberg starter body from the Article reference design.
+ */
+function cammino_get_article_starter_content(): string {
+	$placeholder = esc_url( NSTARTER_URL . '/assets/images/placeholder.webp' );
+
+	return sprintf(
+		<<<'HTML'
+<!-- wp:paragraph {"className":"article-lead"} -->
+<p class="article-lead">Keď Nina prvýkrát prišla na tvorivý workshop Cammina, mala skicár plný nápadov, no chýbala jej odvaha ukázať ich ostatným. O niekoľko mesiacov neskôr stála pred návštevníkmi svojej prvej komunitnej výstavy.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Prvý krok bez istoty</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Nina kreslila odmalička. Svoje ilustrácie si však nechávala pre seba, pretože mala pocit, že nie sú dosť dobré. Na workshop ju priviedla kamarátka a prvé stretnutie strávila najmä tichým pozorovaním.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Mentorka si všimla jej skicár a namiesto hodnotenia sa začala pýtať. Čo chce Nina svojimi obrazmi povedať? Ktoré farby jej pripomínajú domov? A čo by vytvorila, keby sa nebála chyby?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class="wp-block-quote"><p>Nikto mi nepovedal, čo mám nakresliť. Prvýkrát sa ma niekto opýtal, čo chcem povedať ja</p><cite>Nina, účastníčka programu</cite></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Priestor skúšať a rásť</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Počas nasledujúcich týždňov Nina pracovala na malej sérii ilustrácií o miestach, kde sa cíti bezpečne. Každý nový návrh konzultovala s mentorkou aj skupinou. Učila sa prijímať spätnú väzbu a zároveň dôverovať vlastnému pohľadu.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Program jej priniesol tri veci, ktoré predtým chýbali:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"className":"article-list"} -->
+<ul class="wp-block-list article-list"><!-- wp:list-item -->
+<li>pravidelnú a rešpektujúcu spätnú väzbu</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>praktickú pomoc s prípravou portfólia</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>komunitu, pred ktorou mohla tvoriť bez strachu</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none","className":"article-inline-image"} -->
+<figure class="wp-block-image size-large article-inline-image"><img src="%s" alt="Výber ilustrácií pripravených na výstavu"/><figcaption class="wp-element-caption">Prípravy na prvú výstavu boli spoločným dielom celej skupiny</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Od skicára k výstave</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Nápad na výstavu vznikol nenápadne. Skupina chcela na konci programu ukázať, na čom pracovala, a Nina súhlasila, že vystaví tri práce. Nakoniec ich priniesla dvanásť a sama pomohla pripraviť celý priestor.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Dnes pokračuje v tvorbe, pripravuje si portfólio na umeleckú školu a občas pomáha novým účastníkom prekonať prvú neistotu. Jej cesta sa nezačala veľkým rozhodnutím. Začala sa jedným bezpečným miestom a ľuďmi, ktorí jej dali čas.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group {"className":"article-closing","layout":{"type":"flex","flexWrap":"nowrap"}} -->
+<div class="wp-block-group article-closing"><!-- wp:paragraph {"className":"article-closing__icon"} -->
+<p class="article-closing__icon"><i class="fa-solid fa-shoe-prints" aria-hidden="true"></i></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Aj malý krok môže odkryť talent, ktorý bol celý čas na dosah</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+HTML,
+		$placeholder
+	);
+}
+
+/**
+ * Determine whether a post body contains meaningful editor content.
+ */
+function cammino_is_post_content_empty( string $content ): bool {
+	$content_without_comments = preg_replace( '/<!--.*?-->/s', '', $content );
+	$text                     = trim( wp_strip_all_tags( (string) $content_without_comments ) );
+
+	if ( '' !== $text ) {
+		return false;
+	}
+
+	return ! preg_match( '/<(?:img|video|audio|iframe|embed|figure|table|form)\b/i', (string) $content_without_comments );
 }
 
 /**
@@ -450,7 +549,7 @@ add_filter( 'template_include', 'cammino_use_single_post_template', 99 );
  */
 function cammino_use_single_post_template( string $template ): string {
 	if ( cammino_is_managed_post_request() ) {
-		$cammino_template = NSTARTER_PATH . '/templates/single-post.php';
+		$cammino_template = NSTARTER_PATH . '/' . CAMMINO_ARTICLE_TEMPLATE;
 		if ( is_file( $cammino_template ) ) {
 			return $cammino_template;
 		}
