@@ -9,9 +9,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.2.1' );
+define( 'NSTARTER_VERSION', '1.2.2' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
+
+/**
+ * Resolve a file from the actual parent theme without ever pointing back to
+ * this child theme. Direct get_template_directory() forwarding can recurse on
+ * hosts where the parent relationship was not resolved as expected.
+ */
+function nstarter_get_parent_theme_file( string $relative_path ): string {
+	if ( ! function_exists( 'wp_get_theme' ) ) {
+		return '';
+	}
+
+	$relative_path = ltrim( str_replace( '\\', '/', $relative_path ), '/' );
+
+	if ( '' === $relative_path || false !== strpos( $relative_path, '..' ) ) {
+		return '';
+	}
+
+	$parent = wp_get_theme()->parent();
+
+	if ( ! $parent instanceof WP_Theme || ! $parent->exists() ) {
+		return '';
+	}
+
+	$file = trailingslashit( $parent->get_stylesheet_directory() ) . $relative_path;
+
+	return is_file( $file ) ? $file : '';
+}
 
 require_once NSTARTER_PATH . '/inc/snapshots.php';
 require_once NSTARTER_PATH . '/inc/live-sections.php';

@@ -9,4 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require get_template_directory() . '/footer.php';
+$parent_footer = nstarter_get_parent_theme_file( 'footer.php' );
+
+if ( '' !== $parent_footer ) {
+	require $parent_footer;
+	return;
+}
+
+// Emergency fallback: close the document even when Astra is unavailable.
+require NSTARTER_PATH . '/footer-nstarter.php';

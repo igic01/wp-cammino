@@ -110,9 +110,9 @@ function nstarter_use_visual_page_wrapper( $template ): string {
 	}
 
 	if ( '' === $template ) {
-		$parent_fallback = get_template_directory() . ( is_page() ? '/page.php' : '/index.php' );
+		$parent_fallback = nstarter_get_parent_theme_file( is_page() ? 'page.php' : 'index.php' );
 
-		if ( is_file( $parent_fallback ) ) {
+		if ( '' !== $parent_fallback ) {
 			return $parent_fallback;
 		}
 	}

@@ -9,7 +9,9 @@ Cammino Preview is an Astra child theme that adds opt-in PHP source templates an
 3. Existing pages continue using Astra. The child stylesheet and Cammino assets are loaded only for pages explicitly assigned an NStarter snapshot template.
 4. On first activation, existing Astra theme modifications (including menu locations and standard Customizer theme mods) are copied into the child-theme option. The original Astra settings are not changed.
 
-The Cammino snapshot document uses `header-nstarter.php` and `footer-nstarter.php`. For maximum hosting compatibility, the child theme's default `header.php`, `footer.php`, `page.php`, and `index.php` are explicit pass-through files that load the matching Astra parent templates. They contain no replacement layout.
+The Cammino snapshot document uses `header-nstarter.php` and `footer-nstarter.php`. For maximum hosting compatibility, the child theme's default `header.php`, `footer.php`, `page.php`, and `index.php` resolve the installed parent through WordPress and load the matching Astra template only after validating it. If WordPress cannot resolve Astra, they render a minimal emergency fallback instead of recursively including the child file or causing a fatal error.
+
+If activation ever produces a WordPress critical-error screen, immediately reactivate **Astra**. That rollback does not remove or alter Elementor page content. Check the server PHP error log before trying the child theme again.
 
 ## Set up a page
 
