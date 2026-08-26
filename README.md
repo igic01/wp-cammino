@@ -81,6 +81,28 @@ For a text value, use `'type' => 'text'` and `'control' => 'text'`, then mark on
 
 The included **Variable Card Playground** is a complete working example. Regenerating the page intentionally resets its variables and card edits to the PHP source defaults.
 
+## Cammino static designs
+
+The nine permanent source documents in `snapshot-sources/cammino/` are available as native snapshot designs with a **Cammino —** prefix. Their page assets live in `assets/cammino/`; CSS and JavaScript are loaded only when the matching design is selected. Relative asset URLs and `.html` links are resolved to theme assets and WordPress pages when the clean snapshot is rendered. Nothing in the snapshot implementation depends on the temporary prototype directory.
+
+The repeated site shell lives in `snapshot-parts/cammino-header.php` and `snapshot-parts/cammino-footer.php`. The active navigation item, optional header modifier, footer anchor, contact email/address, and unique newsletter field ID are passed as PHP variables by `inc/cammino-snapshots.php`.
+
+Repeated editorial collections are exposed through the visual editor's purple variable control:
+
+| Design | Variable collections |
+| --- | --- |
+| Domov | Support cards, upcoming event rows |
+| O nás | Values, contact people |
+| Príbehy úspechov | Success stories |
+| Novinky | Active events, article cards |
+| Článok | Related article cards |
+| Kontakt | Contact people |
+| Možnosti podpory | Donation option cards |
+| Detail podpory | Related donation cards |
+| Podporte nás | No genuinely repeatable editorial section; form controls remain fixed for JavaScript behavior |
+
+Each collection keeps its existing items editable, supports a count of `0`, and contains a reusable `<template>` for newly added items. Regenerating resets the snapshot to the current permanent source in `snapshot-sources/cammino/`.
+
 ## Add a live section
 
 First register its runtime renderer from the theme, a child theme, or a plugin:
@@ -110,6 +132,11 @@ Then place its marker in a source template:
 The editor displays the fresh runtime output with a visible **LIVE SECTION · LOCKED** boundary in Text and Media modes. Before saving, JavaScript removes the runtime output from the snapshot and retains only the marker. PHP expands that marker again on every page request.
 
 ## Main files
+
+- `inc/cammino-snapshots.php` — Cammino page map, static importer, asset loading, link resolution and repeat-variable adapter.
+- `snapshot-parts/cammino-header.php` / `cammino-footer.php` — shared Cammino site shell.
+- `snapshot-sources/cammino/` — permanent source HTML used when a Cammino snapshot is first rendered or regenerated.
+- `assets/cammino/` — permanent Cammino styles, scripts, fonts, images and logos.
 
 - `snapshot-templates/media-playground.php` — image/video feature test template.
 - `snapshot-templates/variable-card-playground.php` — variable card-count test template.

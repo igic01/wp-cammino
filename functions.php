@@ -16,6 +16,7 @@ define( 'NSTARTER_URL', get_template_directory_uri() );
 require_once NSTARTER_PATH . '/inc/snapshots.php';
 require_once NSTARTER_PATH . '/inc/live-sections.php';
 require_once NSTARTER_PATH . '/inc/variable-sections.php';
+require_once NSTARTER_PATH . '/inc/cammino-snapshots.php';
 require_once NSTARTER_PATH . '/inc/editor.php';
 
 add_action( 'after_setup_theme', 'nstarter_setup' );

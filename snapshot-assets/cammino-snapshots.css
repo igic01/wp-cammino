@@ -1,0 +1,16 @@
+/* Small snapshot-only states layered over the imported Cammino design. */
+.nstarter-variable-empty {
+  display: none;
+  grid-column: 1 / -1;
+  width: 100%;
+  padding: 2rem;
+  border: 2px dashed rgba(100, 54, 75, 0.25);
+  border-radius: 1.25rem;
+  color: var(--color-plum);
+  background: rgba(255, 253, 249, 0.72);
+  text-align: center;
+}
+
+[data-nstarter-variable-section][data-nstarter-variable-value="0"] > .nstarter-variable-empty {
+  display: block;
+}

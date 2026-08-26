@@ -18,11 +18,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param string              $id     Stable variable-section ID.
  * @param array<string,mixed> $config Variable configuration.
  */
-function nstarter_variable_section_attributes( string $id, array $config = array() ): void {
+function nstarter_get_variable_section_attributes( string $id, array $config = array() ): string {
 	$id = sanitize_key( $id );
 
 	if ( '' === $id ) {
-		return;
+		return '';
 	}
 
 	$type    = isset( $config['type'] ) && 'text' === $config['type'] ? 'text' : 'number';
@@ -45,7 +45,21 @@ function nstarter_variable_section_attributes( string $id, array $config = array
 		}
 	}
 
+	$html = '';
+
 	foreach ( $attributes as $name => $attribute_value ) {
-		echo ' ' . esc_attr( $name ) . '="' . esc_attr( $attribute_value ) . '"';
+		$html .= ' ' . esc_attr( $name ) . '="' . esc_attr( $attribute_value ) . '"';
 	}
+
+	return $html;
+}
+
+/**
+ * Print the data attributes that define one editable section variable.
+ *
+ * @param string              $id     Stable variable-section ID.
+ * @param array<string,mixed> $config Variable configuration.
+ */
+function nstarter_variable_section_attributes( string $id, array $config = array() ): void {
+	echo nstarter_get_variable_section_attributes( $id, $config ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
