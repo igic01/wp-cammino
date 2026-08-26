@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.3.4' );
+define( 'NSTARTER_VERSION', '1.4.0' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -92,6 +92,24 @@ function cammino_enqueue_visual_page_assets(): void {
 			'style'  => '/assets/css/pages/news.css',
 			'script' => '/assets/js/pages/news.js',
 		),
+		'donate'   => array(
+			'handle' => 'cammino-donate',
+			'style'  => '/assets/css/pages/donate.css',
+			'script' => '/assets/js/pages/donate.js',
+		),
+		'donate-us' => array(
+			'handle' => 'cammino-donate-us',
+			'style'  => '/assets/css/pages/donate-us.css',
+			'script' => '/assets/js/pages/donate-us.js',
+		),
+		'donate-detail' => array(
+			'handle'        => 'cammino-donate-detail',
+			'style'         => '/assets/css/pages/donate-detail.css',
+			'script'        => '/assets/js/pages/donate-detail.js',
+			'before_styles' => array(
+				'cammino-donate-article' => '/assets/css/pages/article.css',
+			),
+		),
 	);
 
 	if ( ! isset( $pages[ $slug ] ) ) {
@@ -110,7 +128,12 @@ function cammino_enqueue_visual_page_assets(): void {
 		}
 	}
 
-	cammino_enqueue_design_assets( $page['handle'], $page['style'], $page['script'] );
+	cammino_enqueue_design_assets(
+		$page['handle'],
+		$page['style'],
+		$page['script'],
+		$page['before_styles'] ?? array()
+	);
 
 	if ( nstarter_is_preview_request() ) {
 		wp_enqueue_style(
@@ -125,7 +148,7 @@ function cammino_enqueue_visual_page_assets(): void {
 /**
  * Enqueue the shared design system and one page-specific asset pair.
  */
-function cammino_enqueue_design_assets( string $handle, string $style, string $script ): void {
+function cammino_enqueue_design_assets( string $handle, string $style, string $script, array $before_styles = array() ): void {
 	wp_enqueue_style(
 		'cammino-font-awesome',
 		'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css',
@@ -140,12 +163,19 @@ function cammino_enqueue_design_assets( string $handle, string $style, string $s
 		NSTARTER_VERSION
 	);
 
-	wp_enqueue_style(
-		$handle,
-		NSTARTER_URL . $style,
-		array( 'cammino-base' ),
-		NSTARTER_VERSION
-	);
+	$style_dependencies = array( 'cammino-base' );
+
+	foreach ( $before_styles as $before_handle => $before_style ) {
+		wp_enqueue_style(
+			$before_handle,
+			NSTARTER_URL . $before_style,
+			$style_dependencies,
+			NSTARTER_VERSION
+		);
+		$style_dependencies = array( $before_handle );
+	}
+
+	wp_enqueue_style( $handle, NSTARTER_URL . $style, $style_dependencies, NSTARTER_VERSION );
 
 	wp_enqueue_script(
 		$handle,
@@ -218,15 +248,18 @@ function cammino_visual_page_body_classes( array $classes ): array {
 	if ( is_page() ) {
 		$slug         = nstarter_get_native_source_template_slug( get_queried_object_id() );
 		$page_classes = array(
-			'about-us' => 'about-page',
-			'contact'  => 'contact-page',
-			'ss'       => 'stories-page',
-			'news'     => 'news-page',
+			'about-us'      => array( 'about-page' ),
+			'contact'       => array( 'contact-page' ),
+			'ss'            => array( 'stories-page' ),
+			'news'          => array( 'news-page' ),
+			'donate'        => array( 'donation-page' ),
+			'donate-us'     => array( 'donate-us-page' ),
+			'donate-detail' => array( 'article-page', 'donate-detail-page' ),
 		);
 
 		if ( isset( $page_classes[ $slug ] ) ) {
 			$classes[] = 'cammino-visual-page';
-			$classes[] = $page_classes[ $slug ];
+			$classes   = array_merge( $classes, $page_classes[ $slug ] );
 		}
 	}
 

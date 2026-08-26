@@ -24,6 +24,9 @@ shared single-post design for Cammino articles and events.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
 - `snapshot-templates/ss.php` is the variable-card source for Príbehy úspechov.
 - `snapshot-templates/news.php` is the editable shell around live post listings.
+- `snapshot-templates/donate.php` provides the editable donation-options page.
+- `snapshot-templates/donate-us.php` provides the unrestricted-donation page.
+- `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
 - `inc/posts.php` derives Article/Event placement from the post slug and stores
   optional event details.
 - `templates/single-post.php` renders both classified post types identically.
@@ -75,6 +78,9 @@ Card copy and images remain editable through the normal Text and Media modes.
 
 The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.
+
+The donation forms are interactive design previews only. They do not collect,
+transmit, or process payments until a payment provider is integrated separately.
 
 Avoid adding `header.php`, `footer.php`, `page.php`, or other parent-template
 overrides unless a future feature intentionally needs to replace Astra behavior.

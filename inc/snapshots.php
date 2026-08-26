@@ -45,6 +45,26 @@ function nstarter_get_source_template_path( string $slug ): string {
 }
 
 /**
+ * Resolve the published page assigned to a visual source template.
+ */
+function nstarter_get_source_page_url( string $slug, string $fallback_path = '/' ): string {
+	$pages = get_posts(
+		array(
+			'post_type'      => 'page',
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'meta_key'       => '_wp_page_template',
+			'meta_value'     => nstarter_get_source_template_path( $slug ),
+		)
+	);
+
+	return ! empty( $pages )
+		? (string) get_permalink( (int) $pages[0] )
+		: (string) home_url( '/' . ltrim( $fallback_path, '/' ) );
+}
+
+/**
  * Get the Cammino source slug selected in WordPress's Template setting.
  */
 function nstarter_get_native_source_template_slug( int $post_id ): string {
