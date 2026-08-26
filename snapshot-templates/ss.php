@@ -91,13 +91,12 @@ $cammino_stories     = array(
 		<div class="stories-items" data-nstarter-variable-items>
 			<?php foreach ( $cammino_stories as $cammino_story_offset => $cammino_story ) : ?>
 				<?php $cammino_story_index = $cammino_story_offset + 1; ?>
-				<section class="success-story" id="story-<?php echo esc_attr( (string) $cammino_story_index ); ?>" aria-labelledby="story-<?php echo esc_attr( (string) $cammino_story_index ); ?>-title" data-nstarter-variable-item>
+				<section class="success-story" id="story-<?php echo esc_attr( (string) $cammino_story_index ); ?>" aria-labelledby="story-<?php echo esc_attr( (string) $cammino_story_index ); ?>-title" data-story-nav-label="<?php echo esc_attr( $cammino_story['label'] ); ?>" data-nstarter-variable-item>
 					<div class="container">
 						<header class="success-story__header" data-story-reveal="up">
 							<div class="success-story__meta">
 								<span class="story-index"><?php echo esc_html( str_pad( (string) $cammino_story_index, 2, '0', STR_PAD_LEFT ) ); ?></span>
 								<time datetime="<?php echo esc_attr( $cammino_story['datetime'] ); ?>"><?php echo esc_html( $cammino_story['date'] ); ?></time>
-								<span data-story-nav-label><?php echo esc_html( $cammino_story['label'] ); ?></span>
 							</div>
 							<div class="success-story__intro">
 								<h2 id="story-<?php echo esc_attr( (string) $cammino_story_index ); ?>-title"><?php echo wp_kses( $cammino_story['title'], array( 'em' => array() ) ); ?></h2>
@@ -158,13 +157,12 @@ $cammino_stories     = array(
 		</div>
 
 		<template data-nstarter-variable-template>
-			<section class="success-story" id="story-{{story}}" aria-labelledby="story-{{story}}-title" data-nstarter-variable-item>
+			<section class="success-story" id="story-{{story}}" aria-labelledby="story-{{story}}-title" data-story-nav-label="Nový príbeh {{story}}" data-nstarter-variable-item>
 				<div class="container">
 					<header class="success-story__header" data-story-reveal="up">
 						<div class="success-story__meta">
 							<span class="story-index">{{story_padded}}</span>
 							<time datetime="2026-01-01">1. január 2026</time>
-							<span data-story-nav-label>Nový príbeh {{story}}</span>
 						</div>
 						<div class="success-story__intro">
 							<h2 id="story-{{story}}-title">Napíšte názov nového <em>príbehu</em></h2>

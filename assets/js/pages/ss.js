@@ -8,6 +8,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
     .forEach((element) => element.remove());
 
+  // Move legacy visible navigation labels onto their story sections.
+  document.querySelectorAll(".success-story [data-story-nav-label]").forEach((label) => {
+    const story = label.closest(".success-story");
+    if (story && !story.dataset.storyNavLabel) {
+      story.dataset.storyNavLabel = label.textContent.trim();
+    }
+    label.remove();
+  });
+
   // Older saved snapshots kept the URL variable on the small link wrapper.
   // Promote it to the result panel so the editor outline matches the click area.
   document.querySelectorAll(".success-story__result > .story-link-variable[data-nstarter-variable-section]")
@@ -71,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const sections = storySections();
     sections.forEach((section, offset) => {
       if (!section.id) section.id = `story-${offset + 1}`;
-      const label = section.querySelector("[data-story-nav-label]")?.textContent.trim() || `Príbeh ${offset + 1}`;
+      const label = section.dataset.storyNavLabel || `Príbeh ${offset + 1}`;
       const link = document.createElement("a");
       const number = document.createElement("span");
 
@@ -108,9 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
 
-        if (mutation.type === "characterData" && mutation.target.parentElement?.closest("[data-story-nav-label]")) {
-          navigationChanged = true;
-        }
       });
 
       if (navigationChanged) rebuildStoryNavigation();
