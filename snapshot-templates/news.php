@@ -42,7 +42,7 @@
 				<form class="subscribe-form" action="#" method="post" data-newsletter-placeholder>
 					<label class="sr-only" for="cammino-subscribe-email">Váš e-mail</label>
 					<input id="cammino-subscribe-email" type="email" name="email" placeholder="vas@email.sk" required>
-					<button class="button button--cream" type="submit">Chcem novinky <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+					<button class="button button--cream" type="submit" aria-label="Prihlásiť sa na odber"><span>Chcem novinky</span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
 					<span class="newsletter-status" role="status" data-newsletter-status></span>
 				</form>
 			</div>
