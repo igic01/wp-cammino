@@ -94,24 +94,25 @@ body {
 }
 
 /* Keep Elementor/global theme typography from replacing Cammino's local fonts. */
-body.about-page,
-body.about-page #nstarter-snapshot {
+body.cammino-visual-page,
+body.cammino-visual-page #nstarter-snapshot {
   font-family: var(--font-body) !important;
 }
 
-body.about-page #nstarter-snapshot h1,
-body.about-page #nstarter-snapshot h2,
-body.about-page #nstarter-snapshot h3,
-body.about-page #nstarter-snapshot h4,
-body.about-page #nstarter-snapshot h5,
-body.about-page #nstarter-snapshot h6,
-body.about-page #nstarter-snapshot h1 *,
-body.about-page #nstarter-snapshot h2 *,
-body.about-page #nstarter-snapshot h3 *,
-body.about-page #nstarter-snapshot h4 *,
-body.about-page #nstarter-snapshot h5 *,
-body.about-page #nstarter-snapshot h6 *,
-body.about-page #nstarter-snapshot .identity-number {
+body.cammino-visual-page #nstarter-snapshot h1,
+body.cammino-visual-page #nstarter-snapshot h2,
+body.cammino-visual-page #nstarter-snapshot h3,
+body.cammino-visual-page #nstarter-snapshot h4,
+body.cammino-visual-page #nstarter-snapshot h5,
+body.cammino-visual-page #nstarter-snapshot h6,
+body.cammino-visual-page #nstarter-snapshot h1 *,
+body.cammino-visual-page #nstarter-snapshot h2 *,
+body.cammino-visual-page #nstarter-snapshot h3 *,
+body.cammino-visual-page #nstarter-snapshot h4 *,
+body.cammino-visual-page #nstarter-snapshot h5 *,
+body.cammino-visual-page #nstarter-snapshot h6 *,
+body.cammino-visual-page #nstarter-snapshot .identity-number,
+body.cammino-visual-page #nstarter-snapshot .detail-number {
   font-family: var(--font-display) !important;
 }
 

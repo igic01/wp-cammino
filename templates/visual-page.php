@@ -31,7 +31,7 @@ if ( '' === trim( $nstarter_html ) ) {
 <body <?php body_class(); ?>>
 	<?php wp_body_open(); ?>
 	<div id="nstarter-snapshot" data-nstarter-snapshot-root>
-		<?php echo $nstarter_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?php echo nstarter_expand_live_sections( $nstarter_html, $nstarter_post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
 	<?php wp_footer(); ?>
 </body>
