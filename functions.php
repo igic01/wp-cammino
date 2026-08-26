@@ -9,12 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.1.1' );
+define( 'NSTARTER_VERSION', '1.2.0' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
 require_once NSTARTER_PATH . '/inc/snapshots.php';
 require_once NSTARTER_PATH . '/inc/live-sections.php';
+require_once NSTARTER_PATH . '/inc/variable-sections.php';
 require_once NSTARTER_PATH . '/inc/editor.php';
 
 add_action( 'init', 'cammino_register_live_sections' );
@@ -76,6 +77,11 @@ function cammino_enqueue_visual_page_assets(): void {
 			'handle' => 'cammino-contact',
 			'style'  => '/assets/css/pages/contact.css',
 			'script' => '/assets/js/pages/contact.js',
+		),
+		'ss'       => array(
+			'handle' => 'cammino-success-stories',
+			'style'  => '/assets/css/pages/ss.css',
+			'script' => '/assets/js/pages/ss.js',
 		),
 	);
 
@@ -175,11 +181,16 @@ add_filter( 'body_class', 'cammino_visual_page_body_classes' );
  */
 function cammino_visual_page_body_classes( array $classes ): array {
 	if ( is_page() ) {
-		$slug = nstarter_get_native_source_template_slug( get_queried_object_id() );
+		$slug         = nstarter_get_native_source_template_slug( get_queried_object_id() );
+		$page_classes = array(
+			'about-us' => 'about-page',
+			'contact'  => 'contact-page',
+			'ss'       => 'stories-page',
+		);
 
-		if ( in_array( $slug, array( 'about-us', 'contact' ), true ) ) {
+		if ( isset( $page_classes[ $slug ] ) ) {
 			$classes[] = 'cammino-visual-page';
-			$classes[] = 'about-us' === $slug ? 'about-page' : 'contact-page';
+			$classes[] = $page_classes[ $slug ];
 		}
 	}
 

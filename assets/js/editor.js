@@ -283,15 +283,27 @@
         }
     }
 
-    function replaceTemplateTokens(html, index) {
+    function escapeRegExp(value) {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function replaceTemplateTokens(html, index, section) {
+        const token = section.dataset.nstarterVariableToken || 'index';
+        const escapedToken = escapeRegExp(token);
+
         return html
-            .replace(/\{\{index_padded\}\}/g, String(index).padStart(2, '0'))
-            .replace(/\{\{index\}\}/g, String(index));
+            .replace(new RegExp('\\{\\{' + escapedToken + '_padded\\}\\}', 'g'), String(index).padStart(2, '0'))
+            .replace(new RegExp('\\{\\{' + escapedToken + '\\}\\}', 'g'), String(index));
     }
 
     function resizeRepeatSection(section, nextCount) {
-        const container = section.querySelector('[data-nstarter-variable-items]');
-        const template = section.querySelector('template[data-nstarter-variable-template]');
+        const ownsVariableElement = function (element) {
+            return element.closest('[data-nstarter-variable-section]') === section;
+        };
+        const container = Array.from(section.querySelectorAll('[data-nstarter-variable-items]'))
+            .find(ownsVariableElement);
+        const template = Array.from(section.querySelectorAll('template[data-nstarter-variable-template]'))
+            .find(ownsVariableElement);
 
         if (!container) {
             return false;
@@ -319,7 +331,7 @@
 
             for (let index = currentCount + 1; index <= nextCount; index += 1) {
                 const itemTemplate = section.ownerDocument.createElement('template');
-                itemTemplate.innerHTML = replaceTemplateTokens(template.innerHTML, index);
+                itemTemplate.innerHTML = replaceTemplateTokens(template.innerHTML, index, section);
                 container.appendChild(itemTemplate.content.cloneNode(true));
             }
         }
@@ -370,6 +382,16 @@
                 return;
             }
             outputs.forEach(function (output) {
+                const attribute = output.dataset.nstarterVariableOutputAttribute;
+                if (attribute === 'href') {
+                    const href = String(value).trim();
+                    const unsafeProtocol = /^[a-z][a-z\d+.-]*:/i.test(href)
+                        && !/^(https?:|mailto:|tel:)/i.test(href);
+                    value = unsafeProtocol ? '#' : href;
+                    output.setAttribute('href', value);
+                    return;
+                }
+
                 output.textContent = String(value);
             });
         }
