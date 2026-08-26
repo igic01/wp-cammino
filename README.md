@@ -4,7 +4,8 @@ This repository contains a minimal child theme for [Astra](https://wpastra.com/)
 It deliberately relies on Astra's normal template hierarchy, so existing Astra
 and Elementor pages continue to work unchanged while new Cammino features are
 built incrementally. The opt-in custom pages currently include the editable
-**O nás**, **Kontakt**, and **Príbehy úspechov** designs.
+**O nás**, **Kontakt**, **Príbehy úspechov**, and **Novinky** designs, plus a
+shared single-post design for Cammino articles and events.
 
 ## Requirements
 
@@ -22,6 +23,9 @@ built incrementally. The opt-in custom pages currently include the editable
 - `snapshot-templates/about-us.php` is the clean PHP source for the O nás page.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
 - `snapshot-templates/ss.php` is the variable-card source for Príbehy úspechov.
+- `snapshot-templates/news.php` is the editable shell around live post listings.
+- `inc/posts.php` adds Article/Event placement and event details to normal posts.
+- `templates/single-post.php` renders both classified post types identically.
 - `inc/` and `assets/js/editor.js` provide the copied visual snapshot editor.
 - `assets/fonts/` contains the Fredoka and Varela Round families used by custom
   Cammino pages.
@@ -32,7 +36,8 @@ built incrementally. The opt-in custom pages currently include the editable
 
 1. Create or edit a WordPress page.
 2. In the page **Template** selector, choose **Cammino — O nás**,
-   **Cammino — Kontakt**, or **Cammino — Príbehy úspechov**, then save.
+   **Cammino — Kontakt**, **Cammino — Príbehy úspechov**, or
+   **Cammino — Novinky**, then save.
 3. Use the **Cammino visual editor** meta box or the **Visual editor** admin-bar
    link to open the editor.
 4. Edit text in Text mode, replace images or videos in Media mode, and press
@@ -50,6 +55,19 @@ The Príbehy úspechov template uses nested visual-editor variables. The outer
 control sets the number of story cards. Every card has its own 0–4 photo control
 and a text control that writes the destination of its **Celý príbeh** link.
 Card copy and images remain editable through the normal Text and Media modes.
+
+## Publish an article or event
+
+1. Create or edit a normal WordPress post and use its title, excerpt, featured
+   image, categories, and block-editor content as usual.
+2. In **Umiestnenie v Cammino**, choose **Článok** or **Podujatie**. Choosing
+   neither leaves the post on Astra and excludes it from the Cammino listing.
+3. For an event, optionally set its date/time, location, and status label.
+4. Publish the post. Articles appear under Novinky; events appear under
+   Podujatia. Both open through the same Cammino single-post design.
+
+The newsletter card is currently a visual placeholder and intentionally reports
+that no mailing-list integration is connected yet.
 
 Avoid adding `header.php`, `footer.php`, `page.php`, or other parent-template
 overrides unless a future feature intentionally needs to replace Astra behavior.

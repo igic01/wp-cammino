@@ -9,13 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.2.4' );
+define( 'NSTARTER_VERSION', '1.3.0' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
 require_once NSTARTER_PATH . '/inc/snapshots.php';
 require_once NSTARTER_PATH . '/inc/live-sections.php';
 require_once NSTARTER_PATH . '/inc/variable-sections.php';
+require_once NSTARTER_PATH . '/inc/posts.php';
 require_once NSTARTER_PATH . '/inc/editor.php';
 
 add_action( 'init', 'cammino_register_live_sections' );
@@ -34,6 +35,9 @@ function cammino_register_live_sections(): void {
 			return (string) do_shortcode( '[contact-form-7 id="d43ca6f" title="Kontaktný formulár 1"]' );
 		}
 	);
+
+	nstarter_register_live_section( 'cammino_news_events', 'cammino_render_news_events' );
+	nstarter_register_live_section( 'cammino_news_articles', 'cammino_render_news_articles' );
 }
 
 add_action( 'wp_enqueue_scripts', 'cammino_enqueue_child_styles', 15 );
@@ -42,7 +46,7 @@ add_action( 'wp_enqueue_scripts', 'cammino_enqueue_child_styles', 15 );
  * Load shared child-theme CSS on ordinary Astra pages.
  */
 function cammino_enqueue_child_styles(): void {
-	if ( is_page() && nstarter_is_visual_page( get_queried_object_id() ) ) {
+	if ( ( is_page() && nstarter_is_visual_page( get_queried_object_id() ) ) || cammino_is_managed_post_request() ) {
 		return;
 	}
 
@@ -83,6 +87,11 @@ function cammino_enqueue_visual_page_assets(): void {
 			'style'  => '/assets/css/pages/ss.css',
 			'script' => '/assets/js/pages/ss.js',
 		),
+		'news'     => array(
+			'handle' => 'cammino-news',
+			'style'  => '/assets/css/pages/news.css',
+			'script' => '/assets/js/pages/news.js',
+		),
 	);
 
 	if ( ! isset( $pages[ $slug ] ) ) {
@@ -101,6 +110,22 @@ function cammino_enqueue_visual_page_assets(): void {
 		}
 	}
 
+	cammino_enqueue_design_assets( $page['handle'], $page['style'], $page['script'] );
+
+	if ( nstarter_is_preview_request() ) {
+		wp_enqueue_style(
+			'cammino-editor-preview',
+			NSTARTER_URL . '/assets/css/editor-preview.css',
+			array( $page['handle'] ),
+			NSTARTER_VERSION
+		);
+	}
+}
+
+/**
+ * Enqueue the shared design system and one page-specific asset pair.
+ */
+function cammino_enqueue_design_assets( string $handle, string $style, string $script ): void {
 	wp_enqueue_style(
 		'cammino-font-awesome',
 		'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css',
@@ -116,28 +141,36 @@ function cammino_enqueue_visual_page_assets(): void {
 	);
 
 	wp_enqueue_style(
-		$page['handle'],
-		NSTARTER_URL . $page['style'],
+		$handle,
+		NSTARTER_URL . $style,
 		array( 'cammino-base' ),
 		NSTARTER_VERSION
 	);
 
 	wp_enqueue_script(
-		$page['handle'],
-		NSTARTER_URL . $page['script'],
+		$handle,
+		NSTARTER_URL . $script,
 		array(),
 		NSTARTER_VERSION,
 		true
 	);
+}
 
-	if ( nstarter_is_preview_request() ) {
-		wp_enqueue_style(
-			'cammino-editor-preview',
-			NSTARTER_URL . '/assets/css/editor-preview.css',
-			array( $page['handle'] ),
-			NSTARTER_VERSION
-		);
+add_action( 'wp_enqueue_scripts', 'cammino_enqueue_single_post_assets', 1000 );
+
+/**
+ * Load the shared Article/Event design only for classified posts.
+ */
+function cammino_enqueue_single_post_assets(): void {
+	if ( ! cammino_is_managed_post_request() ) {
+		return;
 	}
+
+	cammino_enqueue_design_assets(
+		'cammino-article',
+		'/assets/css/pages/article.css',
+		'/assets/js/pages/article.js'
+	);
 }
 
 add_action( 'wp_enqueue_scripts', 'cammino_isolate_visual_page_assets', 999 );
@@ -146,7 +179,9 @@ add_action( 'wp_enqueue_scripts', 'cammino_isolate_visual_page_assets', 999 );
  * Prevent Astra's presentation layer from leaking into opt-in Cammino pages.
  */
 function cammino_isolate_visual_page_assets(): void {
-	if ( ! is_page() || ! nstarter_is_visual_page( get_queried_object_id() ) ) {
+	$is_visual_page = is_page() && nstarter_is_visual_page( get_queried_object_id() );
+
+	if ( ! $is_visual_page && ! cammino_is_managed_post_request() ) {
 		return;
 	}
 
@@ -186,12 +221,19 @@ function cammino_visual_page_body_classes( array $classes ): array {
 			'about-us' => 'about-page',
 			'contact'  => 'contact-page',
 			'ss'       => 'stories-page',
+			'news'     => 'news-page',
 		);
 
 		if ( isset( $page_classes[ $slug ] ) ) {
 			$classes[] = 'cammino-visual-page';
 			$classes[] = $page_classes[ $slug ];
 		}
+	}
+
+	if ( cammino_is_managed_post_request() ) {
+		$classes[] = 'cammino-visual-page';
+		$classes[] = 'cammino-article-page';
+		$classes[] = 'cammino-' . cammino_get_post_placement( get_queried_object_id() );
 	}
 
 	if ( nstarter_is_preview_request() ) {
