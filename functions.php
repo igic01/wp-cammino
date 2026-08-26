@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.3.0' );
+define( 'NSTARTER_VERSION', '1.3.1' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -159,7 +159,7 @@ function cammino_enqueue_design_assets( string $handle, string $style, string $s
 add_action( 'wp_enqueue_scripts', 'cammino_enqueue_single_post_assets', 1000 );
 
 /**
- * Load the shared Article/Event design only for classified posts.
+ * Load the shared Article/Event design for every normal post.
  */
 function cammino_enqueue_single_post_assets(): void {
 	if ( ! cammino_is_managed_post_request() ) {

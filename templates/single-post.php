@@ -29,13 +29,6 @@ $cammino_related    = get_posts(
 		'post__not_in'        => array( $cammino_post_id ),
 		'ignore_sticky_posts' => true,
 		'no_found_rows'       => true,
-		'meta_query'          => array(
-			array(
-				'key'     => CAMMINO_POST_PLACEMENT_META,
-				'value'   => array( 'article', 'event' ),
-				'compare' => 'IN',
-			),
-		),
 	)
 );
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Cammino post placement, event details, and shared rendering helpers.
+ * Cammino post routing, event details, and shared rendering helpers.
  *
  * @package Cammino
  */
@@ -9,13 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const CAMMINO_POST_PLACEMENT_META = '_cammino_post_placement';
 const CAMMINO_EVENT_DATE_META     = '_cammino_event_date';
 const CAMMINO_EVENT_LOCATION_META = '_cammino_event_location';
 const CAMMINO_EVENT_STATUS_META   = '_cammino_event_status';
 
 /**
- * Return the supported Cammino post placements.
+ * Return the supported Cammino post destinations.
  *
  * @return array<string,string>
  */
@@ -27,25 +26,29 @@ function cammino_get_post_placements(): array {
 }
 
 /**
- * Read a post's validated placement.
+ * Infer a post's destination from its slug.
  */
 function cammino_get_post_placement( int $post_id ): string {
-	$value = (string) get_post_meta( $post_id, CAMMINO_POST_PLACEMENT_META, true );
+	if ( 'post' !== get_post_type( $post_id ) ) {
+		return '';
+	}
 
-	return isset( cammino_get_post_placements()[ $value ] ) ? $value : '';
+	$slug = (string) get_post_field( 'post_name', $post_id );
+
+	return preg_match( '/^(event|podujatie)(-|$)/i', $slug ) ? 'event' : 'article';
 }
 
 /**
  * Is the current request a Cammino-managed single post?
  */
 function cammino_is_managed_post_request(): bool {
-	return is_singular( 'post' ) && '' !== cammino_get_post_placement( get_queried_object_id() );
+	return is_singular( 'post' );
 }
 
 add_action( 'init', 'cammino_register_post_meta' );
 
 /**
- * Register placement fields for REST and block-editor compatibility.
+ * Register optional event fields for REST and block-editor compatibility.
  */
 function cammino_register_post_meta(): void {
 	$common = array(
@@ -56,7 +59,6 @@ function cammino_register_post_meta(): void {
 		'auth_callback'  => static fn(): bool => current_user_can( 'edit_posts' ),
 	);
 
-	register_post_meta( 'post', CAMMINO_POST_PLACEMENT_META, array_merge( $common, array( 'type' => 'string' ) ) );
 	register_post_meta( 'post', CAMMINO_EVENT_DATE_META, array_merge( $common, array( 'type' => 'string' ) ) );
 	register_post_meta( 'post', CAMMINO_EVENT_LOCATION_META, array_merge( $common, array( 'type' => 'string' ) ) );
 	register_post_meta( 'post', CAMMINO_EVENT_STATUS_META, array_merge( $common, array( 'type' => 'string' ) ) );
@@ -65,12 +67,12 @@ function cammino_register_post_meta(): void {
 add_action( 'add_meta_boxes_post', 'cammino_add_post_settings_meta_box' );
 
 /**
- * Add the placement and optional event settings to normal posts.
+ * Add destination guidance and optional event settings to normal posts.
  */
 function cammino_add_post_settings_meta_box(): void {
 	add_meta_box(
 		'cammino-post-settings',
-		__( 'Umiestnenie v Cammino', 'cammino' ),
+		__( 'Cammino príspevok', 'cammino' ),
 		'cammino_render_post_settings_meta_box',
 		'post',
 		'side',
@@ -80,7 +82,7 @@ function cammino_add_post_settings_meta_box(): void {
 }
 
 /**
- * Render post placement fields.
+ * Render destination guidance and optional event fields.
  */
 function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	$placement = cammino_get_post_placement( $post->ID );
@@ -91,13 +93,11 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	wp_nonce_field( 'cammino_save_post_settings', 'cammino_post_settings_nonce' );
 	?>
 	<p>
-		<label for="cammino-post-placement"><strong><?php esc_html_e( 'Zobraziť príspevok ako', 'cammino' ); ?></strong></label>
-		<select id="cammino-post-placement" name="cammino_post_placement" style="width:100%;margin-top:6px">
-			<option value=""><?php esc_html_e( 'Ponechať Astra / nezaradiť', 'cammino' ); ?></option>
-			<?php foreach ( cammino_get_post_placements() as $value => $label ) : ?>
-				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $placement, $value ); ?>><?php echo esc_html( $label ); ?></option>
-			<?php endforeach; ?>
-		</select>
+		<strong><?php esc_html_e( 'Aktuálne umiestnenie:', 'cammino' ); ?></strong>
+		<?php echo esc_html( cammino_get_post_placements()[ $placement ] ?? cammino_get_post_placements()['article'] ); ?>
+	</p>
+	<p>
+		<?php esc_html_e( 'Slug začínajúci na', 'cammino' ); ?> <code>event-</code> <?php esc_html_e( 'alebo', 'cammino' ); ?> <code>podujatie-</code> <?php esc_html_e( 'zaradí príspevok medzi Podujatia. Každý iný slug ho zaradí medzi Novinky.', 'cammino' ); ?>
 	</p>
 	<p style="margin-top:14px"><strong><?php esc_html_e( 'Údaje podujatia', 'cammino' ); ?></strong><br><small><?php esc_html_e( 'Použijú sa iba pri type Podujatie.', 'cammino' ); ?></small></p>
 	<p>
@@ -118,7 +118,7 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 add_action( 'save_post_post', 'cammino_save_post_settings' );
 
 /**
- * Save post placement and optional event fields.
+ * Save optional event fields.
  */
 function cammino_save_post_settings( int $post_id ): void {
 	$nonce = isset( $_POST['cammino_post_settings_nonce'] )
@@ -132,16 +132,6 @@ function cammino_save_post_settings( int $post_id ): void {
 		|| ! current_user_can( 'edit_post', $post_id )
 	) {
 		return;
-	}
-
-	$placement = isset( $_POST['cammino_post_placement'] )
-		? sanitize_key( wp_unslash( $_POST['cammino_post_placement'] ) )
-		: '';
-
-	if ( isset( cammino_get_post_placements()[ $placement ] ) ) {
-		update_post_meta( $post_id, CAMMINO_POST_PLACEMENT_META, $placement );
-	} else {
-		delete_post_meta( $post_id, CAMMINO_POST_PLACEMENT_META );
 	}
 
 	$fields = array(
@@ -173,19 +163,26 @@ function cammino_get_placed_posts( string $placement, int $limit = 12 ): array {
 		return array();
 	}
 
-	return get_posts(
+	$posts = get_posts(
 		array(
 			'post_type'           => 'post',
 			'post_status'         => 'publish',
-			'posts_per_page'      => $limit,
+			'posts_per_page'      => -1,
 			'ignore_sticky_posts' => true,
 			'no_found_rows'       => true,
-			'meta_key'            => CAMMINO_POST_PLACEMENT_META,
-			'meta_value'          => $placement,
 			'orderby'             => 'date',
 			'order'               => 'DESC',
 		)
 	);
+
+	$posts = array_values(
+		array_filter(
+			$posts,
+			static fn( WP_Post $post ): bool => $placement === cammino_get_post_placement( $post->ID )
+		)
+	);
+
+	return array_slice( $posts, 0, $limit );
 }
 
 /**
@@ -305,7 +302,7 @@ function cammino_render_news_events(): string {
 	);
 
 	if ( empty( $events ) ) {
-		return '<div class="news-live-empty"><strong>' . esc_html__( 'Zatiaľ nie sú publikované žiadne podujatia.', 'cammino' ) . '</strong><span>' . esc_html__( 'V príspevku nastavte umiestnenie Podujatie.', 'cammino' ) . '</span></div>';
+		return '<div class="news-live-empty"><strong>' . esc_html__( 'Zatiaľ nie sú publikované žiadne podujatia.', 'cammino' ) . '</strong><span>' . esc_html__( 'Slug podujatia musí začínať na event- alebo podujatie-.', 'cammino' ) . '</span></div>';
 	}
 
 	$featured = array_shift( $events );
@@ -408,7 +405,7 @@ function cammino_render_news_articles(): string {
 	</div>
 
 	<?php if ( empty( $posts ) ) : ?>
-		<div class="news-live-empty"><strong><?php esc_html_e( 'Zatiaľ nie sú publikované žiadne články.', 'cammino' ); ?></strong><span><?php esc_html_e( 'V príspevku nastavte umiestnenie Článok.', 'cammino' ); ?></span></div>
+		<div class="news-live-empty"><strong><?php esc_html_e( 'Zatiaľ nie sú publikované žiadne články.', 'cammino' ); ?></strong><span><?php esc_html_e( 'Každý publikovaný príspevok bez event- alebo podujatie- prefixu sa zobrazí tu.', 'cammino' ); ?></span></div>
 	<?php else : ?>
 		<div class="posts-grid" data-posts-grid>
 			<?php
@@ -449,7 +446,7 @@ function cammino_render_news_articles(): string {
 add_filter( 'template_include', 'cammino_use_single_post_template', 99 );
 
 /**
- * Route only classified posts through the shared Cammino single design.
+ * Route every normal post through the shared Cammino single design.
  */
 function cammino_use_single_post_template( string $template ): string {
 	if ( cammino_is_managed_post_request() ) {

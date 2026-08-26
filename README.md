@@ -24,7 +24,8 @@ shared single-post design for Cammino articles and events.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
 - `snapshot-templates/ss.php` is the variable-card source for Príbehy úspechov.
 - `snapshot-templates/news.php` is the editable shell around live post listings.
-- `inc/posts.php` adds Article/Event placement and event details to normal posts.
+- `inc/posts.php` derives Article/Event placement from the post slug and stores
+  optional event details.
 - `templates/single-post.php` renders both classified post types identically.
 - `inc/` and `assets/js/editor.js` provide the copied visual snapshot editor.
 - `assets/fonts/` contains the Fredoka and Varela Round families used by custom
@@ -59,12 +60,15 @@ Card copy and images remain editable through the normal Text and Media modes.
 ## Publish an article or event
 
 1. Create or edit a normal WordPress post and use its title, excerpt, featured
-   image, categories, and block-editor content as usual.
-2. In **Umiestnenie v Cammino**, choose **Článok** or **Podujatie**. Choosing
-   neither leaves the post on Astra and excludes it from the Cammino listing.
-3. For an event, optionally set its date/time, location, and status label.
-4. Publish the post. Articles appear under Novinky; events appear under
-   Podujatia. Both open through the same Cammino single-post design.
+   image, categories, and block-editor content as usual. Every post automatically
+   uses the shared Cammino single-post design.
+2. To place it under **Podujatia**, make its slug start with `event-` or
+   `podujatie-`, for example `event-komunitny-den`. Every other slug places the
+   post under **Novinky**.
+3. For an event, optionally set its date/time, location, and status label in the
+   **Cammino príspevok** box.
+4. Publish the post. The slug changes only its listing placement; both types
+   keep the same detail-page styling.
 
 The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.
