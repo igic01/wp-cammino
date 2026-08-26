@@ -93,13 +93,27 @@ add_filter( 'template_include', 'nstarter_use_visual_page_wrapper', 99 );
 
 /**
  * Route selected source designs through the snapshot display wrapper.
+ * If a host fails to resolve the inherited child-theme template, explicitly
+ * fall back to Astra's page or index template instead of returning no output.
+ *
+ * @param mixed $template Template path supplied by WordPress.
  */
-function nstarter_use_visual_page_wrapper( string $template ): string {
+function nstarter_use_visual_page_wrapper( $template ): string {
+	$template = is_string( $template ) ? $template : '';
+
 	if ( is_page() && '' !== nstarter_get_native_source_template_slug( get_queried_object_id() ) ) {
 		$wrapper = NSTARTER_PATH . '/' . NSTARTER_VISUAL_PAGE_TEMPLATE;
 
 		if ( is_file( $wrapper ) ) {
 			return $wrapper;
+		}
+	}
+
+	if ( '' === $template ) {
+		$parent_fallback = get_template_directory() . ( is_page() ? '/page.php' : '/index.php' );
+
+		if ( is_file( $parent_fallback ) ) {
+			return $parent_fallback;
 		}
 	}
 
