@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
     .forEach((element) => element.remove());
 
+  document.querySelector(".details-heading > p")?.remove();
+
   const revealElements = document.querySelectorAll("[data-contact-reveal]");
   revealElements.forEach((element) => {
     element.setAttribute("data-nstarter-transient-class", "is-visible");
