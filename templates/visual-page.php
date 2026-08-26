@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-get_header();
+get_header( 'nstarter' );
 
 $nstarter_post_id = get_queried_object_id();
 $nstarter_html    = nstarter_get_snapshot_html( $nstarter_post_id );
@@ -23,4 +23,4 @@ if ( '' === trim( $nstarter_html ) ) {
 	<?php echo nstarter_expand_live_sections( $nstarter_html, $nstarter_post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </div>
 <?php
-get_footer();
+get_footer( 'nstarter' );

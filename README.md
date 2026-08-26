@@ -1,10 +1,19 @@
-# NStarter visual WordPress theme
+# Cammino Preview — Astra child theme
 
-NStarter renders PHP source templates into editable HTML snapshots. The snapshot is stored in an ACF field and displayed as the page until it is regenerated from PHP.
+Cammino Preview is an Astra child theme that adds opt-in PHP source templates and editable HTML snapshots. Pages without an NStarter template continue through Astra's normal template hierarchy and assets. A Cammino snapshot is stored in an ACF field and displayed until it is regenerated from PHP.
+
+## Safe preview installation
+
+1. Keep the parent **Astra** theme installed in the `astra` theme directory.
+2. Install this child theme ZIP and activate **Cammino Preview Child**.
+3. Existing pages continue using Astra. The child stylesheet and Cammino assets are loaded only for pages explicitly assigned an NStarter snapshot template.
+4. On first activation, existing Astra theme modifications (including menu locations and standard Customizer theme mods) are copied into the child-theme option. The original Astra settings are not changed.
+
+The Cammino snapshot document uses `header-nstarter.php` and `footer-nstarter.php`. The child theme intentionally contains no default `header.php`, `footer.php`, `page.php`, or `index.php`, so it does not override those parent templates.
 
 ## Set up a page
 
-1. Activate **NStarter Visual Theme** and Advanced Custom Fields.
+1. Activate **Cammino Preview Child** and Advanced Custom Fields.
 2. Create or edit a WordPress page.
 3. In WordPress's normal page **Template** selector, choose an **NStarter — …** design and save.
 4. Visit the page to see the selected PHP design immediately.
