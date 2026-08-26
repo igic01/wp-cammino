@@ -1,5 +1,8 @@
 <?php
 /**
+ * Template Name: Cammino Article
+ * Template Post Type: post
+ *
  * Shared bare document for Cammino Article and Event posts.
  *
  * @package Cammino
