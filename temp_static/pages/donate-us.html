@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Podporte činnosť OZ Cammino a pomôžte nám nasmerovať pomoc tam, kde je práve najviac potrebná">
+  <meta name="theme-color" content="#64364b">
+  <title>Podporte Cammino</title>
+
+  <link rel="preload" href="../assets/fonts/fredoka-600.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="../assets/fonts/varela-round-400.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/style/main.css">
+  <link rel="stylesheet" href="../assets/style/donate-us.css">
+  <script src="../assets/script/donate-us.js" defer></script>
+</head>
+<body class="donate-us-page">
+  <a class="skip-link" href="#main-content">Preskočiť na obsah</a>
+
+  <header class="site-header donate-us-header" data-header>
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Cammino – domov"><img src="../assets/logos/long_logo.svg" alt="Cammino" width="1666" height="297"></a>
+      <button class="nav-toggle" type="button" aria-label="Otvoriť menu" aria-expanded="false" aria-controls="site-nav" data-nav-toggle><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+      <nav class="site-nav" id="site-nav" aria-label="Hlavná navigácia" data-nav>
+        <a href="index.html">Domov</a><a href="aboutus.html">O nás</a><a href="ss.html">Príbehy</a><a href="news.html#events">Podujatia</a><a href="news.html">Novinky</a><a href="contact.html">Kontakt</a><a class="language-link" href="#" lang="en" aria-label="Switch to English">EN</a><a class="button button--small button--coral nav-donate is-active" href="donate.html" aria-current="page">Prispieť <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="support-hero" aria-labelledby="support-title">
+      <div class="support-hero__photo" aria-hidden="true"></div>
+      <div class="container support-shell">
+        <div class="support-opening">
+          <a class="support-back" href="donate.html" data-us-reveal="up"><i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i> Späť na možnosti podpory</a>
+
+          <div class="support-intro" data-us-reveal="up">
+            <span class="support-intro__icon" aria-hidden="true"><i class="fa-solid fa-hand-holding-heart"></i></span>
+            <p>Dar pre Cammino</p>
+            <h1 id="support-title">Pomôžte nám byť tam, kde nás potrebujú</h1>
+            <p class="support-intro__description">Váš dar použijeme tam, kde môže mať v tejto chvíli najväčší význam. Zodpovedne ho premeníme na bezpečný priestor, príležitosť a konkrétny ďalší krok.</p>
+          </div>
+
+          <a class="donation-scroll-cue" href="#donation-form" aria-label="Prejsť k formuláru darovania" data-us-reveal="up" data-scroll-to-donation>
+            <span>Prejsť k darovaniu</span>
+            <svg viewBox="0 0 42 66" aria-hidden="true">
+              <path class="donation-scroll-cue__line" d="M21 4V49"></path>
+              <path class="donation-scroll-cue__head" d="M9 39L21 52L33 39"></path>
+            </svg>
+          </a>
+        </div>
+
+        <div class="support-form-card" id="donation-form">
+          <form data-us-donation-form>
+            <div class="support-form-card__heading">
+              <span aria-hidden="true"><i class="fa-solid fa-heart"></i></span>
+              <div><small>Váš príspevok</small><h2>Vyberte výšku daru</h2></div>
+            </div>
+
+            <div class="us-frequency-switch" role="group" aria-label="Frekvencia príspevku">
+              <button class="is-active" type="button" data-us-frequency="once" aria-pressed="true">Jednorazovo</button>
+              <button type="button" data-us-frequency="monthly" aria-pressed="false">Mesačne</button>
+            </div>
+
+            <fieldset class="us-amount-fieldset">
+              <legend>Suma príspevku</legend>
+              <div class="us-amount-options">
+                <button type="button" data-us-amount="15">15 €</button>
+                <button class="is-active" type="button" data-us-amount="30">30 €</button>
+                <button type="button" data-us-amount="50">50 €</button>
+                <button type="button" data-us-amount="100">100 €</button>
+              </div>
+              <label class="us-custom-amount"><span>Vlastná suma</span><span><input type="number" min="1" step="1" inputmode="numeric" placeholder="Iná suma" data-us-custom-amount><b>€</b></span></label>
+            </fieldset>
+
+            <div class="us-donor-fields">
+              <label><span>Vaše meno</span><span class="us-form-input"><i class="fa-solid fa-user" aria-hidden="true"></i><input type="text" name="name" autocomplete="name" placeholder="Meno a priezvisko" required></span></label>
+              <label><span>Váš e-mail</span><span class="us-form-input"><i class="fa-solid fa-envelope" aria-hidden="true"></i><input type="email" name="email" autocomplete="email" placeholder="vas@email.sk" required></span></label>
+            </div>
+
+            <label class="us-consent"><input type="checkbox" required><span>Súhlasím so spracovaním údajov potrebných na vybavenie daru.</span></label>
+            <div class="us-summary"><span data-us-summary-frequency>Jednorazový dar</span><strong data-us-summary-amount>30 €</strong></div>
+            <button class="button button--coral us-submit" type="submit">Pokračovať k darovaniu <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></button>
+            <p class="us-secure-note"><i class="fa-solid fa-lock" aria-hidden="true"></i> Toto je ukážka formulára. Platba zatiaľ nebude vykonaná.</p>
+          </form>
+
+          <div class="us-success" hidden data-us-success>
+            <span><i class="fa-solid fa-heart" aria-hidden="true"></i></span>
+            <h2>Ďakujeme, že kráčate s nami</h2>
+            <p>V ostrej verzii by teraz nasledovala bezpečná platobná brána.</p>
+            <button class="button button--cream" type="button" data-us-form-reset>Upraviť dar</button>
+          </div>
+        </div>
+
+        <aside class="about-invite">
+          <div class="about-invite__icon" aria-hidden="true"><i class="fa-solid fa-compass"></i></div>
+          <div><small>Spoznajte našu cestu</small><h2>Chcete vedieť, komu zverujete svoju podporu</h2><p>Prečítajte si viac o našom poslaní, hodnotách a ľuďoch, ktorí tvoria Cammino.</p></div>
+          <a class="button button--cream" href="aboutus.html">O Camminu <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-main">
+      <div class="footer-brand"><a class="brand brand--footer" href="index.html" aria-label="Cammino – domov"><img src="../assets/logos/long_logo.svg" alt="Cammino" width="1666" height="297"></a><p>Pomáhame mladým ľuďom nájsť cestu k vzdelaniu, práci a samostatnej budúcnosti.</p><div class="social-links" aria-label="Sociálne siete"><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a><a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a></div></div>
+      <div class="footer-links"><h2>Cammino</h2><a href="aboutus.html">O nás</a><a href="ss.html">Príbehy úspechov</a><a href="news.html#events">Podujatia</a><a href="news.html">Novinky</a></div>
+      <div class="footer-links"><h2>Zapojte sa</h2><a href="donate.html">Podporte nás</a><a href="contact.html?tema=firmy">Pre firmy</a><a href="contact.html?tema=cas">Dobrovoľníctvo</a><a href="contact.html">Pošlite nám príbeh</a></div>
+      <div class="footer-contact"><h2>Zostaňme v kontakte</h2><a href="mailto:ahoj@cammino.sk">ahoj@cammino.sk</a><p>Bratislava, Slovensko</p><form class="newsletter" action="#" method="post"><label class="sr-only" for="donate-us-footer-email">Váš e-mail</label><input id="donate-us-footer-email" type="email" name="email" placeholder="Váš e-mail" required><button type="submit" aria-label="Prihlásiť sa na odber"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></form></div>
+    </div>
+    <div class="container footer-bottom"><p>© <span data-year></span> Cammino. Každý krok má zmysel.</p><div><a href="#">Ochrana súkromia</a><a href="#">Cookies</a></div></div>
+  </footer>
+</body>
+</html>

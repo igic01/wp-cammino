@@ -1,0 +1,195 @@
+/*
+Theme Name: NStarter Visual Theme
+Theme URI: https://example.com/nstarter
+Author: NStarter
+Description: A lightweight WordPress starter theme with PHP-generated, ACF-backed visual page snapshots.
+Version: 1.1.0
+Requires at least: 6.4
+Requires PHP: 8.0
+Text Domain: nstarter
+*/
+
+:root {
+    --nstarter-ink: #17212b;
+    --nstarter-muted: #667085;
+    --nstarter-accent: #6d5dfc;
+    --nstarter-surface: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    margin: 0;
+}
+
+body {
+    margin: 0;
+    color: var(--nstarter-ink);
+    background: var(--nstarter-surface);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+img,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+[data-nstarter-snapshot-root] {
+    min-height: 100vh;
+}
+
+/* Live sections only look locked inside the visual editor preview. */
+.nstarter-editor-preview.nstarter-mode-text [data-nstarter-live-section],
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section] {
+    position: relative;
+    min-height: 72px;
+    outline: 3px dashed #f59e0b;
+    outline-offset: -3px;
+    cursor: not-allowed;
+    user-select: none;
+}
+
+.nstarter-editor-preview.nstarter-mode-text [data-nstarter-live-section]::before,
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section]::before {
+    content: "LIVE SECTION · LOCKED";
+    position: absolute;
+    z-index: 999999;
+    top: 10px;
+    right: 10px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    color: #111827;
+    background: #fbbf24;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 18%);
+    font: 700 11px/1 system-ui, sans-serif;
+    letter-spacing: .06em;
+    pointer-events: none;
+}
+
+.nstarter-editor-preview.nstarter-mode-text [data-nstarter-live-section] *,
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section] * {
+    pointer-events: none !important;
+}
+
+.nstarter-editor-preview.nstarter-mode-media img,
+.nstarter-editor-preview.nstarter-mode-media video {
+    cursor: pointer;
+    outline: 3px solid transparent;
+    outline-offset: 3px;
+    transition: outline-color 120ms ease;
+}
+
+.nstarter-editor-preview.nstarter-mode-media img:hover,
+.nstarter-editor-preview.nstarter-mode-media video:hover {
+    outline-color: #6d5dfc;
+}
+
+.nstarter-editor-preview .nstarter-video-tools {
+    position: fixed;
+    z-index: 2147483647;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.nstarter-editor-preview .nstarter-video-settings-button {
+    position: absolute;
+    display: grid;
+    width: 28px;
+    height: 28px;
+    padding: 5px;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 75%);
+    border-radius: 3px;
+    color: #fff;
+    background: #222;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.nstarter-editor-preview .nstarter-video-settings-button:hover,
+.nstarter-editor-preview .nstarter-video-settings-button:focus-visible {
+    background: #000;
+}
+
+.nstarter-editor-preview .nstarter-video-settings-button[hidden] {
+    display: none;
+}
+
+.nstarter-editor-preview .nstarter-video-settings-button svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: currentcolor;
+}
+
+/* Snapshot-native variable sections stay editable, including at a zero value. */
+.nstarter-editor-preview.nstarter-mode-text [data-nstarter-variable-section],
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-variable-section] {
+    position: relative;
+    min-height: 72px;
+    outline: 2px dashed #6d5dfc;
+    outline-offset: -2px;
+}
+
+.nstarter-editor-preview.nstarter-mode-text [data-nstarter-variable-section]::before,
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-variable-section]::before {
+    content: "VARIABLE SECTION \00b7 EDITABLE";
+    position: absolute;
+    z-index: 999998;
+    top: 10px;
+    right: 52px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    color: #fff;
+    background: #6d5dfc;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 18%);
+    font: 700 11px/1 system-ui, sans-serif;
+    letter-spacing: .06em;
+    pointer-events: none;
+}
+
+.nstarter-editor-preview .nstarter-variable-tools {
+    position: fixed;
+    z-index: 2147483647;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.nstarter-editor-preview .nstarter-variable-edit-button {
+    position: absolute;
+    display: grid;
+    width: 34px;
+    height: 34px;
+    padding: 7px;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 80%);
+    border-radius: 50%;
+    color: #fff;
+    background: #6d5dfc;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 28%);
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.nstarter-editor-preview .nstarter-variable-edit-button:hover,
+.nstarter-editor-preview .nstarter-variable-edit-button:focus-visible {
+    background: #5142df;
+    transform: scale(1.04);
+}
+
+.nstarter-editor-preview .nstarter-variable-edit-button[hidden] {
+    display: none;
+}
+
+.nstarter-editor-preview .nstarter-variable-edit-button svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: currentcolor;
+}
