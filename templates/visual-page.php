@@ -9,6 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( nstarter_is_preview_request() || isset( $_GET['cammino_snapshot'] ) ) {
+	nocache_headers();
+}
+
 $nstarter_post_id = get_queried_object_id();
 $nstarter_html    = nstarter_get_snapshot_html( $nstarter_post_id );
 

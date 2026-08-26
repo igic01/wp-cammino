@@ -6,6 +6,7 @@
     const loading = document.querySelector('[data-nstarter-loading]');
     const status = document.querySelector('[data-nstarter-status]');
     const saveButton = document.querySelector('[data-nstarter-save]');
+    const viewLink = document.querySelector('[data-nstarter-view]');
     const regenerateButton = document.querySelector('[data-nstarter-regenerate]');
     const modeSelect = document.querySelector('[data-nstarter-mode]');
     const editorPanel = document.querySelector('.nstarter-editor-panel');
@@ -791,6 +792,9 @@
         try {
             const data = await request('nstarter_save_snapshot', { html: serialiseSnapshot() });
             dirty = false;
+            if (viewLink && data.viewUrl) {
+                viewLink.href = data.viewUrl;
+            }
             setStatus(data.message || config.strings.saved, 'success');
         } catch (error) {
             setStatus(error.message || config.strings.error, 'error');
@@ -810,6 +814,9 @@
         try {
             const data = await request('nstarter_regenerate_snapshot');
             dirty = false;
+            if (viewLink && data.viewUrl) {
+                viewLink.href = data.viewUrl;
+            }
             setStatus(data.message || config.strings.regenerated, 'success');
             loading.classList.remove('is-hidden');
             frame.src = config.previewUrl + (config.previewUrl.includes('?') ? '&' : '?') + 'nstarter_refresh=' + Date.now();

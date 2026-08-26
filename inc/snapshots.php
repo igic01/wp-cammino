@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 const NSTARTER_SNAPSHOT_FIELD_KEY   = 'field_nstarter_snapshot_html';
 const NSTARTER_SNAPSHOT_FIELD_NAME  = 'nstarter_snapshot_html';
+const NSTARTER_SNAPSHOT_META_KEY    = '_cammino_snapshot_html';
 const NSTARTER_VISUAL_PAGE_TEMPLATE = 'templates/visual-page.php';
 
 /**
@@ -125,15 +126,22 @@ function nstarter_get_source_template_slug( int $post_id ): string {
  * Read the raw saved HTML snapshot for the currently selected source.
  */
 function nstarter_get_snapshot_html( int $post_id ): string {
-	$html = '';
+	$has_canonical_snapshot = metadata_exists( 'post', $post_id, NSTARTER_SNAPSHOT_META_KEY );
+	$html                   = $has_canonical_snapshot
+		? (string) get_post_meta( $post_id, NSTARTER_SNAPSHOT_META_KEY, true )
+		: '';
 
-	if ( function_exists( 'get_field' ) ) {
+	if ( ! $has_canonical_snapshot && function_exists( 'get_field' ) ) {
 		$value = get_field( NSTARTER_SNAPSHOT_FIELD_NAME, $post_id, false );
 		$html  = is_string( $value ) ? $value : '';
 	}
 
-	if ( '' === $html ) {
-		$html = (string) get_post_meta( $post_id, '_' . NSTARTER_SNAPSHOT_FIELD_NAME, true );
+	// Migrate snapshots saved by the original non-ACF fallback. ACF itself uses
+	// this legacy key for its field reference, so values beginning with `field_`
+	// are metadata, not page HTML.
+	if ( ! $has_canonical_snapshot && '' === $html ) {
+		$legacy = (string) get_post_meta( $post_id, '_' . NSTARTER_SNAPSHOT_FIELD_NAME, true );
+		$html   = str_starts_with( $legacy, 'field_' ) ? '' : $legacy;
 	}
 
 	$saved_source   = (string) get_post_meta( $post_id, '_nstarter_snapshot_source', true );
@@ -145,6 +153,10 @@ function nstarter_get_snapshot_html( int $post_id ): string {
 		return '';
 	}
 
+	if ( ! $has_canonical_snapshot && '' !== $html ) {
+		update_post_meta( $post_id, NSTARTER_SNAPSHOT_META_KEY, wp_slash( $html ) );
+	}
+
 	return $html;
 }
 
@@ -153,14 +165,45 @@ function nstarter_get_snapshot_html( int $post_id ): string {
  */
 function nstarter_update_snapshot_html( int $post_id, string $html ): bool {
 	update_post_meta( $post_id, '_nstarter_snapshot_source', nstarter_get_source_template_slug( $post_id ) );
+	update_post_meta( $post_id, NSTARTER_SNAPSHOT_META_KEY, wp_slash( $html ) );
 
 	if ( function_exists( 'update_field' ) ) {
 		update_field( NSTARTER_SNAPSHOT_FIELD_KEY, $html, $post_id );
-		return true;
 	}
 
-	update_post_meta( $post_id, '_' . NSTARTER_SNAPSHOT_FIELD_NAME, $html );
-	return true;
+	clean_post_cache( $post_id );
+
+	return hash_equals(
+		hash( 'sha256', $html ),
+		hash( 'sha256', (string) get_post_meta( $post_id, NSTARTER_SNAPSHOT_META_KEY, true ) )
+	);
+}
+
+/**
+ * Invalidate WordPress and common full-page caches after a visual save.
+ */
+function nstarter_invalidate_snapshot_cache( int $post_id ): void {
+	clean_post_cache( $post_id );
+	wp_cache_delete( $post_id, 'posts' );
+	wp_cache_delete( $post_id, 'post_meta' );
+
+	// Updating the modified time triggers the normal save hooks used by most
+	// cache plugins without changing the page content or selected template.
+	wp_update_post( array( 'ID' => $post_id ) );
+
+	if ( function_exists( 'rocket_clean_post' ) ) {
+		rocket_clean_post( $post_id );
+	}
+
+	if ( function_exists( 'w3tc_flush_post' ) ) {
+		w3tc_flush_post( $post_id );
+	}
+
+	if ( function_exists( 'wp_cache_post_change' ) ) {
+		wp_cache_post_change( $post_id );
+	}
+
+	do_action( 'litespeed_purge_post', $post_id );
 }
 
 /**

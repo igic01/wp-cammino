@@ -165,7 +165,7 @@ function nstarter_maybe_render_editor(): void {
 					</label>
 
 					<button type="button" class="nstarter-control nstarter-control--primary" data-nstarter-save><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
-					<a class="nstarter-control" href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
+					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
 					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
 				</div>
 			</aside>
@@ -226,9 +226,18 @@ function nstarter_ajax_save_snapshot(): void {
 
 	// This intentionally stores the editor's complete HTML. Access is capability + nonce protected.
 	$html = (string) wp_unslash( $_POST['html'] );
-	nstarter_update_snapshot_html( $post_id, $html );
+	if ( ! nstarter_update_snapshot_html( $post_id, $html ) ) {
+		wp_send_json_error( array( 'message' => __( 'The saved page could not be verified. Please try again.', 'cammino' ) ), 500 );
+	}
 
-	wp_send_json_success( array( 'message' => __( 'Saved', 'nstarter' ) ) );
+	nstarter_invalidate_snapshot_cache( $post_id );
+
+	wp_send_json_success(
+		array(
+			'message' => __( 'Saved', 'cammino' ),
+			'viewUrl' => add_query_arg( 'cammino_snapshot', wp_generate_uuid4(), get_permalink( $post_id ) ),
+		)
+	);
 }
 
 add_action( 'wp_ajax_nstarter_regenerate_snapshot', 'nstarter_ajax_regenerate_snapshot' );
@@ -246,9 +255,18 @@ function nstarter_ajax_regenerate_snapshot(): void {
 	}
 
 	$html = nstarter_render_source_template( $post_id );
-	nstarter_update_snapshot_html( $post_id, $html );
+	if ( ! nstarter_update_snapshot_html( $post_id, $html ) ) {
+		wp_send_json_error( array( 'message' => __( 'The regenerated page could not be verified. Please try again.', 'cammino' ) ), 500 );
+	}
 
-	wp_send_json_success( array( 'message' => __( 'Regenerated from PHP.', 'nstarter' ) ) );
+	nstarter_invalidate_snapshot_cache( $post_id );
+
+	wp_send_json_success(
+		array(
+			'message' => __( 'Regenerated from PHP.', 'cammino' ),
+			'viewUrl' => add_query_arg( 'cammino_snapshot', wp_generate_uuid4(), get_permalink( $post_id ) ),
+		)
+	);
 }
 
 add_action( 'admin_bar_menu', 'nstarter_add_admin_bar_editor_link', 90 );
