@@ -1,143 +1,29 @@
 <?php
 /**
- * NStarter theme bootstrap.
+ * Cammino child theme bootstrap.
  *
- * @package NStarter
+ * Add site-wide theme hooks here as the project grows. Page-specific code
+ * should live with the page feature that owns it.
+ *
+ * @package Cammino
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.2.2' );
-define( 'NSTARTER_PATH', get_stylesheet_directory() );
-define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
+add_action( 'wp_enqueue_scripts', 'cammino_enqueue_child_styles', 15 );
 
 /**
- * Resolve a file from the actual parent theme without ever pointing back to
- * this child theme. Direct get_template_directory() forwarding can recurse on
- * hosts where the parent relationship was not resolved as expected.
+ * Load child-theme styles after Astra's main stylesheet.
  */
-function nstarter_get_parent_theme_file( string $relative_path ): string {
-	if ( ! function_exists( 'wp_get_theme' ) ) {
-		return '';
-	}
+function cammino_enqueue_child_styles(): void {
+	$theme = wp_get_theme();
 
-	$relative_path = ltrim( str_replace( '\\', '/', $relative_path ), '/' );
-
-	if ( '' === $relative_path || false !== strpos( $relative_path, '..' ) ) {
-		return '';
-	}
-
-	$parent = wp_get_theme()->parent();
-
-	if ( ! $parent instanceof WP_Theme || ! $parent->exists() ) {
-		return '';
-	}
-
-	$file = trailingslashit( $parent->get_stylesheet_directory() ) . $relative_path;
-
-	return is_file( $file ) ? $file : '';
-}
-
-require_once NSTARTER_PATH . '/inc/snapshots.php';
-require_once NSTARTER_PATH . '/inc/live-sections.php';
-require_once NSTARTER_PATH . '/inc/variable-sections.php';
-require_once NSTARTER_PATH . '/inc/cammino-snapshots.php';
-require_once NSTARTER_PATH . '/inc/editor.php';
-
-add_action( 'after_setup_theme', 'nstarter_setup' );
-
-/**
- * Configure the basic theme features.
- */
-function nstarter_setup(): void {
-	load_theme_textdomain( 'nstarter', NSTARTER_PATH . '/languages' );
-	add_theme_support( 'title-tag' );
-	add_theme_support( 'post-thumbnails' );
-	add_theme_support( 'responsive-embeds' );
-	add_theme_support( 'html5', array( 'search-form', 'gallery', 'caption', 'style', 'script' ) );
-}
-
-add_action( 'wp_enqueue_scripts', 'nstarter_enqueue_assets' );
-
-/**
- * Load snapshot/editor CSS only on pages using an NStarter design.
- */
-function nstarter_enqueue_assets(): void {
-	if ( ! is_page() || ! nstarter_is_visual_page( get_queried_object_id() ) ) {
-		return;
-	}
-
-	wp_enqueue_style( 'nstarter', get_stylesheet_uri(), array(), NSTARTER_VERSION );
-}
-
-add_action( 'wp_enqueue_scripts', 'nstarter_isolate_visual_page_assets', 999 );
-
-/**
- * Keep Astra's frontend CSS and JavaScript away from the intentionally bare
- * snapshot document. Ordinary Astra pages are never touched by this function.
- */
-function nstarter_isolate_visual_page_assets(): void {
-	if ( ! is_page() || ! nstarter_is_visual_page( get_queried_object_id() ) ) {
-		return;
-	}
-
-	global $wp_styles, $wp_scripts;
-
-	$parent_url = trailingslashit( get_template_directory_uri() );
-	$styles     = is_object( $wp_styles ) ? (array) $wp_styles->queue : array();
-	$scripts    = is_object( $wp_scripts ) ? (array) $wp_scripts->queue : array();
-
-	foreach ( $styles as $handle ) {
-		$source = isset( $wp_styles->registered[ $handle ] ) ? (string) $wp_styles->registered[ $handle ]->src : '';
-		if ( str_starts_with( $handle, 'astra-' ) || ( '' !== $source && str_contains( $source, $parent_url ) ) ) {
-			wp_dequeue_style( $handle );
-		}
-	}
-
-	foreach ( $scripts as $handle ) {
-		$source = isset( $wp_scripts->registered[ $handle ] ) ? (string) $wp_scripts->registered[ $handle ]->src : '';
-		if ( str_starts_with( $handle, 'astra-' ) || ( '' !== $source && str_contains( $source, $parent_url ) ) ) {
-			wp_dequeue_script( $handle );
-		}
-	}
-}
-
-add_action( 'after_switch_theme', 'nstarter_inherit_astra_theme_mods' );
-
-/**
- * Copy the current Astra Customizer/menu settings on first child activation.
- * Existing child-theme values win, and the parent option remains unchanged.
- */
-function nstarter_inherit_astra_theme_mods(): void {
-	if ( get_option( 'nstarter_astra_mods_inherited', false ) ) {
-		return;
-	}
-
-	$parent_mods = get_option( 'theme_mods_astra', array() );
-	$child_key   = 'theme_mods_' . get_stylesheet();
-	$child_mods  = get_option( $child_key, array() );
-
-	if ( is_array( $parent_mods ) && is_array( $child_mods ) ) {
-		update_option( $child_key, array_merge( $parent_mods, $child_mods ) );
-	}
-
-	update_option( 'nstarter_astra_mods_inherited', NSTARTER_VERSION );
-}
-
-add_filter( 'body_class', 'nstarter_body_classes' );
-
-/**
- * Add editor-preview state to the iframe document.
- *
- * @param string[] $classes Existing body classes.
- * @return string[]
- */
-function nstarter_body_classes( array $classes ): array {
-	if ( nstarter_is_preview_request() ) {
-		$classes[] = 'nstarter-editor-preview';
-	}
-
-	return $classes;
+	wp_enqueue_style(
+		'cammino-child',
+		get_stylesheet_uri(),
+		array( 'astra-theme-css' ),
+		(string) $theme->get( 'Version' )
+	);
 }
