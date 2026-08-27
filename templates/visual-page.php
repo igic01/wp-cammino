@@ -19,6 +19,14 @@ $nstarter_html    = nstarter_get_snapshot_html( $nstarter_post_id );
 if ( '' === trim( $nstarter_html ) ) {
 	$nstarter_html = nstarter_render_source_template( $nstarter_post_id );
 }
+
+if ( ! str_contains( $nstarter_html, 'data-nstarter-live-section="cammino_site_header"' ) ) {
+	$nstarter_html = nstarter_get_live_section_marker( 'cammino_site_header' ) . $nstarter_html;
+}
+
+if ( ! str_contains( $nstarter_html, 'data-nstarter-live-section="cammino_site_footer"' ) ) {
+	$nstarter_html .= nstarter_get_live_section_marker( 'cammino_site_footer' );
+}
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -30,11 +38,9 @@ if ( '' === trim( $nstarter_html ) ) {
 </head>
 <body <?php body_class(); ?>>
 	<?php wp_body_open(); ?>
-	<?php cammino_render_site_header(); ?>
 	<div id="nstarter-snapshot" data-nstarter-snapshot-root>
 		<?php echo nstarter_expand_live_sections( $nstarter_html, $nstarter_post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
-	<?php cammino_render_site_footer(); ?>
 	<?php wp_footer(); ?>
 </body>
 </html>

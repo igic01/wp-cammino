@@ -23,12 +23,19 @@ function nstarter_register_live_section( string $id, callable $renderer ): void 
 }
 
 /**
- * Print an empty marker that can safely remain in a saved snapshot.
+ * Build an empty marker that can safely remain in a saved snapshot.
  */
-function nstarter_live_section( string $id, array $args = array() ): void {
+function nstarter_get_live_section_marker( string $id, array $args = array() ): string {
 	$encoded_args = base64_encode( (string) wp_json_encode( $args ) );
 
-	echo '<div class="nstarter-live-section" data-nstarter-live-section="' . esc_attr( sanitize_key( $id ) ) . '" data-nstarter-live-args="' . esc_attr( $encoded_args ) . '"></div>';
+	return '<div class="nstarter-live-section" data-nstarter-live-section="' . esc_attr( sanitize_key( $id ) ) . '" data-nstarter-live-args="' . esc_attr( $encoded_args ) . '"></div>';
+}
+
+/**
+ * Print an empty live-section marker.
+ */
+function nstarter_live_section( string $id, array $args = array() ): void {
+	echo nstarter_get_live_section_marker( $id, $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
 /**

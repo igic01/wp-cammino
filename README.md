@@ -19,8 +19,9 @@ donation designs, plus a shared single-post design for articles and events.
 
 - `style.css` declares the Astra child theme and is the entry point for shared CSS.
 - `functions.php` loads the child stylesheet on ordinary pages and isolated
-  Cammino assets on custom visual pages. It also renders the shared Cammino
-  header and footer for custom visual pages and managed posts.
+  Cammino assets on custom visual pages. It registers the shared Cammino header
+  and footer as locked live sections on visual pages and uses the same renderers
+  outside the editable content of managed posts.
 - `snapshot-templates/home.php` is the editable Cammino homepage source.
 - `snapshot-templates/about-us.php` is the clean PHP source for the O nás page.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
