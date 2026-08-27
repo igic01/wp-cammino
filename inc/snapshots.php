@@ -173,13 +173,6 @@ function nstarter_get_snapshot_html( int $post_id ): string {
 		return '';
 	}
 
-	// The original current-donation design was replaced by the Contact-style
-	// campaign layout. Ignore only that obsolete saved structure so deployed
-	// pages switch immediately without discarding snapshots saved afterward.
-	if ( 'donate-current' === $current_source && str_contains( $html, 'current-donation-hero' ) ) {
-		return '';
-	}
-
 	if ( ! $has_canonical_snapshot && '' !== $html ) {
 		update_post_meta( $post_id, NSTARTER_SNAPSHOT_META_KEY, wp_slash( $html ) );
 	}

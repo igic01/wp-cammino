@@ -107,11 +107,6 @@ function cammino_enqueue_visual_page_assets(): void {
 			'style'  => '/assets/css/pages/donate-us.css',
 			'script' => '/assets/js/pages/donate-us.js',
 		),
-		'donate-current' => array(
-			'handle' => 'cammino-donate-current',
-			'style'  => '/assets/css/pages/contact.css',
-			'script' => '/assets/js/pages/contact.js',
-		),
 		'donate-detail' => array(
 			'handle'        => 'cammino-donate-detail',
 			'style'         => '/assets/css/pages/donate-detail.css',
@@ -265,7 +260,6 @@ function cammino_visual_page_body_classes( array $classes ): array {
 			'news'          => array( 'news-page' ),
 			'donate'        => array( 'donation-page' ),
 			'donate-us'     => array( 'donate-us-page' ),
-			'donate-current' => array( 'contact-page', 'donate-current-page' ),
 			'donate-detail'  => array( 'article-page', 'donate-detail-page' ),
 		);
 

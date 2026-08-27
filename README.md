@@ -27,9 +27,6 @@ donation designs, plus a shared single-post design for articles and events.
 - `snapshot-templates/news.php` is the editable shell around live post listings.
 - `snapshot-templates/donate.php` provides the editable donation-options page.
 - `snapshot-templates/donate-us.php` provides the unrestricted-donation page.
-- `snapshot-templates/donate-current.php` provides the compact Contact-style
-  external-link and editable QR landing page for the current Darujme.sk campaign.
-  It does not process payments inside WordPress.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
 - `inc/posts.php` derives Article/Event placement from the post slug and stores
   optional event details.
@@ -87,9 +84,7 @@ The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.
 
 The original donation forms are interactive design previews only. They do not
-collect, transmit, or process payments. The **Aktuálna zbierka — Darujme úsmev**
-template instead sends donors to the external DARUJME.sk campaign through its
-buttons and clickable QR area.
+collect, transmit, or process payments.
 
 Avoid adding `header.php`, `footer.php`, `page.php`, or other parent-template
 overrides unless a future feature intentionally needs to replace Astra behavior.
