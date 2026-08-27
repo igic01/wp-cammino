@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.4.3' );
+define( 'NSTARTER_VERSION', '1.4.4' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -109,8 +109,8 @@ function cammino_enqueue_visual_page_assets(): void {
 		),
 		'donate-current' => array(
 			'handle' => 'cammino-donate-current',
-			'style'  => '/assets/css/pages/donate-current.css',
-			'script' => '/assets/js/pages/donate-current.js',
+			'style'  => '/assets/css/pages/contact.css',
+			'script' => '/assets/js/pages/contact.js',
 		),
 		'donate-detail' => array(
 			'handle'        => 'cammino-donate-detail',
@@ -265,7 +265,7 @@ function cammino_visual_page_body_classes( array $classes ): array {
 			'news'          => array( 'news-page' ),
 			'donate'        => array( 'donation-page' ),
 			'donate-us'     => array( 'donate-us-page' ),
-			'donate-current' => array( 'donate-current-page' ),
+			'donate-current' => array( 'contact-page', 'donate-current-page' ),
 			'donate-detail'  => array( 'article-page', 'donate-detail-page' ),
 		);
 

@@ -27,9 +27,9 @@ donation designs, plus a shared single-post design for articles and events.
 - `snapshot-templates/news.php` is the editable shell around live post listings.
 - `snapshot-templates/donate.php` provides the editable donation-options page.
 - `snapshot-templates/donate-us.php` provides the unrestricted-donation page.
-- `snapshot-templates/donate-current.php` provides the external-link and QR-code
-  landing page for the current Darujme.sk campaign. It does not process payments
-  inside WordPress.
+- `snapshot-templates/donate-current.php` provides the compact Contact-style
+  external-link and editable QR landing page for the current Darujme.sk campaign.
+  It does not process payments inside WordPress.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
 - `inc/posts.php` derives Article/Event placement from the post slug and stores
   optional event details.
