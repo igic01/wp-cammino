@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
-    .forEach((element) => element.remove());
+  if (!document.body.classList.contains("donate-now-page")) {
+    document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
+      .forEach((element) => element.remove());
+  }
 
   document.querySelector(".details-heading > p")?.remove();
 
@@ -36,27 +38,53 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.querySelectorAll("[data-qr-toggle]").forEach((qrControl) => {
+  const qrControls = document.querySelectorAll("[data-qr-toggle]");
+
+  const closeExpandedQrControls = (exceptControl = null) => {
+    qrControls.forEach((control) => {
+      if (control === exceptControl || !control.classList.contains("is-expanded")) return;
+
+      const controlHint = control.parentElement?.querySelector(".qr-hint");
+      control.classList.remove("is-expanded");
+      control.setAttribute("aria-pressed", "false");
+      control.setAttribute("aria-label", "Zväčšiť QR kód");
+
+      if (controlHint) {
+        controlHint.innerHTML = '<i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> Kliknutím zväčšíte QR';
+      }
+    });
+  };
+
+  qrControls.forEach((qrControl) => {
     const hint = qrControl.parentElement?.querySelector(".qr-hint");
     qrControl.setAttribute("data-nstarter-transient-class", "is-expanded");
     qrControl.setAttribute("data-nstarter-transient-attributes", "aria-pressed aria-label");
 
     const toggleScan = () => {
       const isExpanded = qrControl.classList.toggle("is-expanded");
+      if (isExpanded) closeExpandedQrControls(qrControl);
       qrControl.setAttribute("aria-pressed", String(isExpanded));
       qrControl.setAttribute("aria-label", isExpanded ? "Zmenšiť QR kód" : "Zväčšiť QR kód");
+
       if (hint) {
         hint.innerHTML = `<i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> ${isExpanded ? "Kliknutím zmenšíte QR" : "Kliknutím zväčšíte QR"}`;
       }
     };
 
-    qrControl.addEventListener("click", toggleScan);
+    qrControl.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleScan();
+    });
+
     qrControl.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
+      event.stopPropagation();
       toggleScan();
     });
   });
+
+  document.addEventListener("click", () => closeExpandedQrControls());
 
   const messageField = document.querySelector(".contact-form-runtime .wpcf7 textarea");
 
