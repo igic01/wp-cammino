@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.4.9' );
+define( 'NSTARTER_VERSION', '1.5.0' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -20,6 +20,219 @@ require_once NSTARTER_PATH . '/inc/posts.php';
 require_once NSTARTER_PATH . '/inc/editor.php';
 
 add_action( 'init', 'cammino_register_live_sections' );
+add_action( 'after_setup_theme', 'cammino_register_navigation' );
+
+/**
+ * Register shared Cammino navigation locations.
+ */
+function cammino_register_navigation(): void {
+	register_nav_menus(
+		array(
+			'new-menu' => __( 'New Menu', 'cammino' ),
+		)
+	);
+}
+
+/**
+ * Render WordPress menu links without list wrappers to match the static design.
+ */
+class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
+	/**
+	 * Prevent submenu wrappers in the bare-link navigation.
+	 *
+	 * @param string $output Used to append additional content.
+	 * @param int    $depth  Depth of menu item.
+	 * @param mixed  $args   Menu args.
+	 */
+	public function start_lvl( &$output, $depth = 0, $args = null ) {}
+
+	/**
+	 * Prevent submenu wrapper closing tags in the bare-link navigation.
+	 *
+	 * @param string $output Used to append additional content.
+	 * @param int    $depth  Depth of menu item.
+	 * @param mixed  $args   Menu args.
+	 */
+	public function end_lvl( &$output, $depth = 0, $args = null ) {}
+
+	/**
+	 * Start a menu item.
+	 *
+	 * @param string   $output Used to append additional content.
+	 * @param WP_Post  $item   Menu item data object.
+	 * @param int      $depth  Depth of menu item.
+	 * @param stdClass $args   Menu args.
+	 * @param int      $id     Current item ID.
+	 */
+	public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
+		if ( 0 !== $depth ) {
+			return;
+		}
+
+		$classes = array_filter( (array) $item->classes );
+
+		if ( in_array( 'current-menu-item', $classes, true ) || in_array( 'current_page_item', $classes, true ) ) {
+			$classes[] = 'is-active';
+		}
+
+		$class_attribute = implode( ' ', array_map( 'sanitize_html_class', array_unique( $classes ) ) );
+		$attributes      = array(
+			'href' => ! empty( $item->url ) ? $item->url : '#',
+		);
+
+		if ( '' !== $class_attribute ) {
+			$attributes['class'] = $class_attribute;
+		}
+
+		if ( '_blank' === $item->target ) {
+			$attributes['target'] = '_blank';
+			$attributes['rel']    = trim( (string) $item->xfn . ' noopener noreferrer' );
+		} elseif ( ! empty( $item->xfn ) ) {
+			$attributes['rel'] = $item->xfn;
+		}
+
+		if ( ! empty( $item->attr_title ) ) {
+			$attributes['title'] = $item->attr_title;
+		}
+
+		$output .= '<a';
+
+		foreach ( $attributes as $name => $value ) {
+			$output .= sprintf( ' %s="%s"', esc_attr( $name ), esc_attr( $value ) );
+		}
+
+		$output .= '>' . esc_html( $item->title ) . '</a>';
+	}
+
+	/**
+	 * Prevent list item closing tags in the bare-link navigation.
+	 *
+	 * @param string  $output Used to append additional content.
+	 * @param WP_Post $item   Menu item data object.
+	 * @param int     $depth  Depth of menu item.
+	 * @param mixed   $args   Menu args.
+	 */
+	public function end_el( &$output, $item, $depth = 0, $args = null ) {}
+}
+
+/**
+ * Render the shared Cammino menu.
+ */
+function cammino_render_shared_menu(): void {
+	$args = array(
+		'container'    => false,
+		'depth'        => 1,
+		'echo'         => false,
+		'fallback_cb'  => false,
+		'items_wrap'   => '%3$s',
+		'walker'       => new Cammino_Bare_Nav_Walker(),
+	);
+
+	if ( has_nav_menu( 'new-menu' ) ) {
+		$args['theme_location'] = 'new-menu';
+	} else {
+		$args['menu'] = 'new-menu';
+	}
+
+	$menu = wp_nav_menu( $args );
+
+	if ( is_string( $menu ) && '' !== trim( $menu ) ) {
+		echo $menu; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		return;
+	}
+
+	$fallback_links = array(
+		array( home_url( '/' ), __( 'Domov', 'cammino' ) ),
+		array( nstarter_get_source_page_url( 'about-us', '/o-nas/' ), __( 'O nás', 'cammino' ) ),
+		array( nstarter_get_source_page_url( 'ss', '/pribehy/' ), __( 'Príbehy', 'cammino' ) ),
+		array( nstarter_get_source_page_url( 'news', '/novinky/' ) . '#events', __( 'Podujatia', 'cammino' ) ),
+		array( nstarter_get_source_page_url( 'news', '/novinky/' ), __( 'Novinky', 'cammino' ) ),
+		array( nstarter_get_source_page_url( 'contact', '/kontakt/' ), __( 'Kontakt', 'cammino' ) ),
+	);
+
+	foreach ( $fallback_links as $link ) {
+		printf(
+			'<a href="%s">%s</a>',
+			esc_url( $link[0] ),
+			esc_html( $link[1] )
+		);
+	}
+}
+
+/**
+ * Render the shared Cammino header for custom visual pages.
+ */
+function cammino_render_site_header(): void {
+	?>
+	<a class="skip-link" href="#main-content"><?php esc_html_e( 'Preskočiť na obsah', 'cammino' ); ?></a>
+	<header class="site-header" data-header>
+		<div class="container header-inner">
+			<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Cammino – domov', 'cammino' ); ?>">
+				<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1666" height="297">
+			</a>
+
+			<button class="nav-toggle" type="button" aria-label="<?php esc_attr_e( 'Otvoriť menu', 'cammino' ); ?>" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+				<i class="fa-solid fa-bars" aria-hidden="true"></i>
+			</button>
+
+			<nav class="site-nav" id="site-nav" aria-label="<?php esc_attr_e( 'Hlavná navigácia', 'cammino' ); ?>" data-nav>
+				<?php cammino_render_shared_menu(); ?>
+			</nav>
+		</div>
+	</header>
+	<?php
+}
+
+/**
+ * Render the shared Cammino footer for custom visual pages.
+ */
+function cammino_render_site_footer(): void {
+	?>
+	<footer class="site-footer" id="contact">
+		<div class="container footer-main">
+			<div class="footer-brand">
+				<a class="brand brand--footer" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Cammino – domov', 'cammino' ); ?>">
+					<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1666" height="297">
+				</a>
+				<p><?php esc_html_e( 'Pomáhame mladým ľuďom nájsť cestu k vzdelaniu, práci a samostatnej budúcnosti.', 'cammino' ); ?></p>
+				<div class="social-links" aria-label="<?php esc_attr_e( 'Sociálne siete', 'cammino' ); ?>">
+					<a href="#" aria-label="<?php esc_attr_e( 'Instagram', 'cammino' ); ?>"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+					<a href="#" aria-label="<?php esc_attr_e( 'Facebook', 'cammino' ); ?>"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+					<a href="#" aria-label="<?php esc_attr_e( 'LinkedIn', 'cammino' ); ?>"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
+				</div>
+			</div>
+
+			<div class="footer-links">
+				<h2><?php esc_html_e( 'Cammino', 'cammino' ); ?></h2>
+				<?php cammino_render_shared_menu(); ?>
+			</div>
+
+			<div class="footer-links">
+				<h2><?php esc_html_e( 'Zapojte sa', 'cammino' ); ?></h2>
+				<a href="<?php echo esc_url( nstarter_get_source_page_url( 'donate', '/podporte-nas/' ) ); ?>"><?php esc_html_e( 'Podporte nás', 'cammino' ); ?></a>
+				<a href="#"><?php esc_html_e( 'Pre firmy', 'cammino' ); ?></a>
+				<a href="#"><?php esc_html_e( 'Dobrovoľníctvo', 'cammino' ); ?></a>
+				<a href="#"><?php esc_html_e( 'Pošlite nám príbeh', 'cammino' ); ?></a>
+			</div>
+
+			<div class="footer-contact">
+				<h2><?php esc_html_e( 'Zostaňme v kontakte', 'cammino' ); ?></h2>
+				<a href="mailto:management@ozcammino.sk">management@ozcammino.sk</a>
+				<p><?php esc_html_e( 'Miletičova 7, Bratislava', 'cammino' ); ?></p>
+				<form class="newsletter" action="#" method="post">
+					<label class="sr-only" for="cammino-footer-email"><?php esc_html_e( 'Váš e-mail', 'cammino' ); ?></label>
+					<input id="cammino-footer-email" type="email" name="email" placeholder="<?php esc_attr_e( 'Váš e-mail', 'cammino' ); ?>" required>
+					<button type="submit" aria-label="<?php esc_attr_e( 'Prihlásiť sa na odber', 'cammino' ); ?>"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+				</form>
+			</div>
+		</div>
+		<div class="container footer-bottom">
+			<p>© <span data-year></span> <?php esc_html_e( 'Cammino. Každý krok má zmysel.', 'cammino' ); ?></p>
+			<div><a href="#"><?php esc_html_e( 'Ochrana súkromia', 'cammino' ); ?></a><a href="#"><?php esc_html_e( 'Cookies', 'cammino' ); ?></a></div>
+		</div>
+	</footer>
+	<?php
+}
 
 /**
  * Register dynamic content that must never be stored in an editable snapshot.
@@ -188,9 +401,17 @@ function cammino_enqueue_design_assets( string $handle, string $style, string $s
 	wp_enqueue_style( $handle, NSTARTER_URL . $style, $style_dependencies, NSTARTER_VERSION );
 
 	wp_enqueue_script(
+		'cammino-shell',
+		NSTARTER_URL . '/assets/js/cammino-shell.js',
+		array(),
+		NSTARTER_VERSION,
+		true
+	);
+
+	wp_enqueue_script(
 		$handle,
 		NSTARTER_URL . $script,
-		array(),
+		array( 'cammino-shell' ),
 		NSTARTER_VERSION,
 		true
 	);

@@ -1,10 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  if (!document.body.classList.contains("donate-now-page")) {
-    document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
-      .forEach((element) => element.remove());
-  }
+  document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
+    .forEach((element) => element.remove());
 
   document.querySelector(".details-heading > p")?.remove();
 

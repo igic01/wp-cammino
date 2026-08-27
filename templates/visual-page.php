@@ -30,9 +30,11 @@ if ( '' === trim( $nstarter_html ) ) {
 </head>
 <body <?php body_class(); ?>>
 	<?php wp_body_open(); ?>
+	<?php cammino_render_site_header(); ?>
 	<div id="nstarter-snapshot" data-nstarter-snapshot-root>
 		<?php echo nstarter_expand_live_sections( $nstarter_html, $nstarter_post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
+	<?php cammino_render_site_footer(); ?>
 	<?php wp_footer(); ?>
 </body>
 </html>

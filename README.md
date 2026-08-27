@@ -19,7 +19,8 @@ donation designs, plus a shared single-post design for articles and events.
 
 - `style.css` declares the Astra child theme and is the entry point for shared CSS.
 - `functions.php` loads the child stylesheet on ordinary pages and isolated
-  Cammino assets on custom visual pages.
+  Cammino assets on custom visual pages. It also renders the shared Cammino
+  header and footer for custom visual pages and managed posts.
 - `snapshot-templates/home.php` is the editable Cammino homepage source.
 - `snapshot-templates/about-us.php` is the clean PHP source for the O nás page.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
@@ -86,5 +87,7 @@ that no mailing-list integration is connected yet.
 The original donation forms are interactive design previews only. They do not
 collect, transmit, or process payments.
 
-Avoid adding `header.php`, `footer.php`, `page.php`, or other parent-template
-overrides unless a future feature intentionally needs to replace Astra behavior.
+Avoid adding `page.php` or other parent-template overrides unless a future
+feature intentionally needs to replace Astra behavior. The custom Cammino header
+and footer are rendered only inside the isolated visual-page and post wrappers,
+so ordinary Astra and Elementor pages continue to use Astra.

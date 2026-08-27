@@ -72,7 +72,7 @@ $cammino_related    = get_posts(
 <body <?php body_class(); ?>>
 	<?php wp_body_open(); ?>
 	<div class="reading-progress" aria-hidden="true"><span data-reading-progress></span></div>
-	<a class="skip-link" href="#main-content">Preskočiť na obsah</a>
+	<?php cammino_render_site_header(); ?>
 
 	<main id="main-content">
 		<article>
@@ -146,6 +146,7 @@ $cammino_related    = get_posts(
 		<?php endif; ?>
 	</main>
 
+	<?php cammino_render_site_footer(); ?>
 	<?php wp_footer(); ?>
 </body>
 </html>

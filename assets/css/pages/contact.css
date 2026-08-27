@@ -1,7 +1,7 @@
 /* Contact page */
 
-.contact-page:not(.donate-now-page) #nstarter-snapshot > .site-header,
-.contact-page:not(.donate-now-page) #nstarter-snapshot > .site-footer {
+.contact-page #nstarter-snapshot > .site-header,
+.contact-page #nstarter-snapshot > .site-footer {
   display: none !important;
 }
 

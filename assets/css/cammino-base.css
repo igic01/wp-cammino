@@ -99,6 +99,12 @@ body.cammino-visual-page #nstarter-snapshot {
   font-family: var(--font-body) !important;
 }
 
+body.cammino-visual-page #nstarter-snapshot > .skip-link,
+body.cammino-visual-page #nstarter-snapshot > .site-header,
+body.cammino-visual-page #nstarter-snapshot > .site-footer {
+  display: none !important;
+}
+
 body.cammino-visual-page #nstarter-snapshot h1,
 body.cammino-visual-page #nstarter-snapshot h2,
 body.cammino-visual-page #nstarter-snapshot h3,
