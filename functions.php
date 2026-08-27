@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.4.0' );
+define( 'NSTARTER_VERSION', '1.4.1' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -72,6 +72,11 @@ function cammino_enqueue_visual_page_assets(): void {
 
 	$slug  = nstarter_get_native_source_template_slug( get_queried_object_id() );
 	$pages = array(
+		'home'     => array(
+			'handle' => 'cammino-home',
+			'style'  => '/assets/css/pages/home.css',
+			'script' => '/assets/js/pages/home.js',
+		),
 		'about-us' => array(
 			'handle' => 'cammino-about-us',
 			'style'  => '/assets/css/pages/about-us.css',
@@ -248,6 +253,7 @@ function cammino_visual_page_body_classes( array $classes ): array {
 	if ( is_page() ) {
 		$slug         = nstarter_get_native_source_template_slug( get_queried_object_id() );
 		$page_classes = array(
+			'home'          => array( 'home-page' ),
 			'about-us'      => array( 'about-page' ),
 			'contact'       => array( 'contact-page' ),
 			'ss'            => array( 'stories-page' ),

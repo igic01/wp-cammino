@@ -4,8 +4,8 @@ This repository contains a minimal child theme for [Astra](https://wpastra.com/)
 It deliberately relies on Astra's normal template hierarchy, so existing Astra
 and Elementor pages continue to work unchanged while new Cammino features are
 built incrementally. The opt-in custom pages currently include the editable
-**O nás**, **Kontakt**, **Príbehy úspechov**, and **Novinky** designs, plus a
-shared single-post design for Cammino articles and events.
+**Domov**, **O nás**, **Kontakt**, **Príbehy úspechov**, **Novinky**, and
+donation designs, plus a shared single-post design for articles and events.
 
 ## Requirements
 
@@ -20,6 +20,7 @@ shared single-post design for Cammino articles and events.
 - `style.css` declares the Astra child theme and is the entry point for shared CSS.
 - `functions.php` loads the child stylesheet on ordinary pages and isolated
   Cammino assets on custom visual pages.
+- `snapshot-templates/home.php` is the editable Cammino homepage source.
 - `snapshot-templates/about-us.php` is the clean PHP source for the O nás page.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
 - `snapshot-templates/ss.php` is the variable-card source for Príbehy úspechov.
@@ -39,13 +40,16 @@ shared single-post design for Cammino articles and events.
 ## Create an editable Cammino page
 
 1. Create or edit a WordPress page.
-2. In the page **Template** selector, choose **Cammino — O nás**,
-   **Cammino — Kontakt**, **Cammino — Príbehy úspechov**, or
-   **Cammino — Novinky**, then save.
+2. In the page **Template** selector, choose the required **Cammino — ...**
+   design, such as **Cammino — Domov**, **Cammino — O nás**, **Cammino —
+   Novinky**, or one of the donation templates, then save.
 3. Use the **Cammino visual editor** meta box or the **Visual editor** admin-bar
    link to open the editor.
 4. Edit text in Text mode, replace images or videos in Media mode, and press
    **Save**.
+
+For the homepage, assign **Cammino — Domov** to a page and then select that page
+under **Settings → Reading → Your homepage displays**.
 
 The saved HTML is stored in ACF when ACF is active, with private post meta as a
 fallback. **Regenerate page** resets the editable snapshot from
