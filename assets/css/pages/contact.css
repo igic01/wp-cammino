@@ -655,7 +655,7 @@
   transform: translate3d(-90px, -16px, 0) rotate(0) scale(1.7);
 }
 
-.qr-placeholder img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; filter: grayscale(1) contrast(1.1); }
+.qr-placeholder img { width: 100%; height: 100%; object-fit: contain; object-position: center; border-radius: 12px; filter: grayscale(1) contrast(1.1); }
 
 .qr-scan {
   display: none !important;
@@ -704,7 +704,14 @@
   .support-contact-card,
   .donate-now-page .support-contact-card { grid-template-columns: 1fr; }
   .donate-now-page .support-copy .button--cream { width: fit-content; max-width: 100%; }
-  .qr-wrap { align-items: flex-start; }
+  .qr-wrap {
+    width: 100%;
+    align-items: center;
+  }
+
+  .qr-placeholder {
+    margin-inline: auto;
+  }
   .qr-placeholder,
   .qr-placeholder:hover,
   .qr-placeholder:active,
