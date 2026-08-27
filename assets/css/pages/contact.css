@@ -574,8 +574,12 @@
 .support-copy p { max-width: 490px; color: rgba(78, 40, 58, 0.78); }
 .support-copy .button { margin-top: 0.5rem; }
 
+.donate-now-page .contact-hero .container {
+  width: min(100% - (var(--gutter) * 2), 1380px);
+}
+
 .donate-now-page .contact-hero__grid {
-  grid-template-columns: minmax(0, 0.78fr) minmax(720px, 1.22fr);
+  grid-template-columns: minmax(360px, 0.78fr) minmax(760px, 1.22fr);
   gap: clamp(1.5rem, 3vw, 3.5rem);
 }
 
