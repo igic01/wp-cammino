@@ -409,12 +409,8 @@ h2 em {
   transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
 }
 
-.site-nav > a:last-child::before {
-  content: "\f004";
-  font-family: "Font Awesome 6 Free";
+.site-nav > a:last-child i {
   font-size: 0.88em;
-  font-style: normal;
-  font-weight: 900;
   line-height: 1;
 }
 

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.5.5' );
+define( 'NSTARTER_VERSION', '1.5.6' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -124,8 +124,10 @@ class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
 
 /**
  * Render the shared Cammino menu.
+ *
+ * @param bool $with_cta_icon Whether to add a heart to the final menu link.
  */
-function cammino_render_shared_menu(): void {
+function cammino_render_shared_menu( bool $with_cta_icon = false ): void {
 	$args = array(
 		'container'    => false,
 		'depth'        => 1,
@@ -144,6 +146,19 @@ function cammino_render_shared_menu(): void {
 	$menu = wp_nav_menu( $args );
 
 	if ( is_string( $menu ) && '' !== trim( $menu ) ) {
+		if ( $with_cta_icon ) {
+			$closing_tag_position = strrpos( $menu, '</a>' );
+
+			if ( false !== $closing_tag_position ) {
+				$menu = substr_replace(
+					$menu,
+					'<i class="fa-solid fa-heart" aria-hidden="true"></i></a>',
+					$closing_tag_position,
+					4
+				);
+			}
+		}
+
 		echo $menu; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		return;
 	}
@@ -157,11 +172,18 @@ function cammino_render_shared_menu(): void {
 		array( nstarter_get_source_page_url( 'contact', '/kontakt/' ), __( 'Kontakt', 'cammino' ) ),
 	);
 
-	foreach ( $fallback_links as $link ) {
+	$last_fallback_index = array_key_last( $fallback_links );
+
+	foreach ( $fallback_links as $index => $link ) {
+		$icon = $with_cta_icon && $index === $last_fallback_index
+			? '<i class="fa-solid fa-heart" aria-hidden="true"></i>'
+			: '';
+
 		printf(
-			'<a href="%s">%s</a>',
+			'<a href="%s">%s%s</a>',
 			esc_url( $link[0] ),
-			esc_html( $link[1] )
+			esc_html( $link[1] ),
+			$icon // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
 	}
 }
@@ -183,7 +205,7 @@ function cammino_render_site_header(): void {
 			</button>
 
 			<nav class="site-nav" id="site-nav" aria-label="<?php esc_attr_e( 'Hlavná navigácia', 'cammino' ); ?>" data-nav>
-				<?php cammino_render_shared_menu(); ?>
+				<?php cammino_render_shared_menu( true ); ?>
 			</nav>
 		</div>
 	</header>
