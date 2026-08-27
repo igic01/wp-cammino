@@ -631,9 +631,11 @@
 
 .qr-placeholder {
   position: relative;
+  display: grid;
   width: min(100%, 230px);
   aspect-ratio: 1;
   padding: 0.8rem;
+  place-items: center;
   overflow: hidden;
   border: 8px solid var(--color-white);
   border-radius: 24px;
@@ -655,7 +657,17 @@
   transform: translate3d(-90px, -16px, 0) rotate(0) scale(1.7);
 }
 
-.qr-placeholder img { width: 100%; height: 100%; object-fit: contain; object-position: center; border-radius: 12px; filter: grayscale(1) contrast(1.1); }
+.qr-placeholder img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1;
+  margin: 0 !important;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 12px;
+  filter: grayscale(1) contrast(1.1);
+}
 
 .qr-scan {
   display: none !important;
