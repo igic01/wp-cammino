@@ -583,7 +583,6 @@
 
 .qr-placeholder {
   position: relative;
-  display: block;
   width: min(100%, 230px);
   aspect-ratio: 1;
   padding: 0.8rem;
