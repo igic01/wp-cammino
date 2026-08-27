@@ -38,3 +38,43 @@ document.addEventListener("DOMContentLoaded", () => {
     year.textContent = String(new Date().getFullYear());
   }
 });
+
+(() => {
+  let activePopup = null;
+
+  const close = () => {
+    activePopup?.remove();
+    activePopup = null;
+    document.body.classList.remove("cammino-media-popup-open");
+  };
+
+  const open = (sourceImage, label = "Zavrieť náhľad") => {
+    if (!(sourceImage instanceof HTMLImageElement)) return;
+
+    close();
+
+    const popup = document.createElement("button");
+    const surface = document.createElement("span");
+    const image = sourceImage.cloneNode(true);
+
+    popup.type = "button";
+    popup.className = "cammino-media-popup";
+    popup.setAttribute("aria-label", label);
+    surface.className = "cammino-media-popup__surface";
+    image.removeAttribute("loading");
+
+    surface.append(image);
+    popup.append(surface);
+    popup.addEventListener("click", close);
+    document.body.append(popup);
+    document.body.classList.add("cammino-media-popup-open");
+    activePopup = popup;
+    popup.focus({ preventScroll: true });
+  };
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && activePopup) close();
+  });
+
+  window.CamminoMediaPopup = { open, close };
+})();

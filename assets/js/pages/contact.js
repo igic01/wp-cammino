@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const qrControls = document.querySelectorAll("[data-qr-toggle]");
+  const mobileQrMedia = window.matchMedia("(max-width: 760px)");
 
   const closeExpandedQrControls = (exceptControl = null) => {
     qrControls.forEach((control) => {
@@ -58,7 +59,13 @@ document.addEventListener("DOMContentLoaded", () => {
     qrControl.setAttribute("data-nstarter-transient-class", "is-expanded");
     qrControl.setAttribute("data-nstarter-transient-attributes", "aria-pressed aria-label");
 
-    const toggleScan = () => {
+    const toggleQr = () => {
+      if (mobileQrMedia.matches) {
+        closeExpandedQrControls();
+        window.CamminoMediaPopup?.open(qrControl.querySelector("img"), "Zavrieť QR kód");
+        return;
+      }
+
       const isExpanded = qrControl.classList.toggle("is-expanded");
       if (isExpanded) closeExpandedQrControls(qrControl);
       qrControl.setAttribute("aria-pressed", String(isExpanded));
@@ -71,14 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     qrControl.addEventListener("click", (event) => {
       event.stopPropagation();
-      toggleScan();
+      toggleQr();
     });
 
     qrControl.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
       event.stopPropagation();
-      toggleScan();
+      toggleQr();
     });
   });
 

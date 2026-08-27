@@ -3,6 +3,36 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach((element) => element.remove());
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mobileMedia = window.matchMedia("(max-width: 760px)");
+
+  document.querySelectorAll(".about-hero__image, .europe-image").forEach((frame) => {
+    const syncMobileInteraction = () => {
+      if (mobileMedia.matches) {
+        frame.setAttribute("role", "button");
+        frame.setAttribute("tabindex", "0");
+        frame.setAttribute("aria-label", "Zväčšiť fotografiu");
+        frame.setAttribute("data-nstarter-transient-attributes", "role tabindex aria-label");
+      } else {
+        frame.removeAttribute("role");
+        frame.removeAttribute("tabindex");
+        frame.removeAttribute("aria-label");
+      }
+    };
+
+    const openPhoto = () => {
+      if (!mobileMedia.matches) return;
+      window.CamminoMediaPopup?.open(frame.querySelector("img"), "Zavrieť fotografiu");
+    };
+
+    syncMobileInteraction();
+    mobileMedia.addEventListener?.("change", syncMobileInteraction);
+    frame.addEventListener("click", openPhoto);
+    frame.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      openPhoto();
+    });
+  });
 
   const revealElements = document.querySelectorAll("[data-about-reveal]");
 

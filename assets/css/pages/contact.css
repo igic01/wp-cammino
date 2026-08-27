@@ -655,29 +655,10 @@
   transform: translate3d(-90px, -16px, 0) rotate(0) scale(1.7);
 }
 
-.qr-placeholder:hover .qr-scan,
-.qr-placeholder.is-expanded .qr-scan {
-  opacity: 0;
-  animation: none;
-}
-
 .qr-placeholder img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; filter: grayscale(1) contrast(1.1); }
 
 .qr-scan {
-  position: absolute;
-  z-index: 2;
-  right: 0.7rem;
-  left: 0.7rem;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--color-coral);
-  box-shadow: 0 0 10px rgba(217, 111, 93, 0.7);
-  animation: qr-scan-line 3s ease-in-out infinite;
-}
-
-@keyframes qr-scan-line {
-  0%, 100% { top: 1rem; opacity: 0.25; }
-  50% { top: calc(100% - 1rem); opacity: 1; }
+  display: none !important;
 }
 
 .qr-hint {
@@ -724,7 +705,12 @@
   .donate-now-page .support-contact-card { grid-template-columns: 1fr; }
   .donate-now-page .support-copy .button--cream { width: fit-content; max-width: 100%; }
   .qr-wrap { align-items: flex-start; }
-  .qr-placeholder.is-expanded { transform: translate3d(60px, -12px, 0) rotate(0) scale(1.5); }
+  .qr-placeholder,
+  .qr-placeholder:hover,
+  .qr-placeholder:active,
+  .qr-placeholder.is-expanded {
+    transform: none;
+  }
   .address-card, .support-contact-card { min-height: 0; border-radius: var(--radius-md); }
 }
 
@@ -738,7 +724,6 @@
   .contact-form-card .wpcf7-submit { width: 100%; }
   .address-marker, .support-heart { margin-bottom: 2.2rem; }
   .qr-placeholder { width: min(100%, 220px); }
-  .qr-placeholder.is-expanded { transform: translate3d(32px, -10px, 0) rotate(0) scale(1.35); }
 }
 
 @media (prefers-reduced-motion: reduce) {

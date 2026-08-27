@@ -866,7 +866,23 @@
   .about-hero { padding-block: 2.5rem 3rem; }
   .about-hero h1 { font-size: clamp(3.2rem, 14vw, 4.5rem); }
   .about-hero__visual { min-height: 460px; }
-  .about-hero__image { inset: 2.5rem 0.5rem 2rem; }
+  .about-hero__image {
+    inset: 2.5rem 0.5rem 2rem;
+    cursor: zoom-in;
+    transform: none;
+  }
+
+  .about-hero__image:hover,
+  .about-hero__image:active {
+    transform: none;
+  }
+
+  .europe-image,
+  .europe-image:hover,
+  .europe-image:active {
+    cursor: zoom-in;
+    transform: none;
+  }
   .floating-path--top { right: 0; }
   .floating-path--bottom { left: 0; }
   .hero-path-line { right: -1rem; width: 9rem; }
