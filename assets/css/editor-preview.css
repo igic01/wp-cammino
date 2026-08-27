@@ -31,6 +31,41 @@
     pointer-events: none !important;
 }
 
+/* Let the locked header define its real height inside the editor canvas. */
+.nstarter-editor-preview.nstarter-mode-text [data-nstarter-live-section="cammino_site_header"],
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section="cammino_site_header"],
+.nstarter-editor-preview.nstarter-mode-interaction [data-nstarter-live-section="cammino_site_header"] {
+    min-height: 0;
+}
+
+.nstarter-editor-preview [data-nstarter-live-section="cammino_site_header"] .site-header,
+.nstarter-editor-preview [data-nstarter-live-section="cammino_site_header"] .site-header.is-scrolled {
+    position: relative;
+    inset: auto;
+    padding-block: 1rem 0.5rem;
+    background: rgba(250, 246, 238, 0.96);
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+.nstarter-editor-preview #nstarter-snapshot > [data-nstarter-live-section="cammino_site_header"] ~ main#main-content {
+    padding-top: 0;
+}
+
+.nstarter-editor-preview.nstarter-mode-text [data-nstarter-live-section="cammino_site_header"]::before,
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section="cammino_site_header"]::before {
+    right: auto;
+    left: 10px;
+    content: "HEADER · LIVE & LOCKED";
+}
+
+.nstarter-editor-preview.nstarter-mode-text [data-nstarter-live-section="cammino_site_footer"]::before,
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section="cammino_site_footer"]::before {
+    right: auto;
+    left: 10px;
+    content: "FOOTER · LIVE & LOCKED";
+}
+
 .nstarter-editor-preview.nstarter-mode-media img,
 .nstarter-editor-preview.nstarter-mode-media video {
     cursor: pointer;
