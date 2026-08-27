@@ -592,6 +592,17 @@
     }
 
     function handlePreviewClick(event) {
+        const link = event.target.closest && event.target.closest('a[href]');
+
+        // The editor iframe must always stay on the page being edited, even in
+        // Interaction mode. The separate View action remains available.
+        if (link) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+            return;
+        }
+
         if (mode === 'interaction') {
             return;
         }
@@ -636,6 +647,12 @@
 
         event.preventDefault();
         openMediaPicker(target);
+    }
+
+    function preventPreviewFormNavigation(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
     }
 
     function addTransientDefinition(definitions, element, type, names) {
@@ -866,6 +883,7 @@
         doc.addEventListener('auxclick', handlePreviewClick, true);
         doc.addEventListener('dblclick', handlePreviewClick, true);
         doc.addEventListener('click', handlePreviewClick, true);
+        doc.addEventListener('submit', preventPreviewFormNavigation, true);
         doc.addEventListener('beforeinput', protectLiveSection, true);
         doc.addEventListener('input', markDirty, true);
         doc.addEventListener('keydown', handleShortcut, true);

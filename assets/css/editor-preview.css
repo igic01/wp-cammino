@@ -66,6 +66,10 @@
     content: "FOOTER · LIVE & LOCKED";
 }
 
+.nstarter-editor-preview a[href] {
+    cursor: not-allowed;
+}
+
 .nstarter-editor-preview.nstarter-mode-media img,
 .nstarter-editor-preview.nstarter-mode-media video {
     cursor: pointer;
