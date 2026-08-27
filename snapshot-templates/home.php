@@ -31,9 +31,9 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
           </div>
         </div>
 
-        <div class="hero-visual" data-reveal="scale" data-delay="140">
+        <div class="hero-visual" data-hero-reveal data-delay="140">
           <div class="hero-image-wrap">
-            <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Ľudia spolupracujú počas komunitnej aktivity OZ Cammino" width="1200" height="800">
+            <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Ľudia spolupracujú počas komunitnej aktivity OZ Cammino" width="1200" height="800" decoding="async" fetchpriority="high">
             <div class="image-tint" aria-hidden="true"></div>
           </div>
           <div class="hero-note hero-note--top" aria-hidden="true">

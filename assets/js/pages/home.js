@@ -1,13 +1,44 @@
 document.addEventListener("DOMContentLoaded", () => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const hero = document.querySelector(".hero");
+  const heroVisual = document.querySelector(".hero-visual");
+  const heroImage = heroVisual?.querySelector(".hero-image-wrap img");
   const storyVisual = document.querySelector(".story-visual");
 
+  if (heroVisual) {
+    const transientClasses = new Set((heroVisual.dataset.nstarterTransientClass || "").split(/\s+/).filter(Boolean));
+    transientClasses.add("is-visible");
+    heroVisual.setAttribute("data-nstarter-transient-class", [...transientClasses].join(" "));
+
+    let heroRevealed = false;
+    const revealHero = () => {
+      if (heroRevealed) return;
+      heroRevealed = true;
+      const delay = reducedMotion ? 0 : Number(heroVisual.dataset.delay || 0);
+      window.setTimeout(() => heroVisual.classList.add("is-visible"), delay);
+    };
+
+    if (!heroImage) {
+      revealHero();
+    } else if (reducedMotion) {
+      revealHero();
+    } else if (heroImage.complete) {
+      if (heroImage.naturalWidth > 0 && typeof heroImage.decode === "function") {
+        heroImage.decode().catch(() => {}).finally(revealHero);
+      } else {
+        revealHero();
+      }
+    } else {
+      heroImage.addEventListener("load", revealHero, { once: true });
+      heroImage.addEventListener("error", revealHero, { once: true });
+    }
+  }
+
   if (hero && !reducedMotion) {
-	hero.setAttribute("data-nstarter-transient-attributes", "style");
+    hero.setAttribute("data-nstarter-transient-attributes", "style");
     let pointerFrame;
     hero.addEventListener("pointermove", (event) => {
-      if (window.innerWidth < 820) return;
+      if (window.innerWidth < 820 || !heroVisual?.classList.contains("is-visible")) return;
       cancelAnimationFrame(pointerFrame);
       pointerFrame = requestAnimationFrame(() => {
         const bounds = hero.getBoundingClientRect();
@@ -35,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  const revealElements = document.querySelectorAll("[data-reveal]");
+  const revealElements = document.querySelectorAll("[data-reveal]:not(.hero-visual)");
   revealElements.forEach((element) => {
     const transientClasses = new Set((element.dataset.nstarterTransientClass || "").split(/\s+/).filter(Boolean));
     transientClasses.add("is-visible");

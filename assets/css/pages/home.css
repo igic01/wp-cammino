@@ -132,6 +132,15 @@
   min-height: 590px;
 }
 
+/* Older saved snapshots used the global reveal on this wrapper. Keep those
+   snapshots stable and let the image-ready hero reveal below handle it. */
+.hero-visual[data-reveal] {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition: none;
+}
+
 .hero-image-wrap {
   position: absolute;
   inset: 2rem 0 0 2rem;
@@ -140,30 +149,35 @@
   background: var(--color-sage);
   box-shadow: var(--shadow-soft);
   opacity: 0;
-  transform: translate3d(var(--hero-shift-x), var(--hero-shift-y), 0) rotate(11deg) scale(0.28);
+  transform: translate3d(0, 24px, 0) rotate(5deg) scale(0.96);
   transform-origin: center;
   transition:
-    opacity 500ms 100ms ease-out,
-    transform 1.15s 100ms cubic-bezier(0.34, 1.4, 0.64, 1);
+    opacity 450ms ease-out,
+    transform 850ms cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
 .hero-visual.is-visible .hero-image-wrap {
   opacity: 1;
-  transform: translate3d(var(--hero-shift-x), var(--hero-shift-y), 0) rotate(2deg) scale(1);
+  transform: translate3d(0, 0, 0) rotate(2deg) scale(1);
 }
 
 .hero-image-wrap img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   filter: sepia(0.08) saturate(0.85);
+  transform: translate3d(var(--hero-shift-x), var(--hero-shift-y), 0) scale(1.06);
+  transition: transform 160ms ease-out;
+  will-change: transform;
 }
 
 .image-tint {
   position: absolute;
   inset: 0;
   background: linear-gradient(165deg, transparent 42%, rgba(100, 54, 75, 0.17));
+  pointer-events: none;
 }
 
 .hero-note {
@@ -1319,5 +1333,17 @@
   .event-list[data-reveal] .event-row {
     opacity: 1;
     transform: none;
+  }
+
+  .hero-image-wrap,
+  .hero-visual.is-visible .hero-image-wrap {
+    opacity: 1;
+    transform: rotate(2deg);
+    transition: none;
+  }
+
+  .hero-image-wrap img {
+    transform: scale(1.06);
+    transition: none;
   }
 }
