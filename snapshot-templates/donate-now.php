@@ -37,7 +37,6 @@ $cammino_placeholder = $cammino_asset_url . '/images/placeholder.webp';
     <section class="contact-hero" aria-labelledby="contact-title">
       <div class="container contact-hero__grid">
         <div class="contact-intro" data-contact-reveal="left">
-          <p class="contact-label"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Kontakt</p>
           <h1 id="contact-title">Poďme urobiť <em>ďalší krok spolu</em></h1>
           <p class="contact-lead">Máte otázku, nápad na spoluprácu alebo chcete vedieť viac o našich aktivitách? Vyberte si správny kontakt alebo nám pošlite správu.</p>
 

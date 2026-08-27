@@ -2,46 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
     .forEach((element) => element.remove());
 
-  const header = document.querySelector("[data-header]");
-  const nav = document.querySelector("[data-nav]");
-  const navToggle = document.querySelector("[data-nav-toggle]");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  header?.setAttribute("data-nstarter-transient-class", "is-scrolled");
-  nav?.setAttribute("data-nstarter-transient-class", "is-open");
-
-  const updateHeader = () => {
-    header?.classList.toggle("is-scrolled", window.scrollY > 24);
-  };
-
-  const closeNavigation = () => {
-    if (!nav || !navToggle) return;
-    const icon = navToggle.querySelector("i");
-    nav.classList.remove("is-open");
-    navToggle.setAttribute("aria-expanded", "false");
-    navToggle.setAttribute("aria-label", "Otvoriť menu");
-    icon?.classList.add("fa-bars");
-    icon?.classList.remove("fa-xmark");
-    document.body.classList.remove("nav-open");
-  };
-
-  updateHeader();
-  window.addEventListener("scroll", updateHeader, { passive: true });
-
-  navToggle?.addEventListener("click", () => {
-    const isOpen = nav?.classList.toggle("is-open") ?? false;
-    const icon = navToggle.querySelector("i");
-    navToggle.setAttribute("aria-expanded", String(isOpen));
-    navToggle.setAttribute("aria-label", isOpen ? "Zavrieť menu" : "Otvoriť menu");
-    icon?.classList.toggle("fa-bars", !isOpen);
-    icon?.classList.toggle("fa-xmark", isOpen);
-    document.body.classList.toggle("nav-open", isOpen);
-  });
-
-  nav?.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeNavigation));
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeNavigation();
-  });
 
   const revealElements = document.querySelectorAll("[data-about-reveal]");
 

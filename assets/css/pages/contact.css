@@ -41,6 +41,11 @@
 
 .contact-label i { color: var(--color-coral); }
 
+/* Older editable snapshots may still contain the removed donate label. */
+.donate-now-page .contact-label {
+  display: none;
+}
+
 .detail-number {
   display: inline-flex;
   align-items: center;
