@@ -616,6 +616,19 @@ h2 em {
 }
 
 @media (max-width: 1100px) {
+  body.nav-open .site-header,
+  body.nav-open .site-header.is-scrolled {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    padding-top: 1rem;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
   .nav-toggle {
     display: block;
     position: relative;
@@ -630,11 +643,16 @@ h2 em {
     position: fixed;
     z-index: 101;
     inset: 0;
+    width: 100vw;
+    min-height: 100vh;
+    height: 100dvh;
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
     gap: 0.35rem;
     padding: 6rem var(--gutter) 3rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     color: var(--color-cream);
     background: var(--color-plum-dark);
     opacity: 0;
