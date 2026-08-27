@@ -105,6 +105,12 @@ body.cammino-visual-page #nstarter-snapshot > .site-footer {
   display: none !important;
 }
 
+/* Keep every Cammino hero comfortably below the shared absolute header. */
+body.cammino-visual-page #nstarter-snapshot > main#main-content,
+body.cammino-article-page > main#main-content {
+  padding-top: clamp(5.75rem, 8vw, 6.75rem);
+}
+
 body.cammino-visual-page #nstarter-snapshot h1,
 body.cammino-visual-page #nstarter-snapshot h2,
 body.cammino-visual-page #nstarter-snapshot h3,
@@ -678,6 +684,11 @@ h2 em {
   :root {
     --gutter: 1.15rem;
     --section-space: 4.5rem;
+  }
+
+  body.cammino-visual-page #nstarter-snapshot > main#main-content,
+  body.cammino-article-page > main#main-content {
+    padding-top: 5.25rem;
   }
 
   h1 {
