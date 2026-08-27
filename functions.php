@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.5.0' );
+define( 'NSTARTER_VERSION', '1.5.1' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -31,6 +31,13 @@ function cammino_register_navigation(): void {
 			'new-menu' => __( 'New Menu', 'cammino' ),
 		)
 	);
+}
+
+/**
+ * Remove temporary version suffixes from menu labels.
+ */
+function cammino_clean_nav_title( string $title ): string {
+	return trim( (string) preg_replace( '/\s*-v2$/i', '', $title ) );
 }
 
 /**
@@ -101,7 +108,7 @@ class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
 			$output .= sprintf( ' %s="%s"', esc_attr( $name ), esc_attr( $value ) );
 		}
 
-		$output .= '>' . esc_html( $item->title ) . '</a>';
+		$output .= '>' . esc_html( cammino_clean_nav_title( (string) $item->title ) ) . '</a>';
 	}
 
 	/**
