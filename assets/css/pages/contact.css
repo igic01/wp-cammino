@@ -575,11 +575,23 @@
 .support-copy .button { margin-top: 0.5rem; }
 
 .donate-now-page .contact-hero__grid {
-  grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
+  grid-template-columns: minmax(0, 0.86fr) minmax(620px, 1.14fr);
+  gap: clamp(2rem, 4vw, 4.5rem);
 }
 
 .donate-now-page .support-contact-card {
-  grid-template-columns: minmax(0, 1.35fr) minmax(170px, 0.5fr);
+  grid-template-columns: minmax(0, 1fr) minmax(155px, 0.42fr);
+  gap: clamp(1.25rem, 2.3vw, 2rem);
+}
+
+.donate-now-page .support-copy h3 {
+  max-width: 100%;
+  font-size: clamp(2rem, 2.8vw, 2.65rem);
+  line-height: 1.14;
+}
+
+.donate-now-page .support-copy p {
+  max-width: 360px;
 }
 
 .donate-now-page .support-copy .button--cream {
