@@ -575,13 +575,18 @@
 .support-copy .button { margin-top: 0.5rem; }
 
 .donate-now-page .contact-hero__grid {
-  grid-template-columns: minmax(0, 0.86fr) minmax(620px, 1.14fr);
-  gap: clamp(2rem, 4vw, 4.5rem);
+  grid-template-columns: minmax(0, 0.78fr) minmax(720px, 1.22fr);
+  gap: clamp(1.5rem, 3vw, 3.5rem);
 }
 
 .donate-now-page .support-contact-card {
-  grid-template-columns: minmax(0, 1fr) minmax(155px, 0.42fr);
-  gap: clamp(1.25rem, 2.3vw, 2rem);
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.58fr);
+  gap: clamp(1.5rem, 2.6vw, 2.5rem);
+  margin-top: 100px;
+}
+
+.donate-now-page .qr-placeholder {
+  width: min(100%, 300px);
 }
 
 .donate-now-page .support-copy h3 {
@@ -688,6 +693,7 @@
 @media (max-width: 1080px) {
   .contact-hero__grid,
   .donate-now-page .contact-hero__grid { grid-template-columns: 1fr; }
+  .donate-now-page .support-contact-card { margin-top: 0; }
   .contact-intro { max-width: 760px; padding-top: 0; }
   .contact-form-card { width: min(100%, 780px); }
   .details-grid { grid-template-columns: 1fr; }
