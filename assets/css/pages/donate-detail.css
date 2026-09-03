@@ -30,6 +30,7 @@
 .custom-amount > span:last-child,.form-input { display: flex; align-items: center; gap: .7rem; padding: .72rem .9rem; border: 1px solid var(--color-border); border-radius: 15px; background: var(--color-cream); transition: border-color 300ms ease,box-shadow 300ms ease; }
 .custom-amount > span:last-child:focus-within,.form-input:focus-within { border-color: var(--color-coral); box-shadow: 0 10px 22px rgba(217,111,93,.1); }
 .custom-amount input,.form-input input { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; color: var(--color-charcoal); background: transparent; }
+.custom-amount input:hover,.custom-amount input:focus,.form-input input:hover,.form-input input:focus { color: var(--color-charcoal); background: transparent; }
 .custom-amount b { color: var(--color-plum); }
 .donor-fields { display: grid; gap: .9rem; margin-top: 1.3rem; }
 .donor-fields label { display: grid; }

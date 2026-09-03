@@ -51,6 +51,7 @@
 .us-custom-amount > span:last-child,.us-form-input { display: flex; align-items: center; gap: .7rem; padding: .75rem .95rem; border: 1px solid var(--color-border); border-radius: 15px; background: var(--color-cream); transition: border-color 300ms ease,box-shadow 300ms ease; }
 .us-custom-amount > span:last-child:focus-within,.us-form-input:focus-within { border-color: var(--color-coral); box-shadow: 0 10px 22px rgba(217,111,93,.1); }
 .us-custom-amount input,.us-form-input input { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; color: var(--color-charcoal); background: transparent; }
+.us-custom-amount input:hover,.us-custom-amount input:focus,.us-form-input input:hover,.us-form-input input:focus { color: var(--color-charcoal); background: transparent; }
 .us-custom-amount b { color: var(--color-plum); }
 .us-donor-fields { display: grid; gap: .9rem; margin-top: 1.3rem; }
 .us-donor-fields label { display: grid; }

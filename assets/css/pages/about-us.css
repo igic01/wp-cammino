@@ -706,6 +706,7 @@
 }
 
 .europe-list li:hover {
+  color: var(--color-plum);
   background: var(--color-white);
   box-shadow: 0 16px 32px rgba(80, 45, 54, 0.1);
   transform: translateX(8px);
@@ -806,6 +807,7 @@
 
 .contact-person:hover {
   border-color: rgba(242, 182, 109, 0.45);
+  color: var(--color-white);
   background: rgba(255, 255, 255, 0.11);
   transform: translateX(8px);
 }

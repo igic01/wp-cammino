@@ -84,6 +84,7 @@ body.nstarter-editor-shell {
 }
 
 .nstarter-panel-toggle:hover {
+    color: #222;
     background: #eee;
 }
 
@@ -167,6 +168,7 @@ body.nstarter-editor-shell {
 }
 
 .nstarter-control:hover {
+    color: #222;
     background: #eee;
 }
 
@@ -178,6 +180,7 @@ body.nstarter-editor-shell {
 
 .nstarter-control--primary:hover {
     border-color: #000;
+    color: #fff;
     background: #000;
 }
 

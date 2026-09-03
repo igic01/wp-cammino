@@ -780,6 +780,12 @@
   background: transparent;
 }
 
+.article-search input:hover,
+.article-search input:focus {
+  color: var(--color-charcoal);
+  background: transparent;
+}
+
 .category-filters {
   display: flex;
   gap: 0.45rem;
@@ -807,8 +813,10 @@
     transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.filter-chip:hover {
+.filter-chip:hover,
+.filter-chip:focus-visible {
   border-color: var(--color-coral);
+  color: var(--color-plum-dark);
   background: var(--color-white);
   transform: translateY(-2px);
 }
@@ -1088,6 +1096,12 @@
   color: var(--color-charcoal);
   background: transparent;
   box-shadow: none;
+}
+
+.subscribe-form input:hover,
+.subscribe-form input:focus {
+  color: var(--color-charcoal);
+  background: transparent;
 }
 
 .subscribe-form .button {

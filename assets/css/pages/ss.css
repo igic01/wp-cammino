@@ -281,7 +281,7 @@
   transition: transform 420ms cubic-bezier(.16, 1, .3, 1), background-color 350ms ease;
 }
 
-.story-photo:first-child:hover figcaption { background: var(--color-apricot); transform: translateY(-7px) rotate(-1deg); }
+.story-photo:first-child:hover figcaption { color: var(--color-plum-dark); background: var(--color-apricot); transform: translateY(-7px) rotate(-1deg); }
 
 .success-story__result {
   position: relative;

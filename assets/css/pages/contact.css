@@ -104,6 +104,7 @@
 
 .person-card:hover {
   border-color: rgba(217, 111, 93, 0.35);
+  color: var(--color-plum);
   background: var(--color-white);
   box-shadow: 0 22px 42px rgba(80, 45, 54, 0.13);
   transform: translateX(9px) rotate(-0.25deg);
@@ -288,6 +289,7 @@
 .contact-form-card .wpcf7 input:not([type="submit"]):focus,
 .contact-form-card .wpcf7 textarea:focus {
   border-color: var(--color-coral) !important;
+  color: var(--color-charcoal) !important;
   background: var(--color-white) !important;
   box-shadow: 0 12px 28px rgba(217, 111, 93, 0.12) !important;
   transform: translateY(-2px);
@@ -319,6 +321,7 @@
 
 .contact-form-card .wpcf7-submit:hover,
 .contact-form-card .wpcf7-submit:focus-visible {
+  color: var(--color-white) !important;
   background: var(--color-coral-dark) !important;
   box-shadow: 0 17px 30px rgba(217, 111, 93, 0.3) !important;
   transform: translateY(-3px);

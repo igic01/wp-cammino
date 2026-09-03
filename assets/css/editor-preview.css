@@ -74,6 +74,7 @@
 
 .nstarter-editor-preview .nstarter-video-settings-button:hover,
 .nstarter-editor-preview .nstarter-video-settings-button:focus-visible {
+    color: #fff;
     background: #000;
 }
 
@@ -140,6 +141,7 @@
 
 .nstarter-editor-preview .nstarter-variable-edit-button:hover,
 .nstarter-editor-preview .nstarter-variable-edit-button:focus-visible {
+    color: #fff;
     background: #5142df;
     transform: scale(1.04);
 }

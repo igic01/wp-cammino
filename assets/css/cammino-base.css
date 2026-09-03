@@ -326,7 +326,9 @@ h2 em {
   box-shadow: 0 10px 24px rgba(217, 111, 93, 0.23);
 }
 
-.button--coral:hover {
+.button--coral:hover,
+.button--coral:focus-visible {
+  color: var(--color-white);
   background: var(--color-coral-dark);
   box-shadow: 0 14px 30px rgba(217, 111, 93, 0.3);
 }
@@ -336,7 +338,9 @@ h2 em {
   background: var(--color-cream);
 }
 
-.button--cream:hover {
+.button--cream:hover,
+.button--cream:focus-visible {
+  color: var(--color-plum);
   background: var(--color-white);
   box-shadow: var(--shadow-soft);
 }
@@ -543,8 +547,10 @@ h2 em {
   transition: background var(--transition), border var(--transition);
 }
 
-.social-links a:hover {
+.social-links a:hover,
+.social-links a:focus-visible {
   border-color: var(--color-coral);
+  color: var(--color-white);
   background: var(--color-coral);
 }
 
@@ -608,6 +614,12 @@ h2 em {
   color: rgba(255, 255, 255, 0.5);
 }
 
+.newsletter input:hover,
+.newsletter input:focus {
+  color: var(--color-white);
+  background: transparent;
+}
+
 .newsletter button {
   display: grid;
   width: 2.5rem;
@@ -627,6 +639,12 @@ h2 em {
 
 .newsletter button i {
   line-height: 1;
+}
+
+.newsletter button:hover,
+.newsletter button:focus-visible {
+  color: var(--color-white);
+  background: var(--color-coral-dark);
 }
 
 .footer-bottom {

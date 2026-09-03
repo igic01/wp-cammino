@@ -165,6 +165,7 @@
 .hero-note:hover {
   animation: none;
   border-color: rgba(217, 111, 93, 0.42);
+  color: var(--color-plum);
   background: var(--color-white);
   box-shadow: 0 24px 48px rgba(80, 45, 54, 0.2);
   transform: translateY(-12px) rotate(-2deg) scale(1.07);
@@ -1068,6 +1069,7 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 .event-list.is-visible .event-row:focus-within {
   z-index: 2;
   border-color: transparent;
+  color: var(--color-charcoal);
   background: rgba(255, 253, 249, 0.9);
   box-shadow: 0 18px 38px rgba(80, 45, 54, 0.13);
   transform: translateX(-10px) scale(1.018);
@@ -1470,6 +1472,12 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
   color: var(--color-charcoal);
   background: transparent;
   box-shadow: none;
+}
+
+.subscribe-form input:hover,
+.subscribe-form input:focus {
+  color: var(--color-charcoal);
+  background: transparent;
 }
 
 .subscribe-form .button {
