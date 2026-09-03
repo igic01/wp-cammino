@@ -267,6 +267,13 @@ function nstarter_ajax_save_snapshot(): void {
 		wp_send_json_error( array( 'message' => __( 'The saved page could not be verified. Please try again.', 'cammino' ) ), 500 );
 	}
 
+	if ( 'post' === get_post_type( $post_id ) && isset( $_POST['featured_image_id'] ) ) {
+		$featured_image_id = absint( $_POST['featured_image_id'] );
+		if ( $featured_image_id && wp_attachment_is_image( $featured_image_id ) ) {
+			set_post_thumbnail( $post_id, $featured_image_id );
+		}
+	}
+
 	nstarter_invalidate_snapshot_cache( $post_id );
 
 	wp_send_json_success(

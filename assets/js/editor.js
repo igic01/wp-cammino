@@ -947,7 +947,8 @@
 
         const target = event.target.closest && event.target.closest('img, video');
         const root = snapshotRoot();
-        if (!target || isInLiveSection(target) || (contentBuilder() && !root.contains(target))) {
+        const isPostCover = target && target.matches('.article-cover__frame img');
+        if (!target || isInLiveSection(target) || (contentBuilder() && !root.contains(target) && !isPostCover)) {
             event.preventDefault();
             return;
         }
@@ -1142,7 +1143,11 @@
         setStatus('Saving…');
 
         try {
-            const data = await request('nstarter_save_snapshot', { html: serialiseSnapshot() });
+            const coverImage = frameDocument().querySelector('.article-cover__frame img[data-attachment-id]');
+            const data = await request('nstarter_save_snapshot', {
+                html: serialiseSnapshot(),
+                featured_image_id: coverImage ? coverImage.getAttribute('data-attachment-id') : ''
+            });
             dirty = false;
             if (viewLink && data.viewUrl) {
                 viewLink.href = data.viewUrl;

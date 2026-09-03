@@ -85,7 +85,7 @@ $cammino_related    = get_posts(
 
 			<div class="container article-cover" data-article-reveal="scale">
 				<div class="article-cover__frame">
-					<img src="<?php echo esc_url( $cammino_image ); ?>" alt="<?php echo esc_attr( get_the_title( $cammino_post ) ); ?>" width="1600" height="1000">
+					<img src="<?php echo esc_url( $cammino_image ); ?>" alt="<?php echo esc_attr( get_the_title( $cammino_post ) ); ?>" width="1600" height="1000"<?php echo $cammino_thumbnail ? ' data-attachment-id="' . esc_attr( (string) $cammino_thumbnail ) . '"' : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 					<button class="cover-sticker" type="button" data-cover-sticker><i class="fa-solid <?php echo 'event' === $cammino_placement ? 'fa-calendar-days' : 'fa-book-open'; ?>" aria-hidden="true"></i> <?php echo esc_html( $cammino_sticker ); ?></button>
 				</div>
 				<?php if ( '' !== $cammino_caption ) : ?>
