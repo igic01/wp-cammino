@@ -31,7 +31,7 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
             <div class="image-tint" aria-hidden="true"></div>
           </div>
           <div class="hero-note hero-note--top" aria-hidden="true">
-            <span class="note-icon"><i class="fa-solid fa-star" aria-hidden="true"></i></span>
+            <span class="note-icon"><i class="fa-solid fa-seedling" aria-hidden="true"></i></span>
             <span><strong>Rozvíjame potenciál</strong>ľudí aj komunít</span>
           </div>
           <div class="hero-note hero-note--bottom">
@@ -305,7 +305,7 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
             <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Nina pri práci na svojom tvorivom projekte" width="1200" height="800" loading="lazy">
           </div>
           <div class="quote-mark" aria-hidden="true"><i class="fa-solid fa-quote-left"></i></div>
-          <div class="story-tag"><span aria-hidden="true"><i class="fa-solid fa-star"></i></span> Príbeh so skutočným dopadom</div>
+          <div class="story-tag"><span aria-hidden="true"><i class="fa-solid fa-heart"></i></span> Príbeh so skutočným dopadom</div>
         </div>
         <div class="story-copy" data-reveal="right" data-delay="160">
           <h2 id="story-title">Zo skicára vznikla <em>prvá vlastná výstava</em></h2>

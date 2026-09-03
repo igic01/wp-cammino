@@ -27,6 +27,14 @@ $nstarter_html = (string) preg_replace(
 	$nstarter_html
 );
 
+// Remove the retired star icon from older saved snapshots without requiring
+// editors to regenerate the page and lose their existing visual changes.
+$nstarter_html = (string) preg_replace(
+	'#(?<=\s)fa-\x73tar(?=[\s"\'])#i',
+	'fa-heart',
+	$nstarter_html
+);
+
 // Header and footer are regular snapshot content. Add them only when an older
 // snapshot or a clean source template does not already contain them.
 if ( ! preg_match( '#<header[^>]*class=["\'][^"\']*\bsite-header\b#i', $nstarter_html ) ) {

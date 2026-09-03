@@ -60,7 +60,7 @@ $cammino_stories     = array(
 	<section class="stories-hero" aria-labelledby="stories-title">
 		<div class="container stories-hero__inner">
 			<div data-story-reveal="up">
-				<span class="stories-hero__mark" aria-hidden="true"><i class="fa-solid fa-star"></i></span>
+				<span class="stories-hero__mark" aria-hidden="true"><i class="fa-solid fa-face-smile"></i></span>
 				<h1 id="stories-title">Príbehy, ktoré zanechali <em>úsmev</em></h1>
 				<p>Skutoční ľudia, spoločné projekty a výsledky, ktoré ukazujú, že aj malý krok môže rozbehnúť veľkú zmenu.</p>
 			</div>
@@ -182,7 +182,7 @@ $cammino_stories     = array(
 					</div>
 
 					<footer class="success-story__result story-link-variable" data-story-reveal="up" data-nstarter-variable-section="story_link_{{story}}" data-nstarter-variable-label="Odkaz na celý príbeh {{story_padded}}" data-nstarter-variable-type="text" data-nstarter-variable-control="text" data-nstarter-variable-value="<?php echo esc_attr( $cammino_story_url ); ?>">
-						<span aria-hidden="true"><i class="fa-solid fa-star"></i></span>
+						<span aria-hidden="true"><i class="fa-solid fa-hand-holding-heart"></i></span>
 						<p><strong>Výsledok príbehu</strong> doplňte konkrétny prínos alebo úspech</p>
 						<a href="<?php echo esc_url( $cammino_story_url ); ?>" data-nstarter-variable-output data-nstarter-variable-output-attribute="href">Celý príbeh <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a>
 					</footer>

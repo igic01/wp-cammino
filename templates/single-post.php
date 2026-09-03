@@ -101,7 +101,7 @@ $cammino_related    = get_posts(
 			<div class="container article-cover" data-article-reveal="scale">
 				<div class="article-cover__frame">
 					<img src="<?php echo esc_url( $cammino_image ); ?>" alt="<?php echo esc_attr( get_the_title( $cammino_post ) ); ?>" width="1600" height="1000">
-					<button class="cover-sticker" type="button" data-cover-sticker><i class="fa-solid <?php echo 'event' === $cammino_placement ? 'fa-calendar-days' : 'fa-star'; ?>" aria-hidden="true"></i> <?php echo esc_html( $cammino_sticker ); ?></button>
+					<button class="cover-sticker" type="button" data-cover-sticker><i class="fa-solid <?php echo 'event' === $cammino_placement ? 'fa-calendar-days' : 'fa-book-open'; ?>" aria-hidden="true"></i> <?php echo esc_html( $cammino_sticker ); ?></button>
 				</div>
 				<?php if ( '' !== $cammino_caption ) : ?>
 					<p class="image-caption"><?php echo esc_html( $cammino_caption ); ?></p>
