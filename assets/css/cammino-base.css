@@ -594,6 +594,7 @@ h2 em {
 .newsletter {
   display: flex;
   width: 100%;
+  align-items: center;
   padding: 0.35rem;
   border: 1px solid rgba(255, 255, 255, 0.19);
   border-radius: var(--radius-pill);
@@ -603,11 +604,13 @@ h2 em {
 .newsletter input {
   width: 100%;
   min-width: 0;
-  padding: 0.55rem 0.8rem;
+  height: 2.5rem;
+  padding: 0 0.8rem;
   border: 0;
   outline: 0;
   color: var(--color-white);
   background: transparent;
+  line-height: normal;
 }
 
 .newsletter input::placeholder {
