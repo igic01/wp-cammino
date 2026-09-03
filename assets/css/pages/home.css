@@ -1272,7 +1272,7 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 .community-cta {
   padding-block: clamp(2.5rem, 5vw, 4.25rem);
   overflow: hidden;
-  background: #6d9357;
+  background: #3b482b;
 }
 
 .community-cta-card {
@@ -1333,16 +1333,16 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 
 .community-cta-copy h2 em {
   margin-top: 0.35rem;
-  color: #6d9357;
+  color: #718653;
 }
 
 .community-cta .button--coral {
-  background: #557544;
+  background: #3b482b;
 }
 
 .community-cta .button--coral:hover,
 .community-cta .button--coral:focus-visible {
-  background: #2d5062;
+  background: #586a40;
 }
 
 .community-cta-shape {
@@ -1352,7 +1352,7 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
   bottom: -8rem;
   width: 18rem;
   height: 18rem;
-  border: 3.5rem solid rgba(109, 147, 87, 0.12);
+  border: 3.5rem solid rgba(59, 72, 43, 0.12);
   border-radius: 50%;
   pointer-events: none;
 }
