@@ -494,15 +494,12 @@ function cammino_render_news_events(): string {
 		$date      = $render_date( $featured->ID );
 		$category  = cammino_get_post_category( $featured->ID );
 		$location  = (string) get_post_meta( $featured->ID, CAMMINO_EVENT_LOCATION_META, true );
-		$status    = (string) get_post_meta( $featured->ID, CAMMINO_EVENT_STATUS_META, true );
 		$location  = '' !== $location ? $location : __( 'Cammino', 'cammino' );
-		$status    = '' !== $status ? $status : __( 'Viac informácií', 'cammino' );
 		$permalink = get_permalink( $featured );
 		?>
 		<article class="active-event active-event--featured" data-news-reveal="left">
 			<a class="active-event__image" href="<?php echo esc_url( $permalink ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Zobraziť podujatie: %s', 'cammino' ), get_the_title( $featured ) ) ); ?>">
 				<img src="<?php echo esc_url( cammino_get_post_image_url( $featured->ID, 'large' ) ); ?>" alt="<?php echo esc_attr( get_the_title( $featured ) ); ?>" width="1200" height="800">
-				<span class="event-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> <?php echo esc_html( $status ); ?></span>
 			</a>
 			<div class="active-event__content">
 				<div class="active-event__topline">
