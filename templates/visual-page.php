@@ -83,7 +83,7 @@ if ( ! preg_match( '#<footer[^>]*class=["\'][^"\']*\bsite-footer\b#i', $nstarter
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="theme-color" content="#faf6ee">
+	<meta name="theme-color" content="#f4f7f2">
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
