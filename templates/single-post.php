@@ -51,7 +51,7 @@ $cammino_related    = get_posts(
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="theme-color" content="#f4f7f2">
+	<meta name="theme-color" content="#faf6ee">
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
