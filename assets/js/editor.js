@@ -23,6 +23,11 @@
     const variableLabel = document.querySelector('[data-nstarter-variable-label]');
     const variableInput = document.querySelector('[data-nstarter-variable-input]');
     const variableCancel = document.querySelector('[data-nstarter-variable-cancel]');
+    const sectionOrderButton = document.querySelector('[data-nstarter-section-order]');
+    const sectionOrderDialog = document.querySelector('[data-nstarter-section-order-dialog]');
+    const sectionOrderForm = document.querySelector('[data-nstarter-section-order-form]');
+    const sectionOrderList = document.querySelector('[data-nstarter-section-order-list]');
+    const sectionOrderCancel = document.querySelector('[data-nstarter-section-order-cancel]');
 
     if (!config || !frame) {
         return;
@@ -37,6 +42,8 @@
     let videoToolsLayer = null;
     let variableToolsLayer = null;
     let activeVariableSection = null;
+    let orderedSections = [];
+    let sectionOrderParent = null;
     let transientState = new Map();
 
     function frameDocument() {
@@ -80,6 +87,157 @@
         if (icon) {
             icon.textContent = collapsed ? '⋯' : '−';
         }
+    }
+
+    function orderableSections() {
+        const root = snapshotRoot();
+        const main = root && (root.querySelector('main#main-content') || root.querySelector('main'));
+
+        if (!main) {
+            return { parent: null, sections: [] };
+        }
+
+        const sections = Array.from(main.children).filter(function (element) {
+            return ['SECTION', 'DIV', 'ARTICLE'].includes(element.tagName)
+                && !element.matches('header, footer, .site-header, .site-footer, [data-header]');
+        });
+
+        return { parent: main, sections: sections };
+    }
+
+    function sectionOrderLabel(section, index) {
+        let heading = null;
+
+        for (let level = 1; level <= 6; level += 1) {
+            heading = section.querySelector('h' + level);
+            if (heading) {
+                break;
+            }
+        }
+
+        if (heading) {
+            const headingText = heading.textContent.replace(/\s+/g, ' ').trim();
+            if (headingText) {
+                return headingText;
+            }
+        }
+
+        if (section.id) {
+            return '#' + section.id;
+        }
+
+        if (section.classList.length) {
+            return '.' + Array.from(section.classList).join('.');
+        }
+
+        return section.tagName.toLowerCase() + ' ' + String(index + 1);
+    }
+
+    function renderSectionOrderList() {
+        if (!sectionOrderList) {
+            return;
+        }
+
+        sectionOrderList.replaceChildren();
+
+        if (!orderedSections.length) {
+            const emptyItem = document.createElement('li');
+            const emptyLabel = document.createElement('span');
+            emptyLabel.textContent = config.strings.noOrderableSections;
+            emptyItem.appendChild(emptyLabel);
+            sectionOrderList.appendChild(emptyItem);
+            return;
+        }
+
+        orderedSections.forEach(function (section, index) {
+            const item = document.createElement('li');
+            const label = document.createElement('span');
+            const moveUp = document.createElement('button');
+            const moveDown = document.createElement('button');
+
+            label.textContent = sectionOrderLabel(section, index);
+            label.title = label.textContent;
+
+            moveUp.type = 'button';
+            moveUp.textContent = '↑';
+            moveUp.disabled = index === 0;
+            moveUp.setAttribute('aria-label', config.strings.sectionOrderUp + ': ' + label.textContent);
+            moveUp.title = config.strings.sectionOrderUp;
+            moveUp.addEventListener('click', function () {
+                const previous = orderedSections[index - 1];
+                orderedSections[index - 1] = orderedSections[index];
+                orderedSections[index] = previous;
+                renderSectionOrderList();
+            });
+
+            moveDown.type = 'button';
+            moveDown.textContent = '↓';
+            moveDown.disabled = index === orderedSections.length - 1;
+            moveDown.setAttribute('aria-label', config.strings.sectionOrderDown + ': ' + label.textContent);
+            moveDown.title = config.strings.sectionOrderDown;
+            moveDown.addEventListener('click', function () {
+                const next = orderedSections[index + 1];
+                orderedSections[index + 1] = orderedSections[index];
+                orderedSections[index] = next;
+                renderSectionOrderList();
+            });
+
+            item.append(label, moveUp, moveDown);
+            sectionOrderList.appendChild(item);
+        });
+    }
+
+    function openSectionOrder() {
+        if (busy || !sectionOrderDialog) {
+            return;
+        }
+
+        const result = orderableSections();
+        sectionOrderParent = result.parent;
+        orderedSections = result.sections;
+        renderSectionOrderList();
+        sectionOrderDialog.showModal();
+    }
+
+    function cancelSectionOrder() {
+        orderedSections = [];
+        sectionOrderParent = null;
+        if (sectionOrderDialog && sectionOrderDialog.open) {
+            sectionOrderDialog.close();
+        }
+    }
+
+    function applySectionOrder(event) {
+        event.preventDefault();
+
+        if (!sectionOrderParent || !orderedSections.length) {
+            cancelSectionOrder();
+            return;
+        }
+
+        const currentSections = orderableSections().sections;
+        const changed = currentSections.length === orderedSections.length
+            && orderedSections.some(function (section, index) {
+                return currentSections[index] !== section;
+            });
+
+        if (changed) {
+            const slots = currentSections.map(function (section) {
+                const slot = section.ownerDocument.createComment('nstarter-section-order');
+                sectionOrderParent.insertBefore(slot, section);
+                section.remove();
+                return slot;
+            });
+
+            slots.forEach(function (slot, index) {
+                slot.replaceWith(orderedSections[index]);
+            });
+            markDirty();
+            refreshVideoSettingsTools();
+            refreshVariableTools();
+        }
+
+        cancelSectionOrder();
     }
 
     function isInLiveSection(node) {
@@ -823,6 +981,9 @@
         saveButton.disabled = nextBusy;
         regenerateButton.disabled = nextBusy;
         modeSelect.disabled = nextBusy;
+        if (sectionOrderButton) {
+            sectionOrderButton.disabled = nextBusy;
+        }
     }
 
     async function save() {
@@ -904,6 +1065,15 @@
     saveButton.addEventListener('click', save);
     regenerateButton.addEventListener('click', regenerate);
     panelToggle.addEventListener('click', togglePanel);
+    if (sectionOrderButton && sectionOrderDialog && sectionOrderForm && sectionOrderCancel) {
+        sectionOrderButton.addEventListener('click', openSectionOrder);
+        sectionOrderForm.addEventListener('submit', applySectionOrder);
+        sectionOrderCancel.addEventListener('click', cancelSectionOrder);
+        sectionOrderDialog.addEventListener('cancel', function (event) {
+            event.preventDefault();
+            cancelSectionOrder();
+        });
+    }
     videoForm.addEventListener('submit', applyVideoAttachment);
     videoCancel.addEventListener('click', cancelVideoOptions);
     videoDialog.addEventListener('cancel', function (event) {

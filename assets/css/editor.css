@@ -53,6 +53,7 @@ body.nstarter-editor-shell {
 }
 
 .nstarter-mode-field,
+.nstarter-control--order,
 .nstarter-control--quiet {
     grid-column: 1 / -1;
 }
@@ -346,6 +347,106 @@ body.nstarter-editor-shell {
 }
 
 .nstarter-variable-dialog button[type="submit"] {
+    border-color: #5142df;
+    color: #fff;
+    background: #6d5dfc;
+}
+
+.nstarter-section-order-dialog {
+    width: min(520px, calc(100vw - 32px));
+    max-height: min(720px, calc(100vh - 32px));
+    padding: 18px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    color: #222;
+    background: #fff;
+    font-family: inherit;
+}
+
+.nstarter-section-order-dialog::backdrop {
+    background: rgb(0 0 0 / 38%);
+}
+
+.nstarter-section-order-dialog form {
+    display: grid;
+    gap: 14px;
+}
+
+.nstarter-section-order-dialog h2,
+.nstarter-section-order-dialog p {
+    margin: 0;
+}
+
+.nstarter-section-order-dialog h2 {
+    font-size: 17px;
+}
+
+.nstarter-section-order-dialog p {
+    color: #666;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.nstarter-section-order-dialog ol {
+    display: grid;
+    max-height: min(480px, calc(100vh - 220px));
+    margin: 0;
+    padding: 0;
+    gap: 7px;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.nstarter-section-order-dialog li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 34px 34px;
+    min-height: 42px;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 6px 5px 10px;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    background: #fafafa;
+}
+
+.nstarter-section-order-dialog li > span {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nstarter-section-order-dialog button {
+    min-height: 34px;
+    padding: 0 10px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+    font: 400 12px/1 inherit;
+}
+
+.nstarter-section-order-dialog li button {
+    width: 34px;
+    padding: 0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.nstarter-section-order-dialog button:disabled {
+    cursor: default;
+    opacity: .35;
+}
+
+.nstarter-section-order-dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.nstarter-section-order-dialog button[type="submit"] {
     border-color: #5142df;
     color: #fff;
     background: #6d5dfc;

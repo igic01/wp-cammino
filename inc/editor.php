@@ -112,6 +112,9 @@ function nstarter_maybe_render_editor(): void {
 				'confirmRemoveItems'  => __( 'Reducing this value removes %d editable item(s). Continue?', 'nstarter' ),
 				'unsupportedVariable' => __( 'This section variable is not configured correctly.', 'nstarter' ),
 				'unsupportedMedia'    => __( 'Please choose an image or video.', 'nstarter' ),
+				'sectionOrderUp'      => __( 'Move section up', 'nstarter' ),
+				'sectionOrderDown'    => __( 'Move section down', 'nstarter' ),
+				'noOrderableSections' => __( 'No reorderable content sections were found.', 'nstarter' ),
 				'saved'             => __( 'Saved', 'nstarter' ),
 				'regenerated'       => __( 'Regenerated from PHP', 'nstarter' ),
 				'unsaved'           => __( 'Unsaved changes', 'nstarter' ),
@@ -166,6 +169,7 @@ function nstarter_maybe_render_editor(): void {
 
 					<button type="button" class="nstarter-control nstarter-control--primary" data-nstarter-save><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
 					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
+					<button type="button" class="nstarter-control nstarter-control--order" data-nstarter-section-order><?php esc_html_e( 'Section order', 'nstarter' ); ?></button>
 					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
 				</div>
 			</aside>
@@ -195,6 +199,18 @@ function nstarter_maybe_render_editor(): void {
 					<div>
 						<button type="button" data-nstarter-variable-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>
 						<button type="submit"><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
+					</div>
+				</form>
+			</dialog>
+
+			<dialog class="nstarter-section-order-dialog" data-nstarter-section-order-dialog>
+				<form data-nstarter-section-order-form>
+					<h2><?php esc_html_e( 'Change section order', 'nstarter' ); ?></h2>
+					<p><?php esc_html_e( 'Use the arrow buttons to arrange the page content. The header and footer are excluded.', 'nstarter' ); ?></p>
+					<ol data-nstarter-section-order-list></ol>
+					<div class="nstarter-section-order-dialog__actions">
+						<button type="button" data-nstarter-section-order-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>
+						<button type="submit"><?php esc_html_e( 'Apply order', 'nstarter' ); ?></button>
 					</div>
 				</form>
 			</dialog>
