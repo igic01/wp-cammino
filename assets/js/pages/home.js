@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const hero = document.querySelector(".hero");
   const heroVisual = document.querySelector(".hero-visual");
   const heroImage = heroVisual?.querySelector(".hero-image-wrap img");
-  const storyVisual = document.querySelector(".story-visual");
+  const storyVisuals = document.querySelectorAll(".story-visual");
 
   if (heroVisual) {
     const transientClasses = new Set((heroVisual.dataset.nstarterTransientClass || "").split(/\s+/).filter(Boolean));
@@ -54,15 +54,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (storyVisual && !reducedMotion) {
-    storyVisual.setAttribute("data-nstarter-transient-class", "is-in-view");
+  if (storyVisuals.length && !reducedMotion) {
+    storyVisuals.forEach((storyVisual) => {
+      storyVisual.setAttribute("data-nstarter-transient-class", "is-in-view");
+    });
     if (!("IntersectionObserver" in window)) {
-      storyVisual.classList.add("is-in-view");
+      storyVisuals.forEach((storyVisual) => storyVisual.classList.add("is-in-view"));
     } else {
       const storyObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => entry.target.classList.toggle("is-in-view", entry.isIntersecting));
       }, { threshold: 0.12 });
-      storyObserver.observe(storyVisual);
+      storyVisuals.forEach((storyVisual) => storyObserver.observe(storyVisual));
     }
   }
 

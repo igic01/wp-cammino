@@ -47,15 +47,18 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
 
     </section>
 
-    <section class="section smile-impact" aria-labelledby="smile-impact-title">
-      <div class="container smile-impact-grid">
-        <figure class="smile-impact-media" data-reveal="left">
-          <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Komunitná iniciatíva Darujme úsmev" width="1200" height="800" loading="lazy">
-          <figcaption><i class="fa-solid fa-heart" aria-hidden="true"></i> Partnerstvo s dopadom</figcaption>
-        </figure>
+    <section class="section story-section smile-impact" aria-labelledby="smile-impact-title">
+      <div class="story-blob" aria-hidden="true"></div>
+      <div class="container story-grid">
+        <div class="story-visual" data-reveal="left">
+          <div class="story-image">
+            <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Komunitná iniciatíva Darujme úsmev" width="1200" height="800" loading="lazy">
+          </div>
+          <div class="quote-mark smile-impact-mark" aria-hidden="true"><i class="fa-solid fa-heart"></i></div>
+          <div class="story-tag"><span aria-hidden="true"><i class="fa-solid fa-star"></i></span> Partnerstvo s dopadom</div>
+        </div>
 
-        <div class="smile-impact-content" data-reveal="right" data-delay="120">
-          <span class="smile-impact-kicker">Komunitná iniciatíva</span>
+        <div class="story-copy" data-reveal="right" data-delay="160">
           <h2 id="smile-impact-title">Darujme <em>úsmev</em></h2>
           <p>Komunitná iniciatíva, ktorá spája ľudí z celého Slovenska, aby prinášali radosť a pomoc deťom a rodinám v náročných situáciách.</p>
 
