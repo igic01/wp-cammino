@@ -31,21 +31,6 @@
     pointer-events: none !important;
 }
 
-/* Keep the regular snapshot header in document flow inside the editor canvas. */
-.nstarter-editor-preview #nstarter-snapshot > .site-header,
-.nstarter-editor-preview #nstarter-snapshot > .site-header.is-scrolled {
-    position: relative;
-    inset: auto;
-    padding-block: 1rem 0.5rem;
-    background: rgba(250, 246, 238, 0.96);
-    box-shadow: none;
-    backdrop-filter: none;
-}
-
-.nstarter-editor-preview #nstarter-snapshot > .site-header ~ main#main-content {
-    padding-top: 0;
-}
-
 .nstarter-editor-preview a[href] {
     cursor: not-allowed;
 }
