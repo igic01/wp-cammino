@@ -35,13 +35,24 @@ $nstarter_html = (string) preg_replace(
 	$nstarter_html
 );
 
-// Header and footer are regular snapshot content. Add them only when an older
-// snapshot or a clean source template does not already contain them.
-if ( ! preg_match( '#<header[^>]*class=["\'][^"\']*\bsite-header\b#i', $nstarter_html ) ) {
-	ob_start();
-	cammino_render_site_header();
-	$nstarter_html = (string) ob_get_clean() . $nstarter_html;
-}
+// Saved snapshots can contain an older copy of the header. Always replace that
+// copy with the current shared header so every page has identical navigation,
+// active-menu state and scroll behavior. This remains normal snapshot markup,
+// not a live-section marker.
+$nstarter_html = (string) preg_replace(
+	'#<header\b[^>]*class=["\'][^"\']*\bsite-header\b[^>]*>.*?</header>#is',
+	'',
+	$nstarter_html
+);
+$nstarter_html = (string) preg_replace(
+	'#<a\b[^>]*class=["\'][^"\']*\bskip-link\b[^"\']*["\'][^>]*>.*?</a>#is',
+	'',
+	$nstarter_html
+);
+
+ob_start();
+cammino_render_site_header();
+$nstarter_html = (string) ob_get_clean() . $nstarter_html;
 
 if ( ! preg_match( '#<footer[^>]*class=["\'][^"\']*\bsite-footer\b#i', $nstarter_html ) ) {
 	ob_start();
