@@ -1270,28 +1270,47 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 }
 
 .community-cta {
-  padding-block: clamp(2.5rem, 5vw, 4.25rem);
+  padding-block: clamp(3.5rem, 7vw, 6rem);
   overflow: hidden;
-  background: #3b482b;
+  background: transparent;
 }
 
 .community-cta-card {
   position: relative;
   display: grid;
-  min-height: 300px;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 390px;
+  grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.1fr);
+  align-items: stretch;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding: clamp(1.25rem, 2.5vw, 2rem);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: var(--radius-lg);
-  background: rgba(255, 253, 249, 0.92);
-  box-shadow: none;
+  border: 1px solid rgba(59, 72, 43, 0.22);
+  border-radius: 4rem 2rem 5.5rem 2rem;
+  color: var(--color-white);
+  background: #3b482b;
+  box-shadow: 0 22px 52px rgba(48, 58, 36, 0.16);
+}
+
+.community-cta-card::before {
+  position: absolute;
+  top: -4.5rem;
+  right: 12%;
+  width: 10rem;
+  aspect-ratio: 1;
+  border: 1.6rem solid rgba(255, 255, 255, 0.055);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
 }
 
 .community-cta-media {
   position: relative;
-  z-index: 1;
-  min-height: 300px;
+  z-index: 2;
+  min-height: 350px;
   overflow: hidden;
+  border: 7px solid rgba(255, 255, 255, 0.13);
+  border-radius: 44% 56% 34% 66% / 52% 35% 65% 48%;
+  transform: rotate(-1.8deg);
 }
 
 .community-cta-media::after {
@@ -1301,13 +1320,13 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 .community-cta-media img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   filter: saturate(0.9);
   transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .community-cta-card:hover .community-cta-media img {
-  transform: scale(1.035);
+  transform: scale(1.045);
 }
 
 .community-cta-copy {
@@ -1317,11 +1336,12 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
   align-items: flex-start;
   justify-content: center;
   flex-direction: column;
-  padding: clamp(2rem, 4vw, 3.25rem);
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1.25rem, 4vw, 3.5rem) clamp(2rem, 4vw, 3.5rem) 0;
 }
 
 .community-cta-copy h2 {
   margin-bottom: 1.4rem;
+  color: var(--color-white);
   font-size: clamp(2.3rem, 4.2vw, 3.8rem);
   line-height: 0.98;
 }
@@ -1333,27 +1353,32 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 
 .community-cta-copy h2 em {
   margin-top: 0.35rem;
-  color: #718653;
+  color: #c7d6b5;
 }
 
 .community-cta .button--coral {
-  background: #3b482b;
+  color: #3b482b;
+  background: #f8f4e9;
+  box-shadow: none;
 }
 
 .community-cta .button--coral:hover,
 .community-cta .button--coral:focus-visible {
-  background: #586a40;
+  color: #26321c;
+  background: #a9bd8e;
+  box-shadow: none;
 }
 
 .community-cta-shape {
   position: absolute;
   z-index: 1;
-  right: -7rem;
-  bottom: -8rem;
-  width: 18rem;
-  height: 18rem;
-  border: 3.5rem solid rgba(59, 72, 43, 0.12);
-  border-radius: 50%;
+  right: -6rem;
+  bottom: -9rem;
+  width: 20rem;
+  height: 20rem;
+  border: 3.5rem solid rgba(255, 255, 255, 0.065);
+  border-radius: 46% 54% 42% 58%;
+  transform: rotate(18deg);
   pointer-events: none;
 }
 
@@ -1578,7 +1603,15 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
   }
 
   .community-cta-media {
-    min-height: 280px;
+    min-height: 340px;
+  }
+
+  .community-cta-card {
+    gap: 0.5rem;
+  }
+
+  .community-cta-copy {
+    padding: 2rem 1.5rem 2.5rem;
   }
 
   .event-grid {
@@ -1592,15 +1625,17 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 
 @media (max-width: 560px) {
   .community-cta-card {
-    border-radius: var(--radius-md);
+    padding: 0.8rem;
+    border-radius: 2.4rem 1.4rem 3.2rem 1.4rem;
   }
 
   .community-cta-media {
-    min-height: 230px;
+    min-height: 260px;
+    border-width: 5px;
   }
 
   .community-cta-copy {
-    padding: 1.8rem 1.4rem 2rem;
+    padding: 1.8rem 1rem 2.2rem;
   }
 
   .subscribe-card {
