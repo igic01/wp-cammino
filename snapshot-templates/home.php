@@ -170,7 +170,6 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
             <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Ľudia spojení komunitnými aktivitami OZ Cammino" width="1200" height="800" loading="lazy">
           </div>
           <div class="community-cta-copy" data-reveal="right" data-delay="120">
-            <span class="community-cta-kicker">Každý krok má zmysel</span>
             <h2 id="community-cta-title"><span>Pridajte sa k nám</span><em>a tvorme zmenu spoločne</em></h2>
             <a class="button button--coral" href="<?php echo esc_url( $cammino_donate_url ); ?>">Chcem pomôcť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
           </div>

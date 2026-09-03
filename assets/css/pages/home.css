@@ -1233,6 +1233,7 @@
 }
 
 .community-cta {
+  padding-block: clamp(2.5rem, 5vw, 4.25rem);
   overflow: hidden;
   background:
     radial-gradient(circle at 8% 88%, rgba(217, 111, 93, 0.13), transparent 24rem),
@@ -1242,7 +1243,7 @@
 .community-cta-card {
   position: relative;
   display: grid;
-  min-height: 520px;
+  min-height: 300px;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid rgba(100, 54, 75, 0.12);
@@ -1254,7 +1255,7 @@
 .community-cta-media {
   position: relative;
   z-index: 1;
-  min-height: 520px;
+  min-height: 300px;
   overflow: hidden;
 }
 
@@ -1285,22 +1286,12 @@
   align-items: flex-start;
   justify-content: center;
   flex-direction: column;
-  padding: clamp(2.5rem, 6vw, 5rem);
-}
-
-.community-cta-kicker {
-  margin-bottom: 1.2rem;
-  color: var(--color-coral-dark);
-  font-family: var(--font-body);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
+  padding: clamp(2rem, 4vw, 3.25rem);
 }
 
 .community-cta-copy h2 {
-  margin-bottom: 2rem;
-  font-size: clamp(2.65rem, 5vw, 4.6rem);
+  margin-bottom: 1.4rem;
+  font-size: clamp(2.3rem, 4.2vw, 3.8rem);
   line-height: 0.98;
 }
 
@@ -1541,7 +1532,7 @@
   }
 
   .community-cta-media {
-    min-height: 430px;
+    min-height: 280px;
   }
 
   .event-grid {
@@ -1559,11 +1550,11 @@
   }
 
   .community-cta-media {
-    min-height: 300px;
+    min-height: 230px;
   }
 
   .community-cta-copy {
-    padding: 2.2rem 1.4rem 2.6rem;
+    padding: 1.8rem 1.4rem 2rem;
   }
 
   .subscribe-card {
