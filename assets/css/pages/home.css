@@ -83,6 +83,13 @@
   min-height: 590px;
 }
 
+@media (min-width: 821px) {
+  .hero-visual {
+    top: -2rem;
+    align-self: start;
+  }
+}
+
 /* Older saved snapshots used the global reveal on this wrapper. Keep those
    snapshots stable and let the image-ready hero reveal below handle it. */
 .hero-visual[data-reveal] {
