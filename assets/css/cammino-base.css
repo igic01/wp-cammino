@@ -558,6 +558,13 @@ h2 em {
   gap: 0.65rem;
 }
 
+.footer-contact {
+  width: 100%;
+  max-width: 26rem;
+  margin-left: auto;
+  justify-self: end;
+}
+
 .site-footer h2 {
   margin: 0 0 0.75rem;
   color: var(--color-white);
@@ -788,6 +795,12 @@ h2 em {
   .footer-brand,
   .footer-contact {
     grid-column: 1 / -1;
+  }
+
+  .footer-contact {
+    max-width: none;
+    margin-left: 0;
+    justify-self: stretch;
   }
 
   .footer-bottom {
