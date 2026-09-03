@@ -47,6 +47,65 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
 
     </section>
 
+    <section class="section smile-impact" aria-labelledby="smile-impact-title">
+      <div class="container smile-impact-grid">
+        <figure class="smile-impact-media" data-reveal="left">
+          <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Komunitná iniciatíva Darujme úsmev" width="1200" height="800" loading="lazy">
+          <figcaption><i class="fa-solid fa-heart" aria-hidden="true"></i> Partnerstvo s dopadom</figcaption>
+        </figure>
+
+        <div class="smile-impact-content" data-reveal="right" data-delay="120">
+          <span class="smile-impact-kicker">Komunitná iniciatíva</span>
+          <h2 id="smile-impact-title">Darujme <em>úsmev</em></h2>
+          <p>Komunitná iniciatíva, ktorá spája ľudí z celého Slovenska, aby prinášali radosť a pomoc deťom a rodinám v náročných situáciách.</p>
+
+          <div class="smile-impact-stats" aria-label="Dopad iniciatívy Darujme úsmev">
+            <div class="smile-impact-stat"<?php
+            nstarter_variable_section_attributes(
+              'darujme_usmev_deti',
+              array(
+                'label'   => 'Počet detí',
+                'type'    => 'number',
+                'control' => 'text',
+                'value'   => 5361,
+                'min'     => 0,
+                'max'     => 9999999,
+                'step'    => 1,
+              )
+            );
+            ?>>
+              <span>DETÍ</span>
+              <strong>
+                <span data-impact-counter aria-hidden="true">5,361</span>
+                <span class="sr-only" data-nstarter-variable-output>5361</span>
+              </strong>
+            </div>
+
+            <div class="smile-impact-stat"<?php
+            nstarter_variable_section_attributes(
+              'darujme_usmev_rodiny',
+              array(
+                'label'   => 'Počet rodín',
+                'type'    => 'number',
+                'control' => 'text',
+                'value'   => 1562,
+                'min'     => 0,
+                'max'     => 9999999,
+                'step'    => 1,
+              )
+            );
+            ?>>
+              <span>RODÍN</span>
+              <strong>
+                <span data-impact-counter aria-hidden="true">1,562</span>
+                <span class="sr-only" data-nstarter-variable-output>1562</span>
+              </strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="section about" id="about" aria-labelledby="about-title">
       <div class="container about-grid">
         <div class="section-heading" data-reveal="left">

@@ -66,6 +66,72 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  const impactCounters = document.querySelectorAll("[data-impact-counter]");
+  const numberFormatter = new Intl.NumberFormat("en-US");
+  const animatedCounters = new WeakSet();
+
+  const impactCounterTarget = (counter) => {
+    const variableSection = counter.closest("[data-nstarter-variable-section]");
+    const rawValue = variableSection?.dataset.nstarterVariableValue
+      || counter.textContent.replace(/[^\d-]/g, "");
+    const value = Number(rawValue);
+    return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
+  };
+
+  const renderImpactCounter = (counter, value) => {
+    counter.textContent = numberFormatter.format(Math.round(value));
+  };
+
+  const animateImpactCounter = (counter) => {
+    if (animatedCounters.has(counter)) return;
+    animatedCounters.add(counter);
+
+    const target = impactCounterTarget(counter);
+    if (reducedMotion || target === 0) {
+      renderImpactCounter(counter, target);
+      return;
+    }
+
+    const duration = 1500;
+    const startTime = performance.now();
+    const tick = (currentTime) => {
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      const easedProgress = 1 - Math.pow(1 - progress, 4);
+      renderImpactCounter(counter, target * easedProgress);
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+
+  if (reducedMotion || !("IntersectionObserver" in window)) {
+    impactCounters.forEach((counter) => renderImpactCounter(counter, impactCounterTarget(counter)));
+  } else {
+    const impactObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        animateImpactCounter(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.35 });
+
+    impactCounters.forEach((counter) => {
+      renderImpactCounter(counter, 0);
+      impactObserver.observe(counter);
+    });
+  }
+
+  impactCounters.forEach((counter) => {
+    const variableSection = counter.closest("[data-nstarter-variable-section]");
+    if (!variableSection || !("MutationObserver" in window)) return;
+    const valueObserver = new MutationObserver(() => {
+      renderImpactCounter(counter, impactCounterTarget(counter));
+    });
+    valueObserver.observe(variableSection, {
+      attributes: true,
+      attributeFilter: ["data-nstarter-variable-value"],
+    });
+  });
+
   const revealElements = document.querySelectorAll("[data-reveal]:not(.hero-visual)");
   revealElements.forEach((element) => {
     const transientClasses = new Set((element.dataset.nstarterTransientClass || "").split(/\s+/).filter(Boolean));
