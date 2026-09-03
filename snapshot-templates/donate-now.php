@@ -102,15 +102,8 @@ $cammino_placeholder = $cammino_asset_url . '/images/placeholder.webp';
         <a href="index.html#events">Podujatia</a>
         <a href="news.html">Novinky</a>
       </div>
-      <div class="footer-links">
-        <h2>Zapojte sa</h2>
-        <a href="donate.html">Podporte nás</a>
-        <a href="#">Pre firmy</a>
-        <a href="#">Dobrovoľníctvo</a>
-        <a href="#">Pošlite nám príbeh</a>
-      </div>
       <div class="footer-contact">
-        <h2>Zostaňme v kontakte</h2>
+        <h2>Prihláste sa na newsletter</h2>
         <a href="mailto:management@ozcammino.sk">management@ozcammino.sk</a>
         <p>Miletičova 7, Bratislava</p>
         <form class="newsletter" action="#" method="post">

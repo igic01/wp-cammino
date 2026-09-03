@@ -236,16 +236,8 @@ function cammino_render_site_footer(): void {
 				<?php cammino_render_shared_menu(); ?>
 			</div>
 
-			<div class="footer-links">
-				<h2><?php esc_html_e( 'Zapojte sa', 'cammino' ); ?></h2>
-				<a href="<?php echo esc_url( nstarter_get_source_page_url( 'donate', '/podporte-nas/' ) ); ?>"><?php esc_html_e( 'Podporte nás', 'cammino' ); ?></a>
-				<a href="#"><?php esc_html_e( 'Pre firmy', 'cammino' ); ?></a>
-				<a href="#"><?php esc_html_e( 'Dobrovoľníctvo', 'cammino' ); ?></a>
-				<a href="#"><?php esc_html_e( 'Pošlite nám príbeh', 'cammino' ); ?></a>
-			</div>
-
 			<div class="footer-contact">
-				<h2><?php esc_html_e( 'Zostaňme v kontakte', 'cammino' ); ?></h2>
+				<h2><?php esc_html_e( 'Prihláste sa na newsletter', 'cammino' ); ?></h2>
 				<a href="mailto:management@ozcammino.sk">management@ozcammino.sk</a>
 				<p><?php esc_html_e( 'Miletičova 7, Bratislava', 'cammino' ); ?></p>
 				<form class="newsletter" action="#" method="post">

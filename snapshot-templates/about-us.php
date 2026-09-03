@@ -140,7 +140,7 @@ $cammino_asset_url = NSTARTER_URL . '/assets';
         <div class="info-card" data-about-reveal="scale">
           <div class="info-intro">
             <span class="identity-number">04</span>
-            <h2 id="info-title">Poďme sa <em>spojiť</em></h2>
+            <h2 id="info-title">Pridajte sa <em>k nám</em></h2>
             <p>Máte nápad, otázku alebo chuť spolupracovať? Ozvite sa správnemu človeku priamo.</p>
             <div class="info-address">
               <span aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span>

@@ -61,7 +61,7 @@ $cammino_stories     = array(
 		<div class="container stories-hero__inner">
 			<div data-story-reveal="up">
 				<span class="stories-hero__mark" aria-hidden="true"><i class="fa-solid fa-star"></i></span>
-				<h1 id="stories-title">Príbehy, ktoré zanechali <em>stopu</em></h1>
+				<h1 id="stories-title">Príbehy, ktoré zanechali <em>úsmev</em></h1>
 				<p>Skutoční ľudia, spoločné projekty a výsledky, ktoré ukazujú, že aj malý krok môže rozbehnúť veľkú zmenu.</p>
 			</div>
 			<nav class="story-jump" aria-label="Prejsť na príbeh" data-story-jump data-story-reveal="up" data-delay="140"></nav>

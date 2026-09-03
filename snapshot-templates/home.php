@@ -38,11 +38,11 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
           </div>
           <div class="hero-note hero-note--top" aria-hidden="true">
             <span class="note-icon"><i class="fa-solid fa-star" aria-hidden="true"></i></span>
-            <span><strong>Rozvíjať potenciál</strong>ľudí aj komunít</span>
+            <span><strong>Rozvíjame potenciál</strong>ľudí aj komunít</span>
           </div>
           <div class="hero-note hero-note--bottom">
             <img src="<?php echo esc_url( $cammino_logo ); ?>" alt="" width="526" height="526">
-            <span><strong>Krok za krokom.</strong>Spoločne.</span>
+            <span><strong>Krok za krokom</strong>Spoločne</span>
           </div>
           <svg class="hero-path" viewBox="0 0 170 120" aria-hidden="true">
             <path d="M8 104C35 110 37 63 70 69C105 75 97 18 154 14" pathLength="1" />
@@ -56,7 +56,7 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
     <section class="section about" id="about" aria-labelledby="about-title">
       <div class="container about-grid">
         <div class="section-heading" data-reveal="left">
-          <h2 id="about-title">Cammino znamená cesta<br>K zmene kráčame <em>spoločne</em></h2>
+          <h2 id="about-title">Cammino znamená<br><em>cesta</em></h2>
         </div>
         <div class="about-copy" data-reveal="right" data-delay="100">
           <p>Sme občianske združenie zamerané na vzdelávanie, osobnostný rozvoj a solidaritu. Prostredníctvom projektov, workshopov a komunitných aktivít spájame ľudí rôzneho veku a pomáhame im aktívne prispievať k pozitívnej zmene.</p>
