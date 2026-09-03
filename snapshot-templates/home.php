@@ -54,8 +54,8 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
           <div class="story-image">
             <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Komunitná iniciatíva Darujme úsmev" width="1200" height="800" loading="lazy">
           </div>
-          <div class="quote-mark smile-impact-mark" aria-hidden="true"><i class="fa-solid fa-heart"></i></div>
-          <div class="story-tag"><span aria-hidden="true"><i class="fa-solid fa-star"></i></span> Partnerstvo s dopadom</div>
+          <div class="quote-mark smile-impact-mark" aria-hidden="true"><i class="fa-solid fa-people-group"></i></div>
+          <div class="story-tag"><span aria-hidden="true"><i class="fa-solid fa-hand-holding-heart"></i></span> Pomoc, ktorá spája</div>
         </div>
 
         <div class="story-copy" data-reveal="right" data-delay="160">

@@ -264,6 +264,33 @@
   50% { transform: translateY(-8px) rotate(1deg); }
 }
 
+.smile-impact {
+  background: linear-gradient(135deg, #31564f 0%, #4d7569 100%);
+}
+
+.smile-impact .story-blob {
+  border-color: rgba(242, 182, 109, 0.16);
+}
+
+.smile-impact .story-image {
+  border-color: rgba(255, 253, 249, 0.16);
+}
+
+.smile-impact .quote-mark {
+  top: 1.25rem;
+  right: auto;
+  left: -1.5rem;
+}
+
+.smile-impact .story-tag {
+  right: -0.75rem;
+  bottom: 0.75rem;
+}
+
+.smile-impact .story-tag span {
+  color: #31564f;
+}
+
 .smile-impact-stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1305,6 +1332,11 @@
 
   .quote-mark {
     right: 0;
+  }
+
+  .smile-impact .quote-mark {
+    right: auto;
+    left: 0;
   }
 
   .section-topline {
