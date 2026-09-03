@@ -30,7 +30,7 @@ donation designs, plus a shared single-post design for articles and events.
 - `snapshot-templates/donate.php` provides the editable donation-options page.
 - `snapshot-templates/donate-us.php` provides the unrestricted-donation page.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
-- `inc/posts.php` derives Article/Event placement from the post slug and stores
+- `inc/posts.php` reads Article/Event placement from explicit post metadata and stores
   optional event details.
 - `templates/single-post.php` renders both classified post types identically.
 - `inc/` and `assets/js/editor.js` provide the copied visual snapshot editor.
@@ -74,13 +74,12 @@ Card copy and images remain editable through the normal Text and Media modes.
    explicitly as **Cammino Article** in the post's Template selector. With the
    default template, only the post's own content is rendered. On an empty post,
    **Cammino Article** additionally renders the complete reference article body.
-2. To place it under **Podujatia**, make its slug start with `event-` or
-   `podujatie-`, for example `event-komunitny-den`. Every other slug places the
-   post under **Novinky**.
+2. In the **Cammino príspevok** box, choose **Článok** or **Podujatie** under
+   **Typ príspevku**. The selection controls its listing placement independently
+   of the post slug.
 3. For an event, optionally set its date/time, location, and status label in the
-   **Cammino príspevok** box.
-4. Publish the post. The slug changes only its listing placement; both types
-   keep the same detail-page styling.
+   same box.
+4. Publish the post. Both types keep the same detail-page styling.
 
 The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.
