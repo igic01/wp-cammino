@@ -23,12 +23,6 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
             <a class="button button--coral" href="<?php echo esc_url( $cammino_donate_url ); ?>">Podporte naše aktivity <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
             <a class="text-link" href="#about">Spoznajte Cammino <span aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
           </div>
-          <div class="hero-proof" aria-label="Naša komunita">
-            <div class="avatar-stack" aria-hidden="true">
-              <span>A</span><span>M</span><span>L</span>
-            </div>
-            <p><strong>Vzdelávanie · komunita · solidarita</strong><br>na jednej spoločnej ceste</p>
-          </div>
         </div>
 
         <div class="hero-visual" data-hero-reveal data-delay="140">
