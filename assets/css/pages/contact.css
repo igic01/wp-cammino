@@ -405,7 +405,12 @@
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(80px, 0.45fr);
   color: var(--color-white);
-  background: var(--color-plum);
+  background: #2d5062;
+  box-shadow: 0 20px 45px rgba(24, 52, 66, 0.14);
+}
+
+.address-card:hover {
+  box-shadow: 0 32px 60px rgba(24, 52, 66, 0.25);
 }
 
 .address-card__copy {
@@ -459,6 +464,19 @@
   transform: scale(1.08);
 }
 
+.address-marker .detail-icon__badge {
+  color: #2d5062;
+  background: #dee5d5;
+  box-shadow: 0 16px 34px rgba(24, 52, 66, 0.28);
+}
+
+.address-marker:hover .detail-icon__badge,
+.address-marker.is-popped .detail-icon__badge {
+  color: var(--color-white);
+  background: #6f9eaa;
+  box-shadow: 0 24px 45px rgba(18, 43, 56, 0.36);
+}
+
 .form-heading__icon.is-popped {
   animation: form-icon-float 4s ease-in-out infinite;
 }
@@ -486,6 +504,8 @@
   text-transform: uppercase;
 }
 
+.address-card__copy > span { color: #b8d6c5; }
+
 .address-card h3 {
   margin: 0.55rem 0 1.7rem;
   color: var(--color-white);
@@ -494,6 +514,11 @@
 }
 
 .address-card .text-link { color: var(--color-white); }
+
+.address-card .text-link:hover,
+.address-card .text-link:focus-visible {
+  color: #c7e0e4;
+}
 
 .address-art {
   position: relative;
@@ -509,7 +534,7 @@
   max-width: none;
   overflow: visible;
   fill: none;
-  stroke: var(--color-apricot);
+  stroke: #b8d6c5;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 4;
@@ -544,6 +569,9 @@
 
 .map-ring--one { top: -4rem; right: -7rem; width: 19rem; height: 19rem; }
 .map-ring--two { right: -4rem; bottom: -7rem; width: 14rem; height: 14rem; border-width: 2.5rem; }
+
+.address-card .map-ring { border-color: rgba(222, 229, 213, 0.18); }
+.address-card .map-ring--two { border-color: rgba(184, 214, 197, 0.11); }
 
 .support-contact-card {
   display: grid;
