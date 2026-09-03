@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.5.40' );
+define( 'NSTARTER_VERSION', '1.5.42' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -453,6 +453,15 @@ function cammino_enqueue_single_post_assets(): void {
 		'/assets/css/pages/article.css',
 		'/assets/js/pages/article.js'
 	);
+
+	if ( nstarter_is_preview_request() ) {
+		wp_enqueue_style(
+			'cammino-editor-preview',
+			NSTARTER_URL . '/assets/css/editor-preview.css',
+			array( 'cammino-article' ),
+			NSTARTER_VERSION
+		);
+	}
 }
 
 add_action( 'wp_enqueue_scripts', 'cammino_isolate_visual_page_assets', 999 );

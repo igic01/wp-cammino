@@ -28,6 +28,11 @@
     const sectionOrderForm = document.querySelector('[data-nstarter-section-order-form]');
     const sectionOrderList = document.querySelector('[data-nstarter-section-order-list]');
     const sectionOrderCancel = document.querySelector('[data-nstarter-section-order-cancel]');
+    const contentEditorButton = document.querySelector('[data-nstarter-content-editor]');
+    const contentDialog = document.querySelector('[data-nstarter-content-dialog]');
+    const contentForm = document.querySelector('[data-nstarter-content-form]');
+    const contentList = document.querySelector('[data-nstarter-content-list]');
+    const contentClose = document.querySelector('[data-nstarter-content-close]');
 
     if (!config || !frame) {
         return;
@@ -52,6 +57,133 @@
 
     function snapshotRoot() {
         return frameDocument().querySelector('[data-nstarter-snapshot-root]');
+    }
+
+    function contentBuilder() {
+        const root = snapshotRoot();
+        return root && root.matches('[data-nstarter-content-builder]') ? root : null;
+    }
+
+    function contentItems() {
+        const builder = contentBuilder();
+        return builder
+            ? Array.from(builder.children).filter(function (item) {
+                return item.matches('[data-nstarter-content-item]');
+            })
+            : [];
+    }
+
+    function contentItemLabel(item, index) {
+        const labels = {
+            title: 'Title',
+            paragraph: 'Paragraph',
+            image: 'Image',
+            content: 'Existing content'
+        };
+        const type = item.dataset.nstarterContentType || 'content';
+        const preview = type === 'image'
+            ? (item.querySelector('img') && item.querySelector('img').getAttribute('alt')) || ''
+            : item.textContent.replace(/\s+/g, ' ').trim().slice(0, 48);
+
+        return (labels[type] || 'Content') + ' ' + String(index + 1) + (preview ? ' — ' + preview : '');
+    }
+
+    function renderContentList() {
+        if (!contentList) {
+            return;
+        }
+
+        const items = contentItems();
+        contentList.replaceChildren();
+
+        items.forEach(function (item, index) {
+            const row = document.createElement('li');
+            const label = document.createElement('span');
+            const moveUp = document.createElement('button');
+            const moveDown = document.createElement('button');
+            const remove = document.createElement('button');
+
+            label.textContent = contentItemLabel(item, index);
+            label.title = label.textContent;
+            moveUp.type = moveDown.type = remove.type = 'button';
+            moveUp.textContent = '↑';
+            moveDown.textContent = '↓';
+            remove.textContent = '×';
+            moveUp.disabled = index === 0;
+            moveDown.disabled = index === items.length - 1;
+            moveUp.title = config.strings.contentItemUp;
+            moveDown.title = config.strings.contentItemDown;
+            remove.title = config.strings.contentItemDelete;
+
+            moveUp.addEventListener('click', function () {
+                item.parentElement.insertBefore(item, items[index - 1]);
+                markDirty();
+                renderContentList();
+                refreshVariableTools();
+            });
+            moveDown.addEventListener('click', function () {
+                items[index + 1].after(item);
+                markDirty();
+                renderContentList();
+                refreshVariableTools();
+            });
+            remove.addEventListener('click', function () {
+                if (!window.confirm(config.strings.confirmDeleteContent)) {
+                    return;
+                }
+                item.remove();
+                markDirty();
+                renderContentList();
+                refreshVariableTools();
+                refreshVideoSettingsTools();
+            });
+
+            row.append(label, moveUp, moveDown, remove);
+            contentList.appendChild(row);
+        });
+    }
+
+    function openContentEditor() {
+        if (!contentDialog || !contentBuilder()) {
+            return;
+        }
+        renderContentList();
+        contentDialog.showModal();
+    }
+
+    function closeContentEditor() {
+        if (contentDialog && contentDialog.open) {
+            contentDialog.close();
+        }
+    }
+
+    function addContentItem(type) {
+        const builder = contentBuilder();
+        const template = builder && builder.querySelector('template[data-nstarter-content-template="' + type + '"]');
+        const item = template && template.content.firstElementChild
+            ? template.content.firstElementChild.cloneNode(true)
+            : null;
+
+        if (!builder || !item) {
+            return;
+        }
+
+        const firstTemplate = Array.from(builder.children).find(function (child) {
+            return child.matches('template[data-nstarter-content-template]');
+        });
+        builder.insertBefore(item, firstTemplate || null);
+        markDirty();
+        renderContentList();
+        refreshVariableTools();
+        refreshVideoSettingsTools();
+
+        if (type === 'image') {
+            const image = item.querySelector('img');
+            closeContentEditor();
+            if (image) {
+                openMediaPicker(image);
+            }
+        }
     }
 
     function setStatus(message, state) {
@@ -574,6 +706,16 @@
         });
     }
 
+    function lockPostChrome(doc) {
+        if (!contentBuilder()) {
+            return;
+        }
+
+        doc.querySelectorAll('.site-header, .article-hero, .article-cover, .article-share, .related-section, .site-footer').forEach(function (element) {
+            element.setAttribute('contenteditable', 'false');
+        });
+    }
+
     function applyMode(nextMode) {
         mode = nextMode;
         const doc = frameDocument();
@@ -582,6 +724,7 @@
         doc.body.classList.remove('nstarter-mode-text', 'nstarter-mode-media', 'nstarter-mode-interaction');
         doc.body.classList.add('nstarter-mode-' + mode);
         lockLiveSections(doc);
+        lockPostChrome(doc);
         modeSelect.value = mode;
         refreshVideoSettingsTools();
         refreshVariableTools();
@@ -803,7 +946,8 @@
         }
 
         const target = event.target.closest && event.target.closest('img, video');
-        if (!target || isInLiveSection(target)) {
+        const root = snapshotRoot();
+        if (!target || isInLiveSection(target) || (contentBuilder() && !root.contains(target))) {
             event.preventDefault();
             return;
         }
@@ -984,6 +1128,9 @@
         if (sectionOrderButton) {
             sectionOrderButton.disabled = nextBusy;
         }
+        if (contentEditorButton) {
+            contentEditorButton.disabled = nextBusy;
+        }
     }
 
     async function save() {
@@ -1056,6 +1203,12 @@
         doc.addEventListener('scroll', positionEditorTools, true);
         frame.contentWindow.addEventListener('resize', positionEditorTools);
         applyMode(mode);
+        if (contentEditorButton) {
+            contentEditorButton.hidden = !contentBuilder();
+        }
+        if (sectionOrderButton && contentBuilder()) {
+            sectionOrderButton.hidden = true;
+        }
     }
 
     modeSelect.addEventListener('change', function () {
@@ -1072,6 +1225,23 @@
         sectionOrderDialog.addEventListener('cancel', function (event) {
             event.preventDefault();
             cancelSectionOrder();
+        });
+    }
+    if (contentEditorButton && contentDialog && contentForm && contentClose) {
+        contentEditorButton.addEventListener('click', openContentEditor);
+        contentClose.addEventListener('click', closeContentEditor);
+        contentForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            closeContentEditor();
+        });
+        contentForm.querySelectorAll('[data-nstarter-content-add]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                addContentItem(button.dataset.nstarterContentAdd);
+            });
+        });
+        contentDialog.addEventListener('cancel', function (event) {
+            event.preventDefault();
+            closeContentEditor();
         });
     }
     videoForm.addEventListener('submit', applyVideoAttachment);

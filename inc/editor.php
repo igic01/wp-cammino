@@ -73,7 +73,7 @@ function nstarter_maybe_render_editor(): void {
 	$post_id = isset( $_GET['nstarter_post'] ) ? absint( $_GET['nstarter_post'] ) : get_queried_object_id();
 	$post    = get_post( $post_id );
 
-	if ( ! $post instanceof WP_Post || 'page' !== $post->post_type || ! current_user_can( 'edit_post', $post_id ) ) {
+	if ( ! $post instanceof WP_Post || ! in_array( $post->post_type, array( 'page', 'post' ), true ) || ! current_user_can( 'edit_post', $post_id ) ) {
 		wp_die(
 			esc_html__( 'You cannot edit this page.', 'nstarter' ),
 			esc_html__( 'Visual editor', 'nstarter' ),
@@ -81,7 +81,7 @@ function nstarter_maybe_render_editor(): void {
 		);
 	}
 
-	if ( ! nstarter_is_visual_page( $post_id ) ) {
+	if ( ! nstarter_is_visual_document( $post_id ) ) {
 		wp_die(
 			esc_html__( 'This page does not use a Cammino visual page template.', 'cammino' ),
 			esc_html__( 'Visual editor', 'nstarter' ),
@@ -115,6 +115,10 @@ function nstarter_maybe_render_editor(): void {
 				'sectionOrderUp'      => __( 'Move section up', 'nstarter' ),
 				'sectionOrderDown'    => __( 'Move section down', 'nstarter' ),
 				'noOrderableSections' => __( 'No reorderable content sections were found.', 'nstarter' ),
+				'contentItemUp'       => __( 'Move content item up', 'cammino' ),
+				'contentItemDown'     => __( 'Move content item down', 'cammino' ),
+				'contentItemDelete'   => __( 'Delete content item', 'cammino' ),
+				'confirmDeleteContent'=> __( 'Delete this content item?', 'cammino' ),
 				'saved'             => __( 'Saved', 'nstarter' ),
 				'regenerated'       => __( 'Regenerated from PHP', 'nstarter' ),
 				'unsaved'           => __( 'Unsaved changes', 'nstarter' ),
@@ -170,6 +174,7 @@ function nstarter_maybe_render_editor(): void {
 					<button type="button" class="nstarter-control nstarter-control--primary" data-nstarter-save><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
 					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
 					<button type="button" class="nstarter-control nstarter-control--order" data-nstarter-section-order><?php esc_html_e( 'Section order', 'nstarter' ); ?></button>
+					<button type="button" class="nstarter-control nstarter-control--content" data-nstarter-content-editor hidden><?php esc_html_e( 'Article content', 'cammino' ); ?></button>
 					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
 				</div>
 			</aside>
@@ -214,6 +219,22 @@ function nstarter_maybe_render_editor(): void {
 					</div>
 				</form>
 			</dialog>
+
+			<dialog class="nstarter-content-dialog" data-nstarter-content-dialog>
+				<form data-nstarter-content-form>
+					<h2><?php esc_html_e( 'Article / event content', 'cammino' ); ?></h2>
+					<p><?php esc_html_e( 'Add, remove, or reorder content. Edit words in Text mode and replace photos in Media mode.', 'cammino' ); ?></p>
+					<div class="nstarter-content-add">
+						<button type="button" data-nstarter-content-add="title">+ <?php esc_html_e( 'Title', 'cammino' ); ?></button>
+						<button type="button" data-nstarter-content-add="paragraph">+ <?php esc_html_e( 'Paragraph', 'cammino' ); ?></button>
+						<button type="button" data-nstarter-content-add="image">+ <?php esc_html_e( 'Image', 'cammino' ); ?></button>
+					</div>
+					<ol data-nstarter-content-list></ol>
+					<div class="nstarter-content-dialog__actions">
+						<button type="button" data-nstarter-content-close><?php esc_html_e( 'Done', 'cammino' ); ?></button>
+					</div>
+				</form>
+			</dialog>
 		</div>
 		<?php wp_footer(); ?>
 	</body>
@@ -242,7 +263,7 @@ function nstarter_ajax_save_snapshot(): void {
 
 	// This intentionally stores the editor's complete HTML. Access is capability + nonce protected.
 	$html = (string) wp_unslash( $_POST['html'] );
-	if ( ! nstarter_update_snapshot_html( $post_id, $html ) ) {
+	if ( ! nstarter_is_visual_document( $post_id ) || ! nstarter_update_visual_document_html( $post_id, $html ) ) {
 		wp_send_json_error( array( 'message' => __( 'The saved page could not be verified. Please try again.', 'cammino' ) ), 500 );
 	}
 
@@ -270,8 +291,8 @@ function nstarter_ajax_regenerate_snapshot(): void {
 		wp_send_json_error( array( 'message' => __( 'You cannot edit this page.', 'nstarter' ) ), 403 );
 	}
 
-	$html = nstarter_render_source_template( $post_id );
-	if ( ! nstarter_update_snapshot_html( $post_id, $html ) ) {
+	$html = nstarter_render_visual_document( $post_id );
+	if ( ! nstarter_is_visual_document( $post_id ) || ! nstarter_update_visual_document_html( $post_id, $html ) ) {
 		wp_send_json_error( array( 'message' => __( 'The regenerated page could not be verified. Please try again.', 'cammino' ) ), 500 );
 	}
 
@@ -291,12 +312,12 @@ add_action( 'admin_bar_menu', 'nstarter_add_admin_bar_editor_link', 90 );
  * Add an editor shortcut while viewing a visual page normally.
  */
 function nstarter_add_admin_bar_editor_link( WP_Admin_Bar $admin_bar ): void {
-	if ( ! is_page() || nstarter_is_preview_request() || nstarter_is_editor_request() ) {
+	if ( ! is_singular( array( 'page', 'post' ) ) || nstarter_is_preview_request() || nstarter_is_editor_request() ) {
 		return;
 	}
 
 	$post_id = get_queried_object_id();
-	if ( ! nstarter_is_visual_page( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
+	if ( ! nstarter_is_visual_document( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
 		return;
 	}
 

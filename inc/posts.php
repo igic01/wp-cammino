@@ -13,7 +13,8 @@ const CAMMINO_EVENT_DATE_META     = '_cammino_event_date';
 const CAMMINO_EVENT_LOCATION_META = '_cammino_event_location';
 const CAMMINO_EVENT_STATUS_META   = '_cammino_event_status';
 const CAMMINO_POST_PLACEMENT_META = '_cammino_post_placement';
-const CAMMINO_ARTICLE_TEMPLATE    = 'templates/single-post.php';
+const CAMMINO_POST_TEMPLATE       = 'templates/single-post.php';
+const CAMMINO_POST_SNAPSHOT_META  = '_cammino_post_visual_content';
 
 /**
  * Return the supported Cammino post destinations.
@@ -288,7 +289,10 @@ function cammino_get_post_category( int $post_id ): array {
  * Estimate reading time from post content.
  */
 function cammino_get_reading_minutes( int $post_id ): int {
-	$content = (string) get_post_field( 'post_content', $post_id );
+	$visual_content = (string) get_post_meta( $post_id, CAMMINO_POST_SNAPSHOT_META, true );
+	$content        = '' !== trim( $visual_content )
+		? preg_replace( '#<template\b[^>]*>.*?</template>#is', '', $visual_content )
+		: (string) get_post_field( 'post_content', $post_id );
 	$text    = wp_strip_all_tags( strip_shortcodes( $content ) );
 	$words   = preg_match_all( '/[\p{L}\p{N}]+/u', $text, $matches );
 
@@ -608,6 +612,108 @@ function cammino_render_news_articles(): string {
 	return (string) ob_get_clean();
 }
 
+/**
+ * Whether a post uses the shared Cammino Article/Event visual design.
+ */
+function cammino_is_visual_post( int $post_id ): bool {
+	return 'post' === get_post_type( $post_id );
+}
+
+/**
+ * Flatten layout-only Gutenberg groups into individually movable visual items.
+ *
+ * @param array<int,array<string,mixed>> $blocks Parsed WordPress blocks.
+ * @return array<int,array{type:string,html:string}>
+ */
+function cammino_get_visual_items_from_blocks( array $blocks ): array {
+	$items = array();
+
+	foreach ( $blocks as $block ) {
+		$name  = isset( $block['blockName'] ) ? (string) $block['blockName'] : '';
+		$inner = isset( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ? $block['innerBlocks'] : array();
+
+		if ( in_array( $name, array( 'core/group', 'core/columns', 'core/column' ), true ) && ! empty( $inner ) ) {
+			$items = array_merge( $items, cammino_get_visual_items_from_blocks( $inner ) );
+			continue;
+		}
+
+		$html = trim( (string) render_block( $block ) );
+		if ( '' === $html ) {
+			continue;
+		}
+
+		$type = match ( $name ) {
+			'core/heading'   => 'title',
+			'core/paragraph' => 'paragraph',
+			'core/image'     => 'image',
+			default          => 'content',
+		};
+
+		$items[] = array( 'type' => $type, 'html' => $html );
+	}
+
+	return $items;
+}
+
+/**
+ * Build the editable Article/Event body used when no visual snapshot exists.
+ *
+ * Existing WordPress content is retained as one movable content item. New
+ * posts start with separate title, paragraph, and image items.
+ */
+function cammino_render_post_visual_content( int $post_id ): string {
+	$post_content = trim( (string) get_post_field( 'post_content', $post_id ) );
+	$placeholder  = cammino_get_post_image_url( $post_id, 'large' );
+
+	ob_start();
+	if ( '' !== $post_content ) :
+		$visual_items = cammino_get_visual_items_from_blocks( parse_blocks( $post_content ) );
+		foreach ( $visual_items as $visual_item ) :
+			?>
+			<div class="article-content-block article-content-block--<?php echo esc_attr( $visual_item['type'] ); ?>" data-nstarter-content-item data-nstarter-content-type="<?php echo esc_attr( $visual_item['type'] ); ?>">
+				<?php echo $visual_item['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</div>
+			<?php
+		endforeach;
+	else :
+		?>
+		<p class="article-lead article-content-block" data-nstarter-content-item data-nstarter-content-type="paragraph">Napíšte úvodný text článku alebo podujatia.</p>
+		<h2 class="article-content-block" data-nstarter-content-item data-nstarter-content-type="title">Nadpis sekcie</h2>
+		<p class="article-content-block" data-nstarter-content-item data-nstarter-content-type="paragraph">Napíšte text tejto sekcie.</p>
+		<figure class="article-inline-image article-content-block" data-nstarter-content-item data-nstarter-content-type="image"><img src="<?php echo esc_url( $placeholder ); ?>" alt="" width="1200" height="800" loading="lazy"></figure>
+		<?php
+	endif;
+	?>
+	<template data-nstarter-content-template="title"><h2 class="article-content-block" data-nstarter-content-item data-nstarter-content-type="title">Nový nadpis</h2></template>
+	<template data-nstarter-content-template="paragraph"><p class="article-content-block" data-nstarter-content-item data-nstarter-content-type="paragraph">Nový odsek textu.</p></template>
+	<template data-nstarter-content-template="image"><figure class="article-inline-image article-content-block" data-nstarter-content-item data-nstarter-content-type="image"><img src="<?php echo esc_url( $placeholder ); ?>" alt="" width="1200" height="800" loading="lazy"></figure></template>
+	<?php
+
+	return (string) ob_get_clean();
+}
+
+/**
+ * Read the saved visual body, falling back to the post's current content.
+ */
+function cammino_get_post_visual_content( int $post_id ): string {
+	$html = (string) get_post_meta( $post_id, CAMMINO_POST_SNAPSHOT_META, true );
+
+	return '' !== trim( $html ) ? $html : cammino_render_post_visual_content( $post_id );
+}
+
+/**
+ * Save and verify an Article/Event visual body.
+ */
+function cammino_update_post_visual_content( int $post_id, string $html ): bool {
+	update_post_meta( $post_id, CAMMINO_POST_SNAPSHOT_META, wp_slash( $html ) );
+	clean_post_cache( $post_id );
+
+	return hash_equals(
+		hash( 'sha256', $html ),
+		hash( 'sha256', (string) get_post_meta( $post_id, CAMMINO_POST_SNAPSHOT_META, true ) )
+	);
+}
+
 add_filter( 'template_include', 'cammino_use_single_post_template', 99 );
 
 /**
@@ -615,7 +721,7 @@ add_filter( 'template_include', 'cammino_use_single_post_template', 99 );
  */
 function cammino_use_single_post_template( string $template ): string {
 	if ( cammino_is_managed_post_request() ) {
-		$cammino_template = NSTARTER_PATH . '/' . CAMMINO_ARTICLE_TEMPLATE;
+		$cammino_template = NSTARTER_PATH . '/' . CAMMINO_POST_TEMPLATE;
 		if ( is_file( $cammino_template ) ) {
 			return $cammino_template;
 		}

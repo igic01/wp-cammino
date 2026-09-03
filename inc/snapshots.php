@@ -87,6 +87,36 @@ function nstarter_is_visual_page( int $post_id ): bool {
 	return '' !== nstarter_get_native_source_template_slug( $post_id );
 }
 
+/**
+ * Whether the object can be edited with the Cammino visual editor.
+ */
+function nstarter_is_visual_document( int $post_id ): bool {
+	return nstarter_is_visual_page( $post_id )
+		|| ( function_exists( 'cammino_is_visual_post' ) && cammino_is_visual_post( $post_id ) );
+}
+
+/**
+ * Save visual HTML for either a page snapshot or an Article/Event body.
+ */
+function nstarter_update_visual_document_html( int $post_id, string $html ): bool {
+	if ( function_exists( 'cammino_is_visual_post' ) && cammino_is_visual_post( $post_id ) ) {
+		return cammino_update_post_visual_content( $post_id, $html );
+	}
+
+	return nstarter_update_snapshot_html( $post_id, $html );
+}
+
+/**
+ * Rebuild visual HTML from the correct PHP source.
+ */
+function nstarter_render_visual_document( int $post_id ): string {
+	if ( function_exists( 'cammino_is_visual_post' ) && cammino_is_visual_post( $post_id ) ) {
+		return cammino_render_post_visual_content( $post_id );
+	}
+
+	return nstarter_render_source_template( $post_id );
+}
+
 add_filter( 'theme_page_templates', 'nstarter_register_native_page_templates', 20, 3 );
 
 /**
@@ -288,7 +318,7 @@ function nstarter_register_acf_fields(): void {
 	);
 }
 
-add_action( 'add_meta_boxes_page', 'nstarter_add_editor_meta_box' );
+add_action( 'add_meta_boxes', 'nstarter_add_editor_meta_box' );
 
 /**
  * Add an obvious route from wp-admin to the visual editor.
@@ -298,7 +328,7 @@ function nstarter_add_editor_meta_box(): void {
 		'nstarter-visual-editor',
 		__( 'Cammino visual editor', 'cammino' ),
 		'nstarter_render_editor_meta_box',
-		'page',
+		array( 'page', 'post' ),
 		'side',
 		'high'
 	);
@@ -308,7 +338,7 @@ function nstarter_add_editor_meta_box(): void {
  * Render the editor launch box.
  */
 function nstarter_render_editor_meta_box( WP_Post $post ): void {
-	if ( ! nstarter_is_visual_page( $post->ID ) ) {
+	if ( ! nstarter_is_visual_document( $post->ID ) ) {
 		echo '<p>' . esc_html__( 'Choose a “Cammino — …” design in the page Template setting, then save the page.', 'cammino' ) . '</p>';
 		return;
 	}

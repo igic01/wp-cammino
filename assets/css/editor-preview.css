@@ -90,6 +90,16 @@
 }
 
 /* Snapshot-native variable sections stay editable, including at a zero value. */
+[data-nstarter-content-builder] > [data-nstarter-content-item] {
+  outline: 1px dashed transparent;
+  outline-offset: 6px;
+  transition: outline-color 160ms ease;
+}
+
+[data-nstarter-content-builder] > [data-nstarter-content-item]:hover {
+  outline-color: #6d5dfc;
+}
+
 .nstarter-editor-preview.nstarter-mode-text [data-nstarter-variable-section],
 .nstarter-editor-preview.nstarter-mode-media [data-nstarter-variable-section] {
     position: relative;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Cammino Article
+ * Template Name: Cammino Article / Event
  * Template Post Type: post
  *
  * Shared bare document for Cammino Article and Event posts.
@@ -19,18 +19,14 @@ $cammino_news_url   = cammino_get_news_page_url();
 $cammino_category   = cammino_get_post_category( $cammino_post_id );
 $cammino_minutes    = cammino_get_reading_minutes( $cammino_post_id );
 $cammino_image      = cammino_get_post_image_url( $cammino_post_id, 'full' );
-$cammino_is_article_template = CAMMINO_ARTICLE_TEMPLATE === get_page_template_slug( $cammino_post_id );
 $cammino_timestamp  = 'event' === $cammino_placement
 	? cammino_get_event_timestamp( $cammino_post_id )
 	: (int) get_post_timestamp( $cammino_post );
 $cammino_type_label  = 'event' === $cammino_placement ? 'Podujatie' : 'Článok';
-$cammino_sticker     = 'event' === $cammino_placement || ! $cammino_is_article_template
-	? $cammino_type_label
-	: 'Každý talent potrebuje priestor';
-$cammino_raw_content = (string) get_post_field( 'post_content', $cammino_post_id );
+$cammino_sticker     = $cammino_type_label;
 $cammino_deck        = has_excerpt( $cammino_post )
 	? get_the_excerpt( $cammino_post )
-	: ( $cammino_is_article_template ? 'Od prvého neistého návrhu až po vlastnú výstavu v komunitnom centre' : '' );
+	: '';
 $cammino_caption     = '';
 $cammino_thumbnail   = get_post_thumbnail_id( $cammino_post_id );
 
@@ -38,18 +34,7 @@ if ( $cammino_thumbnail ) {
 	$cammino_caption = (string) wp_get_attachment_caption( $cammino_thumbnail );
 }
 
-if ( '' === $cammino_caption && $cammino_is_article_template ) {
-	$cammino_caption = 'Tvorivý workshop v komunitnom centre Cammino';
-}
-
-if (
-	$cammino_is_article_template
-	&& cammino_is_post_content_empty( $cammino_raw_content )
-) {
-	$cammino_raw_content = cammino_get_article_starter_content();
-}
-
-$cammino_content = apply_filters( 'the_content', $cammino_raw_content );
+$cammino_content    = cammino_get_post_visual_content( $cammino_post_id );
 $cammino_related    = get_posts(
 	array(
 		'post_type'           => 'post',
@@ -117,10 +102,8 @@ $cammino_related    = get_posts(
 					<span class="copy-feedback" role="status" aria-live="polite" data-copy-feedback></span>
 				</aside>
 
-				<div class="article-content" data-article-reveal="up">
-					<?php if ( '' !== trim( wp_strip_all_tags( $cammino_content ) ) ) : ?>
-						<?php echo $cammino_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					<?php endif; ?>
+				<div class="article-content" data-article-reveal="up" data-nstarter-snapshot-root data-nstarter-content-builder="article" data-nstarter-content-label="Obsah článku / podujatia">
+					<?php echo $cammino_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</div>
 			</div>
 		</article>

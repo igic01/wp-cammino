@@ -54,6 +54,7 @@ body.nstarter-editor-shell {
 
 .nstarter-mode-field,
 .nstarter-control--order,
+.nstarter-control--content,
 .nstarter-control--quiet {
     grid-column: 1 / -1;
 }
@@ -455,10 +456,101 @@ body.nstarter-editor-shell {
     background: #6d5dfc;
 }
 
+.nstarter-content-dialog {
+    width: min(620px, calc(100vw - 32px));
+    max-height: min(760px, calc(100vh - 32px));
+    padding: 18px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    color: #222;
+    background: #fff;
+    font-family: inherit;
+}
+
+.nstarter-content-dialog::backdrop {
+    background: rgb(0 0 0 / 38%);
+}
+
+.nstarter-content-dialog form {
+    display: grid;
+    gap: 14px;
+}
+
+.nstarter-content-dialog h2,
+.nstarter-content-dialog p {
+    margin: 0;
+}
+
+.nstarter-content-dialog h2 { font-size: 17px; }
+.nstarter-content-dialog p { color: #666; font-size: 12px; line-height: 1.45; }
+
+.nstarter-content-add {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+}
+
+.nstarter-content-dialog ol {
+    display: grid;
+    max-height: min(430px, calc(100vh - 300px));
+    margin: 0;
+    padding: 0;
+    gap: 7px;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.nstarter-content-dialog li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 34px 34px 34px;
+    min-height: 42px;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 6px 5px 10px;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    background: #fafafa;
+}
+
+.nstarter-content-dialog li > span {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nstarter-content-dialog button {
+    min-height: 34px;
+    padding: 0 10px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+    font: 600 12px/1 inherit;
+}
+
+.nstarter-content-dialog li button {
+    width: 34px;
+    padding: 0;
+    font-size: 17px;
+}
+
+.nstarter-content-dialog li button:last-child {
+    color: #b42318;
+}
+
+.nstarter-content-dialog button:disabled { cursor: default; opacity: .35; }
+.nstarter-content-dialog__actions { display: flex; justify-content: flex-end; }
+.nstarter-content-dialog__actions button { border-color: #5142df; color: #fff; background: #6d5dfc; }
+
 @media (max-width: 480px) {
     .nstarter-editor-panel {
         top: 10px;
         right: 10px;
         width: min(252px, calc(100vw - 20px));
     }
+
+    .nstarter-content-add { grid-template-columns: 1fr; }
 }

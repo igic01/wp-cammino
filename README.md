@@ -68,18 +68,19 @@ Card copy and images remain editable through the normal Text and Media modes.
 
 ## Publish an article or event
 
-1. Create or edit a normal WordPress post and use its title, excerpt, featured
-   image, categories, and block-editor content as usual. Every post automatically
-   uses the shared Cammino single-post design. The same design is also available
-   explicitly as **Cammino Article** in the post's Template selector. With the
-   default template, only the post's own content is rendered. On an empty post,
-   **Cammino Article** additionally renders the complete reference article body.
+1. Create or edit a normal WordPress post and set its title, excerpt, featured
+   image, and categories. Every post automatically uses the shared Cammino
+   Article/Event design.
 2. In the **Cammino príspevok** box, choose **Článok** or **Podujatie** under
    **Typ príspevku**. The selection controls its listing placement independently
    of the post slug.
 3. For an event, optionally set its date/time, location, and status label in the
    same box.
-4. Publish the post. Both types keep the same detail-page styling.
+4. Open **Cammino visual editor**. Use **Article content** to add, remove, and
+   reorder titles, paragraphs, and images. Edit words in Text mode, replace an
+   image in Media mode, and then press **Save**.
+4. Publish the post. Both types use the same reorderable content section and
+   detail-page styling.
 
 The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.
