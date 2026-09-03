@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.5.53' );
+define( 'NSTARTER_VERSION', '1.5.55' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -197,7 +197,7 @@ function cammino_render_site_header(): void {
 	<header class="site-header" data-header>
 		<div class="container header-inner">
 			<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Cammino – domov', 'cammino' ); ?>">
-				<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1666" height="297">
+				<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/new_long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1666" height="297">
 			</a>
 
 			<button class="nav-toggle" type="button" aria-label="<?php esc_attr_e( 'Otvoriť menu', 'cammino' ); ?>" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
@@ -221,7 +221,7 @@ function cammino_render_site_footer(): void {
 		<div class="container footer-main">
 			<div class="footer-brand">
 				<a class="brand brand--footer" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Cammino – domov', 'cammino' ); ?>">
-					<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1666" height="297">
+					<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/new_long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1666" height="297">
 				</a>
 				<p><?php esc_html_e( 'Pomáhame mladým ľuďom nájsť cestu k vzdelaniu, práci a samostatnej budúcnosti.', 'cammino' ); ?></p>
 				<div class="social-links" aria-label="<?php esc_attr_e( 'Sociálne siete', 'cammino' ); ?>">

@@ -13,7 +13,7 @@ $cammino_placeholder = $cammino_asset_url . '/images/placeholder.webp';
   <header class="site-header" data-header>
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="Cammino – domov">
-        <img src="<?php echo esc_url( $cammino_asset_url . '/logos/long_logo.svg' ); ?>" alt="Cammino" width="1666" height="297">
+        <img src="<?php echo esc_url( $cammino_asset_url . '/logos/new_long_logo.svg' ); ?>" alt="Cammino" width="1666" height="297">
       </a>
 
       <button class="nav-toggle" type="button" aria-label="Otvoriť menu" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
@@ -86,7 +86,7 @@ $cammino_placeholder = $cammino_asset_url . '/images/placeholder.webp';
     <div class="container footer-main">
       <div class="footer-brand">
         <a class="brand brand--footer" href="index.html" aria-label="Cammino – domov">
-          <img src="<?php echo esc_url( $cammino_asset_url . '/logos/long_logo.svg' ); ?>" alt="Cammino" width="1666" height="297">
+          <img src="<?php echo esc_url( $cammino_asset_url . '/logos/new_long_logo.svg' ); ?>" alt="Cammino" width="1666" height="297">
         </a>
         <p>Pomáhame mladým ľuďom nájsť cestu k vzdelaniu, práci a samostatnej budúcnosti.</p>
         <div class="social-links" aria-label="Sociálne siete">

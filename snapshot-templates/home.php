@@ -11,7 +11,7 @@ $cammino_news_url    = nstarter_get_source_page_url( 'news', '/novinky/' );
 $cammino_stories_url = nstarter_get_source_page_url( 'ss', '/pribehy/' );
 $cammino_events_url  = $cammino_news_url . '#events';
 $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
-$cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
+$cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
 ?>
 <main id="main-content">
     <section class="hero section" aria-labelledby="hero-title">

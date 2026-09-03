@@ -1335,6 +1335,16 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
   transform: rotate(1.5deg);
 }
 
+.community-cta-media[data-reveal] {
+  opacity: 0;
+  transform: rotate(-5deg) scale(0.58);
+  transform-origin: center;
+}
+
+.community-cta-media[data-reveal].is-visible {
+  animation: community-image-grow 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 .community-cta-media::after {
   display: none;
 }
@@ -1411,6 +1421,21 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 @keyframes community-orbit-drift {
   from { transform: translate3d(-1rem, -0.5rem, 0) rotate(-15deg) scale(0.96); }
   to { transform: translate3d(5rem, 3rem, 0) rotate(24deg) scale(1.08); }
+}
+
+@keyframes community-image-grow {
+  0% {
+    opacity: 0;
+    transform: rotate(-5deg) scale(0.58);
+  }
+  72% {
+    opacity: 1;
+    transform: rotate(2.5deg) scale(1.045);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(1.5deg) scale(1);
+  }
 }
 
 @keyframes community-ring-drift {
@@ -1802,8 +1827,16 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
   .donate-card.is-visible .donate-step,
   .community-cta::before,
   .community-cta-card::before,
-  .community-cta-shape {
+  .community-cta-shape,
+  .community-cta-media[data-reveal].is-visible {
     animation: none;
+  }
+
+  .community-cta-media[data-reveal],
+  .community-cta-media[data-reveal].is-visible {
+    opacity: 1;
+    transform: rotate(1.5deg);
+    transition: none;
   }
 
   .hero-note,

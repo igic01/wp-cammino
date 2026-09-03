@@ -35,6 +35,13 @@ $nstarter_html = (string) preg_replace(
 	$nstarter_html
 );
 
+// Keep logos in older saved snapshots aligned with the current brand assets.
+$nstarter_html = str_replace(
+	array( '/assets/logos/long_logo.svg', '/assets/logos/logo.svg' ),
+	array( '/assets/logos/new_long_logo.svg', '/assets/logos/new_logo.svg' ),
+	$nstarter_html
+);
+
 // Remove the retired Events introduction from older saved News snapshots.
 if ( 'news' === nstarter_get_native_source_template_slug( $nstarter_post_id ) ) {
 	$nstarter_html = (string) preg_replace(
