@@ -20,12 +20,25 @@ if ( '' === trim( $nstarter_html ) ) {
 	$nstarter_html = nstarter_render_source_template( $nstarter_post_id );
 }
 
-if ( ! str_contains( $nstarter_html, 'data-nstarter-live-section="cammino_site_header"' ) ) {
-	$nstarter_html = nstarter_get_live_section_marker( 'cammino_site_header' ) . $nstarter_html;
+// Remove legacy header/footer live markers from previously saved snapshots.
+$nstarter_html = (string) preg_replace(
+	'#<div[^>]*data-nstarter-live-section=["\']cammino_site_(?:header|footer)["\'][^>]*>\s*</div>#i',
+	'',
+	$nstarter_html
+);
+
+// Header and footer are regular snapshot content. Add them only when an older
+// snapshot or a clean source template does not already contain them.
+if ( ! preg_match( '#<header[^>]*class=["\'][^"\']*\bsite-header\b#i', $nstarter_html ) ) {
+	ob_start();
+	cammino_render_site_header();
+	$nstarter_html = (string) ob_get_clean() . $nstarter_html;
 }
 
-if ( ! str_contains( $nstarter_html, 'data-nstarter-live-section="cammino_site_footer"' ) ) {
-	$nstarter_html .= nstarter_get_live_section_marker( 'cammino_site_footer' );
+if ( ! preg_match( '#<footer[^>]*class=["\'][^"\']*\bsite-footer\b#i', $nstarter_html ) ) {
+	ob_start();
+	cammino_render_site_footer();
+	$nstarter_html .= (string) ob_get_clean();
 }
 ?>
 <!doctype html>

@@ -2,12 +2,6 @@
 
 .about-page #main-content { background: transparent; }
 
-/* Remove the shell from snapshots saved before header/footer work was paused. */
-.about-page #nstarter-snapshot > .site-header,
-.about-page #nstarter-snapshot > .site-footer {
-  display: none !important;
-}
-
 [data-about-reveal] {
   opacity: 0;
   filter: blur(3px);

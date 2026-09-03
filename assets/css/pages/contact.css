@@ -1,10 +1,5 @@
 /* Contact page */
 
-.contact-page #nstarter-snapshot > .site-header,
-.contact-page #nstarter-snapshot > .site-footer {
-  display: none !important;
-}
-
 [data-contact-reveal] {
   opacity: 0;
   filter: blur(3px);

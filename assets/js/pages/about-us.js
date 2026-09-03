@@ -1,7 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
-    .forEach((element) => element.remove());
-
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const mobileMedia = window.matchMedia("(max-width: 760px)");
 

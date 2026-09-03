@@ -1,10 +1,5 @@
 /* Editable success stories page */
 
-.stories-page #nstarter-snapshot > .site-header,
-.stories-page #nstarter-snapshot > .site-footer {
-  display: none !important;
-}
-
 [data-story-reveal] {
   opacity: 0;
   filter: blur(7px);

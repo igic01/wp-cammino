@@ -5,9 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const observedReveals = new WeakSet();
   let sectionObserver = null;
 
-  document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
-    .forEach((element) => element.remove());
-
   // Move legacy visible navigation labels onto their story sections.
   document.querySelectorAll(".success-story [data-story-nav-label]").forEach((label) => {
     const story = label.closest(".success-story");

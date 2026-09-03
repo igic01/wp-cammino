@@ -1,10 +1,5 @@
 /* News page */
 
-.news-page #nstarter-snapshot > .site-header,
-.news-page #nstarter-snapshot > .site-footer {
-  display: none !important;
-}
-
 .news-page .news-events {
   padding-top: clamp(3rem, 6vw, 5rem);
 }

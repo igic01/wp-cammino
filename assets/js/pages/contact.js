@@ -1,9 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  document.querySelectorAll("#nstarter-snapshot > .site-header, #nstarter-snapshot > .site-footer")
-    .forEach((element) => element.remove());
-
   document.querySelector(".details-heading > p")?.remove();
 
   const revealElements = document.querySelectorAll("[data-contact-reveal]");

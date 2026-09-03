@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.5.27' );
+define( 'NSTARTER_VERSION', '1.5.28' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 
@@ -259,26 +259,6 @@ function cammino_render_site_footer(): void {
  * Register dynamic content that must never be stored in an editable snapshot.
  */
 function cammino_register_live_sections(): void {
-	nstarter_register_live_section(
-		'cammino_site_header',
-		static function (): string {
-			ob_start();
-			cammino_render_site_header();
-
-			return (string) ob_get_clean();
-		}
-	);
-
-	nstarter_register_live_section(
-		'cammino_site_footer',
-		static function (): string {
-			ob_start();
-			cammino_render_site_footer();
-
-			return (string) ob_get_clean();
-		}
-	);
-
 	nstarter_register_live_section(
 		'cammino_contact_form',
 		static function (): string {
