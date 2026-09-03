@@ -98,6 +98,13 @@
   min-height: 520px;
 }
 
+@media (min-width: 1051px) {
+  .about-hero__visual {
+    top: -2.5rem;
+    align-self: start;
+  }
+}
+
 .about-hero__image {
   position: absolute;
   inset: 2.5rem 1rem 2rem 1.6rem;
