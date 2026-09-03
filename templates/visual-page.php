@@ -60,10 +60,9 @@ if ( 'ss' === nstarter_get_native_source_template_slug( $nstarter_post_id ) ) {
 	);
 }
 
-// Saved snapshots can contain an older copy of the header. Always replace that
-// copy with the current shared header so every page has identical navigation,
-// active-menu state and scroll behavior. This remains normal snapshot markup,
-// not a live-section marker.
+// Saved snapshots can contain older copies of the site shell. Always replace
+// them with the current shared header and footer so every page stays visually
+// consistent. These remain normal theme markup, not live-section markers.
 $nstarter_html = (string) preg_replace(
 	'#<header\b[^>]*class=["\'][^"\']*\bsite-header\b[^>]*>.*?</header>#is',
 	'',
@@ -79,11 +78,15 @@ ob_start();
 cammino_render_site_header();
 $nstarter_html = (string) ob_get_clean() . $nstarter_html;
 
-if ( ! preg_match( '#<footer[^>]*class=["\'][^"\']*\bsite-footer\b#i', $nstarter_html ) ) {
-	ob_start();
-	cammino_render_site_footer();
-	$nstarter_html .= (string) ob_get_clean();
-}
+$nstarter_html = (string) preg_replace(
+	'#<footer\b[^>]*class=["\'][^"\']*\bsite-footer\b[^>]*>.*?</footer>#is',
+	'',
+	$nstarter_html
+);
+
+ob_start();
+cammino_render_site_footer();
+$nstarter_html .= (string) ob_get_clean();
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
