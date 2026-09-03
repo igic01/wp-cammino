@@ -145,24 +145,20 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
       </div>
     </section>
 
-    <section class="section story-section" id="stories" aria-labelledby="story-title">
-      <div class="story-blob" aria-hidden="true"></div>
-      <div class="container story-grid">
-        <div class="story-visual" data-reveal="left">
-          <div class="story-image">
-            <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Nina pri práci na svojom tvorivom projekte" width="1200" height="800" loading="lazy">
+    <section class="section news-subscribe home-subscribe" aria-labelledby="subscribe-title">
+      <div class="container">
+        <div class="subscribe-card" data-reveal="scale">
+          <div class="subscribe-card__icon" aria-hidden="true"><i class="fa-solid fa-envelope-open-text"></i></div>
+          <div class="subscribe-card__copy">
+            <h2 id="subscribe-title">Dobré správy rovno do vašej schránky</h2>
+            <p>Raz za mesiac pošleme výber príbehov, príležitostí a noviniek z Cammina.</p>
           </div>
-          <div class="quote-mark" aria-hidden="true"><i class="fa-solid fa-quote-left"></i></div>
-          <div class="story-tag"><span aria-hidden="true"><i class="fa-solid fa-star"></i></span> Príbeh so skutočným dopadom</div>
-        </div>
-        <div class="story-copy" data-reveal="right" data-delay="160">
-          <h2 id="story-title">Zo skicára vznikla <em>prvá vlastná výstava</em></h2>
-          <p>Nina svoje kresby dlho nikomu neukazovala. Bezpečný priestor, trpezlivá mentorka a skupina rovesníkov jej pomohli veriť vlastnému pohľadu a ukázať svoj talent.</p>
-          <div class="story-person">
-            <span>N</span>
-            <p><strong>Nina</strong><br>príbeh odvahy ukázať svoj talent</p>
-          </div>
-          <a class="button button--cream" href="<?php echo esc_url( $cammino_stories_url ); ?>">Prečítať celý príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
+          <form class="subscribe-form" action="#" method="post" data-newsletter-placeholder>
+            <label class="sr-only" for="cammino-home-subscribe-email">Váš e-mail</label>
+            <input id="cammino-home-subscribe-email" type="email" name="email" placeholder="vas@email.sk" required>
+            <button class="button button--cream" type="submit" aria-label="Prihlásiť sa na odber"><span>Chcem novinky</span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+            <span class="newsletter-status" role="status" data-newsletter-status></span>
+          </form>
         </div>
       </div>
     </section>
@@ -238,6 +234,28 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
             <a class="button button--cream" href="<?php echo esc_url( $cammino_donate_url ); ?>">Chcem pomôcť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-heart"></i></span></a>
             <small>Podpora vzdelávania, komunít a solidarity</small>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section story-section" id="stories" aria-labelledby="story-title">
+      <div class="story-blob" aria-hidden="true"></div>
+      <div class="container story-grid">
+        <div class="story-visual" data-reveal="left">
+          <div class="story-image">
+            <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Nina pri práci na svojom tvorivom projekte" width="1200" height="800" loading="lazy">
+          </div>
+          <div class="quote-mark" aria-hidden="true"><i class="fa-solid fa-quote-left"></i></div>
+          <div class="story-tag"><span aria-hidden="true"><i class="fa-solid fa-star"></i></span> Príbeh so skutočným dopadom</div>
+        </div>
+        <div class="story-copy" data-reveal="right" data-delay="160">
+          <h2 id="story-title">Zo skicára vznikla <em>prvá vlastná výstava</em></h2>
+          <p>Nina svoje kresby dlho nikomu neukazovala. Bezpečný priestor, trpezlivá mentorka a skupina rovesníkov jej pomohli veriť vlastnému pohľadu a ukázať svoj talent.</p>
+          <div class="story-person">
+            <span>N</span>
+            <p><strong>Nina</strong><br>príbeh odvahy ukázať svoj talent</p>
+          </div>
+          <a class="button button--cream" href="<?php echo esc_url( $cammino_stories_url ); ?>">Prečítať celý príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
         </div>
       </div>
     </section>

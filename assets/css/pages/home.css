@@ -1232,6 +1232,151 @@
   transform: rotate(22deg);
 }
 
+.home-subscribe {
+  padding-top: 0;
+  background: transparent;
+}
+
+.subscribe-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "icon copy"
+    "icon form";
+  align-items: center;
+  column-gap: clamp(1.5rem, 4vw, 3rem);
+  row-gap: 1.5rem;
+  padding: clamp(2.4rem, 5vw, 4rem);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  background: var(--color-coral);
+  box-shadow: 0 24px 55px rgba(217, 111, 93, 0.17);
+}
+
+.subscribe-card::after {
+  position: absolute;
+  right: -8rem;
+  bottom: -10rem;
+  width: 22rem;
+  height: 22rem;
+  border: 4rem solid rgba(100, 54, 75, 0.13);
+  border-radius: 50%;
+  content: "";
+}
+
+.subscribe-card__icon,
+.subscribe-card__copy,
+.subscribe-form {
+  position: relative;
+  z-index: 2;
+}
+
+.subscribe-card__icon {
+  grid-area: icon;
+  display: grid;
+  width: 5rem;
+  height: 5rem;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--color-plum);
+  background: var(--color-apricot);
+  font-size: 1.7rem;
+  animation: subscribe-icon-float 3.5s ease-in-out infinite alternate;
+  transition: color 350ms ease, background-color 350ms ease, box-shadow 450ms ease;
+}
+
+.subscribe-card__copy {
+  grid-area: copy;
+}
+
+.subscribe-card__icon i {
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.subscribe-card__icon:hover {
+  color: var(--color-apricot);
+  background: var(--color-plum);
+  box-shadow: 0 18px 34px rgba(80, 45, 54, 0.28);
+}
+
+.subscribe-card__icon:hover i {
+  transform: rotate(-12deg) scale(1.18);
+}
+
+@keyframes subscribe-icon-float {
+  to {
+    box-shadow: 0 16px 30px rgba(80, 45, 54, 0.2);
+    transform: translateY(-8px) rotate(5deg);
+  }
+}
+
+.subscribe-card h2 {
+  margin-bottom: 0.7rem;
+  color: var(--color-white);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.subscribe-card__copy p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.subscribe-form {
+  grid-area: form;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+}
+
+.subscribe-form input {
+  grid-column: 1;
+  grid-row: 1;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 3.1rem;
+  margin: 0;
+  padding: 0.65rem 0.9rem;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  color: var(--color-charcoal);
+  background: transparent;
+  box-shadow: none;
+}
+
+.subscribe-form .button {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 3.1rem;
+  margin: 0;
+  white-space: nowrap;
+  color: var(--color-plum);
+  background: var(--color-apricot);
+}
+
+.subscribe-form .button:hover,
+.subscribe-form .button:focus-visible {
+  color: var(--color-white);
+  background: var(--color-plum);
+  transform: none;
+}
+
+.newsletter-status {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  left: 1rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.72rem;
+}
+
 @media (max-width: 1020px) {
   .hero-grid {
     grid-template-columns: 1fr 0.85fr;
@@ -1310,6 +1455,27 @@
 }
 
 @media (max-width: 560px) {
+  .subscribe-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "icon"
+      "copy"
+      "form";
+    border-radius: var(--radius-md);
+  }
+
+  .subscribe-form .button {
+    width: 3.1rem;
+    min-width: 3.1rem;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .subscribe-form .button span {
+    display: none;
+  }
+
   .hero-actions {
     align-items: flex-start;
     flex-direction: column;
@@ -1409,6 +1575,7 @@
   }
 
   .hero-note,
+  .subscribe-card__icon,
   .support-card .support-icon,
   .event-list[data-reveal] .event-row {
     opacity: 1;

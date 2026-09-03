@@ -134,6 +134,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  document.querySelectorAll("[data-newsletter-placeholder]").forEach((form) => {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const status = form.querySelector("[data-newsletter-status]");
+      if (status) status.textContent = "Newsletter zatiaľ nie je pripojený.";
+    });
+  });
+
   const revealElements = document.querySelectorAll("[data-reveal]:not(.hero-visual)");
   revealElements.forEach((element) => {
     const transientClasses = new Set((element.dataset.nstarterTransientClass || "").split(/\s+/).filter(Boolean));
