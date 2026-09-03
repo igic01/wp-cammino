@@ -745,12 +745,12 @@ h2 em {
   }
 
   .footer-main {
-    grid-template-columns: 1.5fr 1fr;
+    grid-template-columns: 1.5fr 1fr 1fr;
     gap: 3rem 2rem;
   }
 
   .footer-contact {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .newsletter {
