@@ -188,23 +188,72 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
         </div>
 
         <div class="event-grid">
-          <article class="event-card event-card--featured" data-reveal="left">
-            <a class="event-image" href="<?php echo esc_url( $cammino_events_url ); ?>" aria-label="Detail workshopu Objav svoj potenciál">
-              <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Skupina ľudí na vzdelávacom workshope" width="1200" height="800" loading="lazy">
-              <span class="event-type">Workshop</span>
-            </a>
-            <div class="event-content">
-              <div class="event-date"><strong>24</strong><span>SEP</span></div>
-              <div>
-                <p class="event-meta">Bratislava · 16:00</p>
-                <h3><a href="<?php echo esc_url( $cammino_events_url ); ?>">Objav svoj potenciál: workshop osobného rozvoja</a></h3>
-                <p>Praktické popoludnie plné rozhovorov, tvorivých úloh a podnetov, ktoré pomáhajú lepšie spoznať svoje silné stránky.</p>
-              </div>
+          <div class="featured-news-slot" data-reveal="left"<?php
+          nstarter_variable_section_attributes(
+            'home_featured_news',
+            array(
+              'label'   => 'Zobraziť hlavnú novinku',
+              'type'    => 'boolean',
+              'control' => 'repeat',
+              'value'   => 1,
+              'min'     => 0,
+              'max'     => 1,
+              'step'    => 1,
+              'token'   => 'news',
+            )
+          );
+          ?>>
+            <div class="featured-news-items" data-nstarter-variable-items>
+              <article class="event-card event-card--featured" data-nstarter-variable-item>
+                <a class="event-image" href="<?php echo esc_url( $cammino_events_url ); ?>" aria-label="Detail workshopu Objav svoj potenciál">
+                  <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Skupina ľudí na vzdelávacom workshope" width="1200" height="800" loading="lazy">
+                  <span class="event-type">Workshop</span>
+                </a>
+                <div class="event-content">
+                  <div class="event-date"><strong>24</strong><span>SEP</span></div>
+                  <div>
+                    <p class="event-meta">Bratislava · 16:00</p>
+                    <h3><a href="<?php echo esc_url( $cammino_events_url ); ?>">Objav svoj potenciál: workshop osobného rozvoja</a></h3>
+                    <p>Praktické popoludnie plné rozhovorov, tvorivých úloh a podnetov, ktoré pomáhajú lepšie spoznať svoje silné stránky.</p>
+                  </div>
+                </div>
+              </article>
             </div>
-          </article>
+            <template data-nstarter-variable-template>
+              <article class="event-card event-card--featured" data-nstarter-variable-item>
+                <a class="event-image" href="<?php echo esc_url( $cammino_events_url ); ?>" aria-label="Detail novinky">
+                  <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Fotografia hlavnej novinky" width="1200" height="800" loading="lazy">
+                  <span class="event-type">Novinka</span>
+                </a>
+                <div class="event-content">
+                  <div class="event-date"><strong>01</strong><span>JAN</span></div>
+                  <div>
+                    <p class="event-meta">Miesto · 12:00</p>
+                    <h3><a href="<?php echo esc_url( $cammino_events_url ); ?>">Názov hlavnej novinky</a></h3>
+                    <p>Sem doplňte krátky text hlavnej novinky.</p>
+                  </div>
+                </div>
+              </article>
+            </template>
+          </div>
 
-          <div class="event-list" data-reveal="right" data-delay="140">
-            <article class="event-row">
+          <div class="event-list" data-reveal="right" data-delay="140"<?php
+          nstarter_variable_section_attributes(
+            'home_event_count',
+            array(
+              'label'   => 'Počet podujatí',
+              'type'    => 'number',
+              'control' => 'repeat',
+              'value'   => 3,
+              'min'     => 0,
+              'max'     => 3,
+              'step'    => 1,
+              'token'   => 'event',
+            )
+          );
+          ?>>
+            <div class="event-list-items" data-nstarter-variable-items>
+            <article class="event-row" data-nstarter-variable-item>
               <div class="event-date"><strong>02</strong><span>OKT</span></div>
               <div>
                 <p class="event-meta">Online · 18:00</p>
@@ -213,7 +262,7 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
               </div>
               <a class="circle-link" href="<?php echo esc_url( $cammino_events_url ); ?>" aria-label="Detail webinára"><i class="fa-solid fa-arrow-right-long icon-diagonal" aria-hidden="true"></i></a>
             </article>
-            <article class="event-row">
+            <article class="event-row" data-nstarter-variable-item>
               <div class="event-date"><strong>11</strong><span>OKT</span></div>
               <div>
                 <p class="event-meta">Košice · 14:00</p>
@@ -222,7 +271,7 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
               </div>
               <a class="circle-link" href="<?php echo esc_url( $cammino_events_url ); ?>" aria-label="Detail komunitného dňa"><i class="fa-solid fa-arrow-right-long icon-diagonal" aria-hidden="true"></i></a>
             </article>
-            <article class="event-row">
+            <article class="event-row" data-nstarter-variable-item>
               <div class="event-date"><strong>19</strong><span>OKT</span></div>
               <div>
                 <p class="event-meta">Žilina · 15:30</p>
@@ -231,6 +280,18 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
               </div>
               <a class="circle-link" href="<?php echo esc_url( $cammino_events_url ); ?>" aria-label="Detail tvorivej dielne"><i class="fa-solid fa-arrow-right-long icon-diagonal" aria-hidden="true"></i></a>
             </article>
+            </div>
+            <template data-nstarter-variable-template>
+              <article class="event-row" data-nstarter-variable-item>
+                <div class="event-date"><strong>01</strong><span>JAN</span></div>
+                <div>
+                  <p class="event-meta">Miesto · 12:00</p>
+                  <h3><a href="<?php echo esc_url( $cammino_events_url ); ?>">Názov podujatia {{event}}</a></h3>
+                  <span class="event-type event-type--inline">Podujatie</span>
+                </div>
+                <a class="circle-link" href="<?php echo esc_url( $cammino_events_url ); ?>" aria-label="Detail podujatia {{event}}"><i class="fa-solid fa-arrow-right-long icon-diagonal" aria-hidden="true"></i></a>
+              </article>
+            </template>
           </div>
         </div>
       </div>

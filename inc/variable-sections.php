@@ -25,7 +25,9 @@ function nstarter_variable_section_attributes( string $id, array $config = array
 		return;
 	}
 
-	$type    = isset( $config['type'] ) && 'text' === $config['type'] ? 'text' : 'number';
+	$type    = isset( $config['type'] ) && in_array( $config['type'], array( 'text', 'boolean' ), true )
+		? $config['type']
+		: 'number';
 	$control = isset( $config['control'] ) && 'text' === $config['control'] ? 'text' : 'repeat';
 	$value   = isset( $config['value'] ) && is_scalar( $config['value'] ) ? (string) $config['value'] : '';
 	$label   = isset( $config['label'] ) && is_scalar( $config['label'] )

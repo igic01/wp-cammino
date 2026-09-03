@@ -257,12 +257,17 @@
 
         activeVariableSection = section;
         const label = section.dataset.nstarterVariableLabel || config.strings.editSectionVariable;
-        const inputType = section.dataset.nstarterVariableType === 'text' ? 'text' : 'number';
+        const variableType = section.dataset.nstarterVariableType || 'number';
+        const inputType = variableType === 'text' ? 'text' : (variableType === 'boolean' ? 'checkbox' : 'number');
 
         variableTitle.textContent = config.strings.editSectionVariable;
-        variableLabel.textContent = label;
+        variableLabel.textContent = variableType === 'boolean' ? label + ' (áno / nie)' : label;
         variableInput.type = inputType;
-        variableInput.value = section.dataset.nstarterVariableValue || '';
+        if (inputType === 'checkbox') {
+            variableInput.checked = section.dataset.nstarterVariableValue === '1';
+        } else {
+            variableInput.value = section.dataset.nstarterVariableValue || '';
+        }
         ['min', 'max', 'step'].forEach(function (name) {
             variableInput.removeAttribute(name);
             const value = section.dataset['nstarterVariable' + name.charAt(0).toUpperCase() + name.slice(1)];
@@ -347,9 +352,9 @@
             return;
         }
 
-        const type = section.dataset.nstarterVariableType === 'text' ? 'text' : 'number';
+        const type = section.dataset.nstarterVariableType || 'number';
         const control = section.dataset.nstarterVariableControl === 'text' ? 'text' : 'repeat';
-        let value = variableInput.value;
+        let value = type === 'boolean' ? (variableInput.checked ? 1 : 0) : variableInput.value;
 
         if (type === 'number') {
             value = Number(value);
@@ -367,7 +372,7 @@
         }
 
         if (control === 'repeat') {
-            const resized = type === 'number' ? resizeRepeatSection(section, value) : false;
+            const resized = type === 'number' || type === 'boolean' ? resizeRepeatSection(section, value) : false;
             if (resized === null) {
                 return;
             }

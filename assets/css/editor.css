@@ -317,6 +317,12 @@ body.nstarter-editor-shell {
     outline: none;
 }
 
+.nstarter-variable-dialog input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+}
+
 .nstarter-variable-dialog p {
     color: #666;
     font-size: 11px;
