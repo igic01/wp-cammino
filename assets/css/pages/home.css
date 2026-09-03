@@ -1110,6 +1110,11 @@
   background: transparent;
 }
 
+.story-section + .donate {
+  padding-top: clamp(4rem, 8vw, 7rem);
+  padding-bottom: clamp(4rem, 8vw, 7rem);
+}
+
 .donate-card {
   position: relative;
   display: grid;

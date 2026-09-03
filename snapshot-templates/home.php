@@ -236,23 +236,6 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
       </div>
     </section>
 
-    <section class="section donate" id="donate" aria-labelledby="donate-title">
-      <div class="container">
-        <div class="donate-card" data-reveal="scale">
-          <div class="donate-step donate-step--one" aria-hidden="true"></div>
-          <div class="donate-step donate-step--two" aria-hidden="true"></div>
-          <div class="donate-copy">
-            <h2 id="donate-title">Pomôžte nám meniť dobré nápady na <em>skutočné príležitosti</em></h2>
-            <p>Váš príspevok podporí vzdelávanie, praktické dielne, komunitné aktivity a priamu pomoc tam, kde je práve najviac potrebná.</p>
-          </div>
-          <div class="donate-action">
-            <a class="button button--cream" href="<?php echo esc_url( $cammino_donate_url ); ?>">Chcem pomôcť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-heart"></i></span></a>
-            <small>Podpora vzdelávania, komunít a solidarity</small>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="section story-section" id="stories" aria-labelledby="story-title">
       <div class="story-blob" aria-hidden="true"></div>
       <div class="container story-grid">
@@ -271,6 +254,23 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/logo.svg';
             <p><strong>Nina</strong><br>príbeh odvahy ukázať svoj talent</p>
           </div>
           <a class="button button--cream" href="<?php echo esc_url( $cammino_stories_url ); ?>">Prečítať celý príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section donate" id="donate" aria-labelledby="donate-title">
+      <div class="container">
+        <div class="donate-card" data-reveal="scale">
+          <div class="donate-step donate-step--one" aria-hidden="true"></div>
+          <div class="donate-step donate-step--two" aria-hidden="true"></div>
+          <div class="donate-copy">
+            <h2 id="donate-title">Pomôžte nám meniť dobré nápady na <em>skutočné príležitosti</em></h2>
+            <p>Váš príspevok podporí vzdelávanie, praktické dielne, komunitné aktivity a priamu pomoc tam, kde je práve najviac potrebná.</p>
+          </div>
+          <div class="donate-action">
+            <a class="button button--cream" href="<?php echo esc_url( $cammino_donate_url ); ?>">Chcem pomôcť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-heart"></i></span></a>
+            <small>Podpora vzdelávania, komunít a solidarity</small>
+          </div>
         </div>
       </div>
     </section>
