@@ -35,6 +35,15 @@ $nstarter_html = (string) preg_replace(
 	$nstarter_html
 );
 
+// Remove the retired Events introduction from older saved News snapshots.
+if ( 'news' === nstarter_get_native_source_template_slug( $nstarter_post_id ) ) {
+	$nstarter_html = (string) preg_replace(
+		'#<p>\s*Stretnutia,\s*workshopy\s*a\s*príležitosti,\s*ku\s*ktorým\s*sa\s*môžete\s*pridať\.\s*</p>#iu',
+		'',
+		$nstarter_html
+	);
+}
+
 // Remove captions retained by older Success Stories snapshots.
 if ( 'ss' === nstarter_get_native_source_template_slug( $nstarter_post_id ) ) {
 	$nstarter_html = (string) preg_replace(

@@ -13,7 +13,6 @@
 			<div class="news-events__heading" data-news-reveal="up">
 				<div>
 					<h1 id="events-title">Podujatia <em>práve teraz</em></h1>
-					<p>Stretnutia, workshopy a príležitosti, ku ktorým sa môžete pridať.</p>
 				</div>
 			</div>
 

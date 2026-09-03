@@ -489,7 +489,7 @@ function cammino_render_news_events(): string {
 
 	ob_start();
 	?>
-	<div class="active-events-grid">
+	<div class="active-events-grid<?php echo empty( $events ) ? ' active-events-grid--single' : ''; ?>">
 		<?php
 		$date      = $render_date( $featured->ID );
 		$category  = cammino_get_post_category( $featured->ID );
@@ -507,7 +507,7 @@ function cammino_render_news_events(): string {
 			<div class="active-event__content">
 				<div class="active-event__topline">
 					<time class="active-event__date" datetime="<?php echo esc_attr( $date['iso'] ); ?>"><strong><?php echo esc_html( $date['day'] ); ?></strong><span><?php echo esc_html( $date['month'] ); ?></span></time>
-					<div><span><?php echo esc_html( $location ); ?></span><strong><?php echo esc_html( $date['time'] ); ?></strong></div>
+					<div><span><?php esc_html_e( 'Čas začiatku', 'cammino' ); ?></span><strong><?php echo esc_html( $date['time'] ); ?></strong></div>
 				</div>
 				<span class="active-event__type"><?php echo esc_html( $category['name'] ); ?></span>
 				<h2><?php echo esc_html( get_the_title( $featured ) ); ?></h2>
