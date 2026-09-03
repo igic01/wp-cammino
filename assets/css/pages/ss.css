@@ -262,27 +262,6 @@
 
 .story-photo:hover img { transform: scale(1.075); filter: saturate(1.08); }
 
-.story-photo figcaption { display: none; }
-
-.story-photo:first-child figcaption {
-  position: absolute;
-  z-index: 2;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  display: block;
-  max-width: calc(100% - 3rem);
-  padding: .75rem 1rem;
-  border-radius: var(--radius-pill);
-  color: var(--color-plum);
-  background: rgba(255, 253, 249, .94);
-  box-shadow: 0 12px 30px rgba(80, 45, 54, .18);
-  font-size: .75rem;
-  font-weight: 700;
-  transition: transform 420ms cubic-bezier(.16, 1, .3, 1), background-color 350ms ease;
-}
-
-.story-photo:first-child:hover figcaption { color: var(--color-plum-dark); background: var(--color-apricot); transform: translateY(-7px) rotate(-1deg); }
-
 .success-story__result {
   position: relative;
   display: grid;

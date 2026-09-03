@@ -14,7 +14,6 @@ $cammino_stories     = array(
 		'label'       => 'Nina',
 		'title'       => 'Nina našla odvahu ukázať svoj <em>talent</em>',
 		'description' => 'Zo skicára, ktorý nikomu neukazovala, vznikla prvá vlastná výstava. Bezpečný priestor, trpezlivá mentorka a skupina rovesníkov jej pomohli veriť vlastnému pohľadu.',
-		'caption'     => 'Od prvého návrhu po komunitnú výstavu',
 		'result'      => '<strong>12 diel</strong> vystavených v komunitnom centre',
 		'icon'        => 'fa-palette',
 		'photos'      => 4,
@@ -25,7 +24,6 @@ $cammino_stories     = array(
 		'label'       => 'Komunita',
 		'title'       => 'Komunitný deň spojil celú <em>štvrť</em>',
 		'description' => 'Jeden dvor sa na celý deň zmenil na priestor pre hudbu, tvorivé dielne a nové priateľstvá. Program pripravovali mladí ľudia spolu so susedmi a dobrovoľníkmi.',
-		'caption'     => 'Deň vytvorený komunitou pre komunitu',
 		'result'      => '<strong>120+ ľudí</strong> sa stretlo na jednom mieste',
 		'icon'        => 'fa-people-group',
 		'photos'      => 4,
@@ -36,7 +34,6 @@ $cammino_stories     = array(
 		'label'       => 'Nový smer',
 		'title'       => 'Nový smer otvoril dvere k prvej <em>práci</em>',
 		'description' => 'Šesťtýždňový program spojil praktické workshopy, individuálny mentoring a stretnutia so zamestnávateľmi. Tento príbeh nemá jednu fotografiu — jeho obraz tvoria konkrétne výsledky celej skupiny.',
-		'caption'     => 'Každý účastník našiel svoj ďalší krok',
 		'result'      => '<strong>Každý účastník</strong> odišiel s vlastným ďalším krokom',
 		'icon'        => 'fa-briefcase',
 		'photos'      => 0,
@@ -47,7 +44,6 @@ $cammino_stories     = array(
 		'label'       => 'Dielňa',
 		'title'       => 'Digitálna dielňa premenila nápady na <em>projekty</em>',
 		'description' => 'Účastníci začínali s prázdnou obrazovkou. Počas štyroch sobôt vytvorili prvé weby, vizuálne identity a prototypy, ktoré dnes ďalej rozvíjajú.',
-		'caption'     => 'Keď sa zvedavosť zmení na praktickú zručnosť',
 		'result'      => '<strong>16 projektov</strong> vzniklo za štyri spoločné soboty',
 		'icon'        => 'fa-laptop-code',
 		'photos'      => 4,
@@ -124,14 +120,12 @@ $cammino_stories     = array(
 								<?php for ( $cammino_photo_index = 1; $cammino_photo_index <= $cammino_story['photos']; $cammino_photo_index++ ) : ?>
 									<figure class="story-photo" data-nstarter-variable-item>
 										<img src="<?php echo esc_url( $cammino_story_image ); ?>" alt="Fotografia <?php echo esc_attr( (string) $cammino_photo_index ); ?> k príbehu <?php echo esc_attr( (string) $cammino_story_index ); ?>" width="1400" height="900"<?php echo 1 < $cammino_photo_index ? ' loading="lazy"' : ''; ?>>
-										<figcaption><?php echo esc_html( $cammino_story['caption'] ); ?></figcaption>
 									</figure>
 								<?php endfor; ?>
 							</div>
 							<template data-nstarter-variable-template>
 								<figure class="story-photo" data-nstarter-variable-item>
 									<img src="<?php echo esc_url( $cammino_story_image ); ?>" alt="Fotografia {{photo}} k príbehu <?php echo esc_attr( (string) $cammino_story_index ); ?>" width="1400" height="900" loading="lazy">
-									<figcaption><?php echo esc_html( $cammino_story['caption'] ); ?></figcaption>
 								</figure>
 							</template>
 						</div>
@@ -176,7 +170,6 @@ $cammino_stories     = array(
 						<template data-nstarter-variable-template>
 							<figure class="story-photo" data-nstarter-variable-item>
 								<img src="<?php echo esc_url( $cammino_story_image ); ?>" alt="Fotografia {{photo}} k príbehu {{story}}" width="1400" height="900" loading="lazy">
-								<figcaption>Doplňte popis fotografie</figcaption>
 							</figure>
 						</template>
 					</div>

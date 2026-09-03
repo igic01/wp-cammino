@@ -35,6 +35,15 @@ $nstarter_html = (string) preg_replace(
 	$nstarter_html
 );
 
+// Remove captions retained by older Success Stories snapshots.
+if ( 'ss' === nstarter_get_native_source_template_slug( $nstarter_post_id ) ) {
+	$nstarter_html = (string) preg_replace(
+		'#<figcaption\b[^>]*>.*?</figcaption>#is',
+		'',
+		$nstarter_html
+	);
+}
+
 // Saved snapshots can contain an older copy of the header. Always replace that
 // copy with the current shared header so every page has identical navigation,
 // active-menu state and scroll behavior. This remains normal snapshot markup,
