@@ -6,7 +6,7 @@
  */
 
 $cammino_about_url   = nstarter_get_source_page_url( 'about-us', '/o-nas/' );
-$cammino_donate_url  = nstarter_get_source_page_url( 'donate', '/podporte-nas/' );
+$cammino_donate_url  = CAMMINO_DONATE_URL;
 $cammino_news_url    = nstarter_get_source_page_url( 'news', '/novinky/' );
 $cammino_stories_url = nstarter_get_source_page_url( 'ss', '/pribehy/' );
 $cammino_events_url  = $cammino_news_url . '#events';
@@ -170,8 +170,8 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
             <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Ľudia spojení komunitnými aktivitami OZ Cammino" width="1200" height="800" loading="lazy">
           </div>
           <div class="community-cta-copy" data-reveal="right" data-delay="120">
-            <h2 id="community-cta-title"><span>Pridajte sa k nám</span><em>a tvorme zmenu spoločne</em></h2>
-            <a class="button button--coral" href="<?php echo esc_url( $cammino_donate_url ); ?>">Chcem pomôcť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
+            <h2 id="community-cta-title"><span>Spoznajte nášho partnera</span><em>Darujme úsmev</em></h2>
+            <a class="button button--coral" href="https://www.exallievi.sk/darujmeusmev/">Viac o projekte <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
           </div>
           <div class="community-cta-shape" aria-hidden="true"></div>
         </div>

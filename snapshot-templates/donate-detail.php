@@ -5,7 +5,7 @@
  * @package Cammino
  */
 
-$cammino_donate_url = nstarter_get_source_page_url( 'donate', '/podporte-nas/' );
+$cammino_donate_url = CAMMINO_DONATE_URL;
 $cammino_detail_url = nstarter_get_source_page_url( 'donate-detail', '/podporte-nas/detail/' );
 $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 ?>

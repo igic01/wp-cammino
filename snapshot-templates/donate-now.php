@@ -68,7 +68,7 @@ $cammino_placeholder = $cammino_asset_url . '/images/placeholder.webp';
               <span>Podporte nás</span>
               <h3>Pomôžte dobrým veciam napredovať</h3>
               <p>Každá podpora nám umožňuje vytvárať ďalšie príležitosti pre mladých ľudí a komunity.</p>
-              <a class="button button--cream" href="donate.html">Chcem pomôcť <span class="button-arrow"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
+              <a class="button button--cream" href="https://cammino.darujme.sk/darujmeusmev/">Chcem pomôcť <span class="button-arrow"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
             </div>
 
             <div class="qr-wrap" aria-label="QR kód pre podporu OZ Cammino">

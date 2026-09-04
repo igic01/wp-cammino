@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'NSTARTER_VERSION', '1.5.59' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
+define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
 
 require_once NSTARTER_PATH . '/inc/snapshots.php';
 require_once NSTARTER_PATH . '/inc/live-sections.php';
@@ -38,6 +39,19 @@ function cammino_register_navigation(): void {
  */
 function cammino_clean_nav_title( string $title ): string {
 	return trim( (string) preg_replace( '/\s*-v2$/i', '', $title ) );
+}
+
+/**
+ * Point legacy donation-page links at the current donation page.
+ */
+function cammino_normalize_donate_url( string $url ): string {
+	$path = wp_parse_url( $url, PHP_URL_PATH );
+
+	if ( is_string( $path ) && '/podporte-nas/' === trailingslashit( '/' . ltrim( $path, '/' ) ) ) {
+		return CAMMINO_DONATE_URL;
+	}
+
+	return $url;
 }
 
 /**
@@ -84,7 +98,7 @@ class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
 
 		$class_attribute = implode( ' ', array_map( 'sanitize_html_class', array_unique( $classes ) ) );
 		$attributes      = array(
-			'href' => ! empty( $item->url ) ? $item->url : '#',
+			'href' => ! empty( $item->url ) ? cammino_normalize_donate_url( $item->url ) : '#',
 		);
 
 		if ( '' !== $class_attribute ) {
@@ -196,7 +210,7 @@ function cammino_render_site_header(): void {
 	<a class="skip-link" href="#main-content"><?php esc_html_e( 'Preskočiť na obsah', 'cammino' ); ?></a>
 	<header class="site-header" data-header>
 		<div class="container header-inner">
-			<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Cammino – domov', 'cammino' ); ?>">
+			<a class="brand" href="<?php echo esc_url( 'https://ozcammino.sk/domov-v2/' ); ?>" aria-label="<?php esc_attr_e( 'Cammino – domov', 'cammino' ); ?>">
 				<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/new_long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1666" height="297">
 			</a>
 
