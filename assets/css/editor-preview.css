@@ -1,6 +1,7 @@
 /* Live sections only look locked inside the visual editor preview. */
 .nstarter-editor-preview.nstarter-mode-text [data-nstarter-live-section],
-.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section] {
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section],
+.nstarter-editor-preview.nstarter-mode-link [data-nstarter-live-section] {
     position: relative;
     min-height: 72px;
     outline: 3px dashed #f59e0b;
@@ -10,7 +11,8 @@
 }
 
 .nstarter-editor-preview.nstarter-mode-text [data-nstarter-live-section]::before,
-.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section]::before {
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section]::before,
+.nstarter-editor-preview.nstarter-mode-link [data-nstarter-live-section]::before {
     content: "LIVE SECTION · LOCKED";
     position: absolute;
     z-index: 999999;
@@ -27,12 +29,24 @@
 }
 
 .nstarter-editor-preview.nstarter-mode-text [data-nstarter-live-section] *,
-.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section] * {
+.nstarter-editor-preview.nstarter-mode-media [data-nstarter-live-section] *,
+.nstarter-editor-preview.nstarter-mode-link [data-nstarter-live-section] * {
     pointer-events: none !important;
 }
 
 .nstarter-editor-preview a[href] {
     cursor: not-allowed;
+}
+
+.nstarter-editor-preview.nstarter-mode-link a[href]:not(.skip-link):not(.site-header a):not(.site-footer a) {
+    cursor: pointer;
+    outline: 3px solid transparent;
+    outline-offset: 3px;
+    transition: outline-color 120ms ease;
+}
+
+.nstarter-editor-preview.nstarter-mode-link a[href]:not(.skip-link):not(.site-header a):not(.site-footer a):hover {
+    outline-color: #6d5dfc;
 }
 
 .nstarter-editor-preview.nstarter-mode-media img,

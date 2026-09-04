@@ -17,6 +17,10 @@
     const videoMuted = document.querySelector('[data-nstarter-video-muted]');
     const videoControls = document.querySelector('[data-nstarter-video-controls]');
     const videoCancel = document.querySelector('[data-nstarter-video-cancel]');
+    const linkDialog = document.querySelector('[data-nstarter-link-dialog]');
+    const linkForm = document.querySelector('[data-nstarter-link-form]');
+    const linkInput = document.querySelector('[data-nstarter-link-input]');
+    const linkCancel = document.querySelector('[data-nstarter-link-cancel]');
     const variableDialog = document.querySelector('[data-nstarter-variable-dialog]');
     const variableForm = document.querySelector('[data-nstarter-variable-form]');
     const variableTitle = document.querySelector('[data-nstarter-variable-title]');
@@ -43,6 +47,7 @@
     let dirty = false;
     let mediaFrame = null;
     let mediaTarget = null;
+    let linkTarget = null;
     let pendingVideoAttachment = null;
     let videoToolsLayer = null;
     let variableToolsLayer = null;
@@ -377,6 +382,66 @@
         return Boolean(element && element.closest('[data-nstarter-live-section]'));
     }
 
+    function isEditableLink(link) {
+        const root = snapshotRoot();
+
+        return Boolean(
+            link
+            && root
+            && root.contains(link)
+            && !isInLiveSection(link)
+            && !link.matches('.skip-link')
+            && !link.closest('.site-header, .site-footer')
+        );
+    }
+
+    function isSafeLinkUrl(url) {
+        return !/^[a-z][a-z\d+.-]*:/i.test(url) || /^(https?:|mailto:|tel:)/i.test(url);
+    }
+
+    function openLinkEditor(link) {
+        if (!linkDialog || !linkInput || !isEditableLink(link)) {
+            return;
+        }
+
+        linkTarget = link;
+        linkInput.value = link.getAttribute('href') || '';
+        linkInput.setCustomValidity('');
+        linkDialog.showModal();
+        linkInput.focus();
+        linkInput.select();
+    }
+
+    function closeLinkEditor() {
+        linkTarget = null;
+        if (linkDialog && linkDialog.open) {
+            linkDialog.close();
+        }
+    }
+
+    function applyLink(event) {
+        event.preventDefault();
+
+        if (!linkTarget || !linkInput) {
+            closeLinkEditor();
+            return;
+        }
+
+        const url = linkInput.value.trim();
+        if (!url || !isSafeLinkUrl(url)) {
+            linkInput.setCustomValidity(config.strings.invalidLink);
+            linkInput.reportValidity();
+            return;
+        }
+
+        linkInput.setCustomValidity('');
+        if (linkTarget.getAttribute('href') !== url) {
+            linkTarget.setAttribute('href', url);
+            markDirty();
+        }
+        closeLinkEditor();
+    }
+
     function removeVideoSettingsTools() {
         if (videoToolsLayer) {
             videoToolsLayer.remove();
@@ -464,7 +529,7 @@
     }
 
     function positionVariableTools() {
-        if (!variableToolsLayer || mode === 'interaction') {
+        if (!variableToolsLayer || mode === 'interaction' || mode === 'link') {
             return;
         }
 
@@ -499,7 +564,7 @@
     function refreshVariableTools() {
         removeVariableTools();
 
-        if (mode === 'interaction' || !variableDialog) {
+        if (mode === 'interaction' || mode === 'link' || !variableDialog) {
             return;
         }
 
@@ -721,7 +786,7 @@
         const doc = frameDocument();
 
         doc.designMode = mode === 'text' ? 'on' : 'off';
-        doc.body.classList.remove('nstarter-mode-text', 'nstarter-mode-media', 'nstarter-mode-interaction');
+        doc.body.classList.remove('nstarter-mode-text', 'nstarter-mode-media', 'nstarter-mode-link', 'nstarter-mode-interaction');
         doc.body.classList.add('nstarter-mode-' + mode);
         lockLiveSections(doc);
         lockPostChrome(doc);
@@ -906,6 +971,9 @@
             event.preventDefault();
             event.stopImmediatePropagation();
             event.stopPropagation();
+            if (mode === 'link') {
+                openLinkEditor(link);
+            }
             return;
         }
 
@@ -915,6 +983,11 @@
 
         event.stopImmediatePropagation();
         event.stopPropagation();
+
+        if (mode === 'link') {
+            event.preventDefault();
+            return;
+        }
 
         const variableButton = event.target.closest
             && event.target.closest('[data-nstarter-variable-edit]');
@@ -1255,6 +1328,17 @@
         event.preventDefault();
         cancelVideoOptions();
     });
+    if (linkDialog && linkForm && linkInput && linkCancel) {
+        linkForm.addEventListener('submit', applyLink);
+        linkCancel.addEventListener('click', closeLinkEditor);
+        linkInput.addEventListener('input', function () {
+            linkInput.setCustomValidity('');
+        });
+        linkDialog.addEventListener('cancel', function (event) {
+            event.preventDefault();
+            closeLinkEditor();
+        });
+    }
     variableForm.addEventListener('submit', applyVariableValue);
     variableCancel.addEventListener('click', cancelVariableEditor);
     variableDialog.addEventListener('cancel', function (event) {

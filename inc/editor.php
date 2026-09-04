@@ -107,6 +107,7 @@ function nstarter_maybe_render_editor(): void {
 				'confirmRegenerate' => __( 'Regenerate this page from its PHP template? All saved visual edits will be replaced.', 'nstarter' ),
 				'chooseMedia'       => __( 'Choose an image or video', 'nstarter' ),
 				'useMedia'          => __( 'Use this media', 'nstarter' ),
+				'invalidLink'       => __( 'Enter a valid web, email, phone, page, or anchor link.', 'nstarter' ),
 				'editVideoSettings'   => __( 'Edit video settings', 'nstarter' ),
 				'editSectionVariable' => __( 'Edit section variable', 'nstarter' ),
 				'confirmRemoveItems'  => __( 'Reducing this value removes %d editable item(s). Continue?', 'nstarter' ),
@@ -167,6 +168,7 @@ function nstarter_maybe_render_editor(): void {
 						<select data-nstarter-mode aria-label="<?php esc_attr_e( 'Editor mode', 'nstarter' ); ?>">
 							<option value="text" selected><?php esc_html_e( 'Text editing', 'nstarter' ); ?></option>
 							<option value="media"><?php esc_html_e( 'Media editing', 'nstarter' ); ?></option>
+							<option value="link"><?php esc_html_e( 'Link editing', 'nstarter' ); ?></option>
 							<option value="interaction"><?php esc_html_e( 'Interaction', 'nstarter' ); ?></option>
 						</select>
 					</label>
@@ -189,6 +191,21 @@ function nstarter_maybe_render_editor(): void {
 					<div>
 						<button type="button" data-nstarter-video-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>
 						<button type="submit"><?php esc_html_e( 'Apply video', 'nstarter' ); ?></button>
+					</div>
+				</form>
+			</dialog>
+
+			<dialog class="nstarter-link-dialog" data-nstarter-link-dialog>
+				<form data-nstarter-link-form>
+					<h2><?php esc_html_e( 'Edit link', 'nstarter' ); ?></h2>
+					<label>
+						<span><?php esc_html_e( 'Destination URL', 'nstarter' ); ?></span>
+						<input type="text" inputmode="url" autocomplete="url" data-nstarter-link-input required>
+					</label>
+					<p><?php esc_html_e( 'You can use a full URL, a site path such as /contact/, an email or phone link, or an anchor such as #about.', 'nstarter' ); ?></p>
+					<div>
+						<button type="button" data-nstarter-link-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>
+						<button type="submit"><?php esc_html_e( 'Apply link', 'nstarter' ); ?></button>
 					</div>
 				</form>
 			</dialog>
