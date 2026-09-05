@@ -4,7 +4,7 @@ This repository contains a minimal child theme for [Astra](https://wpastra.com/)
 It deliberately relies on Astra's normal template hierarchy, so existing Astra
 and Elementor pages continue to work unchanged while new Cammino features are
 built incrementally. The opt-in custom pages currently include the editable
-**Domov**, **O nás**, **Naše aktivity**, **Kontakt**, **Príbehy úspechov**, **Novinky**, and
+**Domov**, **O nás**, **Naše aktivity**, **Darujme úsmev**, **Kontakt**, **Príbehy úspechov**, **Novinky**, and
 donation designs, plus a shared single-post design for articles and events.
 
 ## Requirements
@@ -27,6 +27,8 @@ donation designs, plus a shared single-post design for articles and events.
 - `snapshot-templates/activities.php` provides the Naše aktivity page with four
   activity areas, scroll reveals, and an animated illustration using the shared
   design tokens. Choose **Cammino — Naše aktivity** for `/nase-aktivity/`.
+- `snapshot-templates/darujme-usmev.php` provides the Darujme úsmev campaign
+  page. Choose **Cammino — Darujme úsmev** for `/darujme-usmev/`.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
 - `snapshot-templates/ss.php` is the variable-card source for Príbehy úspechov.
 - `snapshot-templates/news.php` is the editable shell around live post listings.
@@ -71,6 +73,24 @@ reduced-motion preferences. Project news, stories, and contact links resolve to
 their assigned templates; Darujme úsmev uses the same project URL as the homepage.
 The impact section uses qualitative outcomes until verified figures and reporting
 periods are available.
+
+The Darujme úsmev template includes the project introduction, qualitative impact,
+three-step process, story introduction, three ways to help, gallery and partner
+acknowledgement, and a closing invitation. Its gift illustration and scroll
+animations respect reduced motion and remain still in the editor. Text, links,
+photos and captions use the normal visual editing modes.
+
+Three repeat controls manage verified result cards (0–4, initially 0), gallery
+photos (0–9, initially 3 placeholders), and confirmed partner logos (0–12,
+initially 0). After adding a result card, replace its dash, description and period
+with verified information. After adding a partner, replace the placeholder logo
+and name. Use consented photos and supply appropriate alt text in Media mode.
+The source document's draft totals, project age, overseas recipients and example
+family story require confirmation; they are not presented as facts in the initial
+snapshot. The story section uses general introductory copy until a verified story
+is available. Support links lead to the existing Kontakt template to arrange
+volunteering, partnership or a project donation; set a verified project payment URL
+in Link mode when available.
 
 The Príbehy úspechov template uses nested visual-editor variables. The outer
 control sets the number of story cards. Every card has its own 0–4 photo control

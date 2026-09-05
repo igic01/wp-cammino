@@ -1,0 +1,269 @@
+/* Darujme úsmev — an editable campaign page in the shared Cammino design system. */
+.smile-main { --smile-ease: cubic-bezier(0.16, 1, 0.3, 1); overflow: clip; }
+.smile-main section[id] { scroll-margin-top: 7rem; }
+.smile-main .smile-lead { font-size: clamp(1.05rem, 1.5vw, 1.2rem); line-height: 1.75; }
+.smile-main .text-link { gap: 0.85rem; }
+.smile-eyebrow { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.5rem; color: var(--color-plum); font-size: 0.74rem; letter-spacing: 0.13em; text-transform: uppercase; }
+.smile-eyebrow > i { color: var(--color-coral); font-size: 0.8rem; }
+.smile-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.4rem; }
+.smile-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(3rem, 7vw, 7rem); }
+.smile-split h2 { font-size: clamp(2.5rem, 4.1vw, 3.8rem); }
+.smile-split p:not(.smile-eyebrow) { margin-bottom: 1.5rem; }
+.smile-section-heading { max-width: 46rem; margin: 0 auto 4rem; text-align: center; }
+.smile-section-heading .smile-eyebrow { justify-content: center; }
+.smile-section-heading h2 { font-size: clamp(2.5rem, 4.5vw, 4rem); }
+
+.smile-hero { padding-top: clamp(2rem, 4vw, 4rem); }
+.smile-hero__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 3rem; }
+.smile-hero__copy h1 { margin-bottom: 1.5rem; font-size: clamp(4.5rem, 8vw, 7.5rem); line-height: 0.95; letter-spacing: -0.04em; }
+.smile-hero__copy h1 em { position: relative; display: inline-block; padding-bottom: 0.3rem; }
+.smile-hero__copy h1 em::after { position: absolute; right: 4%; bottom: -0.7rem; left: 4%; height: 1.5rem; border-bottom: 4px solid var(--color-apricot); border-radius: 0 0 50% 50%; content: ""; transform: rotate(-4deg); }
+.smile-hero__copy .smile-lead { max-width: 33rem; margin-top: 2.3rem; margin-bottom: 2rem; }
+.smile-hero__footnote { display: flex; align-items: center; gap: 0.65rem; margin: 1.6rem 0 0; color: var(--color-plum); font-size: 0.78rem; }
+.smile-hero__footnote > span { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: #65784f; }
+
+/* A CSS illustration keeps the hero crisp and ready before photos are supplied. */
+.smile-gift-scene { position: relative; width: 100%; aspect-ratio: 0.94; isolation: isolate; }
+.smile-gift-scene__halo { position: absolute; z-index: -2; inset: 4% -1% 5% 1%; border-radius: 46% 54% 46% 54% / 54% 45% 55% 46%; background: #efdfcf; transform: rotate(12deg); }
+.smile-gift-scene__trail { position: absolute; z-index: -1; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.smile-gift-scene__trail path { stroke: var(--color-coral); stroke-width: 1.5; stroke-dasharray: 0.008 0.014; }
+.smile-face { position: absolute; top: 10%; left: 27%; width: 49%; aspect-ratio: 1; border-radius: 50%; background: var(--color-apricot); box-shadow: inset -12px -9px 0 rgba(100, 54, 75, 0.04); transform: rotate(8deg); }
+.smile-face__eyes { position: absolute; top: 29%; left: 28%; width: 8%; height: 12%; border-radius: 50%; background: var(--color-plum); }
+.smile-face__eyes::after { position: absolute; left: 440%; width: 100%; height: 100%; border-radius: inherit; background: inherit; content: ""; }
+.smile-face__mouth { position: absolute; top: 40%; left: 27%; width: 46%; height: 31%; border: 7px solid var(--color-plum); border-top: 0; border-radius: 0 0 100px 100px; transform: scaleY(0.8); }
+.smile-face__cheek { position: absolute; top: 45%; left: 13%; width: 13%; height: 7%; border-radius: 50%; background: rgba(217, 111, 93, 0.45); }
+.smile-face__cheek::after { position: absolute; left: 465%; width: 100%; height: 100%; border-radius: inherit; background: inherit; content: ""; }
+.smile-gift { position: absolute; inset: 0; transform: rotate(-6deg); }
+.smile-gift__box { position: absolute; bottom: 12%; left: 20%; width: 65%; height: 33%; overflow: hidden; border-radius: 0.5rem 0.5rem 1.5rem 1.5rem; background: var(--color-coral); box-shadow: 0 24px 35px rgba(100, 54, 75, 0.12), inset -15px 0 rgba(100, 54, 75, 0.08); }
+.smile-gift__box::after { position: absolute; inset: 0 auto 0 43%; width: 16%; background: var(--color-plum); content: ""; }
+.smile-gift__box > span { position: absolute; inset: 15% 8%; border: 1px dashed rgba(255, 253, 249, 0.5); border-radius: 0.5rem; }
+.smile-gift__lid { position: absolute; bottom: 43%; left: 17%; width: 71%; height: 9%; border-radius: 0.6rem; background: #e78774; box-shadow: 0 8px 0 rgba(100, 54, 75, 0.1); transition: transform 700ms var(--smile-ease); }
+.smile-gift__lid::after { position: absolute; inset: 0 auto 0 44%; width: 14.5%; background: var(--color-plum); content: ""; }
+.smile-gift__bow { position: absolute; bottom: 90%; width: 23%; height: 115%; border: 12px solid var(--color-plum); }
+.smile-gift__bow--left { left: 28%; border-radius: 65% 65% 0 65%; transform: rotate(13deg); }
+.smile-gift__bow--right { left: 49%; border-radius: 65% 65% 65% 0; transform: rotate(-13deg); }
+.smile-gift-scene__tag { position: absolute; right: -1%; bottom: 8%; display: flex; align-items: center; gap: 0.8rem; padding: 1.3rem 1.5rem; border-radius: 0.3rem 1.2rem 1.2rem 0.3rem; color: var(--color-plum); background: var(--color-white); box-shadow: var(--shadow-soft); transform: rotate(8deg); font-size: 0.9rem; line-height: 1.5; }
+.smile-gift-scene__tag::before { position: absolute; top: -2.2rem; left: 1.1rem; width: 1px; height: 3rem; background: var(--color-plum); content: ""; transform: rotate(-25deg); }
+.smile-gift-scene__tag > i { color: var(--color-coral); font-size: 1.4rem; }
+.smile-gift-scene__spark { position: absolute; color: var(--color-plum); line-height: 1; }
+.smile-gift-scene__spark--one { top: 2%; right: 1%; font-size: 5rem; transform: rotate(10deg); }
+.smile-gift-scene__spark--two { top: 34%; left: 6%; font-size: 3.5rem; color: var(--color-coral); }
+.smile-gift-scene__heart { position: absolute; top: 9%; left: 10%; color: var(--color-coral); font-size: 2rem; transform: rotate(-20deg); }
+.smile-gift-scene__note { position: absolute; right: 4%; bottom: -2%; color: var(--color-plum); font-family: var(--font-display); font-size: 1.15rem; transform: rotate(-4deg); }
+.smile-jump { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: clamp(4rem, 7vw, 6rem); border-block: 1px solid var(--color-border); }
+.smile-jump a { display: flex; align-items: center; justify-content: space-between; gap: 0.7rem; min-height: 5rem; padding: 1rem 1.4rem; color: var(--color-plum); font-size: 0.84rem; transition: background-color 250ms ease; }
+.smile-jump a + a { border-left: 1px solid var(--color-border); }
+.smile-jump a > i { color: var(--color-coral-dark); transition: transform 250ms ease; }
+.smile-jump a:hover, .smile-jump a:focus-visible { background: var(--color-cream-deep); }
+.smile-jump a:hover > i { transform: translateY(4px); }
+
+.smile-photo-stack { position: relative; padding: 1.5rem 1.5rem 2rem 0; }
+.smile-photo-stack__back { position: absolute; inset: 2rem 1rem 1rem; border-radius: 1rem; background: var(--color-sage); transform: rotate(7deg); }
+.smile-photo-stack__front { position: relative; margin: 0; padding: 0.8rem 0.8rem 1.3rem; border: 1px solid var(--color-border); border-radius: 0.7rem; background: var(--color-white); box-shadow: var(--shadow-soft); transform: rotate(-5deg); }
+.smile-photo-stack__front img { width: 100%; height: auto; aspect-ratio: 1.12; object-fit: cover; border-radius: 0.25rem; }
+.smile-photo-stack__front figcaption { padding-top: 1.1rem; color: var(--color-plum); font-family: var(--font-display); font-size: 1.1rem; text-align: center; }
+.smile-photo-stack__seal { position: absolute; right: -0.1rem; bottom: -0.4rem; display: grid; width: 5.5rem; height: 5.5rem; place-items: center; border: 6px solid var(--color-cream); border-radius: 50%; color: var(--color-plum); background: var(--color-apricot); font-size: 2rem; transform: rotate(12deg); }
+
+.smile-impact { color: var(--color-white); background: var(--color-plum); }
+.smile-impact::before { position: absolute; top: -10rem; right: -9rem; width: 30rem; height: 30rem; border: 1px solid rgba(255, 253, 249, 0.14); border-radius: 50%; content: ""; pointer-events: none; }
+.smile-impact__heading { display: grid; grid-template-columns: 1.3fr 0.8fr; align-items: end; gap: 4rem; margin-bottom: 3rem; }
+.smile-impact .smile-eyebrow { color: #ead5de; }
+.smile-impact h2, .smile-impact h3 { color: var(--color-white); }
+.smile-impact h2 { font-size: clamp(2.5rem, 4.5vw, 4rem); }
+.smile-impact h2 em { color: var(--color-apricot); }
+.smile-impact__heading > p { color: #efdee6; }
+.smile-impact__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.smile-impact__grid article { padding: 2rem 2.2rem 0.5rem 0; border-top: 1px solid rgba(255, 253, 249, 0.22); }
+.smile-impact__grid article + article { padding-left: 2.2rem; border-left: 1px solid rgba(255, 253, 249, 0.22); }
+.smile-impact__grid article > span { display: grid; width: 3.4rem; height: 3.4rem; margin-bottom: 1.5rem; place-items: center; border-radius: 50%; color: var(--color-apricot); background: rgba(255, 253, 249, 0.08); font-size: 1.4rem; }
+.smile-impact__grid h3 { font-size: 1.8rem; }
+.smile-impact__grid p { margin: 0; color: #efdee6; font-size: 0.93rem; }
+.smile-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 1rem; }
+.smile-results:not(:empty) { margin-top: 3rem; }
+.smile-result { padding: 1.7rem; border: 1px solid rgba(255, 253, 249, 0.25); border-radius: 1rem; }
+.smile-result > strong { color: var(--color-apricot); font-family: var(--font-display); font-size: 3.5rem; line-height: 1.2; }
+.smile-result h3 { margin: 0.7rem 0; font-size: 1.25rem; }
+.smile-result p { margin: 0; color: #efdee6; font-size: 0.75rem; }
+
+.smile-process__steps { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+.smile-process__path { position: absolute; top: 2rem; left: 3%; width: 94%; height: 6rem; color: var(--color-coral); }
+.smile-process__path path { stroke: currentColor; stroke-width: 1.5; stroke-dasharray: 1; }
+.smile-step { position: relative; padding: 0 1rem; text-align: center; }
+.smile-step__number { position: absolute; top: 0; left: calc(50% + 2.6rem); color: var(--color-coral-dark); font-size: 0.8rem; }
+.smile-step__icon { position: relative; display: grid; width: 7rem; height: 7rem; margin: 0 auto 2.2rem; place-items: center; border: 8px solid var(--color-cream); border-radius: 50%; color: var(--color-plum); background: var(--color-sage); font-size: 2.1rem; transition: transform 500ms var(--smile-ease); }
+.smile-step:nth-of-type(2) .smile-step__icon { background: var(--color-apricot); }
+.smile-step:nth-of-type(3) .smile-step__icon { background: #f1dbd3; }
+.smile-step h3 { font-size: 1.7rem; line-height: 1.15; }
+.smile-step p { margin-bottom: 0; font-size: 0.94rem; }
+
+.smile-story { background: #f0e0cc; }
+.smile-story__visual { position: relative; padding: 0 1rem 2rem; }
+.smile-story__image { overflow: hidden; border-radius: 48% 48% 1.5rem 1.5rem; background: var(--color-sage); transform: rotate(4deg); }
+.smile-story__image img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; transition: transform 1000ms var(--smile-ease); }
+.smile-story__note { position: absolute; left: -0.5rem; bottom: 0; display: flex; align-items: center; gap: 1rem; padding: 1.3rem 1.7rem; border-radius: 1rem; color: var(--color-white); background: var(--color-plum); transform: rotate(-6deg); }
+.smile-story__note > i { color: var(--color-apricot); font-size: 1.8rem; }
+.smile-story__note > span { font-family: var(--font-display); font-size: 1.35rem; line-height: 1.3; }
+.smile-story__spark { position: absolute; top: -1rem; right: 0; color: var(--color-coral); font-size: 5rem; line-height: 1; }
+
+.smile-help-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.3rem; }
+.smile-help-card { display: flex; flex-direction: column; align-items: flex-start; padding: clamp(1.5rem, 3vw, 2.5rem); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-plum); }
+.smile-help-card--sage { background: var(--color-sage); }
+.smile-help-card--apricot { background: #f3d4a8; }
+.smile-help-card--coral { background: #edb3a6; }
+.smile-help-card__label { margin-bottom: 2rem; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.smile-help-card__icon { display: grid; width: 4.5rem; height: 4.5rem; margin-bottom: 2rem; place-items: center; border: 1px solid var(--color-border); border-radius: 50%; background: rgba(255, 253, 249, 0.35); font-size: 1.9rem; transition: transform 550ms var(--smile-ease), background-color 350ms ease; }
+.smile-help-card h3 { margin-bottom: 1.3rem; font-size: clamp(1.9rem, 2.5vw, 2.45rem); }
+.smile-help-card p { margin-bottom: 2rem; color: #493a3b; font-size: 0.94rem; }
+.smile-help-card a { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; margin-top: auto; padding-top: 1.2rem; border-top: 1px solid var(--color-border); font-size: 0.8rem; }
+.smile-help-card a > span { display: grid; flex-shrink: 0; width: 2.3rem; height: 2.3rem; place-items: center; border-radius: 50%; color: var(--color-white); background: var(--color-plum); transition: transform 350ms ease; }
+.smile-involvement__contact { margin: 2rem 0 0; color: var(--color-plum); font-size: 0.85rem; text-align: center; }
+.smile-involvement__contact a { text-decoration: underline; text-underline-offset: 4px; }
+
+.smile-community { padding-top: 0; }
+.smile-community__heading { display: grid; grid-template-columns: 1fr 0.8fr; align-items: end; gap: 4rem; margin-bottom: 3rem; }
+.smile-community__heading > p { max-width: 28rem; color: #554d4a; }
+.smile-gallery { min-height: 1px; }
+.smile-gallery__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.7rem; padding: 0.75rem; }
+.smile-gallery__grid:empty { display: none; }
+.smile-gallery__photo { margin: 0; padding: 0.7rem 0.7rem 1.2rem; border: 1px solid var(--color-border); border-radius: 0.5rem; background: var(--color-white); box-shadow: 0 15px 35px rgba(80, 45, 54, 0.06); transform: rotate(-4deg); transition: transform 700ms var(--smile-ease), box-shadow 500ms ease; }
+.smile-gallery__photo:nth-child(3n+2) { transform: translateY(1rem) rotate(3deg); }
+.smile-gallery__photo:nth-child(3n) { transform: rotate(-2deg); }
+.smile-gallery__photo > div { overflow: hidden; border-radius: 0.2rem; }
+.smile-gallery__photo img { width: 100%; height: auto; aspect-ratio: 1.15; object-fit: cover; transition: transform 900ms var(--smile-ease); }
+.smile-gallery__photo figcaption { padding: 1rem 0.4rem 0; color: var(--color-plum); font-family: var(--font-display); font-size: 1.2rem; text-align: center; }
+.smile-partners { margin-top: 3rem; }
+.smile-partners__thanks { display: flex; align-items: center; justify-content: center; gap: 0.7rem; color: var(--color-plum); font-size: 0.84rem; text-align: center; }
+.smile-partners__thanks > i { color: var(--color-coral); }
+.smile-partners__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: 1rem; }
+.smile-partners__grid:not(:empty) { padding-top: 2rem; margin-top: 2rem; border-top: 1px solid var(--color-border); }
+.smile-partner { display: grid; place-items: center; gap: 0.75rem; margin: 0; padding: 1rem; border-radius: 0.7rem; background: var(--color-white); }
+.smile-partner img { width: 100%; max-width: 10rem; height: 5rem; object-fit: contain; }
+.smile-partner figcaption { color: var(--color-plum); font-size: 0.8rem; text-align: center; }
+
+.smile-closing { padding-bottom: var(--section-space); }
+.smile-closing__card { position: relative; padding: clamp(2.5rem, 6vw, 5rem); overflow: hidden; border-radius: var(--radius-lg); background: #65784f; color: var(--color-white); text-align: center; }
+.smile-closing__card::before, .smile-closing__card::after { position: absolute; width: 24rem; height: 24rem; border: 1px solid rgba(255, 253, 249, 0.2); border-radius: 50%; content: ""; pointer-events: none; }
+.smile-closing__card::before { top: -5rem; left: -15rem; }
+.smile-closing__card::after { bottom: -8rem; right: -14rem; }
+.smile-closing__card .smile-eyebrow { justify-content: center; color: #f0eacf; font-size: 0.68rem; }
+.smile-closing__card h2 { color: var(--color-white); font-size: clamp(2.4rem, 4.5vw, 4.2rem); }
+.smile-closing__card h2 em { color: #f6d39e; }
+.smile-closing__card > p:not(.smile-eyebrow) { max-width: 35rem; margin: 0 auto 2rem; }
+.smile-closing__face { position: relative; width: 6rem; height: 4.5rem; margin: 0 auto 2rem; color: var(--color-apricot); }
+.smile-closing__face > span { position: absolute; top: 0; left: 20%; width: 0.65rem; height: 0.85rem; border-radius: 50%; background: currentColor; }
+.smile-closing__face > span::after { position: absolute; left: 4rem; width: 100%; height: 100%; border-radius: inherit; background: inherit; content: ""; }
+.smile-closing__face svg { position: absolute; left: 0; bottom: 0; width: 100%; }
+.smile-closing__face path { stroke: currentColor; stroke-width: 8; stroke-linecap: round; }
+
+/* Progressive enhancement: pending state is added only after JS is ready. */
+[data-smile-reveal] { transition: opacity 800ms ease, transform 1000ms var(--smile-ease); }
+[data-smile-reveal].smile-reveal-pending { opacity: 0; transform: translateY(28px); }
+[data-smile-reveal="left"].smile-reveal-pending { transform: translateX(-30px); }
+[data-smile-reveal="right"].smile-reveal-pending { transform: translateX(30px); }
+[data-smile-reveal="scale"].smile-reveal-pending { transform: scale(0.92) rotate(-2deg); }
+.smile-main [data-smile-reveal]:focus-within { opacity: 1; transform: none; transition: none; }
+.smile-gift-scene.is-visible .smile-face { animation: smile-face-rise 1400ms var(--smile-ease) backwards 180ms; }
+.smile-gift-scene.is-visible .smile-gift__lid { animation: smile-gift-open 1600ms var(--smile-ease) backwards 150ms; }
+.smile-gift-scene.is-visible .smile-gift-scene__spark { animation: smile-spark-in 1300ms var(--smile-ease) backwards 300ms; }
+.smile-gift-scene.is-visible .smile-gift-scene__tag { animation: smile-tag-in 1200ms var(--smile-ease) backwards 450ms; }
+.smile-process__steps.is-visible .smile-process__path path { animation: smile-draw 1600ms ease backwards 250ms; }
+.smile-closing__card.is-visible .smile-closing__face path { stroke-dasharray: 1; animation: smile-draw 1400ms ease backwards 250ms; }
+@keyframes smile-face-rise { from { opacity: 0; transform: translateY(80px) rotate(-12deg) scale(0.8); } to { opacity: 1; transform: rotate(8deg); } }
+@keyframes smile-gift-open { 0% { transform: translateY(0); } 45% { transform: translateY(-25px) rotate(4deg); } 100% { transform: translateY(0); } }
+@keyframes smile-spark-in { from { opacity: 0; scale: 0.4; rotate: -90deg; } to { opacity: 1; scale: 1; rotate: 0deg; } }
+@keyframes smile-tag-in { from { opacity: 0; transform: translateY(20px) rotate(15deg); } to { opacity: 1; transform: rotate(8deg); } }
+@keyframes smile-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+@media (hover: hover) and (pointer: fine) {
+  .smile-gift-scene:hover .smile-gift__lid { transform: translateY(-10px) rotate(2deg); }
+  .smile-step:hover .smile-step__icon { transform: translateY(-5px) rotate(-8deg); }
+  .smile-help-card:hover .smile-help-card__icon { transform: rotate(-12deg) scale(1.06); background: var(--color-white); }
+  .smile-help-card a:hover > span { transform: rotate(45deg); }
+  .smile-story__image:hover img, .smile-gallery__photo:hover img { transform: scale(1.04); }
+  .smile-gallery__photo:hover { transform: translateY(-5px) rotate(0); box-shadow: var(--shadow-soft); }
+}
+
+@media (max-width: 1020px) {
+  .smile-hero__grid { gap: 2rem; }
+  .smile-split { gap: 3rem; }
+  .smile-gift-scene__tag { padding: 1rem; font-size: 0.78rem; }
+  .smile-gift-scene__note { font-size: 0.95rem; }
+  .smile-gift__bow { border-width: 9px; }
+  .smile-process__steps { gap: 1rem; }
+  .smile-step { padding-inline: 0.4rem; }
+  .smile-step h3 { font-size: 1.5rem; }
+  .smile-help-grid { gap: 1rem; }
+  .smile-help-card a { font-size: 0.75rem; }
+  .smile-impact__heading, .smile-community__heading { gap: 2rem; }
+}
+
+@media (max-width: 760px) {
+  .smile-hero__grid, .smile-split { grid-template-columns: 1fr; }
+  .smile-hero__copy { max-width: 35rem; }
+  .smile-hero__copy h1 { font-size: clamp(4.5rem, 14vw, 6.5rem); }
+  .smile-gift-scene { width: min(100%, 480px); margin: 1rem auto; }
+  .smile-gift-scene__tag { font-size: 0.9rem; }
+  .smile-gift-scene__note { font-size: 1.05rem; }
+  .smile-jump { margin-top: 3rem; grid-template-columns: 1fr 1fr; }
+  .smile-jump a { min-height: 4.5rem; padding: 1rem; }
+  .smile-jump a:nth-child(3) { border-left: 0; }
+  .smile-jump a:nth-child(n+3) { border-top: 1px solid var(--color-border); }
+  .smile-photo-stack { width: min(100% - 1rem, 480px); margin-inline: auto; }
+  .smile-about .smile-photo-stack { grid-row: 2; margin-top: 1rem; }
+  .smile-impact__heading, .smile-community__heading { grid-template-columns: 1fr; gap: 0; }
+  .smile-impact__grid { grid-template-columns: 1fr; }
+  .smile-impact__grid article { display: grid; grid-template-columns: auto 1fr; gap: 0 1.2rem; padding: 1.6rem 0; }
+  .smile-impact__grid article + article { border-left: 0; padding-left: 0; }
+  .smile-impact__grid article > span { grid-row: 1 / 3; margin: 0; }
+  .smile-impact__grid h3 { margin-bottom: 0.65rem; }
+  .smile-impact__grid p { grid-column: 2; }
+  .smile-process__steps { grid-template-columns: 1fr; gap: 2.5rem; }
+  .smile-process__path { display: none; }
+  .smile-step { max-width: 32rem; margin-inline: auto; }
+  .smile-step h3 { font-size: 1.9rem; }
+  .smile-step__icon { margin-bottom: 1.5rem; }
+  .smile-step__number { left: calc(50% + 3rem); }
+  .smile-story__visual { width: min(100%, 480px); margin-inline: auto; }
+  .smile-help-grid { grid-template-columns: 1fr; }
+  .smile-help-card { position: relative; padding: 2rem; }
+  .smile-help-card__label { margin-bottom: 1.5rem; }
+  .smile-help-card__icon { position: absolute; top: 1.5rem; right: 1.5rem; width: 3.5rem; height: 3.5rem; font-size: 1.5rem; }
+  .smile-help-card h3 { padding-right: 3rem; font-size: 2.3rem; }
+  .smile-help-card a { font-size: 0.9rem; }
+  .smile-gallery__grid { gap: 1rem; }
+  .smile-gallery__photo { padding: 0.4rem 0.4rem 0.8rem; }
+  .smile-gallery__photo figcaption { font-size: 0.85rem; padding-inline: 0; }
+}
+
+@media (max-width: 480px) {
+  .smile-actions { align-items: flex-start; flex-direction: column; gap: 1.3rem; }
+  .smile-gift-scene__tag { right: 0; gap: 0.6rem; padding: 0.9rem; font-size: 0.73rem; }
+  .smile-gift-scene__note { right: 0; font-size: 0.9rem; }
+  .smile-gift-scene__spark--one { font-size: 3.6rem; }
+  .smile-gift-scene__spark--two { font-size: 2.5rem; }
+  .smile-face__mouth { border-width: 5px; }
+  .smile-gift__bow { border-width: 7px; }
+  .smile-eyebrow { font-size: 0.67rem; }
+  .smile-jump a { font-size: 0.76rem; padding-inline: 0.8rem; }
+  .smile-photo-stack__front figcaption { font-size: 0.85rem; }
+  .smile-photo-stack__seal { width: 4.5rem; height: 4.5rem; font-size: 1.6rem; }
+  .smile-section-heading { margin-bottom: 3rem; }
+  .smile-help-card { padding: 1.6rem; }
+  .smile-help-card__icon { right: 1.3rem; }
+  .smile-help-card h3 { font-size: 2rem; }
+  .smile-gallery__grid { grid-template-columns: 1fr; gap: 1.6rem; padding-inline: 1rem; }
+  .smile-gallery__photo { padding: 0.65rem 0.65rem 1rem; }
+  .smile-gallery__photo:nth-child(3n+2) { transform: rotate(3deg); }
+  .smile-gallery__photo figcaption { font-size: 1.15rem; }
+  .smile-partners__thanks { align-items: flex-start; }
+  .smile-partners__thanks > i { margin-top: 0.3rem; }
+  .smile-closing__card { padding-inline: 1.5rem; border-radius: var(--radius-md); }
+}
+
+.nstarter-editor-preview .smile-main [data-smile-reveal] { opacity: 1; transform: none; }
+.nstarter-editor-preview .smile-main *, .nstarter-editor-preview .smile-main *::before { animation: none !important; transition: none !important; }
+.nstarter-editor-preview .smile-gallery { min-height: 2rem; }
+@media (prefers-reduced-motion: reduce) {
+  .smile-main *, .smile-main *::before, .smile-main *::after { animation: none !important; transition: none !important; }
+  .smile-main [data-smile-reveal].smile-reveal-pending { opacity: 1; transform: none; }
+}

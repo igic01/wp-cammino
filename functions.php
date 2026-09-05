@@ -335,6 +335,11 @@ function cammino_enqueue_visual_page_assets(): void {
 			'style'  => '/assets/css/pages/activities.css',
 			'script' => '/assets/js/pages/activities.js',
 		),
+		'darujme-usmev' => array(
+			'handle' => 'cammino-darujme-usmev',
+			'style'  => '/assets/css/pages/darujme-usmev.css',
+			'script' => '/assets/js/pages/darujme-usmev.js',
+		),
 		'contact'  => array(
 			'handle' => 'cammino-contact',
 			'style'  => '/assets/css/pages/contact.css',
@@ -531,6 +536,7 @@ function cammino_visual_page_body_classes( array $classes ): array {
 			'home'          => array( 'home-page' ),
 			'about-us'      => array( 'about-page' ),
 			'activities'    => array( 'activities-page' ),
+			'darujme-usmev' => array( 'smile-page' ),
 			'contact'       => array( 'contact-page' ),
 			'ss'            => array( 'stories-page' ),
 			'news'          => array( 'news-page' ),
