@@ -176,7 +176,7 @@ function nstarter_maybe_render_editor(): void {
 					<button type="button" class="nstarter-control nstarter-control--primary" data-nstarter-save><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
 					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
 					<button type="button" class="nstarter-control nstarter-control--order" data-nstarter-section-order><?php esc_html_e( 'Section order', 'nstarter' ); ?></button>
-					<button type="button" class="nstarter-control nstarter-control--content" data-nstarter-content-editor hidden><?php esc_html_e( 'Article content', 'cammino' ); ?></button>
+					<button type="button" class="nstarter-control nstarter-control--content" data-nstarter-content-editor hidden><?php esc_html_e( 'Obsah príspevku', 'cammino' ); ?></button>
 					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
 				</div>
 			</aside>
@@ -239,17 +239,36 @@ function nstarter_maybe_render_editor(): void {
 
 			<dialog class="nstarter-content-dialog" data-nstarter-content-dialog>
 				<form data-nstarter-content-form>
-					<h2><?php esc_html_e( 'Article / event content', 'cammino' ); ?></h2>
+					<h2><?php esc_html_e( 'Obsah príspevku', 'cammino' ); ?></h2>
 					<p><?php esc_html_e( 'Add, remove, or reorder content. Edit words in Text mode and replace photos in Media mode.', 'cammino' ); ?></p>
 					<div class="nstarter-content-add">
 						<button type="button" data-nstarter-content-add="title">+ <?php esc_html_e( 'Title', 'cammino' ); ?></button>
 						<button type="button" data-nstarter-content-add="paragraph">+ <?php esc_html_e( 'Paragraph', 'cammino' ); ?></button>
 						<button type="button" data-nstarter-content-add="image">+ <?php esc_html_e( 'Image', 'cammino' ); ?></button>
+						<button type="button" data-nstarter-content-add="posts">+ <?php esc_html_e( 'Ďalšie príspevky', 'cammino' ); ?></button>
 					</div>
 					<ol data-nstarter-content-list></ol>
 					<div class="nstarter-content-dialog__actions">
 						<button type="button" data-nstarter-content-close><?php esc_html_e( 'Done', 'cammino' ); ?></button>
 					</div>
+				</form>
+			</dialog>
+
+			<dialog class="nstarter-collection-dialog nstarter-content-dialog" data-collection-dialog>
+				<form data-collection-form>
+					<h2>Ďalšie príspevky</h2>
+					<label>Nadpis sekcie<input name="title" type="text" maxlength="160"></label>
+					<label>Zobraziť<select name="mode"><option value="latest">Najnovšie príspevky</option><option value="selected">Vybrané príspevky</option></select></label>
+					<label>Typ príspevkov<select name="type"><option value="all">Všetky typy</option><?php foreach ( cammino_get_post_placements() as $value => $label ) : ?><option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select></label>
+					<label data-collection-limit>Počet kariet<input name="limit" type="number" min="1" max="6" value="3"></label>
+					<div data-collection-picker hidden>
+						<label>Hľadať publikované príspevky<input name="search" type="search" autocomplete="off"></label>
+						<p>Vyberte najviac 6 príspevkov. Zobrazia sa v poradí výberu. Typ vyššie filtruje výsledky hľadania.</p>
+						<div data-collection-selected></div>
+						<div data-collection-results></div>
+					</div>
+					<p role="status" data-collection-status></p>
+					<div class="nstarter-content-dialog__actions"><button type="button" data-collection-cancel>Zrušiť</button><button type="submit">Použiť</button></div>
 				</form>
 			</dialog>
 		</div>

@@ -1,9 +1,9 @@
 <?php
 /**
- * Template Name: Cammino Article / Event
+ * Template Name: Cammino — Podujatie / Projekt / Príbeh pomoci
  * Template Post Type: post
  *
- * Shared bare document for Cammino Article and Event posts.
+ * Shared article layout for events, projects, impact stories and legacy articles.
  *
  * @package Cammino
  */
@@ -22,7 +22,7 @@ $cammino_image      = cammino_get_post_image_url( $cammino_post_id, 'full' );
 $cammino_timestamp  = 'event' === $cammino_placement
 	? cammino_get_event_timestamp( $cammino_post_id )
 	: (int) get_post_timestamp( $cammino_post );
-$cammino_type_label  = 'event' === $cammino_placement ? 'Podujatie' : 'Článok';
+$cammino_type_label  = cammino_get_post_type_label( $cammino_placement );
 $cammino_sticker     = $cammino_type_label;
 $cammino_deck        = has_excerpt( $cammino_post )
 	? get_the_excerpt( $cammino_post )
@@ -34,17 +34,21 @@ if ( $cammino_thumbnail ) {
 	$cammino_caption = (string) wp_get_attachment_caption( $cammino_thumbnail );
 }
 
-$cammino_content    = cammino_get_post_visual_content( $cammino_post_id );
-$cammino_related    = get_posts(
-	array(
-		'post_type'           => 'post',
-		'post_status'         => 'publish',
-		'posts_per_page'      => 3,
-		'post__not_in'        => array( $cammino_post_id ),
-		'ignore_sticky_posts' => true,
-		'no_found_rows'       => true,
-	)
-);
+$cammino_content = cammino_expand_post_live_content( cammino_get_post_visual_content( $cammino_post_id ), $cammino_post_id );
+$cammino_facts = array();
+if ( 'event' === $cammino_placement ) {
+	foreach ( array( CAMMINO_EVENT_LOCATION_META => 'Miesto', CAMMINO_EVENT_STATUS_META => 'Stav' ) as $key => $label ) {
+		$value = (string) get_post_meta( $cammino_post_id, $key, true );
+		if ( '' !== $value ) { $cammino_facts[ $label ] = $value; }
+	}
+	if ( get_post_meta( $cammino_post_id, CAMMINO_EVENT_DATE_META, true ) ) {
+		$cammino_facts['Dátum a čas'] = wp_date( get_option( 'date_format' ) . ' H:i', $cammino_timestamp );
+	}
+}
+foreach ( cammino_get_post_detail_fields() as $key => $field ) {
+	$value = (string) get_post_meta( $cammino_post_id, '_cammino_' . $key, true );
+	if ( $field['type'] === $cammino_placement && '' !== $value ) { $cammino_facts[ $field['label'] ] = $value; }
+}
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -86,13 +90,18 @@ $cammino_related    = get_posts(
 			<div class="container article-cover" data-article-reveal="scale">
 				<div class="article-cover__frame">
 					<img src="<?php echo esc_url( $cammino_image ); ?>" alt="<?php echo esc_attr( get_the_title( $cammino_post ) ); ?>" width="1600" height="1000"<?php echo $cammino_thumbnail ? ' data-attachment-id="' . esc_attr( (string) $cammino_thumbnail ) . '"' : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-					<button class="cover-sticker" type="button" data-cover-sticker><i class="fa-solid <?php echo 'event' === $cammino_placement ? 'fa-calendar-days' : 'fa-book-open'; ?>" aria-hidden="true"></i> <?php echo esc_html( $cammino_sticker ); ?></button>
+					<button class="cover-sticker" type="button" data-cover-sticker><i class="fa-solid <?php echo esc_attr( cammino_get_post_type_icon( $cammino_placement ) ); ?>" aria-hidden="true"></i> <?php echo esc_html( $cammino_sticker ); ?></button>
 				</div>
 				<?php if ( '' !== $cammino_caption ) : ?>
 					<p class="image-caption"><?php echo esc_html( $cammino_caption ); ?></p>
 				<?php endif; ?>
 			</div>
 
+			<?php if ( $cammino_facts ) : ?>
+				<dl class="container cammino-post-facts">
+					<?php foreach ( $cammino_facts as $label => $value ) : ?><div><dt><?php echo esc_html( $label ); ?></dt><dd><?php echo esc_html( $value ); ?></dd></div><?php endforeach; ?>
+				</dl>
+			<?php endif; ?>
 			<div class="container article-layout">
 				<aside class="article-share" aria-label="Zdieľať" data-article-reveal="left">
 					<span>Zdieľať</span>
@@ -102,31 +111,13 @@ $cammino_related    = get_posts(
 					<span class="copy-feedback" role="status" aria-live="polite" data-copy-feedback></span>
 				</aside>
 
-				<div class="article-content" data-article-reveal="up" data-nstarter-snapshot-root data-nstarter-content-builder="article" data-nstarter-content-label="Obsah článku / podujatia">
+				<div class="article-content" data-nstarter-snapshot-root data-nstarter-content-builder="article" data-nstarter-content-label="Obsah príspevku">
 					<?php echo $cammino_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</div>
 			</div>
 		</article>
 
-		<?php if ( ! empty( $cammino_related ) ) : ?>
-			<section class="related-section section" aria-labelledby="related-title">
-				<div class="container">
-					<div class="related-heading" data-article-reveal="up">
-						<div><span>Čítajte ďalej</span><h2 id="related-title">Ďalšie novinky z Cammina</h2></div>
-						<a href="<?php echo esc_url( $cammino_news_url ); ?>">Všetky novinky <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a>
-					</div>
-					<div class="related-grid">
-						<?php foreach ( $cammino_related as $index => $related ) : ?>
-							<?php $related_category = cammino_get_post_category( $related->ID ); ?>
-							<a class="related-card" href="<?php echo esc_url( get_permalink( $related ) ); ?>" data-article-reveal="up" data-delay="<?php echo esc_attr( (string) ( 100 * $index ) ); ?>">
-								<div class="related-card__image"><img src="<?php echo esc_url( cammino_get_post_image_url( $related->ID, 'medium_large' ) ); ?>" alt="<?php echo esc_attr( get_the_title( $related ) ); ?>" width="700" height="480" loading="lazy"><span><?php echo esc_html( $related_category['name'] ); ?></span></div>
-								<div class="related-card__body"><small><?php echo esc_html( get_the_date( '', $related ) . ' · ' . cammino_get_reading_minutes( $related->ID ) . ' min' ); ?></small><h3><?php echo esc_html( get_the_title( $related ) ); ?></h3><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></div>
-							</a>
-						<?php endforeach; ?>
-					</div>
-				</div>
-			</section>
-		<?php endif; ?>
+
 	</main>
 
 	<?php cammino_render_site_footer(); ?>

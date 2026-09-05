@@ -37,6 +37,13 @@
     const contentForm = document.querySelector('[data-nstarter-content-form]');
     const contentList = document.querySelector('[data-nstarter-content-list]');
     const contentClose = document.querySelector('[data-nstarter-content-close]');
+    const collectionDialog = document.querySelector('[data-collection-dialog]');
+    const collectionForm = document.querySelector('[data-collection-form]');
+    let collectionItem = null;
+    let collectionIds = [];
+    let collectionNames = new Map();
+    let collectionRequest = 0;
+    let collectionTimer;
 
     if (!config || !frame) {
         return;
@@ -83,7 +90,8 @@
             title: 'Title',
             paragraph: 'Paragraph',
             image: 'Image',
-            content: 'Existing content'
+            content: 'Existing content',
+            posts: 'Ďalšie príspevky'
         };
         const type = item.dataset.nstarterContentType || 'content';
         const preview = type === 'image'
@@ -144,6 +152,15 @@
             });
 
             row.append(label, moveUp, moveDown, remove);
+            if (item.dataset.nstarterContentType === 'posts') {
+                const edit = document.createElement('button');
+                edit.type = 'button';
+                edit.textContent = 'Nastaviť';
+                edit.className = 'nstarter-collection-configure';
+                edit.addEventListener('click', function () { openCollectionEditor(item); });
+                row.classList.add('has-collection-settings');
+                row.append(edit);
+            }
             contentList.appendChild(row);
         });
     }
@@ -182,6 +199,9 @@
         refreshVariableTools();
         refreshVideoSettingsTools();
 
+        if (type === 'posts') {
+            openCollectionEditor(item);
+        }
         if (type === 'image') {
             const image = item.querySelector('img');
             closeContentEditor();
@@ -189,6 +209,142 @@
                 openMediaPicker(image);
             }
         }
+    }
+
+    function collectionSettings() {
+        return {
+            title: collectionForm.elements.title.value,
+            mode: collectionForm.elements.mode.value,
+            type: collectionForm.elements.type.value,
+            limit: Number(collectionForm.elements.limit.value),
+            ids: collectionIds.slice()
+        };
+    }
+
+    function renderCollectionSelection() {
+        const selected = collectionForm.querySelector('[data-collection-selected]');
+        selected.replaceChildren();
+        collectionIds.forEach(function (id, index) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = String(index + 1) + '. ' + (collectionNames.get(id) || '#' + id) + ' ×';
+            button.setAttribute('aria-label', 'Odobrať: ' + (collectionNames.get(id) || '#' + id));
+            button.addEventListener('click', function () {
+                collectionIds = collectionIds.filter(function (value) { return value !== id; });
+                renderCollectionSelection();
+                searchCollectionPosts();
+            });
+            selected.append(button);
+        });
+    }
+
+    async function searchCollectionPosts() {
+        const token = ++collectionRequest;
+        const status = collectionForm.querySelector('[data-collection-status]');
+        status.textContent = 'Načítavam…';
+        try {
+            const data = await request('cammino_post_collection', {
+                settings: JSON.stringify(collectionSettings()), search: collectionForm.elements.search.value
+            });
+            if (token !== collectionRequest || !collectionDialog.open) return;
+            data.selected.concat(data.posts).forEach(function (post) { collectionNames.set(post.id, post.title); });
+            renderCollectionSelection();
+            const results = collectionForm.querySelector('[data-collection-results]');
+            results.replaceChildren();
+            data.posts.forEach(function (post) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = post.title + ' — ' + post.type;
+                button.disabled = collectionIds.includes(post.id) || collectionIds.length >= 6;
+                button.addEventListener('click', function () {
+                    if (collectionIds.length >= 6 || collectionIds.includes(post.id)) return;
+                    collectionIds.push(post.id);
+                    renderCollectionSelection();
+                    searchCollectionPosts();
+                });
+                results.append(button);
+            });
+            status.textContent = data.posts.length ? 'Vybrané: ' + collectionIds.length + ' / 6' : 'Nenašli sa žiadne príspevky.';
+        } catch (error) {
+            if (token === collectionRequest) status.textContent = error.message;
+        }
+    }
+
+    function syncCollectionMode() {
+        const manual = collectionForm.elements.mode.value === 'selected';
+        collectionForm.querySelector('[data-collection-picker]').hidden = !manual;
+        collectionForm.querySelector('[data-collection-limit]').hidden = manual;
+        collectionForm.elements.limit.disabled = manual;
+        if (manual) searchCollectionPosts();
+        else {
+            ++collectionRequest;
+            collectionForm.querySelector('[data-collection-status]').textContent = '';
+        }
+    }
+
+    function openCollectionEditor(item) {
+        const marker = item.querySelector('[data-nstarter-live-section="cammino_post_collection"]');
+        if (!marker || !collectionDialog) return;
+        let settings = {};
+        try {
+            const bytes = Uint8Array.from(atob(marker.dataset.nstarterLiveArgs || ''), function (char) { return char.charCodeAt(0); });
+            settings = JSON.parse(new TextDecoder().decode(bytes));
+        } catch (error) { /* Use safe defaults for an older or empty marker. */ }
+        collectionItem = item;
+        collectionIds = Array.isArray(settings.ids) ? settings.ids.slice(0, 6) : [];
+        collectionNames = new Map();
+        collectionForm.elements.title.value = typeof settings.title === 'string' ? settings.title : 'Čítajte ďalej';
+        collectionForm.elements.mode.value = settings.mode === 'selected' ? 'selected' : 'latest';
+        collectionForm.elements.type.value = settings.type || 'all';
+        collectionForm.elements.limit.value = settings.limit || 3;
+        collectionForm.elements.search.value = '';
+        collectionForm.querySelector('[data-collection-status]').textContent = '';
+        collectionForm.querySelector('[data-collection-results]').replaceChildren();
+        closeContentEditor();
+        collectionDialog.showModal();
+        renderCollectionSelection();
+        syncCollectionMode();
+    }
+
+    function closeCollectionEditor() {
+        ++collectionRequest;
+        clearTimeout(collectionTimer);
+        collectionDialog.close();
+        collectionItem = null;
+        openContentEditor();
+    }
+
+    if (collectionForm) {
+        collectionForm.elements.mode.addEventListener('change', syncCollectionMode);
+        collectionForm.elements.type.addEventListener('change', syncCollectionMode);
+        collectionForm.elements.search.addEventListener('input', function () {
+            ++collectionRequest;
+            clearTimeout(collectionTimer);
+            collectionTimer = setTimeout(searchCollectionPosts, 250);
+        });
+        collectionForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const item = collectionItem;
+            const button = collectionForm.querySelector('[type="submit"]');
+            button.disabled = true;
+            const token = ++collectionRequest;
+            clearTimeout(collectionTimer);
+            try {
+                const data = await request('cammino_post_collection', {settings: JSON.stringify(collectionSettings()), preview: '1'});
+                if (token !== collectionRequest || item !== collectionItem || !collectionDialog.open) return;
+                const marker = item.querySelector('[data-nstarter-live-section]');
+                const bytes = new TextEncoder().encode(JSON.stringify(data.settings));
+                marker.dataset.nstarterLiveArgs = btoa(Array.from(bytes, function (byte) { return String.fromCharCode(byte); }).join(''));
+                marker.innerHTML = data.html;
+                marker.setAttribute('contenteditable', 'false');
+                markDirty();
+                closeCollectionEditor();
+            } catch (error) {
+                collectionForm.querySelector('[data-collection-status]').textContent = error.message;
+            } finally { button.disabled = false; }
+        });
+        collectionForm.querySelector('[data-collection-cancel]').addEventListener('click', closeCollectionEditor);
+        collectionDialog.addEventListener('cancel', function (event) { event.preventDefault(); closeCollectionEditor(); });
     }
 
     function setStatus(message, state) {
@@ -776,7 +932,7 @@
             return;
         }
 
-        doc.querySelectorAll('.site-header, .article-hero, .article-cover, .article-share, .related-section, .site-footer').forEach(function (element) {
+        doc.querySelectorAll('.site-header, .article-hero, .article-cover, .article-share, .cammino-post-facts, .related-section, .site-footer').forEach(function (element) {
             element.setAttribute('contenteditable', 'false');
         });
     }

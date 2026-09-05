@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.5.60' );
+define( 'NSTARTER_VERSION', '1.6.0' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
@@ -18,6 +18,7 @@ require_once NSTARTER_PATH . '/inc/snapshots.php';
 require_once NSTARTER_PATH . '/inc/live-sections.php';
 require_once NSTARTER_PATH . '/inc/variable-sections.php';
 require_once NSTARTER_PATH . '/inc/posts.php';
+require_once NSTARTER_PATH . '/inc/post-collections.php';
 require_once NSTARTER_PATH . '/inc/editor.php';
 
 add_action( 'init', 'cammino_register_live_sections' );

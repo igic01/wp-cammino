@@ -624,7 +624,16 @@ body.nstarter-editor-shell {
 }
 
 .nstarter-content-dialog button:disabled { cursor: default; opacity: .35; }
-.nstarter-content-dialog__actions { display: flex; justify-content: flex-end; }
+.nstarter-content-dialog li.has-collection-settings { grid-template-columns: minmax(0, 1fr) 34px 34px 34px; }
+.nstarter-content-dialog li .nstarter-collection-configure { grid-column: 1 / -1; width: auto; color: #5142df; font-size: 12px; }
+.nstarter-collection-dialog label { display: grid; gap: 5px; font-size: 13px; }
+.nstarter-collection-dialog input, .nstarter-collection-dialog select { width: 100%; min-height: 36px; margin: 0; }
+.nstarter-collection-dialog [hidden] { display: none !important; }
+[data-collection-results], [data-collection-selected] { display: grid; gap: 6px; margin-top: 10px; }
+[data-collection-results] { max-height: 210px; overflow-y: auto; }
+[data-collection-results] button, [data-collection-selected] button { height: auto; min-height: 36px; padding: 8px !important; text-align: left; line-height: 1.4 !important; }
+[data-collection-selected] button { color: #5142df; background: #f1efff; }
+.nstarter-content-dialog__actions { display: flex; justify-content: flex-end; gap: 8px; }
 .nstarter-content-dialog__actions button { border-color: #5142df; color: #fff; background: #6d5dfc; }
 
 @media (max-width: 480px) {

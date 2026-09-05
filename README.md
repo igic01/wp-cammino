@@ -5,7 +5,8 @@ It deliberately relies on Astra's normal template hierarchy, so existing Astra
 and Elementor pages continue to work unchanged while new Cammino features are
 built incrementally. The opt-in custom pages currently include the editable
 **Domov**, **O nás**, **Naše aktivity**, **Darujme úsmev**, **Kontakt**, **Príbehy úspechov**, **Novinky**, and
-donation designs, plus a shared single-post design for articles and events.
+donation designs, plus a shared single-post design for events, projects, and
+impact stories.
 
 ## Requirements
 
@@ -35,9 +36,12 @@ donation designs, plus a shared single-post design for articles and events.
 - `snapshot-templates/donate.php` provides the editable donation-options page.
 - `snapshot-templates/donate-us.php` provides the unrestricted-donation page.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
-- `inc/posts.php` reads Article/Event placement from explicit post metadata and stores
-  optional event details.
-- `templates/single-post.php` renders both classified post types identically.
+- `inc/posts.php` stores the selected event/project/impact-story type and optional
+  details, preserves legacy articles, and provides type-aware starter content.
+- `inc/post-collections.php` renders configurable live collections of other posts
+  and provides authenticated search and preview for the visual editor.
+- `templates/single-post.php` renders all three types using the shared article
+  layout with type-specific labels, accents, and factual summaries.
 - `inc/` and `assets/js/editor.js` provide the copied visual snapshot editor.
 - `assets/fonts/` contains the Fredoka and Varela Round families used by custom
   Cammino pages.
@@ -97,21 +101,59 @@ control sets the number of story cards. Every card has its own 0–4 photo contr
 and a text control that writes the destination of its **Celý príbeh** link.
 Card copy and images remain editable through the normal Text and Media modes.
 
-## Publish an article or event
+## Publish an event, project, or impact story
 
 1. Create or edit a normal WordPress post and set its title, excerpt, featured
    image, and categories. Every post automatically uses the shared Cammino
-   Article/Event design.
-2. In the **Cammino príspevok** box, choose **Článok** or **Podujatie** under
-   **Typ príspevku**. The selection controls its listing placement independently
-   of the post slug.
-3. For an event, optionally set its date/time, location, and status label in the
-   same box.
-4. Open **Cammino visual editor**. Use **Article content** to add, remove, and
+   article design. These remain normal WordPress posts with a type dropdown,
+   preserving their URLs and compatibility with the existing visual editor.
+2. In **Cammino príspevok → Typ príspevku**, choose **Podujatie** (event),
+   **Projekt** (project), or **Príbeh pomoci** (impact story). The posts list also
+   shows this type in its own column.
+3. Fill the optional fields for that type: event date/time, location and status;
+   project period, countries/location and status; or impact result and reporting
+   period. Only populated fields for the current type appear publicly.
+4. Open **Cammino visual editor**. Use **Obsah príspevku** to add, remove, and
    reorder titles, paragraphs, and images. Edit words in Text mode, replace an
    image in Media mode, and then press **Save**.
-4. Publish the post. Both types use the same reorderable content section and
-   detail-page styling.
+5. Publish the post. Events appear in the existing event listing; projects,
+   impact stories and legacy articles appear in the main news listing.
+
+Titles, excerpts and type-specific facts are edited in WordPress. Body sections,
+links and images are edited in the visual editor. New empty posts receive starter
+headings appropriate to their type. Changing a type never regenerates a saved
+body or overwrites existing content. **Regenerate page** remains an explicit reset
+to the WordPress content/starter body.
+
+## Add a section of other posts
+
+1. Open **Obsah príspevku → + Ďalšie príspevky**.
+2. Set the section heading, then choose **Najnovšie príspevky** to show 1–6 cards
+   from all types or one type. Alternatively choose **Vybrané príspevky**, search
+   by title, and pick up to six published posts in the desired order. Removing and
+   selecting a post again changes its position. The type selector filters search
+   results; manual selections can span several types.
+3. Press **Použiť**, arrange the section using the builder arrows, and press the
+   main **Save** button. Add several sections if needed. **Nastaviť** reopens an
+   existing section's settings; **×** removes it.
+
+The saved body stores collection settings, not copies of the linked posts. Cards
+read current titles, images, types, and URLs on each render. Draft, private and
+password-protected posts, and the current post itself, are excluded. Empty
+collections are hidden publicly and explained in the editor.
+
+Existing visual bodies gain these controls without regeneration. The old fixed
+“Read next” section becomes an editable default collection. Once removed and
+saved, it stays removed. Legacy **Článok** records retain their content and type
+until explicitly reclassified; only the three new types are selectable. A one-time
+migration preserves the old classification of records without stored type metadata.
+
+## Post workflow checks
+
+Run `php tests/post-workflow.php` for standalone regression checks using WordPress
+test doubles. They cover migration, type changes, saved-content preservation,
+collection ordering, live updates, visibility, configuration validation, and
+authenticated endpoints. These checks do not require or modify a WordPress database.
 
 The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.
