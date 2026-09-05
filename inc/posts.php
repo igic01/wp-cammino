@@ -766,14 +766,20 @@ function cammino_get_post_visual_content( int $post_id ): string {
 	$html = (string) get_post_meta( $post_id, CAMMINO_POST_SNAPSHOT_META, true );
 
 	$html = '' !== trim( $html ) ? $html : cammino_render_post_visual_content( $post_id );
-	if ( ! str_contains( $html, '<!-- cammino-post-collections-v1 -->' ) ) {
-		$first_template = strpos( $html, '<template' );
-		$html = substr_replace( $html, cammino_get_post_collection_block(), false === $first_template ? strlen( $html ) : $first_template, 0 );
-		$html .= '<!-- cammino-post-collections-v1 -->';
-	}
-	// Upgrade the builder tools without regenerating or replacing saved content.
-	if ( ! str_contains( $html, 'data-nstarter-content-template="posts"' ) ) {
-		$html .= cammino_get_post_collection_template();
+	if ( ! str_contains( $html, 'data-cammino-post-bottom' ) ) {
+		// Retain older inline collections; promote the last one to the fixed footer.
+		$html = preg_replace( '#<template\b[^>]*data-nstarter-content-template="posts"[^>]*>.*?</template>#is', '', $html );
+		$pattern = '#<div\b[^>]*data-nstarter-content-type="posts"[^>]*>\s*<div\b[^>]*data-nstarter-live-section="cammino_post_collection"[^>]*>\s*</div>\s*</div>#is';
+		preg_match_all( $pattern, $html, $matches, PREG_OFFSET_CAPTURE );
+		$last = end( $matches[0] );
+		if ( $last ) {
+			$bottom = $last[0];
+			$html = substr_replace( $html, '', $last[1], strlen( $last[0] ) );
+		} else {
+			$bottom = cammino_get_post_collection_block( array( 'mode' => str_contains( $html, '<!-- cammino-post-collections-v1 -->' ) ? 'none' : 'latest' ) );
+		}
+		$bottom = preg_replace( '/data-nstarter-content-item(?:="[^"]*")?\s+data-nstarter-content-type="posts"/', 'data-cammino-post-bottom', $bottom );
+		$html .= $bottom;
 	}
 	return $html;
 }

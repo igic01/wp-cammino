@@ -11,7 +11,7 @@ function cammino_sanitize_post_collection( array $args ): array {
 	$ids = isset( $args['ids'] ) && is_array( $args['ids'] ) ? $args['ids'] : array();
 	return array(
 		'title' => isset( $args['title'] ) && is_string( $args['title'] ) ? sanitize_text_field( $args['title'] ) : 'Čítajte ďalej',
-		'mode' => ( $args['mode'] ?? '' ) === 'selected' ? 'selected' : 'latest',
+		'mode' => in_array( $args['mode'] ?? '', array( 'selected', 'none' ), true ) ? $args['mode'] : 'latest',
 		'type' => isset( cammino_get_post_placements()[ $type ] ) ? $type : 'all',
 		'limit' => max( 1, min( 6, isset( $args['limit'] ) && is_numeric( $args['limit'] ) ? (int) $args['limit'] : 3 ) ),
 		'ids' => array_slice( array_values( array_unique( array_filter( array_map( 'absint', array_filter( $ids, 'is_numeric' ) ) ) ) ), 0, 6 ),
@@ -20,6 +20,7 @@ function cammino_sanitize_post_collection( array $args ): array {
 
 function cammino_get_post_collection_posts( array $args, int $post_id ): array {
 	$args = cammino_sanitize_post_collection( $args );
+	if ( 'none' === $args['mode'] ) { return array(); }
 	$query = array(
 		'post_type' => 'post', 'post_status' => 'publish', 'has_password' => false,
 		'posts_per_page' => $args['limit'], 'post__not_in' => array( $post_id ),
@@ -49,7 +50,7 @@ function cammino_render_post_collection( array $args, int $post_id, bool $previe
 	<section class="cammino-post-collection" aria-label="<?php echo esc_attr( $args['title'] ?: 'Ďalšie príspevky' ); ?>">
 		<?php if ( '' !== $args['title'] ) : ?><h2><?php echo esc_html( $args['title'] ); ?></h2><?php endif; ?>
 		<?php if ( ! $posts ) : ?>
-			<p class="cammino-collection-empty">Zatiaľ tu nie sú zodpovedajúce publikované príspevky. Výber upravíte cez Obsah príspevku → Nastaviť. Prázdna sekcia sa návštevníkom nezobrazí.</p>
+			<p class="cammino-collection-empty"><?php echo 'none' === $args['mode'] ? 'Sekcia je skrytá.' : 'Zatiaľ tu nie sú zodpovedajúce publikované príspevky.'; ?> Výber upravíte cez Obsah príspevku → Ďalšie príspevky. Prázdna sekcia sa návštevníkom nezobrazí.</p>
 		<?php else : ?>
 			<div class="related-grid">
 			<?php foreach ( $posts as $related ) : ?>

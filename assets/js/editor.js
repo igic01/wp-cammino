@@ -87,9 +87,9 @@
 
     function contentItemLabel(item, index) {
         const labels = {
-            title: 'Title',
-            paragraph: 'Paragraph',
-            image: 'Image',
+            title: 'Nadpis',
+            paragraph: 'Odsek',
+            image: 'Obrázok',
             content: 'Existing content',
             posts: 'Ďalšie príspevky'
         };
@@ -161,6 +161,45 @@
                 row.classList.add('has-collection-settings');
                 row.append(edit);
             }
+            const type = item.dataset.nstarterContentType;
+            if (type === 'title' || type === 'paragraph') {
+                const target = item.matches('h2,h3,h4,p') ? item : item.querySelector('h2,h3,h4,p');
+                // Preserve existing rich formatting: those blocks remain editable in the preview.
+                if (target && !target.children.length) {
+                    const input = document.createElement('textarea');
+                    input.value = target.textContent;
+                    input.rows = type === 'title' ? 2 : 4;
+                    input.setAttribute('aria-label', type === 'title' ? 'Nadpis' : 'Text odseku');
+                    input.addEventListener('input', function () { target.textContent = input.value; markDirty(); });
+                    row.append(input);
+                } else {
+                    const edit = document.createElement('button');
+                    edit.type = 'button'; edit.textContent = 'Upraviť text v náhľade';
+                    edit.addEventListener('click', function () { closeContentEditor(); item.scrollIntoView({block:'center'}); item.focus(); });
+                    row.append(edit);
+                }
+            }
+            if (type === 'image') {
+                const edit = document.createElement('button');
+                edit.type = 'button'; edit.textContent = 'Vybrať / zmeniť obrázok';
+                const photo = item.querySelector('img');
+                if (photo) {
+                    const thumb = document.createElement('img'); thumb.src = photo.src; thumb.alt = photo.alt;
+                    row.append(thumb);
+                    edit.addEventListener('click', function () { closeContentEditor(); openMediaPicker(photo); });
+                    row.append(edit);
+                }
+            }
+            const insert = document.createElement('div');
+            insert.className = 'nstarter-content-insert';
+            ['title', 'paragraph', 'image'].forEach(function (type, i) {
+                const button = document.createElement('button'); button.type = 'button';
+                button.textContent = '+ ' + ['Nadpis', 'Odsek', 'Obrázok'][i];
+                button.title = 'Pridať za tento blok';
+                button.addEventListener('click', function () { addContentItem(type, item); });
+                insert.append(button);
+            });
+            row.append(insert);
             contentList.appendChild(row);
         });
     }
@@ -179,7 +218,7 @@
         }
     }
 
-    function addContentItem(type) {
+    function addContentItem(type, afterItem) {
         const builder = contentBuilder();
         const template = builder && builder.querySelector('template[data-nstarter-content-template="' + type + '"]');
         const item = template && template.content.firstElementChild
@@ -193,7 +232,8 @@
         const firstTemplate = Array.from(builder.children).find(function (child) {
             return child.matches('template[data-nstarter-content-template]');
         });
-        builder.insertBefore(item, firstTemplate || null);
+        if (afterItem) afterItem.after(item);
+        else builder.insertBefore(item, firstTemplate || builder.querySelector('[data-cammino-post-bottom]') || null);
         markDirty();
         renderContentList();
         refreshVariableTools();
@@ -210,6 +250,11 @@
             }
         }
     }
+
+    document.querySelector('[data-cammino-bottom-settings]')?.addEventListener('click', function () {
+        const bottom = contentBuilder()?.querySelector('[data-cammino-post-bottom]');
+        if (bottom) openCollectionEditor(bottom);
+    });
 
     function collectionSettings() {
         return {
@@ -272,8 +317,11 @@
 
     function syncCollectionMode() {
         const manual = collectionForm.elements.mode.value === 'selected';
+        const hidden = collectionForm.elements.mode.value === 'none';
+        collectionForm.querySelector('[data-collection-heading]').hidden = hidden;
+        collectionForm.querySelector('[data-collection-type]').hidden = hidden;
         collectionForm.querySelector('[data-collection-picker]').hidden = !manual;
-        collectionForm.querySelector('[data-collection-limit]').hidden = manual;
+        collectionForm.querySelector('[data-collection-limit]').hidden = manual || hidden;
         collectionForm.elements.limit.disabled = manual;
         if (manual) searchCollectionPosts();
         else {
@@ -294,7 +342,7 @@
         collectionIds = Array.isArray(settings.ids) ? settings.ids.slice(0, 6) : [];
         collectionNames = new Map();
         collectionForm.elements.title.value = typeof settings.title === 'string' ? settings.title : 'Čítajte ďalej';
-        collectionForm.elements.mode.value = settings.mode === 'selected' ? 'selected' : 'latest';
+        collectionForm.elements.mode.value = ['selected', 'none'].includes(settings.mode) ? settings.mode : 'latest';
         collectionForm.elements.type.value = settings.type || 'all';
         collectionForm.elements.limit.value = settings.limit || 3;
         collectionForm.elements.search.value = '';

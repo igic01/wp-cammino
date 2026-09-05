@@ -114,8 +114,8 @@ Card copy and images remain editable through the normal Text and Media modes.
    project period, countries/location and status; or impact result and reporting
    period. Only populated fields for the current type appear publicly.
 4. Open **Cammino visual editor**. Use **Obsah príspevku** to add, remove, and
-   reorder titles, paragraphs, and images. Edit words in Text mode, replace an
-   image in Media mode, and then press **Save**.
+   reorder titles, paragraphs, and images. Edit plain text directly in the panel, replace an
+   image using its media button, and then press **Save**.
 5. Publish the post. Events appear in the existing event listing; projects,
    impact stories and legacy articles appear in the main news listing.
 
@@ -125,28 +125,31 @@ headings appropriate to their type. Changing a type never regenerates a saved
 body or overwrites existing content. **Regenerate page** remains an explicit reset
 to the WordPress content/starter body.
 
-## Add a section of other posts
+## Article body and bottom recommendations
 
-1. Open **Obsah príspevku → + Ďalšie príspevky**.
-2. Set the section heading, then choose **Najnovšie príspevky** to show 1–6 cards
-   from all types or one type. Alternatively choose **Vybrané príspevky**, search
-   by title, and pick up to six published posts in the desired order. Removing and
-   selecting a post again changes its position. The type selector filters search
-   results; manual selections can span several types.
-3. Press **Použiť**, arrange the section using the builder arrows, and press the
-   main **Save** button. Add several sections if needed. **Nastaviť** reopens an
-   existing section's settings; **×** removes it.
+All three post types use the same content builder below the cover image.
+Open **Obsah príspevku** to add unlimited headings, paragraphs and images.
+Use the buttons below any block to insert directly after it, arrows to change
+order, and the remove button to delete it. Plain text is editable directly in
+this panel; formatted text remains editable in the preview to preserve links
+and formatting. Image blocks open the WordPress media library.
 
-The saved body stores collection settings, not copies of the linked posts. Cards
-read current titles, images, types, and URLs on each render. Draft, private and
-password-protected posts, and the current post itself, are excluded. Empty
-collections are hidden publicly and explained in the editor.
+Open **Ďalšie príspevky** in the content panel to configure the separate bottom section:
 
-Existing visual bodies gain these controls without regeneration. The old fixed
-“Read next” section becomes an editable default collection. Once removed and
-saved, it stays removed. Legacy **Článok** records retain their content and type
-until explicitly reclassified; only the three new types are selectable. A one-time
-migration preserves the old classification of records without stored type metadata.
+- **Automatic**: the latest 1–6 published posts, optionally filtered by type.
+- **Choose posts**: search and select up to six posts in display order.
+- **None**: hide the section, retaining your selections for later.
+
+Press **Použiť**, then **Hotovo**, then the main **Save** button.
+The bottom section always follows the article body. Cards read current titles,
+images and links on each render; automatic results update as posts are published.
+The current post, drafts, private and password-protected posts are excluded.
+Empty sections are hidden publicly.
+
+Existing saved content is preserved. The last old collection becomes the bottom
+section; any earlier inline collections remain editable for compatibility.
+A previously removed collection stays hidden. Legacy article classifications
+remain unchanged until explicitly reclassified.
 
 ## Post workflow checks
 

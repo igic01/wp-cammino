@@ -35,12 +35,12 @@ $GLOBALS['test_posts'][3]->post_status = 'publish';
 $saved = '<p data-nstarter-content-item data-nstarter-content-type="paragraph">Zachovať moje úpravy.</p>';
 cammino_update_post_visual_content(4,$saved);
 $upgraded = cammino_get_post_visual_content(4);
-expect( str_contains($upgraded,$saved) && str_contains($upgraded,'data-nstarter-content-template="posts"'), 'Saved body gains tools without regeneration' );
-expect( strpos($upgraded,'data-nstarter-content-type="posts"') < strpos($upgraded,'<template'), 'Default collection precedes inert templates so new items append in order' );
+expect( str_contains($upgraded,$saved) && str_contains($upgraded,'data-cammino-post-bottom'), 'Saved body gains tools without regeneration' );
+expect( strpos($upgraded,'data-cammino-post-bottom') > strpos($upgraded,$saved), 'Bottom collection follows the body' );
 cammino_update_post_visual_content(4,$upgraded);
 expect( cammino_get_post_visual_content(4)===$upgraded, 'Upgrade is stable after save/reload' );
 cammino_update_post_visual_content(4,$saved.'<!-- cammino-post-collections-v1 -->'.cammino_get_post_collection_template());
-expect( substr_count(cammino_get_post_visual_content(4),'data-nstarter-content-type="posts"')===1, 'Removed default block does not respawn; only template remains' );
+expect( !str_contains(cammino_expand_post_live_content(cammino_get_post_visual_content(4),4),'related-card'), 'Removed default block does not respawn; bottom remains hidden' );
 foreach(array(1=>'O podujatí',2=>'O projekte',3=>'Čo sa zmenilo') as $id=>$heading) {
 	expect(str_contains(cammino_render_post_visual_content($id),$heading),'New body fits type '.$id);
 }
@@ -59,4 +59,15 @@ $_POST['nonce']='invalid';
 try { cammino_ajax_post_collection(); } catch(TestJsonResponse $r) { expect($r->status===403,'Invalid nonce refused'); }
 $_POST=array('post_id'=>1,'nonce'=>'test-nonce','settings'=>'{"type":"project"}','search'=>'Beta');
 try { cammino_ajax_post_collection(); } catch(TestJsonResponse $r) { expect(array_column($r->payload['data']['posts'],'id')===array(2),'Authenticated search returns matching published posts'); }
+$before = count($GLOBALS['test_queries']);
+expect(cammino_get_post_collection_posts(array('mode'=>'none','ids'=>array(2)),1)===array(), 'None ignores retained selections');
+expect(count($GLOBALS['test_queries'])===$before, 'Hidden bottom issues no query');
+expect(cammino_render_post_collection(array('mode'=>'none'),1)==='', 'None is invisible publicly');
+$legacy = str_replace('data-nstarter-content-item ', 'data-nstarter-content-item="" ', cammino_get_post_collection_block(array('mode'=>'selected','ids'=>array(2))));
+cammino_update_post_visual_content(1,$saved.$legacy.cammino_get_post_collection_template());
+$upgraded = cammino_get_post_visual_content(1);
+expect(substr_count($upgraded,'data-cammino-post-bottom')===1 && !str_contains($upgraded,'data-nstarter-content-type="posts"'), 'Browser-serialized collection becomes fixed bottom');
+expect(str_contains(cammino_expand_post_live_content($upgraded,1),'Projekt Beta'), 'Migration preserves manual selection');
+cammino_update_post_visual_content(1,$upgraded);
+expect(cammino_get_post_visual_content(1)===$upgraded, 'Bottom upgrade is idempotent');
 echo "Passed $checks post workflow checks.\n";
