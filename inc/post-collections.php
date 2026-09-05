@@ -50,7 +50,7 @@ function cammino_render_post_collection( array $args, int $post_id, bool $previe
 	<section class="cammino-post-collection" aria-label="<?php echo esc_attr( $args['title'] ?: 'Ďalšie príspevky' ); ?>">
 		<?php if ( '' !== $args['title'] ) : ?><h2><?php echo esc_html( $args['title'] ); ?></h2><?php endif; ?>
 		<?php if ( ! $posts ) : ?>
-			<p class="cammino-collection-empty"><?php echo 'none' === $args['mode'] ? 'Sekcia je skrytá.' : 'Zatiaľ tu nie sú zodpovedajúce publikované príspevky.'; ?> Výber upravíte cez Obsah príspevku → Ďalšie príspevky. Prázdna sekcia sa návštevníkom nezobrazí.</p>
+			<p class="cammino-collection-empty"><?php echo 'none' === $args['mode'] ? 'This section is hidden.' : 'There are no matching published posts yet.'; ?> Change the selection under Post content → Related posts. Empty sections are hidden from visitors.</p>
 		<?php else : ?>
 			<div class="related-grid">
 			<?php foreach ( $posts as $related ) : ?>
@@ -90,7 +90,7 @@ function cammino_ajax_post_collection(): void {
 	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 	check_ajax_referer( 'nstarter_editor_' . $post_id, 'nonce' );
 	if ( ! current_user_can( 'edit_post', $post_id ) || ! cammino_is_visual_post( $post_id ) ) {
-		wp_send_json_error( array( 'message' => 'Tento príspevok nemôžete upravovať.' ), 403 );
+		wp_send_json_error( array( 'message' => 'You cannot edit this post.' ), 403 );
 	}
 	$raw = isset( $_POST['settings'] ) && is_string( $_POST['settings'] ) ? json_decode( wp_unslash( $_POST['settings'] ), true ) : array();
 	$args = cammino_sanitize_post_collection( is_array( $raw ) ? $raw : array() );

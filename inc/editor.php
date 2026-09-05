@@ -176,7 +176,7 @@ function nstarter_maybe_render_editor(): void {
 					<button type="button" class="nstarter-control nstarter-control--primary" data-nstarter-save><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
 					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
 					<button type="button" class="nstarter-control nstarter-control--order" data-nstarter-section-order><?php esc_html_e( 'Section order', 'nstarter' ); ?></button>
-					<button type="button" class="nstarter-control nstarter-control--content" data-nstarter-content-editor hidden><?php esc_html_e( 'Obsah príspevku', 'cammino' ); ?></button>
+					<button type="button" class="nstarter-control nstarter-control--content" data-nstarter-content-editor hidden><?php esc_html_e( 'Post content', 'cammino' ); ?></button>
 					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
 				</div>
 			</aside>
@@ -239,37 +239,37 @@ function nstarter_maybe_render_editor(): void {
 
 			<dialog class="nstarter-content-dialog" data-nstarter-content-dialog>
 				<form data-nstarter-content-form>
-					<h2><?php esc_html_e( 'Obsah príspevku', 'cammino' ); ?></h2>
-					<p><?php esc_html_e( 'Pridajte nadpis, odsek alebo obrázok. Poradie zmeníte šípkami. Text upravíte priamo tu.', 'cammino' ); ?></p>
+					<h2><?php esc_html_e( 'Post content', 'cammino' ); ?></h2>
+					<p><?php esc_html_e( 'Add a heading, paragraph, or image. Use the arrows to change the order. You can edit text directly here.', 'cammino' ); ?></p>
 					<div class="nstarter-content-add">
-						<button type="button" data-nstarter-content-add="title">+ <?php esc_html_e( 'Nadpis', 'cammino' ); ?></button>
-						<button type="button" data-nstarter-content-add="paragraph">+ <?php esc_html_e( 'Odsek', 'cammino' ); ?></button>
-						<button type="button" data-nstarter-content-add="image">+ <?php esc_html_e( 'Obrázok', 'cammino' ); ?></button>
-						<button type="button" data-cammino-bottom-settings><?php esc_html_e( 'Ďalšie príspevky', 'cammino' ); ?></button>
+						<button type="button" data-nstarter-content-add="title">+ <?php esc_html_e( 'Heading', 'cammino' ); ?></button>
+						<button type="button" data-nstarter-content-add="paragraph">+ <?php esc_html_e( 'Paragraph', 'cammino' ); ?></button>
+						<button type="button" data-nstarter-content-add="image">+ <?php esc_html_e( 'Image', 'cammino' ); ?></button>
+						<button type="button" data-cammino-bottom-settings><?php esc_html_e( 'Related posts', 'cammino' ); ?></button>
 					</div>
 					<ol data-nstarter-content-list></ol>
-<p>Zmeny potvrďte tlačidlom Hotovo a potom uložte príspevok.</p>
+					<p>Confirm your changes with Done, then save the post.</p>
 					<div class="nstarter-content-dialog__actions">
-						<button type="button" data-nstarter-content-close><?php esc_html_e( 'Hotovo', 'cammino' ); ?></button>
+						<button type="button" data-nstarter-content-close><?php esc_html_e( 'Done', 'cammino' ); ?></button>
 					</div>
 				</form>
 			</dialog>
 
 			<dialog class="nstarter-collection-dialog nstarter-content-dialog" data-collection-dialog>
 				<form data-collection-form>
-					<h2>Ďalšie príspevky</h2>
-					<p>Táto sekcia je vždy na konci článku. Automatický výber vynechá tento článok.</p><label data-collection-heading>Nadpis sekcie<input name="title" type="text" maxlength="160"></label>
-					<label>Zobraziť<select name="mode"><option value="latest">Automaticky — najnovšie publikované</option><option value="selected">Vyberiem príspevky</option><option value="none">Nič — skryť sekciu</option></select></label>
-					<label data-collection-type>Typ príspevkov<select name="type"><option value="all">Všetky typy</option><?php foreach ( cammino_get_post_placements() as $value => $label ) : ?><option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select></label>
-					<label data-collection-limit>Počet kariet<input name="limit" type="number" min="1" max="6" value="3"></label>
+					<h2>Related posts</h2>
+					<p>This section always appears at the end of the post. Automatic selection excludes the current post.</p><label data-collection-heading>Section heading<input name="title" type="text" maxlength="160"></label>
+					<label>Display<select name="mode"><option value="latest">Automatic — latest published posts</option><option value="selected">Choose posts manually</option><option value="none">None — hide this section</option></select></label>
+					<label data-collection-type>Post type<select name="type"><option value="all">All post types</option><?php foreach ( cammino_get_post_placements() as $value => $label ) : ?><option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select></label>
+					<label data-collection-limit>Number of cards<input name="limit" type="number" min="1" max="6" value="3"></label>
 					<div data-collection-picker hidden>
-						<label>Hľadať publikované príspevky<input name="search" type="search" autocomplete="off"></label>
-						<p>Vyberte najviac 6 príspevkov. Zobrazia sa v poradí výberu. Typ vyššie filtruje výsledky hľadania.</p>
+						<label>Search published posts<input name="search" type="search" autocomplete="off"></label>
+						<p>Select up to 6 posts. They appear in the order selected. The post type above filters the search results.</p>
 						<div data-collection-selected></div>
 						<div data-collection-results></div>
 					</div>
 					<p role="status" data-collection-status></p>
-					<div class="nstarter-content-dialog__actions"><button type="button" data-collection-cancel>Zrušiť</button><button type="submit">Použiť</button></div>
+					<div class="nstarter-content-dialog__actions"><button type="button" data-collection-cancel>Cancel</button><button type="submit">Apply</button></div>
 				</form>
 			</dialog>
 		</div>

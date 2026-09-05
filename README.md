@@ -113,7 +113,7 @@ Card copy and images remain editable through the normal Text and Media modes.
 3. Fill the optional fields for that type: event date/time, location and status;
    project period, countries/location and status; or impact result and reporting
    period. Only populated fields for the current type appear publicly.
-4. Open **Cammino visual editor**. Use **Obsah príspevku** to add, remove, and
+4. Open **Cammino visual editor**. Use **Post content** to add, remove, and
    reorder titles, paragraphs, and images. Edit plain text directly in the panel, replace an
    image using its media button, and then press **Save**.
 5. Publish the post. Events appear in the existing event listing; projects,
@@ -128,19 +128,19 @@ to the WordPress content/starter body.
 ## Article body and bottom recommendations
 
 All three post types use the same content builder below the cover image.
-Open **Obsah príspevku** to add unlimited headings, paragraphs and images.
+Open **Post content** to add unlimited headings, paragraphs and images.
 Use the buttons below any block to insert directly after it, arrows to change
 order, and the remove button to delete it. Plain text is editable directly in
 this panel; formatted text remains editable in the preview to preserve links
 and formatting. Image blocks open the WordPress media library.
 
-Open **Ďalšie príspevky** in the content panel to configure the separate bottom section:
+Open **Related posts** in the content panel to configure the separate bottom section:
 
 - **Automatic**: the latest 1–6 published posts, optionally filtered by type.
 - **Choose posts**: search and select up to six posts in display order.
 - **None**: hide the section, retaining your selections for later.
 
-Press **Použiť**, then **Hotovo**, then the main **Save** button.
+Press **Apply**, then **Done**, then the main **Save** button.
 The bottom section always follows the article body. Cards read current titles,
 images and links on each render; automatic results update as posts are published.
 The current post, drafts, private and password-protected posts are excluded.

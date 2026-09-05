@@ -87,11 +87,11 @@
 
     function contentItemLabel(item, index) {
         const labels = {
-            title: 'Nadpis',
-            paragraph: 'Odsek',
-            image: 'Obrázok',
+            title: 'Heading',
+            paragraph: 'Paragraph',
+            image: 'Image',
             content: 'Existing content',
-            posts: 'Ďalšie príspevky'
+            posts: 'Related posts'
         };
         const type = item.dataset.nstarterContentType || 'content';
         const preview = type === 'image'
@@ -155,7 +155,7 @@
             if (item.dataset.nstarterContentType === 'posts') {
                 const edit = document.createElement('button');
                 edit.type = 'button';
-                edit.textContent = 'Nastaviť';
+                edit.textContent = 'Configure';
                 edit.className = 'nstarter-collection-configure';
                 edit.addEventListener('click', function () { openCollectionEditor(item); });
                 row.classList.add('has-collection-settings');
@@ -169,19 +169,19 @@
                     const input = document.createElement('textarea');
                     input.value = target.textContent;
                     input.rows = type === 'title' ? 2 : 4;
-                    input.setAttribute('aria-label', type === 'title' ? 'Nadpis' : 'Text odseku');
+                    input.setAttribute('aria-label', type === 'title' ? 'Heading' : 'Paragraph text');
                     input.addEventListener('input', function () { target.textContent = input.value; markDirty(); });
                     row.append(input);
                 } else {
                     const edit = document.createElement('button');
-                    edit.type = 'button'; edit.textContent = 'Upraviť text v náhľade';
+                    edit.type = 'button'; edit.textContent = 'Edit text in preview';
                     edit.addEventListener('click', function () { closeContentEditor(); item.scrollIntoView({block:'center'}); item.focus(); });
                     row.append(edit);
                 }
             }
             if (type === 'image') {
                 const edit = document.createElement('button');
-                edit.type = 'button'; edit.textContent = 'Vybrať / zmeniť obrázok';
+                edit.type = 'button'; edit.textContent = 'Choose / replace image';
                 const photo = item.querySelector('img');
                 if (photo) {
                     const thumb = document.createElement('img'); thumb.src = photo.src; thumb.alt = photo.alt;
@@ -194,8 +194,8 @@
             insert.className = 'nstarter-content-insert';
             ['title', 'paragraph', 'image'].forEach(function (type, i) {
                 const button = document.createElement('button'); button.type = 'button';
-                button.textContent = '+ ' + ['Nadpis', 'Odsek', 'Obrázok'][i];
-                button.title = 'Pridať za tento blok';
+                button.textContent = '+ ' + ['Heading', 'Paragraph', 'Image'][i];
+                button.title = 'Add after this block';
                 button.addEventListener('click', function () { addContentItem(type, item); });
                 insert.append(button);
             });
@@ -273,7 +273,7 @@
             const button = document.createElement('button');
             button.type = 'button';
             button.textContent = String(index + 1) + '. ' + (collectionNames.get(id) || '#' + id) + ' ×';
-            button.setAttribute('aria-label', 'Odobrať: ' + (collectionNames.get(id) || '#' + id));
+            button.setAttribute('aria-label', 'Remove: ' + (collectionNames.get(id) || '#' + id));
             button.addEventListener('click', function () {
                 collectionIds = collectionIds.filter(function (value) { return value !== id; });
                 renderCollectionSelection();
@@ -286,7 +286,7 @@
     async function searchCollectionPosts() {
         const token = ++collectionRequest;
         const status = collectionForm.querySelector('[data-collection-status]');
-        status.textContent = 'Načítavam…';
+        status.textContent = 'Loading…';
         try {
             const data = await request('cammino_post_collection', {
                 settings: JSON.stringify(collectionSettings()), search: collectionForm.elements.search.value
@@ -309,7 +309,7 @@
                 });
                 results.append(button);
             });
-            status.textContent = data.posts.length ? 'Vybrané: ' + collectionIds.length + ' / 6' : 'Nenašli sa žiadne príspevky.';
+            status.textContent = data.posts.length ? 'Selected: ' + collectionIds.length + ' / 6' : 'No posts found.';
         } catch (error) {
             if (token === collectionRequest) status.textContent = error.message;
         }
