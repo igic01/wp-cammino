@@ -54,6 +54,8 @@
     let dirty = false;
     let mediaFrame = null;
     let mediaTarget = null;
+    let mediaReturnsToContent = false;
+    let mediaReturnIndex = -1;
     let linkTarget = null;
     let pendingVideoAttachment = null;
     let videoToolsLayer = null;
@@ -186,7 +188,7 @@
                 if (photo) {
                     const thumb = document.createElement('img'); thumb.src = photo.src; thumb.alt = photo.alt;
                     row.append(thumb);
-                    edit.addEventListener('click', function () { closeContentEditor(); openMediaPicker(photo); });
+                    edit.addEventListener('click', function () { closeContentEditor(); openMediaPicker(photo, true); });
                     row.append(edit);
                 }
             }
@@ -246,7 +248,7 @@
             const image = item.querySelector('img');
             closeContentEditor();
             if (image) {
-                openMediaPicker(image);
+                openMediaPicker(image, true);
             }
         }
     }
@@ -1123,13 +1125,18 @@
         videoDialog.close();
     }
 
-    function openMediaPicker(target) {
+    function openMediaPicker(target, returnToContent) {
         mediaTarget = target;
+        mediaReturnsToContent = Boolean(returnToContent);
+        mediaReturnIndex = mediaReturnsToContent
+            ? contentItems().indexOf(target.closest('[data-nstarter-content-item]'))
+            : -1;
+        let attachmentSelected = false;
 
         mediaFrame = window.wp.media({
             title: config.strings.chooseMedia,
             button: { text: config.strings.useMedia },
-            library: { type: ['image', 'video'] },
+            library: { type: mediaReturnsToContent ? 'image' : ['image', 'video'] },
             multiple: false
         });
 
@@ -1140,6 +1147,7 @@
                 return;
             }
 
+            attachmentSelected = true;
             const attachmentType = attachment.type || (attachment.mime || '').split('/')[0];
 
             if (attachmentType === 'image') {
@@ -1150,6 +1158,23 @@
                 mediaTarget = null;
                 setStatus(config.strings.unsupportedMedia, 'error');
             }
+        });
+
+        mediaFrame.on('close', function () {
+            if (!attachmentSelected) {
+                mediaTarget = null;
+            }
+            if (!mediaReturnsToContent) {
+                return;
+            }
+            const returnIndex = mediaReturnIndex;
+            mediaReturnsToContent = false;
+            mediaReturnIndex = -1;
+            window.setTimeout(function () {
+                openContentEditor();
+                const row = contentList && contentList.children[returnIndex];
+                if (row) row.scrollIntoView({ block: 'nearest' });
+            }, 0);
         });
 
         mediaFrame.open();
