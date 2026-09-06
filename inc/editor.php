@@ -250,14 +250,13 @@ function nstarter_maybe_render_editor(): void {
 			<dialog class="nstarter-collection-dialog" data-collection-dialog>
 				<form data-collection-form>
 					<h2>Related posts</h2>
-					<p>This section always appears at the end of the post. Automatic selection excludes the current post.</p><label data-collection-heading>Section heading<input name="title" type="text" maxlength="160"></label>
-					<label>Display<select name="mode"><option value="latest">Automatic — latest published posts</option><option value="selected">Choose posts manually</option><option value="none">None — hide this section</option></select></label>
-					<label data-collection-type>Post type<select name="type"><option value="all">All post types</option><?php foreach ( cammino_get_post_placements() as $value => $label ) : ?><option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select></label>
-					<label data-collection-limit>Number of cards<input name="limit" type="number" min="1" max="6" value="3"></label>
-					<div data-collection-picker hidden>
-						<label>Search published posts<input name="search" type="search" autocomplete="off"></label>
-						<p>Select up to 6 posts. They appear in the order selected. The post type above filters the search results.</p>
+					<p>Choose up to 6 published posts. Click a post to add it, or click a selected post marked × to remove it. If the selection is empty, nothing appears on the post page.</p>
+					<label>Section heading<input name="title" type="text" maxlength="160"></label>
+					<div data-collection-picker>
+						<label>Search posts<input name="search" type="search" autocomplete="off"></label>
+						<p><strong>Selected posts</strong></p>
 						<div data-collection-selected></div>
+						<p><strong>Available posts</strong></p>
 						<div data-collection-results></div>
 					</div>
 					<p role="status" data-collection-status></p>

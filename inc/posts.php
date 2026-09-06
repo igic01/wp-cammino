@@ -761,7 +761,7 @@ function cammino_get_post_visual_content( int $post_id ): string {
 			$bottom = $last[0];
 			$html = substr_replace( $html, '', $last[1], strlen( $last[0] ) );
 		} else {
-			$bottom = cammino_get_post_collection_block( array( 'mode' => str_contains( $html, '<!-- cammino-post-collections-v1 -->' ) ? 'none' : 'latest' ) );
+			$bottom = cammino_get_post_collection_block();
 		}
 		$bottom = preg_replace( '/data-nstarter-content-item(?:="[^"]*")?\s+data-nstarter-content-type="posts"/', 'data-cammino-post-bottom', $bottom );
 		$html .= $bottom;

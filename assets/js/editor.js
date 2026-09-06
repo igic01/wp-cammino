@@ -269,9 +269,9 @@
     function collectionSettings() {
         return {
             title: collectionForm.elements.title.value,
-            mode: collectionForm.elements.mode.value,
-            type: collectionForm.elements.type.value,
-            limit: Number(collectionForm.elements.limit.value),
+            mode: 'selected',
+            type: 'all',
+            limit: 6,
             ids: collectionIds.slice()
         };
     }
@@ -319,24 +319,9 @@
                 });
                 results.append(button);
             });
-            status.textContent = data.posts.length ? 'Selected: ' + collectionIds.length + ' / 6' : 'No posts found.';
+            status.textContent = 'Selected: ' + collectionIds.length + ' / 6 · Available: ' + data.posts.length;
         } catch (error) {
             if (token === collectionRequest) status.textContent = error.message;
-        }
-    }
-
-    function syncCollectionMode() {
-        const manual = collectionForm.elements.mode.value === 'selected';
-        const hidden = collectionForm.elements.mode.value === 'none';
-        collectionForm.querySelector('[data-collection-heading]').hidden = hidden;
-        collectionForm.querySelector('[data-collection-type]').hidden = hidden;
-        collectionForm.querySelector('[data-collection-picker]').hidden = !manual;
-        collectionForm.querySelector('[data-collection-limit]').hidden = manual || hidden;
-        collectionForm.elements.limit.disabled = manual;
-        if (manual) searchCollectionPosts();
-        else {
-            ++collectionRequest;
-            collectionForm.querySelector('[data-collection-status]').textContent = '';
         }
     }
 
@@ -352,15 +337,12 @@
         collectionIds = Array.isArray(settings.ids) ? settings.ids.slice(0, 6) : [];
         collectionNames = new Map();
         collectionForm.elements.title.value = typeof settings.title === 'string' ? settings.title : 'Čítajte ďalej';
-        collectionForm.elements.mode.value = ['selected', 'none'].includes(settings.mode) ? settings.mode : 'latest';
-        collectionForm.elements.type.value = settings.type || 'all';
-        collectionForm.elements.limit.value = settings.limit || 3;
         collectionForm.elements.search.value = '';
         collectionForm.querySelector('[data-collection-status]').textContent = '';
         collectionForm.querySelector('[data-collection-results]').replaceChildren();
         collectionDialog.showModal();
         renderCollectionSelection();
-        syncCollectionMode();
+        searchCollectionPosts();
     }
 
     function closeCollectionEditor() {
@@ -372,8 +354,6 @@
     }
 
     if (collectionForm) {
-        collectionForm.elements.mode.addEventListener('change', syncCollectionMode);
-        collectionForm.elements.type.addEventListener('change', syncCollectionMode);
         collectionForm.elements.search.addEventListener('input', function () {
             ++collectionRequest;
             clearTimeout(collectionTimer);

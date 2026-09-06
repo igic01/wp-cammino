@@ -138,13 +138,13 @@ Save, View, and reset.
 Use the purple variable-section control on **Related posts** to configure the
 separate bottom section:
 
-- **Automatic**: the latest 1–6 published posts, optionally filtered by type.
-- **Choose posts**: search and select up to six posts in display order.
-- **None**: hide the section, retaining your selections for later.
+- Browse or search the list of published posts and select up to six.
+- Selected posts appear in display order; click a selected item marked **×** to remove it.
+- An empty selection renders no Related Posts section on the public post.
 
 Press **Apply**, then use the standard **Save** button in the editor panel.
 The bottom section always follows the article body. Cards read current titles,
-images and links on each render; automatic results update as posts are published.
+images and links on each render.
 The current post, drafts, private and password-protected posts are excluded.
 Empty sections are hidden publicly.
 
