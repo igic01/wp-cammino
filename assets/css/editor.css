@@ -594,4 +594,3 @@ body.nstarter-editor-shell {
         width: min(252px, calc(100vw - 20px));
     }
 }
-[data-cammino-bottom-settings] { grid-column: 1 / -1; }

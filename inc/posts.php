@@ -766,6 +766,21 @@ function cammino_get_post_visual_content( int $post_id ): string {
 		$bottom = preg_replace( '/data-nstarter-content-item(?:="[^"]*")?\s+data-nstarter-content-type="posts"/', 'data-cammino-post-bottom', $bottom );
 		$html .= $bottom;
 	}
+
+	// Existing fixed collections gain the same variable-section control without regeneration.
+	if ( function_exists( 'cammino_get_post_collection_variable_attributes' ) ) {
+		$variable_attributes = cammino_get_post_collection_variable_attributes();
+		$html = (string) preg_replace_callback(
+			'#<div\b(?=[^>]*\bdata-cammino-post-bottom\b)[^>]*#i',
+			static function ( array $match ) use ( $variable_attributes ): string {
+				return str_contains( $match[0], 'data-nstarter-variable-section' )
+					? $match[0]
+					: $match[0] . $variable_attributes;
+			},
+			$html,
+			1
+		);
+	}
 	return $html;
 }
 

@@ -133,9 +133,10 @@ cover image. Its three large inline buttons add unlimited headings, paragraphs,
 and placeholder images. Text is editable in the preview; clicking an image opens
 the WordPress media library. The small buttons below each block change its order
 or remove it. The standard floating editor panel remains available for modes,
-Save, View, reset, and related-post settings.
+Save, View, and reset.
 
-Open **Related posts** in the editor panel to configure the separate bottom section:
+Use the purple variable-section control on **Related posts** to configure the
+separate bottom section:
 
 - **Automatic**: the latest 1–6 published posts, optionally filtered by type.
 - **Choose posts**: search and select up to six posts in display order.

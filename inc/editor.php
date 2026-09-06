@@ -130,7 +130,6 @@ function nstarter_maybe_render_editor(): void {
 				'newHeading'          => __( 'New heading', 'cammino' ),
 				'newParagraph'        => __( 'Write your paragraph here.', 'cammino' ),
 				'editImage'           => __( 'Choose or replace image', 'cammino' ),
-				'editRelatedPosts'    => __( 'Related posts', 'cammino' ),
 				'emptyPostContent'    => __( 'Your content will appear here.', 'cammino' ),
 				'saved'             => __( 'Saved', 'nstarter' ),
 				'regenerated'       => __( 'Regenerated from PHP', 'nstarter' ),
@@ -188,9 +187,6 @@ function nstarter_maybe_render_editor(): void {
 					<button type="button" class="nstarter-control nstarter-control--primary" data-nstarter-save><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
 					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
 					<button type="button" class="nstarter-control nstarter-control--order" data-nstarter-section-order><?php esc_html_e( 'Section order', 'nstarter' ); ?></button>
-					<?php if ( 'post' === $post->post_type ) : ?>
-						<button type="button" class="nstarter-control nstarter-control--content" data-cammino-bottom-settings><?php esc_html_e( 'Related posts', 'cammino' ); ?></button>
-					<?php endif; ?>
 					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
 				</div>
 			</aside>

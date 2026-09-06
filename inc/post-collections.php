@@ -50,7 +50,7 @@ function cammino_render_post_collection( array $args, int $post_id, bool $previe
 	<section class="cammino-post-collection" aria-label="<?php echo esc_attr( $args['title'] ?: 'Ďalšie príspevky' ); ?>">
 		<?php if ( '' !== $args['title'] ) : ?><h2><?php echo esc_html( $args['title'] ); ?></h2><?php endif; ?>
 		<?php if ( ! $posts ) : ?>
-			<p class="cammino-collection-empty"><?php echo 'none' === $args['mode'] ? 'This section is hidden.' : 'There are no matching published posts yet.'; ?> Change the selection with Related posts in the editor panel. Empty sections are hidden from visitors.</p>
+			<p class="cammino-collection-empty"><?php echo 'none' === $args['mode'] ? 'This section is hidden.' : 'There are no matching published posts yet.'; ?> Use this section's variable control to change the selection. Empty sections are hidden from visitors.</p>
 		<?php else : ?>
 			<div class="related-grid">
 			<?php foreach ( $posts as $related ) : ?>
@@ -66,8 +66,22 @@ function cammino_render_post_collection( array $args, int $post_id, bool $previe
 	return (string) ob_get_clean();
 }
 
+/** Return the variable-section attributes shared by new and upgraded collections. */
+function cammino_get_post_collection_variable_attributes(): string {
+	ob_start();
+	nstarter_variable_section_attributes(
+		'cammino_related_posts',
+		array(
+			'label'   => __( 'Related posts', 'cammino' ),
+			'type'    => 'collection',
+			'control' => 'collection',
+		)
+	);
+	return (string) ob_get_clean();
+}
+
 function cammino_get_post_collection_block( array $args = array() ): string {
-	return '<div class="article-content-block article-content-block--posts" data-nstarter-content-item data-nstarter-content-type="posts">'
+	return '<div class="article-content-block article-content-block--posts" data-nstarter-content-item data-nstarter-content-type="posts"' . cammino_get_post_collection_variable_attributes() . '>'
 		. nstarter_get_live_section_marker( 'cammino_post_collection', cammino_sanitize_post_collection( $args ) ) . '</div>';
 }
 

@@ -32,7 +32,6 @@
     const sectionOrderForm = document.querySelector('[data-nstarter-section-order-form]');
     const sectionOrderList = document.querySelector('[data-nstarter-section-order-list]');
     const sectionOrderCancel = document.querySelector('[data-nstarter-section-order-cancel]');
-    const collectionSettingsButton = document.querySelector('[data-cammino-bottom-settings]');
     const collectionDialog = document.querySelector('[data-collection-dialog]');
     const collectionForm = document.querySelector('[data-collection-form]');
     let collectionItem = null;
@@ -266,11 +265,6 @@
         renderInlinePostEditor();
         return true;
     }
-
-    collectionSettingsButton?.addEventListener('click', function () {
-        const bottom = contentBuilder()?.querySelector('[data-cammino-post-bottom]');
-        if (bottom) openCollectionEditor(bottom);
-    });
 
     function collectionSettings() {
         return {
@@ -825,6 +819,11 @@
     }
 
     function openVariableEditor(section) {
+        if (section && section.dataset.nstarterVariableControl === 'collection') {
+            openCollectionEditor(section);
+            return;
+        }
+
         if (!variableDialog || !variableInput || !section) {
             return;
         }
@@ -1457,9 +1456,6 @@
         modeSelect.disabled = nextBusy;
         if (sectionOrderButton) {
             sectionOrderButton.disabled = nextBusy;
-        }
-        if (collectionSettingsButton) {
-            collectionSettingsButton.disabled = nextBusy;
         }
         const builder = contentBuilder();
         if (builder) {

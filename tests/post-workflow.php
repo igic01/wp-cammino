@@ -23,6 +23,7 @@ expect( $args['title']==='Úsmev' && $args['type']==='all' && $args['mode']==='l
 expect( '' === cammino_render_post_collection(array('mode'=>'selected','ids'=>array()),1), 'Empty section hidden publicly' );
 expect( str_contains(cammino_render_post_collection(array('mode'=>'selected','ids'=>array()),1,true),'cammino-collection-empty'), 'Editor explains empty selection' );
 $marker = cammino_get_post_collection_block(array('title'=>'Súvisiace príbehy','mode'=>'selected','ids'=>array(3)));
+expect(str_contains($marker,'data-nstarter-variable-section="cammino_related_posts"') && str_contains($marker,'data-nstarter-variable-control="collection"'), 'Related posts is a collection variable section');
 $html = cammino_expand_post_live_content($marker.cammino_get_post_collection_template(),1);
 expect( str_contains($html,'Príbeh Gama'), 'Live block renders selected post' );
 $inert = substr($html,strpos($html,'<template'));
@@ -35,7 +36,7 @@ $GLOBALS['test_posts'][3]->post_status = 'publish';
 $saved = '<p data-nstarter-content-item data-nstarter-content-type="paragraph">Zachovať moje úpravy.</p>';
 cammino_update_post_visual_content(4,$saved);
 $upgraded = cammino_get_post_visual_content(4);
-expect( str_contains($upgraded,$saved) && str_contains($upgraded,'data-cammino-post-bottom'), 'Saved body gains tools without regeneration' );
+expect( str_contains($upgraded,$saved) && str_contains($upgraded,'data-cammino-post-bottom') && str_contains($upgraded,'data-nstarter-variable-section="cammino_related_posts"'), 'Saved body gains variable tools without regeneration' );
 expect( strpos($upgraded,'data-cammino-post-bottom') > strpos($upgraded,$saved), 'Bottom collection follows the body' );
 cammino_update_post_visual_content(4,$upgraded);
 expect( cammino_get_post_visual_content(4)===$upgraded, 'Upgrade is stable after save/reload' );

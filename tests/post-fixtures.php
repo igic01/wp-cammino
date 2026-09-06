@@ -113,6 +113,7 @@ function selected( $value, $expected ) { if ( $value === $expected ) { echo 'sel
 function parse_blocks( $content ) { return array( array( 'blockName' => null, 'innerHTML' => $content ) ); }
 function render_block( $block ) { return $block['innerHTML']; }
 require NSTARTER_PATH . '/inc/live-sections.php';
+require NSTARTER_PATH . '/inc/variable-sections.php';
 require NSTARTER_PATH . '/inc/posts.php';
 require NSTARTER_PATH . '/inc/post-collections.php';
 cammino_register_post_meta();
