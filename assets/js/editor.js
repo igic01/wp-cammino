@@ -915,6 +915,10 @@
             : mediaTarget;
 
         replacementTarget.replaceWith(replacement);
+        finishMediaChange();
+    }
+
+    function finishMediaChange() {
         mediaTarget = null;
         pendingVideoAttachment = null;
         markDirty();
@@ -923,14 +927,36 @@
     }
 
     function useImageAttachment(attachment) {
-        const image = mediaTarget.ownerDocument.createElement('img');
+        const target = mediaTarget;
+        const url = attachment.url || (attachment.sizes && attachment.sizes.full && attachment.sizes.full.url) || '';
+        if (!target || !url) return;
 
-        copyPresentationAttributes(mediaTarget, image);
-        image.setAttribute('src', attachment.url);
+        if (target.tagName.toLowerCase() === 'img') {
+            const picture = target.parentElement && target.parentElement.tagName.toLowerCase() === 'picture'
+                ? target.parentElement
+                : null;
+            target.removeAttribute('srcset');
+            target.removeAttribute('sizes');
+            target.setAttribute('src', url);
+            target.src = url;
+            target.setAttribute('data-attachment-id', attachment.id);
+            target.setAttribute('alt', attachment.alt || target.getAttribute('alt') || '');
+            if (picture) {
+                picture.before(target);
+                picture.remove();
+            }
+            finishMediaChange();
+            return;
+        }
+
+        const image = target.ownerDocument.createElement('img');
+
+        copyPresentationAttributes(target, image);
+        image.setAttribute('src', url);
         image.setAttribute('data-attachment-id', attachment.id);
         image.setAttribute(
             'alt',
-            attachment.alt || (mediaTarget.tagName.toLowerCase() === 'img' ? mediaTarget.getAttribute('alt') || '' : '')
+            attachment.alt || ''
         );
         replaceMediaElement(image);
     }
@@ -1009,17 +1035,19 @@
         mediaTarget = target;
         let attachmentSelected = false;
 
-        mediaFrame = window.wp.media({
+        const picker = window.wp.media({
             title: config.strings.chooseMedia,
             button: { text: config.strings.useMedia },
             library: { type: imageOnly ? 'image' : ['image', 'video'] },
             multiple: false
         });
+        mediaFrame = picker;
 
-        mediaFrame.on('select', function () {
-            const attachment = mediaFrame.state().get('selection').first().toJSON();
+        picker.on('select', function () {
+            const attachment = picker.state().get('selection').first().toJSON();
+            const attachmentUrl = attachment && (attachment.url || (attachment.sizes && attachment.sizes.full && attachment.sizes.full.url));
 
-            if (!mediaTarget || !attachment || !attachment.url) {
+            if (!mediaTarget || !attachment || !attachmentUrl) {
                 return;
             }
 
@@ -1036,13 +1064,18 @@
             }
         });
 
-        mediaFrame.on('close', function () {
-            if (!attachmentSelected) {
-                mediaTarget = null;
-            }
+        picker.on('close', function () {
+            // WordPress can dispatch close before select on some media-frame
+            // paths. Defer cleanup so a valid selection still updates the image.
+            window.setTimeout(function () {
+                if (!attachmentSelected && mediaFrame === picker) {
+                    mediaTarget = null;
+                    mediaFrame = null;
+                }
+            }, 100);
         });
 
-        mediaFrame.open();
+        picker.open();
     }
 
     function renderPostTitle(title) {

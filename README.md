@@ -116,7 +116,7 @@ Card copy and images remain editable through the normal Text and Media modes.
    shows this type in its own column. Event posts are automatically assigned to
    the dedicated WordPress **Podujatia** category and removed from that category
    if their type changes.
-3. Fill the optional fields for that type: event date/time, location and status;
+3. Fill the optional fields for that type: event date/time and location;
    project period, countries/location and status; or impact result and reporting
    period. Only populated fields for the current type appear publicly.
 4. Open **Cammino visual editor**. Use the purple variable control attached to

@@ -11,7 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 const CAMMINO_EVENT_DATE_META     = '_cammino_event_date';
 const CAMMINO_EVENT_LOCATION_META = '_cammino_event_location';
-const CAMMINO_EVENT_STATUS_META   = '_cammino_event_status';
 const CAMMINO_EVENT_HIDE_IMAGE_META = '_cammino_event_hide_image';
 const CAMMINO_EVENT_CATEGORY_SLUG = 'podujatia';
 const CAMMINO_POST_PLACEMENT_META = '_cammino_post_placement';
@@ -139,7 +138,6 @@ function cammino_register_post_meta(): void {
 
 	register_post_meta( 'post', CAMMINO_EVENT_DATE_META, array_merge( $common, array( 'type' => 'string' ) ) );
 	register_post_meta( 'post', CAMMINO_EVENT_LOCATION_META, array_merge( $common, array( 'type' => 'string' ) ) );
-	register_post_meta( 'post', CAMMINO_EVENT_STATUS_META, array_merge( $common, array( 'type' => 'string' ) ) );
 	register_post_meta( 'post', CAMMINO_EVENT_HIDE_IMAGE_META, array_merge( $common, array( 'type' => 'string' ) ) );
 	foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 		register_post_meta( 'post', '_cammino_' . $key, array_merge( $common, array( 'type' => 'string' ) ) );
@@ -263,7 +261,6 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	$placements = cammino_get_post_placements();
 	$date       = (string) get_post_meta( $post->ID, CAMMINO_EVENT_DATE_META, true );
 	$location   = (string) get_post_meta( $post->ID, CAMMINO_EVENT_LOCATION_META, true );
-	$status     = (string) get_post_meta( $post->ID, CAMMINO_EVENT_STATUS_META, true );
 	$hide_image = '1' === (string) get_post_meta( $post->ID, CAMMINO_EVENT_HIDE_IMAGE_META, true );
 
 	wp_nonce_field( 'cammino_save_post_settings', 'cammino_post_settings_nonce' );
@@ -291,10 +288,6 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	<p>
 		<label for="cammino-event-location"><?php esc_html_e( 'Miesto', 'cammino' ); ?></label>
 		<input id="cammino-event-location" name="cammino_event_location" type="text" value="<?php echo esc_attr( $location ); ?>" style="width:100%">
-	</p>
-	<p>
-		<label for="cammino-event-status"><?php esc_html_e( 'Stav', 'cammino' ); ?></label>
-		<input id="cammino-event-status" name="cammino_event_status" type="text" value="<?php echo esc_attr( $status ); ?>" placeholder="<?php esc_attr_e( 'Registrácia otvorená', 'cammino' ); ?>" style="width:100%">
 	</p>
 	<p><label><input name="cammino_event_hide_image" type="checkbox" value="1" <?php checked( $hide_image ); ?>> <?php esc_html_e( 'Skryť fotografiu na stránke podujatia', 'cammino' ); ?></label></p>
 	</div>
@@ -329,7 +322,6 @@ function cammino_save_post_settings( int $post_id ): void {
 		CAMMINO_POST_PLACEMENT_META => isset( $_POST['cammino_post_placement'] ) ? cammino_sanitize_post_placement( wp_unslash( $_POST['cammino_post_placement'] ) ) : cammino_get_post_placement( $post_id ),
 		CAMMINO_EVENT_DATE_META     => isset( $_POST['cammino_event_date'] ) ? sanitize_text_field( wp_unslash( $_POST['cammino_event_date'] ) ) : '',
 		CAMMINO_EVENT_LOCATION_META => isset( $_POST['cammino_event_location'] ) ? sanitize_text_field( wp_unslash( $_POST['cammino_event_location'] ) ) : '',
-		CAMMINO_EVENT_STATUS_META   => isset( $_POST['cammino_event_status'] ) ? sanitize_text_field( wp_unslash( $_POST['cammino_event_status'] ) ) : '',
 		CAMMINO_EVENT_HIDE_IMAGE_META => isset( $_POST['cammino_event_hide_image'] ) ? '1' : '',
 	);
 	foreach ( cammino_get_post_detail_fields() as $key => $field ) {
@@ -804,12 +796,10 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 					$raw_date = (string) get_post_meta( $event_id, CAMMINO_EVENT_DATE_META, true );
 					$timestamp = cammino_get_event_timestamp( $event_id );
 					$location = (string) get_post_meta( $event_id, CAMMINO_EVENT_LOCATION_META, true );
-					$status = (string) get_post_meta( $event_id, CAMMINO_EVENT_STATUS_META, true );
 					?>
 					<article class="event-directory-card">
 						<time datetime="<?php echo esc_attr( $raw_date ); ?>"><strong><?php echo esc_html( wp_date( 'j', $timestamp ) ); ?></strong><span><?php echo esc_html( wp_date( 'F Y', $timestamp ) ); ?></span><small><?php echo esc_html( wp_date( 'H:i', $timestamp ) ); ?></small></time>
 						<div class="event-directory-card__content">
-							<?php if ( '' !== $status ) : ?><span class="event-directory-card__status"><?php echo esc_html( $status ); ?></span><?php endif; ?>
 							<h2><a href="<?php echo esc_url( get_permalink( $event ) ); ?>"><?php echo esc_html( get_the_title( $event ) ); ?></a></h2>
 							<p><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <?php echo esc_html( '' !== $location ? $location : __( 'Miesto bude doplnené', 'cammino' ) ); ?></p>
 						</div>

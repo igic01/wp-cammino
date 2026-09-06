@@ -41,12 +41,6 @@ if ( $cammino_thumbnail ) {
 
 $cammino_content = cammino_get_post_visual_content( $cammino_post_id );
 $cammino_facts = array();
-if ( 'event' === $cammino_placement ) {
-	$cammino_event_status = (string) get_post_meta( $cammino_post_id, CAMMINO_EVENT_STATUS_META, true );
-	if ( '' !== $cammino_event_status ) {
-		$cammino_facts['Stav'] = $cammino_event_status;
-	}
-}
 foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 	$value = (string) get_post_meta( $cammino_post_id, '_cammino_' . $key, true );
 	if ( $field['type'] === $cammino_placement && '' !== $value ) { $cammino_facts[ $field['label'] ] = $value; }
