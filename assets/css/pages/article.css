@@ -121,42 +121,6 @@
   line-height: 1.55;
 }
 
-.article-byline {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.9rem 1.15rem;
-  margin-top: 2rem;
-  color: rgba(100, 54, 75, 0.72);
-  font-size: 0.96rem;
-}
-
-.article-byline > span:nth-child(2) { display: grid; line-height: 1.25; text-align: left; }
-.article-byline small { color: rgba(39, 36, 35, 0.55); }
-.article-byline strong { color: var(--color-plum); font-size: 1.05rem; }
-
-.author-avatar {
-  display: grid;
-  width: 54px;
-  aspect-ratio: 1;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--color-plum);
-  background: var(--color-apricot);
-  font-size: 1.05rem;
-  box-shadow: 0 10px 24px rgba(100, 54, 75, 0.14);
-  animation: authorAvatarFloat 3.6s ease-in-out infinite;
-}
-
-.author-avatar i { transform-origin: 50% 70%; }
-
-.article-byline:hover .author-avatar i {
-  animation: authorPenMove 650ms cubic-bezier(.2,.8,.2,1);
-}
-
-.byline-separator { width: 5px; height: 5px; border-radius: 50%; background: var(--color-coral); }
-
 .article-cover { max-width: 1260px; margin-top: clamp(3rem, 6vw, 5rem); }
 
 .article-cover__frame {
@@ -400,17 +364,6 @@
   72% { transform: translateY(-12px) rotate(2.5deg) scale(1.1); }
 }
 
-@keyframes authorAvatarFloat {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-6px) rotate(2deg); }
-}
-
-@keyframes authorPenMove {
-  0%, 100% { transform: rotate(0) scale(1); }
-  35% { transform: rotate(-18deg) translate(-2px, -2px) scale(1.18); }
-  70% { transform: rotate(10deg) translate(2px, 1px) scale(1.1); }
-}
-
 @media (max-width: 900px) {
   .article-layout { grid-template-columns: minmax(0, 760px); }
   .article-content { grid-column: 1; }
@@ -425,9 +378,6 @@
   .article-back { margin-bottom: 1.8rem; }
   .article-hero h1 { font-size: clamp(2.75rem, 14vw, 4rem); }
   .article-deck { margin-top: 1.2rem; }
-  .article-byline { gap: 0.65rem; }
-  .byline-separator { display: none; }
-  .article-byline time { flex-basis: 45%; text-align: right; }
   .article-cover__frame { aspect-ratio: 4 / 5; border-width: 6px; border-radius: 2.5rem 2.5rem 1.5rem 1.5rem; }
   .cover-sticker { right: 0.8rem; bottom: 0.8rem; max-width: calc(100% - 1.6rem); }
   .image-caption { margin-inline: 0.3rem; }
@@ -443,8 +393,6 @@
   .cover-sticker:hover,
   .cover-sticker:focus-visible,
   .cover-sticker.is-pulsing { animation: none; }
-  .author-avatar,
-  .article-byline:hover .author-avatar i { animation: none; }
 }
 
 /* Each post type keeps the article layout, with its own accent and factual summary. */

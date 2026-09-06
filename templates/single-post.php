@@ -17,7 +17,6 @@ $cammino_post       = get_post( $cammino_post_id );
 $cammino_placement  = cammino_get_post_placement( $cammino_post_id );
 $cammino_news_url   = cammino_get_news_page_url();
 $cammino_category   = cammino_get_post_category( $cammino_post_id );
-$cammino_minutes    = cammino_get_reading_minutes( $cammino_post_id );
 $cammino_image      = cammino_get_post_image_url( $cammino_post_id, 'full' );
 $cammino_timestamp  = 'event' === $cammino_placement
 	? cammino_get_event_timestamp( $cammino_post_id )
@@ -77,14 +76,6 @@ foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 				<?php if ( '' !== $cammino_deck ) : ?>
 					<p class="article-deck" data-article-reveal="up" data-delay="180"><?php echo esc_html( $cammino_deck ); ?></p>
 				<?php endif; ?>
-				<div class="article-byline" data-article-reveal="up" data-delay="240">
-					<span class="author-avatar" aria-hidden="true"><i class="fa-solid fa-pen-nib"></i></span>
-					<span><strong><?php echo esc_html( get_the_author_meta( 'display_name', (int) $cammino_post->post_author ) ); ?></strong></span>
-					<span class="byline-separator" aria-hidden="true"></span>
-					<time datetime="<?php echo esc_attr( wp_date( 'c', $cammino_timestamp ) ); ?>"><?php echo esc_html( wp_date( get_option( 'date_format' ), $cammino_timestamp ) ); ?></time>
-					<span class="byline-separator" aria-hidden="true"></span>
-					<span><?php echo esc_html( $cammino_minutes . ' min čítania' ); ?></span>
-				</div>
 			</header>
 
 			<div class="container article-cover" data-article-reveal="scale">
