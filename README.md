@@ -113,34 +113,35 @@ Card copy and images remain editable through the normal Text and Media modes.
 3. Fill the optional fields for that type: event date/time, location and status;
    project period, countries/location and status; or impact result and reporting
    period. Only populated fields for the current type appear publicly.
-4. Open **Cammino visual editor**. Use **Post content** to add, remove, and
-   reorder titles, paragraphs, and images. Edit plain text directly in the panel, replace an
-   image using its media button, and then press **Save**.
+4. Open **Cammino visual editor**. The post title and cover image stay at the
+   top. Use the three buttons directly below the body to add a heading,
+   paragraph, or placeholder image. Edit text in place; click an image to
+   replace it, and use the small controls below a block to move or remove it.
 5. Publish the post. Events appear in the existing event listing; projects,
    impact stories and legacy articles appear in the main news listing.
 
 Titles, excerpts and type-specific facts are edited in WordPress. Body sections,
-links and images are edited in the visual editor. New empty posts receive starter
-headings appropriate to their type. Changing a type never regenerates a saved
-body or overwrites existing content. **Regenerate page** remains an explicit reset
-to the WordPress content/starter body.
+links and images are edited in the visual editor. New empty posts start with an
+empty body and the inline add controls. Changing a type never regenerates a saved
+body or overwrites existing content. **Reset content** remains an explicit reset
+to the current WordPress content or an empty body.
 
 ## Article body and bottom recommendations
 
-All three post types use the same content builder below the cover image.
-Open **Post content** to add unlimited headings, paragraphs and images.
-Use the buttons below any block to insert directly after it, arrows to change
-order, and the remove button to delete it. Plain text is editable directly in
-this panel; formatted text remains editable in the preview to preserve links
-and formatting. Image blocks open the WordPress media library.
+All three post types use the same dedicated content-builder element below the
+cover image. Its three large inline buttons add unlimited headings, paragraphs,
+and placeholder images. Text is editable in the preview; clicking an image opens
+the WordPress media library. The small buttons below each block change its order
+or remove it. Save, preview, reset, and related-post settings are in the inline
+builder footer, so posts no longer use the floating corner panel.
 
-Open **Related posts** in the content panel to configure the separate bottom section:
+Open **Related posts** in the inline builder footer to configure the separate bottom section:
 
 - **Automatic**: the latest 1–6 published posts, optionally filtered by type.
 - **Choose posts**: search and select up to six posts in display order.
 - **None**: hide the section, retaining your selections for later.
 
-Press **Apply**, then **Done**, then the main **Save** button.
+Press **Apply**, then use **Save post design** in the inline builder.
 The bottom section always follows the article body. Cards read current titles,
 images and links on each render; automatic results update as posts are published.
 The current post, drafts, private and password-protected posts are excluded.

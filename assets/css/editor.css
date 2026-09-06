@@ -59,6 +59,10 @@ body.nstarter-editor-shell {
     grid-column: 1 / -1;
 }
 
+.nstarter-editor-shell--post .nstarter-editor-panel {
+    display: none;
+}
+
 .nstarter-editor-status {
     display: flex;
     align-items: center;

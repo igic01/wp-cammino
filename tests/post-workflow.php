@@ -41,9 +41,11 @@ cammino_update_post_visual_content(4,$upgraded);
 expect( cammino_get_post_visual_content(4)===$upgraded, 'Upgrade is stable after save/reload' );
 cammino_update_post_visual_content(4,$saved.'<!-- cammino-post-collections-v1 -->'.cammino_get_post_collection_template());
 expect( !str_contains(cammino_expand_post_live_content(cammino_get_post_visual_content(4),4),'related-card'), 'Removed default block does not respawn; bottom remains hidden' );
-foreach(array(1=>'O podujatí',2=>'O projekte',3=>'Čo sa zmenilo') as $id=>$heading) {
-	expect(str_contains(cammino_render_post_visual_content($id),$heading),'New body fits type '.$id);
-}
+$fresh_body = cammino_render_post_visual_content(1);
+$fresh_visible_body = preg_replace('#<template\b[^>]*>.*?</template>#is', '', $fresh_body);
+expect(!str_contains($fresh_visible_body,'data-nstarter-content-item'), 'New post body starts empty');
+expect(substr_count($fresh_body,'data-nstarter-content-template=')===3, 'Inline builder provides title, paragraph and image templates');
+expect(str_contains($fresh_body,'/assets/images/placeholder.webp'), 'New image template uses the local placeholder');
 $_POST = array('cammino_post_settings_nonce'=>'test-nonce','cammino_post_placement'=>'project','cammino_project_period'=>'2026–2027');
 cammino_save_post_settings(4);
 expect(get_post_meta(4,CAMMINO_POST_SNAPSHOT_META,true)===$saved.'<!-- cammino-post-collections-v1 -->'.cammino_get_post_collection_template(),'Type changes preserve visual snapshot');

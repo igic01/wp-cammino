@@ -64,6 +64,7 @@
     let orderedSections = [];
     let sectionOrderParent = null;
     let transientState = new Map();
+    let inlinePostStatus = null;
 
     function frameDocument() {
         return frame.contentDocument || frame.contentWindow.document;
@@ -220,12 +221,43 @@
         }
     }
 
-    function addContentItem(type, afterItem) {
+    function fallbackContentItem(builder, type) {
+        const doc = builder.ownerDocument;
+        let item = null;
+
+        if (type === 'title') {
+            item = doc.createElement('h2');
+            item.textContent = config.strings.newHeading;
+        } else if (type === 'paragraph') {
+            item = doc.createElement('p');
+            item.textContent = config.strings.newParagraph;
+        } else if (type === 'image') {
+            item = doc.createElement('figure');
+            item.className = 'article-inline-image';
+            const image = doc.createElement('img');
+            image.src = config.placeholderUrl;
+            image.alt = '';
+            image.width = 1200;
+            image.height = 800;
+            image.loading = 'lazy';
+            item.appendChild(image);
+        }
+
+        if (item) {
+            item.classList.add('article-content-block');
+            item.dataset.nstarterContentItem = '';
+            item.dataset.nstarterContentType = type;
+        }
+
+        return item;
+    }
+
+    function addContentItem(type, afterItem, chooseImage) {
         const builder = contentBuilder();
         const template = builder && builder.querySelector('template[data-nstarter-content-template="' + type + '"]');
         const item = template && template.content.firstElementChild
             ? template.content.firstElementChild.cloneNode(true)
-            : null;
+            : (builder ? fallbackContentItem(builder, type) : null);
 
         if (!builder || !item) {
             return;
@@ -238,19 +270,180 @@
         else builder.insertBefore(item, firstTemplate || builder.querySelector('[data-cammino-post-bottom]') || null);
         markDirty();
         renderContentList();
+        renderInlinePostEditor();
         refreshVariableTools();
         refreshVideoSettingsTools();
 
         if (type === 'posts') {
             openCollectionEditor(item);
         }
-        if (type === 'image') {
+        if (type === 'image' && chooseImage !== false) {
             const image = item.querySelector('img');
             closeContentEditor();
             if (image) {
                 openMediaPicker(image, true);
             }
         }
+
+        return item;
+    }
+
+    function createInlineButton(doc, action, label, text, className) {
+        const button = doc.createElement('button');
+        button.type = 'button';
+        button.dataset.nstarterInlineAction = action;
+        button.setAttribute('aria-label', label);
+        button.title = label;
+        button.textContent = text;
+        if (className) button.className = className;
+        return button;
+    }
+
+    function renderInlinePostEditor() {
+        const builder = contentBuilder();
+        if (!config.isPost || !builder) return;
+
+        builder.querySelectorAll('[data-nstarter-editor-runtime]').forEach(function (element) {
+            element.remove();
+        });
+
+        const doc = builder.ownerDocument;
+        const items = contentItems();
+        const firstTemplate = Array.from(builder.children).find(function (child) {
+            return child.matches('template[data-nstarter-content-template]');
+        });
+        const insertionPoint = firstTemplate || builder.querySelector('[data-cammino-post-bottom]') || null;
+
+        if (!items.length) {
+            const empty = doc.createElement('div');
+            empty.className = 'nstarter-post-builder-empty';
+            empty.dataset.nstarterEditorRuntime = '';
+            empty.setAttribute('contenteditable', 'false');
+            empty.textContent = config.strings.emptyPostContent;
+            builder.insertBefore(empty, insertionPoint);
+        }
+
+        items.forEach(function (item, index) {
+            const tools = doc.createElement('div');
+            tools.className = 'nstarter-post-item-tools';
+            tools.dataset.nstarterEditorRuntime = '';
+            tools.setAttribute('contenteditable', 'false');
+
+            if (item.dataset.nstarterContentType === 'image' && item.querySelector('img')) {
+                const edit = createInlineButton(doc, 'edit-image', config.strings.editImage, 'Edit image', 'nstarter-post-item-tools__edit');
+                edit.nstarterContentItem = item;
+                tools.appendChild(edit);
+            }
+
+            const up = createInlineButton(doc, 'move-up', config.strings.contentItemUp, '↑');
+            const down = createInlineButton(doc, 'move-down', config.strings.contentItemDown, '↓');
+            const remove = createInlineButton(doc, 'delete', config.strings.contentItemDelete, '×', 'nstarter-post-item-tools__delete');
+            up.disabled = index === 0;
+            down.disabled = index === items.length - 1;
+            up.nstarterContentItem = down.nstarterContentItem = remove.nstarterContentItem = item;
+            tools.append(up, down, remove);
+            item.after(tools);
+        });
+
+        const controls = doc.createElement('section');
+        controls.className = 'nstarter-post-builder-controls';
+        controls.dataset.nstarterEditorRuntime = '';
+        controls.setAttribute('contenteditable', 'false');
+        controls.setAttribute('aria-label', 'Post content controls');
+
+        const addRow = doc.createElement('div');
+        addRow.className = 'nstarter-post-builder-controls__add';
+        addRow.append(
+            createInlineButton(doc, 'add-title', config.strings.addHeading, '+ ' + config.strings.addHeading),
+            createInlineButton(doc, 'add-paragraph', config.strings.addParagraph, '+ ' + config.strings.addParagraph),
+            createInlineButton(doc, 'add-image', config.strings.addImage, '+ ' + config.strings.addImage)
+        );
+
+        const footer = doc.createElement('div');
+        footer.className = 'nstarter-post-builder-controls__footer';
+        inlinePostStatus = doc.createElement('span');
+        inlinePostStatus.className = 'nstarter-post-builder-status';
+        inlinePostStatus.setAttribute('role', 'status');
+        inlinePostStatus.setAttribute('aria-live', 'polite');
+        inlinePostStatus.textContent = dirty ? config.strings.unsaved : config.strings.saved;
+
+        const utilities = doc.createElement('div');
+        utilities.append(
+            createInlineButton(doc, 'related-posts', config.strings.editRelatedPosts, config.strings.editRelatedPosts),
+            createInlineButton(doc, 'reset', config.strings.resetPost, config.strings.resetPost),
+            createInlineButton(doc, 'view', config.strings.viewPost, config.strings.viewPost),
+            createInlineButton(doc, 'save', config.strings.savePost, config.strings.savePost, 'nstarter-post-builder-save')
+        );
+        footer.append(inlinePostStatus, utilities);
+        controls.append(addRow, footer);
+        builder.insertBefore(controls, insertionPoint);
+    }
+
+    function focusContentItem(item) {
+        if (!item) return;
+        item.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        if (item.dataset.nstarterContentType === 'image') return;
+        const doc = item.ownerDocument;
+        const selection = doc.getSelection();
+        const range = doc.createRange();
+        range.selectNodeContents(item);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        item.focus();
+    }
+
+    function handleInlinePostAction(event) {
+        if (!config.isPost || !event.target.closest) return false;
+        const button = event.target.closest('[data-nstarter-inline-action]');
+        if (!button) return false;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+        const action = button.dataset.nstarterInlineAction;
+
+        if (action.indexOf('add-') === 0) {
+            const item = addContentItem(action.slice(4), null, false);
+            focusContentItem(item);
+            return true;
+        }
+        if (action === 'save') { save(); return true; }
+        if (action === 'reset') { regenerate(); return true; }
+        if (action === 'view') {
+            window.open(viewLink && viewLink.href ? viewLink.href : config.viewUrl, '_blank', 'noopener');
+            return true;
+        }
+        if (action === 'related-posts') {
+            const bottom = contentBuilder().querySelector('[data-cammino-post-bottom]');
+            if (bottom) openCollectionEditor(bottom);
+            return true;
+        }
+
+        const item = button.nstarterContentItem;
+        if (!item || !item.isConnected) return true;
+        if (action === 'edit-image') {
+            const image = item.querySelector('img');
+            if (image) openMediaPicker(image, false, true);
+            return true;
+        }
+
+        const items = contentItems();
+        const index = items.indexOf(item);
+        if (action === 'move-up' && index > 0) {
+            item.parentElement.insertBefore(item, items[index - 1]);
+        } else if (action === 'move-down' && index > -1 && index < items.length - 1) {
+            items[index + 1].after(item);
+        } else if (action === 'delete') {
+            if (!window.confirm(config.strings.confirmDeleteContent)) return true;
+            item.remove();
+        } else {
+            return true;
+        }
+
+        markDirty();
+        renderInlinePostEditor();
+        return true;
     }
 
     document.querySelector('[data-cammino-bottom-settings]')?.addEventListener('click', function () {
@@ -361,7 +554,8 @@
         clearTimeout(collectionTimer);
         collectionDialog.close();
         collectionItem = null;
-        openContentEditor();
+        if (config.isPost) renderInlinePostEditor();
+        else openContentEditor();
     }
 
     if (collectionForm) {
@@ -405,6 +599,11 @@
         status.classList.remove('is-dirty', 'is-success', 'is-error');
         if (state) {
             status.classList.add('is-' + state);
+        }
+        if (inlinePostStatus) {
+            inlinePostStatus.textContent = message;
+            inlinePostStatus.classList.remove('is-dirty', 'is-success', 'is-error');
+            if (state) inlinePostStatus.classList.add('is-' + state);
         }
     }
 
@@ -1039,6 +1238,7 @@
         mediaTarget = null;
         pendingVideoAttachment = null;
         markDirty();
+        renderInlinePostEditor();
         refreshVideoSettingsTools();
     }
 
@@ -1125,7 +1325,7 @@
         videoDialog.close();
     }
 
-    function openMediaPicker(target, returnToContent) {
+    function openMediaPicker(target, returnToContent, imageOnly) {
         mediaTarget = target;
         mediaReturnsToContent = Boolean(returnToContent);
         mediaReturnIndex = mediaReturnsToContent
@@ -1136,7 +1336,7 @@
         mediaFrame = window.wp.media({
             title: config.strings.chooseMedia,
             button: { text: config.strings.useMedia },
-            library: { type: mediaReturnsToContent ? 'image' : ['image', 'video'] },
+            library: { type: mediaReturnsToContent || imageOnly ? 'image' : ['image', 'video'] },
             multiple: false
         });
 
@@ -1192,6 +1392,30 @@
     }
 
     function handlePreviewClick(event) {
+        if (handleInlinePostAction(event)) {
+            return;
+        }
+
+        if (config.isPost && event.target.closest) {
+            const inlineImage = event.target.closest('[data-nstarter-content-type="image"] img, .article-cover__frame img');
+            if (inlineImage) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                event.stopPropagation();
+                openMediaPicker(inlineImage, false, true);
+                return;
+            }
+
+            const inlineLink = event.target.closest('[data-nstarter-content-builder] a[href]');
+            if (inlineLink && isEditableLink(inlineLink)) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                event.stopPropagation();
+                openLinkEditor(inlineLink);
+                return;
+            }
+        }
+
         const link = event.target.closest && event.target.closest('a[href]');
 
         // The editor iframe must always stay on the page being edited, even in
@@ -1389,6 +1613,10 @@
         const copy = root.cloneNode(true);
         restoreTransientState(copy);
 
+        copy.querySelectorAll('[data-nstarter-editor-runtime]').forEach(function (element) {
+            element.remove();
+        });
+
         // Runtime live HTML never enters ACF; retain only the original marker.
         copy.querySelectorAll('[data-nstarter-live-section]').forEach(function (section) {
             section.replaceChildren();
@@ -1433,6 +1661,12 @@
         }
         if (contentEditorButton) {
             contentEditorButton.disabled = nextBusy;
+        }
+        const builder = contentBuilder();
+        if (builder) {
+            builder.querySelectorAll('[data-nstarter-inline-action]').forEach(function (button) {
+                button.disabled = nextBusy;
+            });
         }
     }
 
@@ -1510,8 +1744,11 @@
         doc.addEventListener('scroll', positionEditorTools, true);
         frame.contentWindow.addEventListener('resize', positionEditorTools);
         applyMode(mode);
+        if (config.isPost) {
+            renderInlinePostEditor();
+        }
         if (contentEditorButton) {
-            contentEditorButton.hidden = !contentBuilder();
+            contentEditorButton.hidden = config.isPost || !contentBuilder();
         }
         if (sectionOrderButton && contentBuilder()) {
             sectionOrderButton.hidden = true;

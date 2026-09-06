@@ -717,12 +717,12 @@ function cammino_get_visual_items_from_blocks( array $blocks ): array {
 /**
  * Build the type-specific editable body when no visual snapshot exists.
  *
- * Existing WordPress content is retained as one movable content item. New
- * posts start with separate title, paragraph, and image items.
+ * Existing WordPress content is split into movable content items. New posts
+ * start with an empty builder and three templates used by the inline editor.
  */
 function cammino_render_post_visual_content( int $post_id ): string {
 	$post_content = trim( (string) get_post_field( 'post_content', $post_id ) );
-	$placeholder  = cammino_get_post_image_url( $post_id, 'large' );
+	$placeholder  = NSTARTER_URL . '/assets/images/placeholder.webp';
 
 	ob_start();
 	if ( '' !== $post_content ) :
@@ -734,21 +734,6 @@ function cammino_render_post_visual_content( int $post_id ): string {
 			</div>
 			<?php
 		endforeach;
-	else :
-		$headings = match ( cammino_get_post_placement( $post_id ) ) {
-			'event' => array( 'O podujatí', 'Program a účasť' ),
-			'project' => array( 'O projekte', 'Ciele a aktivity', 'Výsledky a dopad' ),
-			'impact-story' => array( 'Náš príbeh', 'Čo sa zmenilo' ),
-			default => array( 'Nadpis sekcie' ),
-		};
-		?>
-		<p class="article-lead article-content-block" data-nstarter-content-item data-nstarter-content-type="paragraph"><?php echo esc_html( cammino_get_post_type_label( cammino_get_post_placement( $post_id ) ) ); ?>: napíšte úvodný text.</p>
-		<?php foreach ( $headings as $heading ) : ?>
-			<h2 class="article-content-block" data-nstarter-content-item data-nstarter-content-type="title"><?php echo esc_html( $heading ); ?></h2>
-			<p class="article-content-block" data-nstarter-content-item data-nstarter-content-type="paragraph">Napíšte text tejto sekcie.</p>
-		<?php endforeach; ?>
-		<figure class="article-inline-image article-content-block" data-nstarter-content-item data-nstarter-content-type="image"><img src="<?php echo esc_url( $placeholder ); ?>" alt="" width="1200" height="800" loading="lazy"></figure>
-		<?php
 	endif;
 	?>
 	<template data-nstarter-content-template="title"><h2 class="article-content-block" data-nstarter-content-item data-nstarter-content-type="title">Nový nadpis</h2></template>

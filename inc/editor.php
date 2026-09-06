@@ -103,8 +103,12 @@ function nstarter_maybe_render_editor(): void {
 			'postId'     => $post_id,
 			'previewUrl' => nstarter_get_preview_url( $post_id ),
 			'viewUrl'    => get_permalink( $post_id ),
+			'isPost'     => 'post' === $post->post_type,
+			'placeholderUrl' => NSTARTER_URL . '/assets/images/placeholder.webp',
 			'strings'    => array(
-				'confirmRegenerate' => __( 'Regenerate this page from its PHP template? All saved visual edits will be replaced.', 'nstarter' ),
+				'confirmRegenerate' => 'post' === $post->post_type
+					? __( 'Reset this post body? All saved body edits will be replaced.', 'cammino' )
+					: __( 'Regenerate this page from its PHP template? All saved visual edits will be replaced.', 'nstarter' ),
 				'chooseMedia'       => __( 'Choose an image or video', 'nstarter' ),
 				'useMedia'          => __( 'Use this media', 'nstarter' ),
 				'invalidLink'       => __( 'Enter a valid web, email, phone, page, or anchor link.', 'nstarter' ),
@@ -120,6 +124,17 @@ function nstarter_maybe_render_editor(): void {
 				'contentItemDown'     => __( 'Move content item down', 'cammino' ),
 				'contentItemDelete'   => __( 'Delete content item', 'cammino' ),
 				'confirmDeleteContent'=> __( 'Delete this content item?', 'cammino' ),
+				'addHeading'          => __( 'Add heading', 'cammino' ),
+				'addParagraph'        => __( 'Add paragraph', 'cammino' ),
+				'addImage'            => __( 'Add image', 'cammino' ),
+				'newHeading'          => __( 'New heading', 'cammino' ),
+				'newParagraph'        => __( 'Write your paragraph here.', 'cammino' ),
+				'editImage'           => __( 'Choose or replace image', 'cammino' ),
+				'editRelatedPosts'    => __( 'Related posts', 'cammino' ),
+				'emptyPostContent'    => __( 'Your post content will appear here.', 'cammino' ),
+				'savePost'            => __( 'Save post design', 'cammino' ),
+				'viewPost'            => __( 'View post', 'cammino' ),
+				'resetPost'           => __( 'Reset content', 'cammino' ),
 				'saved'             => __( 'Saved', 'nstarter' ),
 				'regenerated'       => __( 'Regenerated from PHP', 'nstarter' ),
 				'unsaved'           => __( 'Unsaved changes', 'nstarter' ),
@@ -141,7 +156,7 @@ function nstarter_maybe_render_editor(): void {
 		<title><?php echo esc_html( sprintf( __( 'Edit “%s”', 'nstarter' ), get_the_title( $post ) ) ); ?></title>
 		<?php wp_head(); ?>
 	</head>
-	<body class="nstarter-editor-shell">
+	<body class="nstarter-editor-shell<?php echo 'post' === $post->post_type ? ' nstarter-editor-shell--post' : ''; ?>">
 		<div class="nstarter-editor-stage">
 			<div class="nstarter-editor-loading" data-nstarter-loading><?php esc_html_e( 'Loading page…', 'nstarter' ); ?></div>
 			<iframe

@@ -114,6 +114,152 @@
   outline-color: #6d5dfc;
 }
 
+/* Posts use an inline builder instead of the floating editor panel. */
+.nstarter-post-builder-empty {
+    display: grid;
+    min-height: 230px;
+    margin-bottom: 1rem;
+    padding: 2rem;
+    place-items: center;
+    border: 2px dashed rgb(109 93 252 / 42%);
+    border-radius: 24px;
+    color: #716b78;
+    background: rgb(255 255 255 / 58%);
+    font: 600 0.95rem/1.5 system-ui, sans-serif;
+    text-align: center;
+}
+
+.nstarter-post-item-tools {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    margin: -0.55rem 0 1.25rem;
+    font-family: system-ui, sans-serif;
+}
+
+.nstarter-post-item-tools button,
+.nstarter-post-builder-controls button {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #c9c5df;
+    border-radius: 9px;
+    color: #41387f;
+    background: #fff;
+    box-shadow: 0 2px 8px rgb(38 31 88 / 7%);
+    cursor: pointer;
+    font: 650 0.78rem/1 system-ui, sans-serif;
+    transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+
+.nstarter-post-item-tools button {
+    min-width: 36px;
+    padding: 0 0.65rem;
+}
+
+.nstarter-post-item-tools button:hover,
+.nstarter-post-builder-controls button:hover {
+    border-color: #6d5dfc;
+    background: #f4f2ff;
+    transform: translateY(-1px);
+}
+
+.nstarter-post-item-tools button:disabled,
+.nstarter-post-builder-controls button:disabled {
+    cursor: default;
+    opacity: 0.38;
+    transform: none;
+}
+
+.nstarter-post-item-tools .nstarter-post-item-tools__delete {
+    color: #b42318;
+}
+
+.nstarter-post-item-tools .nstarter-post-item-tools__edit {
+    margin-right: auto;
+    padding-inline: 0.9rem;
+}
+
+.nstarter-post-builder-controls {
+    display: grid;
+    margin: 2.5rem 0;
+    padding: clamp(1rem, 3vw, 1.5rem);
+    gap: 1rem;
+    border: 1px solid rgb(109 93 252 / 28%);
+    border-radius: 20px;
+    background: #fbfaff;
+    box-shadow: 0 14px 36px rgb(48 39 112 / 9%);
+}
+
+.nstarter-post-builder-controls__add {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.nstarter-post-builder-controls__add button {
+    min-height: 52px;
+    padding: 0.75rem;
+    border: 2px solid #6d5dfc;
+    color: #5142df;
+    background: #fff;
+    font-size: 0.86rem;
+}
+
+.nstarter-post-builder-controls__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid #e3e0f2;
+}
+
+.nstarter-post-builder-controls__footer > div {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.nstarter-post-builder-controls__footer button {
+    min-height: 34px;
+    padding: 0.55rem 0.75rem;
+}
+
+.nstarter-post-builder-controls__footer .nstarter-post-builder-save {
+    border-color: #5142df;
+    color: #fff;
+    background: #6d5dfc;
+}
+
+.nstarter-post-builder-controls__footer .nstarter-post-builder-save:hover {
+    color: #fff;
+    background: #5142df;
+}
+
+.nstarter-post-builder-status {
+    flex: 0 0 auto;
+    color: #676273;
+    font: 650 0.76rem/1.3 system-ui, sans-serif;
+}
+
+.nstarter-post-builder-status.is-dirty { color: #8a5b00; }
+.nstarter-post-builder-status.is-success { color: #176b32; }
+.nstarter-post-builder-status.is-error { color: #a00000; }
+
+.nstarter-editor-preview [data-nstarter-content-type="image"] img,
+.nstarter-editor-preview .article-cover__frame img {
+    cursor: pointer;
+}
+
+@media (max-width: 680px) {
+    .nstarter-post-builder-controls__add { grid-template-columns: 1fr; }
+    .nstarter-post-builder-controls__footer { align-items: stretch; flex-direction: column; }
+    .nstarter-post-builder-controls__footer > div { justify-content: flex-start; }
+}
+
 .nstarter-editor-preview.nstarter-mode-text [data-nstarter-variable-section],
 .nstarter-editor-preview.nstarter-mode-media [data-nstarter-variable-section] {
     position: relative;
