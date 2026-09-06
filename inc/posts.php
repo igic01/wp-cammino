@@ -344,7 +344,7 @@ function cammino_get_post_category( int $post_id ): array {
 }
 
 /**
- * Estimate reading time from post content.
+ * Estimate reading time from the post body.
  */
 function cammino_get_reading_minutes( int $post_id ): int {
 	$visual_content = (string) get_post_meta( $post_id, CAMMINO_POST_SNAPSHOT_META, true );

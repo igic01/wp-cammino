@@ -132,16 +132,16 @@ All three post types use the same dedicated content-builder element below the
 cover image. Its three large inline buttons add unlimited headings, paragraphs,
 and placeholder images. Text is editable in the preview; clicking an image opens
 the WordPress media library. The small buttons below each block change its order
-or remove it. Save, preview, reset, and related-post settings are in the inline
-builder footer, so posts no longer use the floating corner panel.
+or remove it. The standard floating editor panel remains available for modes,
+Save, View, reset, and related-post settings.
 
-Open **Related posts** in the inline builder footer to configure the separate bottom section:
+Open **Related posts** in the editor panel to configure the separate bottom section:
 
 - **Automatic**: the latest 1–6 published posts, optionally filtered by type.
 - **Choose posts**: search and select up to six posts in display order.
 - **None**: hide the section, retaining your selections for later.
 
-Press **Apply**, then use **Save post design** in the inline builder.
+Press **Apply**, then use the standard **Save** button in the editor panel.
 The bottom section always follows the article body. Cards read current titles,
 images and links on each render; automatic results update as posts are published.
 The current post, drafts, private and password-protected posts are excluded.

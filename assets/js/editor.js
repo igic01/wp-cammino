@@ -32,11 +32,7 @@
     const sectionOrderForm = document.querySelector('[data-nstarter-section-order-form]');
     const sectionOrderList = document.querySelector('[data-nstarter-section-order-list]');
     const sectionOrderCancel = document.querySelector('[data-nstarter-section-order-cancel]');
-    const contentEditorButton = document.querySelector('[data-nstarter-content-editor]');
-    const contentDialog = document.querySelector('[data-nstarter-content-dialog]');
-    const contentForm = document.querySelector('[data-nstarter-content-form]');
-    const contentList = document.querySelector('[data-nstarter-content-list]');
-    const contentClose = document.querySelector('[data-nstarter-content-close]');
+    const collectionSettingsButton = document.querySelector('[data-cammino-bottom-settings]');
     const collectionDialog = document.querySelector('[data-collection-dialog]');
     const collectionForm = document.querySelector('[data-collection-form]');
     let collectionItem = null;
@@ -54,8 +50,6 @@
     let dirty = false;
     let mediaFrame = null;
     let mediaTarget = null;
-    let mediaReturnsToContent = false;
-    let mediaReturnIndex = -1;
     let linkTarget = null;
     let pendingVideoAttachment = null;
     let videoToolsLayer = null;
@@ -64,7 +58,6 @@
     let orderedSections = [];
     let sectionOrderParent = null;
     let transientState = new Map();
-    let inlinePostStatus = null;
 
     function frameDocument() {
         return frame.contentDocument || frame.contentWindow.document;
@@ -86,139 +79,6 @@
                 return item.matches('[data-nstarter-content-item]');
             })
             : [];
-    }
-
-    function contentItemLabel(item, index) {
-        const labels = {
-            title: 'Heading',
-            paragraph: 'Paragraph',
-            image: 'Image',
-            content: 'Existing content',
-            posts: 'Related posts'
-        };
-        const type = item.dataset.nstarterContentType || 'content';
-        const preview = type === 'image'
-            ? (item.querySelector('img') && item.querySelector('img').getAttribute('alt')) || ''
-            : item.textContent.replace(/\s+/g, ' ').trim().slice(0, 48);
-
-        return (labels[type] || 'Content') + ' ' + String(index + 1) + (preview ? ' — ' + preview : '');
-    }
-
-    function renderContentList() {
-        if (!contentList) {
-            return;
-        }
-
-        const items = contentItems();
-        contentList.replaceChildren();
-
-        items.forEach(function (item, index) {
-            const row = document.createElement('li');
-            const label = document.createElement('span');
-            const moveUp = document.createElement('button');
-            const moveDown = document.createElement('button');
-            const remove = document.createElement('button');
-
-            label.textContent = contentItemLabel(item, index);
-            label.title = label.textContent;
-            moveUp.type = moveDown.type = remove.type = 'button';
-            moveUp.textContent = '↑';
-            moveDown.textContent = '↓';
-            remove.textContent = '×';
-            moveUp.disabled = index === 0;
-            moveDown.disabled = index === items.length - 1;
-            moveUp.title = config.strings.contentItemUp;
-            moveDown.title = config.strings.contentItemDown;
-            remove.title = config.strings.contentItemDelete;
-
-            moveUp.addEventListener('click', function () {
-                item.parentElement.insertBefore(item, items[index - 1]);
-                markDirty();
-                renderContentList();
-                refreshVariableTools();
-            });
-            moveDown.addEventListener('click', function () {
-                items[index + 1].after(item);
-                markDirty();
-                renderContentList();
-                refreshVariableTools();
-            });
-            remove.addEventListener('click', function () {
-                if (!window.confirm(config.strings.confirmDeleteContent)) {
-                    return;
-                }
-                item.remove();
-                markDirty();
-                renderContentList();
-                refreshVariableTools();
-                refreshVideoSettingsTools();
-            });
-
-            row.append(label, moveUp, moveDown, remove);
-            if (item.dataset.nstarterContentType === 'posts') {
-                const edit = document.createElement('button');
-                edit.type = 'button';
-                edit.textContent = 'Configure';
-                edit.className = 'nstarter-collection-configure';
-                edit.addEventListener('click', function () { openCollectionEditor(item); });
-                row.classList.add('has-collection-settings');
-                row.append(edit);
-            }
-            const type = item.dataset.nstarterContentType;
-            if (type === 'title' || type === 'paragraph') {
-                const target = item.matches('h2,h3,h4,p') ? item : item.querySelector('h2,h3,h4,p');
-                // Preserve existing rich formatting: those blocks remain editable in the preview.
-                if (target && !target.children.length) {
-                    const input = document.createElement('textarea');
-                    input.value = target.textContent;
-                    input.rows = type === 'title' ? 2 : 4;
-                    input.setAttribute('aria-label', type === 'title' ? 'Heading' : 'Paragraph text');
-                    input.addEventListener('input', function () { target.textContent = input.value; markDirty(); });
-                    row.append(input);
-                } else {
-                    const edit = document.createElement('button');
-                    edit.type = 'button'; edit.textContent = 'Edit text in preview';
-                    edit.addEventListener('click', function () { closeContentEditor(); item.scrollIntoView({block:'center'}); item.focus(); });
-                    row.append(edit);
-                }
-            }
-            if (type === 'image') {
-                const edit = document.createElement('button');
-                edit.type = 'button'; edit.textContent = 'Choose / replace image';
-                const photo = item.querySelector('img');
-                if (photo) {
-                    const thumb = document.createElement('img'); thumb.src = photo.src; thumb.alt = photo.alt;
-                    row.append(thumb);
-                    edit.addEventListener('click', function () { closeContentEditor(); openMediaPicker(photo, true); });
-                    row.append(edit);
-                }
-            }
-            const insert = document.createElement('div');
-            insert.className = 'nstarter-content-insert';
-            ['title', 'paragraph', 'image'].forEach(function (type, i) {
-                const button = document.createElement('button'); button.type = 'button';
-                button.textContent = '+ ' + ['Heading', 'Paragraph', 'Image'][i];
-                button.title = 'Add after this block';
-                button.addEventListener('click', function () { addContentItem(type, item); });
-                insert.append(button);
-            });
-            row.append(insert);
-            contentList.appendChild(row);
-        });
-    }
-
-    function openContentEditor() {
-        if (!contentDialog || !contentBuilder()) {
-            return;
-        }
-        renderContentList();
-        contentDialog.showModal();
-    }
-
-    function closeContentEditor() {
-        if (contentDialog && contentDialog.open) {
-            contentDialog.close();
-        }
     }
 
     function fallbackContentItem(builder, type) {
@@ -252,7 +112,7 @@
         return item;
     }
 
-    function addContentItem(type, afterItem, chooseImage) {
+    function addContentItem(type, afterItem) {
         const builder = contentBuilder();
         const template = builder && builder.querySelector('template[data-nstarter-content-template="' + type + '"]');
         const item = template && template.content.firstElementChild
@@ -269,21 +129,9 @@
         if (afterItem) afterItem.after(item);
         else builder.insertBefore(item, firstTemplate || builder.querySelector('[data-cammino-post-bottom]') || null);
         markDirty();
-        renderContentList();
         renderInlinePostEditor();
         refreshVariableTools();
         refreshVideoSettingsTools();
-
-        if (type === 'posts') {
-            openCollectionEditor(item);
-        }
-        if (type === 'image' && chooseImage !== false) {
-            const image = item.querySelector('img');
-            closeContentEditor();
-            if (image) {
-                openMediaPicker(image, true);
-            }
-        }
 
         return item;
     }
@@ -349,7 +197,7 @@
         controls.className = 'nstarter-post-builder-controls';
         controls.dataset.nstarterEditorRuntime = '';
         controls.setAttribute('contenteditable', 'false');
-        controls.setAttribute('aria-label', 'Post content controls');
+        controls.setAttribute('aria-label', 'Content builder controls');
 
         const addRow = doc.createElement('div');
         addRow.className = 'nstarter-post-builder-controls__add';
@@ -359,23 +207,7 @@
             createInlineButton(doc, 'add-image', config.strings.addImage, '+ ' + config.strings.addImage)
         );
 
-        const footer = doc.createElement('div');
-        footer.className = 'nstarter-post-builder-controls__footer';
-        inlinePostStatus = doc.createElement('span');
-        inlinePostStatus.className = 'nstarter-post-builder-status';
-        inlinePostStatus.setAttribute('role', 'status');
-        inlinePostStatus.setAttribute('aria-live', 'polite');
-        inlinePostStatus.textContent = dirty ? config.strings.unsaved : config.strings.saved;
-
-        const utilities = doc.createElement('div');
-        utilities.append(
-            createInlineButton(doc, 'related-posts', config.strings.editRelatedPosts, config.strings.editRelatedPosts),
-            createInlineButton(doc, 'reset', config.strings.resetPost, config.strings.resetPost),
-            createInlineButton(doc, 'view', config.strings.viewPost, config.strings.viewPost),
-            createInlineButton(doc, 'save', config.strings.savePost, config.strings.savePost, 'nstarter-post-builder-save')
-        );
-        footer.append(inlinePostStatus, utilities);
-        controls.append(addRow, footer);
+        controls.appendChild(addRow);
         builder.insertBefore(controls, insertionPoint);
     }
 
@@ -404,19 +236,8 @@
         const action = button.dataset.nstarterInlineAction;
 
         if (action.indexOf('add-') === 0) {
-            const item = addContentItem(action.slice(4), null, false);
+            const item = addContentItem(action.slice(4));
             focusContentItem(item);
-            return true;
-        }
-        if (action === 'save') { save(); return true; }
-        if (action === 'reset') { regenerate(); return true; }
-        if (action === 'view') {
-            window.open(viewLink && viewLink.href ? viewLink.href : config.viewUrl, '_blank', 'noopener');
-            return true;
-        }
-        if (action === 'related-posts') {
-            const bottom = contentBuilder().querySelector('[data-cammino-post-bottom]');
-            if (bottom) openCollectionEditor(bottom);
             return true;
         }
 
@@ -424,7 +245,7 @@
         if (!item || !item.isConnected) return true;
         if (action === 'edit-image') {
             const image = item.querySelector('img');
-            if (image) openMediaPicker(image, false, true);
+            if (image) openMediaPicker(image, true);
             return true;
         }
 
@@ -446,7 +267,7 @@
         return true;
     }
 
-    document.querySelector('[data-cammino-bottom-settings]')?.addEventListener('click', function () {
+    collectionSettingsButton?.addEventListener('click', function () {
         const bottom = contentBuilder()?.querySelector('[data-cammino-post-bottom]');
         if (bottom) openCollectionEditor(bottom);
     });
@@ -543,7 +364,6 @@
         collectionForm.elements.search.value = '';
         collectionForm.querySelector('[data-collection-status]').textContent = '';
         collectionForm.querySelector('[data-collection-results]').replaceChildren();
-        closeContentEditor();
         collectionDialog.showModal();
         renderCollectionSelection();
         syncCollectionMode();
@@ -554,8 +374,7 @@
         clearTimeout(collectionTimer);
         collectionDialog.close();
         collectionItem = null;
-        if (config.isPost) renderInlinePostEditor();
-        else openContentEditor();
+        renderInlinePostEditor();
     }
 
     if (collectionForm) {
@@ -599,11 +418,6 @@
         status.classList.remove('is-dirty', 'is-success', 'is-error');
         if (state) {
             status.classList.add('is-' + state);
-        }
-        if (inlinePostStatus) {
-            inlinePostStatus.textContent = message;
-            inlinePostStatus.classList.remove('is-dirty', 'is-success', 'is-error');
-            if (state) inlinePostStatus.classList.add('is-' + state);
         }
     }
 
@@ -1325,18 +1139,14 @@
         videoDialog.close();
     }
 
-    function openMediaPicker(target, returnToContent, imageOnly) {
+    function openMediaPicker(target, imageOnly) {
         mediaTarget = target;
-        mediaReturnsToContent = Boolean(returnToContent);
-        mediaReturnIndex = mediaReturnsToContent
-            ? contentItems().indexOf(target.closest('[data-nstarter-content-item]'))
-            : -1;
         let attachmentSelected = false;
 
         mediaFrame = window.wp.media({
             title: config.strings.chooseMedia,
             button: { text: config.strings.useMedia },
-            library: { type: mediaReturnsToContent || imageOnly ? 'image' : ['image', 'video'] },
+            library: { type: imageOnly ? 'image' : ['image', 'video'] },
             multiple: false
         });
 
@@ -1364,17 +1174,6 @@
             if (!attachmentSelected) {
                 mediaTarget = null;
             }
-            if (!mediaReturnsToContent) {
-                return;
-            }
-            const returnIndex = mediaReturnIndex;
-            mediaReturnsToContent = false;
-            mediaReturnIndex = -1;
-            window.setTimeout(function () {
-                openContentEditor();
-                const row = contentList && contentList.children[returnIndex];
-                if (row) row.scrollIntoView({ block: 'nearest' });
-            }, 0);
         });
 
         mediaFrame.open();
@@ -1402,7 +1201,7 @@
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 event.stopPropagation();
-                openMediaPicker(inlineImage, false, true);
+                openMediaPicker(inlineImage, true);
                 return;
             }
 
@@ -1659,8 +1458,8 @@
         if (sectionOrderButton) {
             sectionOrderButton.disabled = nextBusy;
         }
-        if (contentEditorButton) {
-            contentEditorButton.disabled = nextBusy;
+        if (collectionSettingsButton) {
+            collectionSettingsButton.disabled = nextBusy;
         }
         const builder = contentBuilder();
         if (builder) {
@@ -1747,9 +1546,6 @@
         if (config.isPost) {
             renderInlinePostEditor();
         }
-        if (contentEditorButton) {
-            contentEditorButton.hidden = config.isPost || !contentBuilder();
-        }
         if (sectionOrderButton && contentBuilder()) {
             sectionOrderButton.hidden = true;
         }
@@ -1769,23 +1565,6 @@
         sectionOrderDialog.addEventListener('cancel', function (event) {
             event.preventDefault();
             cancelSectionOrder();
-        });
-    }
-    if (contentEditorButton && contentDialog && contentForm && contentClose) {
-        contentEditorButton.addEventListener('click', openContentEditor);
-        contentClose.addEventListener('click', closeContentEditor);
-        contentForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-            closeContentEditor();
-        });
-        contentForm.querySelectorAll('[data-nstarter-content-add]').forEach(function (button) {
-            button.addEventListener('click', function () {
-                addContentItem(button.dataset.nstarterContentAdd);
-            });
-        });
-        contentDialog.addEventListener('cancel', function (event) {
-            event.preventDefault();
-            closeContentEditor();
         });
     }
     videoForm.addEventListener('submit', applyVideoAttachment);

@@ -59,10 +59,6 @@ body.nstarter-editor-shell {
     grid-column: 1 / -1;
 }
 
-.nstarter-editor-shell--post .nstarter-editor-panel {
-    display: none;
-}
-
 .nstarter-editor-status {
     display: flex;
     align-items: center;
@@ -542,7 +538,7 @@ body.nstarter-editor-shell {
     background: #6d5dfc;
 }
 
-.nstarter-content-dialog {
+.nstarter-collection-dialog {
     width: min(620px, calc(100vw - 32px));
     max-height: min(760px, calc(100vh - 32px));
     padding: 18px;
@@ -553,61 +549,24 @@ body.nstarter-editor-shell {
     font-family: inherit;
 }
 
-.nstarter-content-dialog::backdrop {
+.nstarter-collection-dialog::backdrop {
     background: rgb(0 0 0 / 38%);
 }
 
-.nstarter-content-dialog form {
+.nstarter-collection-dialog form {
     display: grid;
     gap: 14px;
 }
 
-.nstarter-content-dialog h2,
-.nstarter-content-dialog p {
+.nstarter-collection-dialog h2,
+.nstarter-collection-dialog p {
     margin: 0;
 }
 
-.nstarter-content-dialog h2 { font-size: 17px; }
-.nstarter-content-dialog p { color: #666; font-size: 12px; line-height: 1.45; }
+.nstarter-collection-dialog h2 { font-size: 17px; }
+.nstarter-collection-dialog p { color: #666; font-size: 12px; line-height: 1.45; }
 
-.nstarter-content-add {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 7px;
-}
-
-.nstarter-content-dialog ol {
-    display: grid;
-    max-height: min(430px, calc(100vh - 300px));
-    margin: 0;
-    padding: 0;
-    gap: 7px;
-    overflow-y: auto;
-    list-style: none;
-}
-
-.nstarter-content-dialog li {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 34px 34px 34px;
-    min-height: 42px;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 6px 5px 10px;
-    border: 1px solid #d3d3d3;
-    border-radius: 4px;
-    background: #fafafa;
-}
-
-.nstarter-content-dialog li > span {
-    overflow: hidden;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.25;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.nstarter-content-dialog button {
+.nstarter-collection-dialog button {
     min-height: 34px;
     padding: 0 10px;
     border: 1px solid #aaa;
@@ -617,19 +576,7 @@ body.nstarter-editor-shell {
     font: 600 12px/1 inherit;
 }
 
-.nstarter-content-dialog li button {
-    width: 34px;
-    padding: 0;
-    font-size: 17px;
-}
-
-.nstarter-content-dialog li button:last-child {
-    color: #b42318;
-}
-
-.nstarter-content-dialog button:disabled { cursor: default; opacity: .35; }
-.nstarter-content-dialog li.has-collection-settings { grid-template-columns: minmax(0, 1fr) 34px 34px 34px; }
-.nstarter-content-dialog li .nstarter-collection-configure { grid-column: 1 / -1; width: auto; color: #5142df; font-size: 12px; }
+.nstarter-collection-dialog button:disabled { cursor: default; opacity: .35; }
 .nstarter-collection-dialog label { display: grid; gap: 5px; font-size: 13px; }
 .nstarter-collection-dialog input, .nstarter-collection-dialog select { width: 100%; min-height: 36px; margin: 0; }
 .nstarter-collection-dialog [hidden] { display: none !important; }
@@ -637,8 +584,8 @@ body.nstarter-editor-shell {
 [data-collection-results] { max-height: 210px; overflow-y: auto; }
 [data-collection-results] button, [data-collection-selected] button { height: auto; min-height: 36px; padding: 8px !important; text-align: left; line-height: 1.4 !important; }
 [data-collection-selected] button { color: #5142df; background: #f1efff; }
-.nstarter-content-dialog__actions { display: flex; justify-content: flex-end; gap: 8px; }
-.nstarter-content-dialog__actions button { border-color: #5142df; color: #fff; background: #6d5dfc; }
+.nstarter-collection-dialog__actions { display: flex; justify-content: flex-end; gap: 8px; }
+.nstarter-collection-dialog__actions button { border-color: #5142df; color: #fff; background: #6d5dfc; }
 
 @media (max-width: 480px) {
     .nstarter-editor-panel {
@@ -646,34 +593,5 @@ body.nstarter-editor-shell {
         right: 10px;
         width: min(252px, calc(100vw - 20px));
     }
-
-    .nstarter-content-add { grid-template-columns: 1fr; }
 }
-[data-nstarter-content-list] textarea,
-[data-nstarter-content-list] li > img,
-.nstarter-content-insert {
-    grid-column: 1 / -1;
-}
-[data-nstarter-content-list] textarea {
-    box-sizing: border-box;
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5d1;
-    border-radius: 8px;
-    font: inherit;
-    line-height: 1.6;
-    resize: vertical;
-}
-[data-nstarter-content-list] li > img { max-width: 100%; height: 100px; object-fit: cover; border-radius: 8px; }
-.nstarter-content-insert { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; border-top: 1px solid #e2e8e5; }
-.nstarter-content-insert button { font-size: 12px; }
 [data-cammino-bottom-settings] { grid-column: 1 / -1; }
-.nstarter-content-dialog ol { grid-auto-rows: max-content; align-content: start; }
-.nstarter-content-dialog li .nstarter-content-insert button {
-    width: auto;
-    padding: 6px 10px;
-    font-size: 12px;
-    color: #29463b;
-    font-weight: 500;
-}
-.nstarter-content-dialog li > img + button { grid-column: 1 / -1; width: auto; font-size: 13px; }

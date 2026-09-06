@@ -50,7 +50,7 @@ function cammino_render_post_collection( array $args, int $post_id, bool $previe
 	<section class="cammino-post-collection" aria-label="<?php echo esc_attr( $args['title'] ?: 'Ďalšie príspevky' ); ?>">
 		<?php if ( '' !== $args['title'] ) : ?><h2><?php echo esc_html( $args['title'] ); ?></h2><?php endif; ?>
 		<?php if ( ! $posts ) : ?>
-			<p class="cammino-collection-empty"><?php echo 'none' === $args['mode'] ? 'This section is hidden.' : 'There are no matching published posts yet.'; ?> Change the selection under Post content → Related posts. Empty sections are hidden from visitors.</p>
+			<p class="cammino-collection-empty"><?php echo 'none' === $args['mode'] ? 'This section is hidden.' : 'There are no matching published posts yet.'; ?> Change the selection with Related posts in the editor panel. Empty sections are hidden from visitors.</p>
 		<?php else : ?>
 			<div class="related-grid">
 			<?php foreach ( $posts as $related ) : ?>

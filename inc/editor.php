@@ -131,10 +131,7 @@ function nstarter_maybe_render_editor(): void {
 				'newParagraph'        => __( 'Write your paragraph here.', 'cammino' ),
 				'editImage'           => __( 'Choose or replace image', 'cammino' ),
 				'editRelatedPosts'    => __( 'Related posts', 'cammino' ),
-				'emptyPostContent'    => __( 'Your post content will appear here.', 'cammino' ),
-				'savePost'            => __( 'Save post design', 'cammino' ),
-				'viewPost'            => __( 'View post', 'cammino' ),
-				'resetPost'           => __( 'Reset content', 'cammino' ),
+				'emptyPostContent'    => __( 'Your content will appear here.', 'cammino' ),
 				'saved'             => __( 'Saved', 'nstarter' ),
 				'regenerated'       => __( 'Regenerated from PHP', 'nstarter' ),
 				'unsaved'           => __( 'Unsaved changes', 'nstarter' ),
@@ -156,7 +153,7 @@ function nstarter_maybe_render_editor(): void {
 		<title><?php echo esc_html( sprintf( __( 'Edit “%s”', 'nstarter' ), get_the_title( $post ) ) ); ?></title>
 		<?php wp_head(); ?>
 	</head>
-	<body class="nstarter-editor-shell<?php echo 'post' === $post->post_type ? ' nstarter-editor-shell--post' : ''; ?>">
+	<body class="nstarter-editor-shell">
 		<div class="nstarter-editor-stage">
 			<div class="nstarter-editor-loading" data-nstarter-loading><?php esc_html_e( 'Loading page…', 'nstarter' ); ?></div>
 			<iframe
@@ -191,7 +188,9 @@ function nstarter_maybe_render_editor(): void {
 					<button type="button" class="nstarter-control nstarter-control--primary" data-nstarter-save><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
 					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
 					<button type="button" class="nstarter-control nstarter-control--order" data-nstarter-section-order><?php esc_html_e( 'Section order', 'nstarter' ); ?></button>
-					<button type="button" class="nstarter-control nstarter-control--content" data-nstarter-content-editor hidden><?php esc_html_e( 'Post content', 'cammino' ); ?></button>
+					<?php if ( 'post' === $post->post_type ) : ?>
+						<button type="button" class="nstarter-control nstarter-control--content" data-cammino-bottom-settings><?php esc_html_e( 'Related posts', 'cammino' ); ?></button>
+					<?php endif; ?>
 					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
 				</div>
 			</aside>
@@ -252,25 +251,7 @@ function nstarter_maybe_render_editor(): void {
 				</form>
 			</dialog>
 
-			<dialog class="nstarter-content-dialog" data-nstarter-content-dialog>
-				<form data-nstarter-content-form>
-					<h2><?php esc_html_e( 'Post content', 'cammino' ); ?></h2>
-					<p><?php esc_html_e( 'Add a heading, paragraph, or image. Use the arrows to change the order. You can edit text directly here.', 'cammino' ); ?></p>
-					<div class="nstarter-content-add">
-						<button type="button" data-nstarter-content-add="title">+ <?php esc_html_e( 'Heading', 'cammino' ); ?></button>
-						<button type="button" data-nstarter-content-add="paragraph">+ <?php esc_html_e( 'Paragraph', 'cammino' ); ?></button>
-						<button type="button" data-nstarter-content-add="image">+ <?php esc_html_e( 'Image', 'cammino' ); ?></button>
-						<button type="button" data-cammino-bottom-settings><?php esc_html_e( 'Related posts', 'cammino' ); ?></button>
-					</div>
-					<ol data-nstarter-content-list></ol>
-					<p>Confirm your changes with Done, then save the post.</p>
-					<div class="nstarter-content-dialog__actions">
-						<button type="button" data-nstarter-content-close><?php esc_html_e( 'Done', 'cammino' ); ?></button>
-					</div>
-				</form>
-			</dialog>
-
-			<dialog class="nstarter-collection-dialog nstarter-content-dialog" data-collection-dialog>
+			<dialog class="nstarter-collection-dialog" data-collection-dialog>
 				<form data-collection-form>
 					<h2>Related posts</h2>
 					<p>This section always appears at the end of the post. Automatic selection excludes the current post.</p><label data-collection-heading>Section heading<input name="title" type="text" maxlength="160"></label>
@@ -284,7 +265,7 @@ function nstarter_maybe_render_editor(): void {
 						<div data-collection-results></div>
 					</div>
 					<p role="status" data-collection-status></p>
-					<div class="nstarter-content-dialog__actions"><button type="button" data-collection-cancel>Cancel</button><button type="submit">Apply</button></div>
+					<div class="nstarter-collection-dialog__actions"><button type="button" data-collection-cancel>Cancel</button><button type="submit">Apply</button></div>
 				</form>
 			</dialog>
 		</div>
