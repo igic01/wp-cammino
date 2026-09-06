@@ -17,9 +17,20 @@ expect( 'impact-story' === cammino_get_post_placement( 8 ), 'Unstored metadata u
 
 cammino_migrate_post_placements_from_slugs();
 expect( 'article' === cammino_get_post_placement( 8 ) && 'event' === cammino_get_post_placement( 1 ), 'Upgrade preserves old untyped articles and events' );
+cammino_migrate_event_categories();
+$event_term_id = cammino_get_event_category_id( false );
+expect( $event_term_id > 0 && in_array( $event_term_id, $GLOBALS['test_post_terms'][1], true ), 'Existing events move to the dedicated event category' );
+cammino_sync_event_category( 1, 'project' );
+expect( ! in_array( $event_term_id, $GLOBALS['test_post_terms'][1], true ), 'Changing an event type removes the dedicated event category' );
+cammino_sync_event_category( 1, 'event' );
 $GLOBALS['test_meta'][8][CAMMINO_POST_PLACEMENT_META] = 'project';
 cammino_migrate_post_placements_from_slugs();
 expect( 'project' === cammino_get_post_placement( 8 ), 'Migration is idempotent' );
+
+expect( cammino_update_visual_post_details( 1, 'Nový názov podujatia', '2026-10-15T16:00', 'Bratislava' ), 'Visual editor saves event title, date, and location' );
+expect( get_the_title( 1 ) === 'Nový názov podujatia', 'Visual editor updates the WordPress post title' );
+expect( get_post_meta( 1, CAMMINO_EVENT_DATE_META, true ) === '2026-10-15T16:00' && get_post_meta( 1, CAMMINO_EVENT_LOCATION_META, true ) === 'Bratislava', 'Visual editor updates event metadata' );
+expect( ! cammino_update_visual_post_details( 1, '', 'not-a-date', 'Bratislava' ), 'Invalid visual event details are rejected' );
 
 $saved = '<p data-nstarter-content-item data-nstarter-content-type="paragraph">Zachovať moje úpravy.</p>';
 cammino_update_post_visual_content( 4, $saved );

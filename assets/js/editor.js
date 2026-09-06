@@ -32,6 +32,10 @@
     const sectionOrderForm = document.querySelector('[data-nstarter-section-order-form]');
     const sectionOrderList = document.querySelector('[data-nstarter-section-order-list]');
     const sectionOrderCancel = document.querySelector('[data-nstarter-section-order-cancel]');
+    const postDetailsButton = document.querySelector('[data-cammino-post-details]');
+    const postDetailsDialog = document.querySelector('[data-cammino-post-details-dialog]');
+    const postDetailsForm = document.querySelector('[data-cammino-post-details-form]');
+    const postDetailsCancel = document.querySelector('[data-cammino-post-details-cancel]');
 
     if (!config || !frame) {
         return;
@@ -50,6 +54,7 @@
     let orderedSections = [];
     let sectionOrderParent = null;
     let transientState = new Map();
+    let postDetails = Object.assign({ title: '', eventDate: '', eventLocation: '' }, config.postDetails || {});
 
     function frameDocument() {
         return frame.contentDocument || frame.contentWindow.document;
@@ -1028,6 +1033,73 @@
         mediaFrame.open();
     }
 
+    function renderPostTitle(title) {
+        const heading = frameDocument().querySelector('[data-cammino-post-title]');
+        if (!heading) return;
+        const words = title.trim().split(/\s+/).filter(Boolean);
+        heading.replaceChildren();
+        if (words.length < 2) {
+            heading.textContent = title;
+            return;
+        }
+        const emphasis = heading.ownerDocument.createElement('em');
+        emphasis.textContent = words.pop();
+        heading.append(heading.ownerDocument.createTextNode(words.join(' ') + ' '), emphasis);
+    }
+
+    function formatEventDate(value) {
+        const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value || '');
+        if (!match) return config.strings.missingEventDate;
+        const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), Number(match[4]), Number(match[5]));
+        return new Intl.DateTimeFormat('sk-SK', {
+            day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }).format(date);
+    }
+
+    function refreshPostDetailsPreview() {
+        renderPostTitle(postDetails.title);
+        if (!config.isEvent) return;
+        const doc = frameDocument();
+        const date = doc.querySelector('[data-cammino-event-date]');
+        const location = doc.querySelector('[data-cammino-event-location]');
+        if (date) {
+            date.dateTime = postDetails.eventDate;
+            date.textContent = formatEventDate(postDetails.eventDate);
+        }
+        if (location) {
+            location.textContent = postDetails.eventLocation || config.strings.missingEventLocation;
+        }
+    }
+
+    function openPostDetails() {
+        if (!postDetailsDialog || !postDetailsForm) return;
+        postDetailsForm.elements.title.value = postDetails.title;
+        if (config.isEvent) {
+            postDetailsForm.elements.event_date.value = postDetails.eventDate;
+            postDetailsForm.elements.event_location.value = postDetails.eventLocation;
+        }
+        postDetailsDialog.showModal();
+        postDetailsForm.elements.title.focus();
+        postDetailsForm.elements.title.select();
+    }
+
+    function closePostDetails() {
+        if (postDetailsDialog && postDetailsDialog.open) postDetailsDialog.close();
+    }
+
+    function applyPostDetails(event) {
+        event.preventDefault();
+        if (!postDetailsForm.reportValidity()) return;
+        postDetails.title = postDetailsForm.elements.title.value.trim();
+        if (config.isEvent) {
+            postDetails.eventDate = postDetailsForm.elements.event_date.value;
+            postDetails.eventLocation = postDetailsForm.elements.event_location.value.trim();
+        }
+        refreshPostDetailsPreview();
+        closePostDetails();
+        markDirty();
+    }
+
     function stopPreviewInteraction(event) {
         if (mode === 'interaction') {
             return;
@@ -1307,6 +1379,9 @@
         if (sectionOrderButton) {
             sectionOrderButton.disabled = nextBusy;
         }
+        if (postDetailsButton) {
+            postDetailsButton.disabled = nextBusy;
+        }
         const builder = contentBuilder();
         if (builder) {
             builder.querySelectorAll('[data-nstarter-inline-action]').forEach(function (button) {
@@ -1327,7 +1402,10 @@
             const coverImage = frameDocument().querySelector('.article-cover__frame img[data-attachment-id]');
             const data = await request('nstarter_save_snapshot', {
                 html: serialiseSnapshot(),
-                featured_image_id: coverImage ? coverImage.getAttribute('data-attachment-id') : ''
+                featured_image_id: coverImage ? coverImage.getAttribute('data-attachment-id') : '',
+                post_title: postDetails.title,
+                event_date: postDetails.eventDate,
+                event_location: postDetails.eventLocation
             });
             dirty = false;
             if (viewLink && data.viewUrl) {
@@ -1404,6 +1482,15 @@
     saveButton.addEventListener('click', save);
     regenerateButton.addEventListener('click', regenerate);
     panelToggle.addEventListener('click', togglePanel);
+    if (postDetailsButton && postDetailsDialog && postDetailsForm && postDetailsCancel) {
+        postDetailsButton.addEventListener('click', openPostDetails);
+        postDetailsForm.addEventListener('submit', applyPostDetails);
+        postDetailsCancel.addEventListener('click', closePostDetails);
+        postDetailsDialog.addEventListener('cancel', function (event) {
+            event.preventDefault();
+            closePostDetails();
+        });
+    }
     if (sectionOrderButton && sectionOrderDialog && sectionOrderForm && sectionOrderCancel) {
         sectionOrderButton.addEventListener('click', openSectionOrder);
         sectionOrderForm.addEventListener('submit', applySectionOrder);

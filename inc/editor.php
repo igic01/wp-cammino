@@ -89,6 +89,9 @@ function nstarter_maybe_render_editor(): void {
 		);
 	}
 
+	$is_post  = 'post' === $post->post_type;
+	$is_event = $is_post && 'event' === cammino_get_post_placement( $post_id );
+
 	show_admin_bar( false );
 	remove_action( 'wp_head', '_admin_bar_bump_cb' );
 	wp_enqueue_media( array( 'post' => $post_id ) );
@@ -103,7 +106,13 @@ function nstarter_maybe_render_editor(): void {
 			'postId'     => $post_id,
 			'previewUrl' => nstarter_get_preview_url( $post_id ),
 			'viewUrl'    => get_permalink( $post_id ),
-			'isPost'     => 'post' === $post->post_type,
+			'isPost'     => $is_post,
+			'isEvent'    => $is_event,
+			'postDetails' => $is_post ? array(
+				'title'         => get_the_title( $post ),
+				'eventDate'     => $is_event ? (string) get_post_meta( $post_id, CAMMINO_EVENT_DATE_META, true ) : '',
+				'eventLocation' => $is_event ? (string) get_post_meta( $post_id, CAMMINO_EVENT_LOCATION_META, true ) : '',
+			) : array(),
 			'placeholderUrl' => NSTARTER_URL . '/assets/images/placeholder.webp',
 			'strings'    => array(
 				'confirmRegenerate' => 'post' === $post->post_type
@@ -131,6 +140,8 @@ function nstarter_maybe_render_editor(): void {
 				'newParagraph'        => __( 'Write your paragraph here.', 'cammino' ),
 				'editImage'           => __( 'Choose or replace image', 'cammino' ),
 				'emptyPostContent'    => __( 'Your content will appear here.', 'cammino' ),
+				'missingEventDate'    => __( 'Dátum bude doplnený', 'cammino' ),
+				'missingEventLocation'=> __( 'Miesto bude doplnené', 'cammino' ),
 				'saved'             => __( 'Saved', 'nstarter' ),
 				'regenerated'       => __( 'Regenerated from PHP', 'nstarter' ),
 				'unsaved'           => __( 'Unsaved changes', 'nstarter' ),
@@ -187,6 +198,9 @@ function nstarter_maybe_render_editor(): void {
 					<button type="button" class="nstarter-control nstarter-control--primary" data-nstarter-save><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
 					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
 					<button type="button" class="nstarter-control nstarter-control--order" data-nstarter-section-order><?php esc_html_e( 'Section order', 'nstarter' ); ?></button>
+					<?php if ( $is_post ) : ?>
+						<button type="button" class="nstarter-control nstarter-control--post-details" data-cammino-post-details><?php echo esc_html( $is_event ? __( 'Event details', 'cammino' ) : __( 'Post title', 'cammino' ) ); ?></button>
+					<?php endif; ?>
 					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
 				</div>
 			</aside>
@@ -247,6 +261,21 @@ function nstarter_maybe_render_editor(): void {
 				</form>
 			</dialog>
 
+			<?php if ( $is_post ) : ?>
+				<dialog class="nstarter-post-details-dialog" data-cammino-post-details-dialog>
+					<form data-cammino-post-details-form>
+						<h2><?php echo esc_html( $is_event ? __( 'Edit event details', 'cammino' ) : __( 'Edit post title', 'cammino' ) ); ?></h2>
+						<label><?php esc_html_e( 'Title', 'cammino' ); ?><input name="title" type="text" maxlength="200" required></label>
+						<?php if ( $is_event ) : ?>
+							<label><?php esc_html_e( 'Event date and time', 'cammino' ); ?><input name="event_date" type="datetime-local" required></label>
+							<label><?php esc_html_e( 'Location', 'cammino' ); ?><input name="event_location" type="text" maxlength="200" required></label>
+							<p><?php esc_html_e( 'These details appear directly below the event title.', 'cammino' ); ?></p>
+						<?php endif; ?>
+						<div><button type="button" data-cammino-post-details-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button><button type="submit"><?php esc_html_e( 'Apply', 'cammino' ); ?></button></div>
+					</form>
+				</dialog>
+			<?php endif; ?>
+
 		</div>
 		<?php wp_footer(); ?>
 	</body>
@@ -271,6 +300,20 @@ function nstarter_ajax_save_snapshot(): void {
 
 	if ( ! isset( $_POST['html'] ) ) {
 		wp_send_json_error( array( 'message' => __( 'No snapshot HTML was received.', 'nstarter' ) ), 400 );
+	}
+
+	if ( 'post' === get_post_type( $post_id ) ) {
+		$title = isset( $_POST['post_title'] ) ? (string) wp_unslash( $_POST['post_title'] ) : get_the_title( $post_id );
+		$date = isset( $_POST['event_date'] )
+			? (string) wp_unslash( $_POST['event_date'] )
+			: (string) get_post_meta( $post_id, CAMMINO_EVENT_DATE_META, true );
+		$location = isset( $_POST['event_location'] )
+			? (string) wp_unslash( $_POST['event_location'] )
+			: (string) get_post_meta( $post_id, CAMMINO_EVENT_LOCATION_META, true );
+
+		if ( ! cammino_update_visual_post_details( $post_id, $title, $date, $location ) ) {
+			wp_send_json_error( array( 'message' => __( 'The post details could not be saved. Check the title, date, and location.', 'cammino' ) ), 400 );
+		}
 	}
 
 	// This intentionally stores the editor's complete HTML. Access is capability + nonce protected.

@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 const CAMMINO_EVENT_DATE_META     = '_cammino_event_date';
 const CAMMINO_EVENT_LOCATION_META = '_cammino_event_location';
 const CAMMINO_EVENT_STATUS_META   = '_cammino_event_status';
+const CAMMINO_EVENT_CATEGORY_SLUG = 'podujatia';
 const CAMMINO_POST_PLACEMENT_META = '_cammino_post_placement';
 const CAMMINO_POST_TEMPLATE       = 'templates/single-post.php';
 const CAMMINO_POST_SNAPSHOT_META  = '_cammino_post_visual_content';
@@ -27,6 +28,46 @@ function cammino_get_post_placements(): array {
 		'project' => __( 'Projekt', 'cammino' ),
 		'impact-story' => __( 'Príbeh pomoci', 'cammino' ),
 	);
+}
+
+/** Return the dedicated WordPress category ID used by event posts. */
+function cammino_get_event_category_id( bool $create = true ): int {
+	$term = term_exists( CAMMINO_EVENT_CATEGORY_SLUG, 'category' );
+
+	if ( ! $term && $create ) {
+		$term = wp_insert_term(
+			__( 'Podujatia', 'cammino' ),
+			'category',
+			array( 'slug' => CAMMINO_EVENT_CATEGORY_SLUG )
+		);
+	}
+
+	if ( is_wp_error( $term ) || ! $term ) {
+		return 0;
+	}
+
+	return (int) ( is_array( $term ) ? $term['term_id'] : $term );
+}
+
+/** Keep the dedicated event category aligned with the selected post type. */
+function cammino_sync_event_category( int $post_id, string $placement = '' ): void {
+	if ( 'post' !== get_post_type( $post_id ) ) {
+		return;
+	}
+
+	$placement = '' !== $placement ? cammino_sanitize_post_placement( $placement ) : cammino_get_post_placement( $post_id );
+	if ( 'event' === $placement ) {
+		$term_id = cammino_get_event_category_id();
+		if ( $term_id ) {
+			wp_set_post_terms( $post_id, array( $term_id ), 'category', true );
+		}
+		return;
+	}
+
+	$term_id = cammino_get_event_category_id( false );
+	if ( $term_id ) {
+		wp_remove_object_terms( $post_id, $term_id, 'category' );
+	}
 }
 
 /**
@@ -116,6 +157,7 @@ function cammino_register_post_meta(): void {
 }
 
 add_action( 'init', 'cammino_migrate_post_placements_from_slugs', 20 );
+add_action( 'init', 'cammino_migrate_event_categories', 25 );
 
 /**
  * Preserve the old placement of existing posts once, then use metadata only.
@@ -149,6 +191,35 @@ function cammino_migrate_post_placements_from_slugs(): void {
 	}
 
 	update_option( 'cammino_post_placement_migration_2', '1', false );
+}
+
+/** Assign existing event posts to their dedicated WordPress category once. */
+function cammino_migrate_event_categories(): void {
+	if ( get_option( 'cammino_event_category_migration_1' ) ) {
+		return;
+	}
+
+	$term_id = cammino_get_event_category_id();
+	if ( ! $term_id ) {
+		return;
+	}
+
+	$post_ids = get_posts(
+		array(
+			'post_type'      => 'post',
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+			'meta_query'     => cammino_get_placement_meta_query( 'event' ),
+		)
+	);
+
+	foreach ( $post_ids as $post_id ) {
+		wp_set_post_terms( (int) $post_id, array( $term_id ), 'category', true );
+	}
+
+	update_option( 'cammino_event_category_migration_1', '1', false );
 }
 
 add_action( 'add_meta_boxes_post', 'cammino_add_post_settings_meta_box' );
@@ -273,6 +344,56 @@ function cammino_save_post_settings( int $post_id ): void {
 			update_post_meta( $post_id, $meta_key, $value );
 		}
 	}
+
+	cammino_sync_event_category( $post_id, $fields[ CAMMINO_POST_PLACEMENT_META ] );
+}
+
+/**
+ * Save the fields exposed by the visual post-details editor.
+ */
+function cammino_update_visual_post_details( int $post_id, string $title, string $event_date = '', string $event_location = '' ): bool {
+	if ( 'post' !== get_post_type( $post_id ) ) {
+		return false;
+	}
+
+	$title          = sanitize_text_field( $title );
+	$event_date     = sanitize_text_field( $event_date );
+	$event_location = sanitize_text_field( $event_location );
+	$placement      = cammino_get_post_placement( $post_id );
+
+	if ( '' === $title || ( '' !== $event_date && ! preg_match( '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $event_date ) ) ) {
+		return false;
+	}
+
+	$result = wp_update_post(
+		array(
+			'ID'         => $post_id,
+			'post_title' => wp_slash( $title ),
+		),
+		true
+	);
+	if ( is_wp_error( $result ) || ! $result ) {
+		return false;
+	}
+
+	if ( 'event' === $placement ) {
+		foreach ( array( CAMMINO_EVENT_DATE_META => $event_date, CAMMINO_EVENT_LOCATION_META => $event_location ) as $meta_key => $value ) {
+			if ( '' === $value ) {
+				delete_post_meta( $post_id, $meta_key );
+			} else {
+				update_post_meta( $post_id, $meta_key, $value );
+			}
+		}
+	}
+
+	cammino_sync_event_category( $post_id, $placement );
+	clean_post_cache( $post_id );
+
+	return $title === (string) get_post_field( 'post_title', $post_id )
+		&& ( 'event' !== $placement || (
+			$event_date === (string) get_post_meta( $post_id, CAMMINO_EVENT_DATE_META, true )
+			&& $event_location === (string) get_post_meta( $post_id, CAMMINO_EVENT_LOCATION_META, true )
+		) );
 }
 
 /**

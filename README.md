@@ -108,22 +108,26 @@ Card copy and images remain editable through the normal Text and Media modes.
    preserving their URLs and compatibility with the existing visual editor.
 2. In **Cammino príspevok → Typ príspevku**, choose **Podujatie** (event),
    **Projekt** (project), or **Príbeh pomoci** (impact story). The posts list also
-   shows this type in its own column.
+   shows this type in its own column. Event posts are automatically assigned to
+   the dedicated WordPress **Podujatia** category and removed from that category
+   if their type changes.
 3. Fill the optional fields for that type: event date/time, location and status;
    project period, countries/location and status; or impact result and reporting
    period. Only populated fields for the current type appear publicly.
-4. Open **Cammino visual editor**. The post title and cover image stay at the
-   top. Use the three buttons directly below the body to add a heading,
+4. Open **Cammino visual editor**. Use **Event details** to update an event's
+   title, date/time, and location; those details appear prominently below its
+   title. Use the three buttons directly below the body to add a heading,
    paragraph, or placeholder image. Edit text in place; click an image to
    replace it, and use the small controls below a block to move or remove it.
 5. Publish the post. Events appear in the existing event listing; projects,
    impact stories and legacy articles appear in the main news listing.
 
-Titles, excerpts and type-specific facts are edited in WordPress. Body sections,
-links and images are edited in the visual editor. New empty posts start with an
-empty body and the inline add controls. Changing a type never regenerates a saved
-body or overwrites existing content. **Reset content** remains an explicit reset
-to the current WordPress content or an empty body.
+Titles, excerpts and type-specific facts can be edited in WordPress. Post titles
+and the event date/location are also editable in the visual editor. Body sections,
+links and images are edited there as well. New empty posts start with an empty
+body and the inline add controls. Changing a type never regenerates a saved body
+or overwrites existing content. **Reset content** remains an explicit reset to
+the current WordPress content or an empty body.
 
 ## Article body builder
 
@@ -138,9 +142,10 @@ classifications remain unchanged until explicitly reclassified.
 ## Post workflow checks
 
 Run `php tests/post-workflow.php` for standalone regression checks using WordPress
-test doubles. They cover migration, type changes, saved-content preservation,
-the inline builder, and removal of legacy Related Posts markup. These checks do
-not require or modify a WordPress database.
+test doubles. They cover migration, event-category assignment, visual event
+details, type changes, saved-content preservation, the inline builder, and
+removal of legacy Related Posts markup. These checks do not require or modify a
+WordPress database.
 
 The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.

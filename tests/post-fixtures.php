@@ -9,6 +9,7 @@ class WP_Post {
 	public $ID, $post_title, $post_type = 'post', $post_status = 'publish', $post_password = '', $post_content = '', $post_name = '', $post_author = 1;
 	public function __construct( int $id, string $title ) { $this->ID = $id; $this->post_title = $title; $this->post_name = 'post-' . $id; }
 }
+class WP_Error {}
 class TestJsonResponse extends RuntimeException {
 	public $payload, $status;
 	public function __construct( $payload, $status ) { $this->payload = $payload; $this->status = $status; }
@@ -19,6 +20,8 @@ $GLOBALS['test_defaults'] = array();
 $GLOBALS['test_options'] = array( 'date_format' => 'j. F Y' );
 $GLOBALS['test_can_edit'] = true;
 $GLOBALS['test_queries'] = array();
+$GLOBALS['test_terms'] = array();
+$GLOBALS['test_post_terms'] = array();
 foreach ( array( 1 => 'Podujatie Alfa', 2 => 'Projekt Beta', 3 => 'Príbeh Gama', 4 => 'Pôvodný článok', 5 => 'Koncept', 6 => 'Súkromný projekt', 7 => 'Heslom chránený', 8 => 'Bez metadát' ) as $id => $title ) {
 	$GLOBALS['test_posts'][ $id ] = new WP_Post( $id, $title );
 }
@@ -44,9 +47,16 @@ function wp_json_encode( $value ) { return json_encode( $value ); }
 function wp_slash( $value ) { return addslashes( $value ); }
 function wp_unslash( $value ) { return stripslashes( $value ); }
 function current_user_can( ...$args ) { return $GLOBALS['test_can_edit']; }
+function is_wp_error( $value ) { return $value instanceof WP_Error; }
 function register_post_meta( $type, $key, $args ) { $GLOBALS['test_defaults'][ $key ] = $args['default'] ?? ''; }
 function get_post( $id ) { return $id instanceof WP_Post ? $id : ( $GLOBALS['test_posts'][ $id ] ?? null ); }
 function get_post_type( $id ) { return get_post( $id )->post_type ?? ''; }
+function wp_update_post( $data, $wp_error = false ) {
+	$post = get_post( (int) ( $data['ID'] ?? 0 ) );
+	if ( ! $post ) { return $wp_error ? new WP_Error() : 0; }
+	if ( isset( $data['post_title'] ) ) { $post->post_title = stripslashes( $data['post_title'] ); }
+	return $post->ID;
+}
 function get_post_meta( $id, $key, $single = true ) { return $GLOBALS['test_meta'][ $id ][ $key ] ?? ( $GLOBALS['test_defaults'][ $key ] ?? '' ); }
 function update_post_meta( $id, $key, $value ) {
 	$GLOBALS['test_meta'][ $id ][ $key ] = stripslashes( $value );
@@ -57,6 +67,27 @@ function get_post_field( $key, $id ) { return get_post( $id )->$key ?? ''; }
 function clean_post_cache( $id ) {}
 function get_option( $key ) { return $GLOBALS['test_options'][ $key ] ?? false; }
 function update_option( $key, $value, $autoload = false ) { $GLOBALS['test_options'][ $key ] = $value; }
+function term_exists( $term, $taxonomy = '' ) {
+	foreach ( $GLOBALS['test_terms'] as $id => $stored ) {
+		if ( $stored['slug'] === $term || $stored['name'] === $term ) { return array( 'term_id' => $id ); }
+	}
+	return 0;
+}
+function wp_insert_term( $name, $taxonomy, $args = array() ) {
+	$id = count( $GLOBALS['test_terms'] ) + 1;
+	$GLOBALS['test_terms'][ $id ] = array( 'name' => $name, 'slug' => $args['slug'] ?? sanitize_key( $name ) );
+	return array( 'term_id' => $id );
+}
+function wp_set_post_terms( $post_id, $terms, $taxonomy, $append = false ) {
+	$current = $append ? ( $GLOBALS['test_post_terms'][ $post_id ] ?? array() ) : array();
+	$GLOBALS['test_post_terms'][ $post_id ] = array_values( array_unique( array_merge( $current, array_map( 'intval', $terms ) ) ) );
+	return $GLOBALS['test_post_terms'][ $post_id ];
+}
+function wp_remove_object_terms( $post_id, $terms, $taxonomy ) {
+	$remove = array_map( 'intval', (array) $terms );
+	$GLOBALS['test_post_terms'][ $post_id ] = array_values( array_diff( $GLOBALS['test_post_terms'][ $post_id ] ?? array(), $remove ) );
+	return true;
+}
 function wp_is_post_revision( $id ) { return false; }
 function wp_verify_nonce( $nonce, $action ) { return 'test-nonce' === $nonce; }
 function check_ajax_referer( $action, $field ) { if ( ! wp_verify_nonce( $_POST[$field] ?? '', $action ) ) { wp_send_json_error( array( 'message' => 'Bad nonce' ), 403 ); } }
