@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.8.1' );
+define( 'NSTARTER_VERSION', '1.9.0' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
@@ -286,6 +286,7 @@ function cammino_register_live_sections(): void {
 
 	nstarter_register_live_section( 'cammino_news_events', 'cammino_render_news_events' );
 	nstarter_register_live_section( 'cammino_news_articles', 'cammino_render_news_articles' );
+	nstarter_register_live_section( 'cammino_all_events', 'cammino_render_all_events' );
 }
 
 add_action( 'wp_enqueue_scripts', 'cammino_enqueue_child_styles', 15 );
@@ -354,6 +355,11 @@ function cammino_enqueue_visual_page_assets(): void {
 			'handle' => 'cammino-news',
 			'style'  => '/assets/css/pages/news.css',
 			'script' => '/assets/js/pages/news.js',
+		),
+		'events'   => array(
+			'handle' => 'cammino-events',
+			'style'  => '/assets/css/pages/events.css',
+			'script' => '/assets/js/pages/events.js',
 		),
 		'donate'   => array(
 			'handle' => 'cammino-donate',
@@ -540,6 +546,7 @@ function cammino_visual_page_body_classes( array $classes ): array {
 			'contact'       => array( 'contact-page' ),
 			'ss'            => array( 'stories-page' ),
 			'news'          => array( 'news-page' ),
+			'events'        => array( 'events-page' ),
 			'donate'        => array( 'donation-page' ),
 			'donate-us'     => array( 'donate-us-page' ),
 			'donate-now'    => array( 'contact-page', 'donate-now-page' ),

@@ -464,6 +464,8 @@ body.nstarter-editor-shell {
     font: 400 14px/1 inherit;
 }
 .nstarter-post-details-dialog input:focus { border-color: #6d5dfc; box-shadow: 0 0 0 1px #6d5dfc; outline: none; }
+.nstarter-post-details-dialog .nstarter-post-details-dialog__check { display: flex; align-items: center; grid-template-columns: none; }
+.nstarter-post-details-dialog__check input { width: 20px; height: 20px; padding: 0; }
 .nstarter-post-details-dialog form > div { display: flex; justify-content: flex-end; gap: 7px; }
 .nstarter-post-details-dialog button {
     min-height: 34px;

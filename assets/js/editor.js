@@ -53,7 +53,7 @@
     let orderedSections = [];
     let sectionOrderParent = null;
     let transientState = new Map();
-    let postDetails = Object.assign({ title: '', eventDate: '', eventLocation: '' }, config.postDetails || {});
+    let postDetails = Object.assign({ title: '', eventDate: '', eventLocation: '', hideImage: false }, config.postDetails || {});
 
     function frameDocument() {
         return frame.contentDocument || frame.contentWindow.document;
@@ -1081,6 +1081,10 @@
         if (location) {
             location.textContent = postDetails.eventLocation || config.strings.missingEventLocation;
         }
+        const cover = doc.querySelector('[data-cammino-event-cover]');
+        if (cover) {
+            cover.hidden = Boolean(postDetails.hideImage);
+        }
     }
 
     function openPostDetails() {
@@ -1089,6 +1093,7 @@
         if (config.isEvent) {
             postDetailsForm.elements.event_date.value = postDetails.eventDate;
             postDetailsForm.elements.event_location.value = postDetails.eventLocation;
+            postDetailsForm.elements.hide_image.checked = Boolean(postDetails.hideImage);
         }
         postDetailsDialog.showModal();
         postDetailsForm.elements.title.focus();
@@ -1106,6 +1111,7 @@
         if (config.isEvent) {
             postDetails.eventDate = postDetailsForm.elements.event_date.value;
             postDetails.eventLocation = postDetailsForm.elements.event_location.value.trim();
+            postDetails.hideImage = postDetailsForm.elements.hide_image.checked;
         }
         refreshPostDetailsPreview();
         closePostDetails();
@@ -1414,7 +1420,8 @@
                 featured_image_id: coverImage ? coverImage.getAttribute('data-attachment-id') : '',
                 post_title: postDetails.title,
                 event_date: postDetails.eventDate,
-                event_location: postDetails.eventLocation
+                event_location: postDetails.eventLocation,
+                hide_image: postDetails.hideImage ? '1' : '0'
             });
             dirty = false;
             if (viewLink && data.viewUrl) {

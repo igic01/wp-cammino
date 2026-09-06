@@ -14,6 +14,7 @@ if ( nstarter_is_preview_request() || isset( $_GET['cammino_snapshot'] ) ) {
 }
 
 $nstarter_post_id = get_queried_object_id();
+$nstarter_source_slug = nstarter_get_native_source_template_slug( $nstarter_post_id );
 $nstarter_html    = nstarter_get_snapshot_html( $nstarter_post_id );
 
 if ( '' === trim( $nstarter_html ) ) {
@@ -43,7 +44,7 @@ $nstarter_html = str_replace(
 );
 
 // Remove the retired Events introduction from older saved News snapshots.
-if ( 'news' === nstarter_get_native_source_template_slug( $nstarter_post_id ) ) {
+if ( 'news' === $nstarter_source_slug ) {
 	$nstarter_html = (string) preg_replace(
 		'#<p>\s*Stretnutia,\s*workshopy\s*a\s*príležitosti,\s*ku\s*ktorým\s*sa\s*môžete\s*pridať\.\s*</p>#iu',
 		'',
@@ -52,7 +53,7 @@ if ( 'news' === nstarter_get_native_source_template_slug( $nstarter_post_id ) ) 
 }
 
 // Remove captions retained by older Success Stories snapshots.
-if ( 'ss' === nstarter_get_native_source_template_slug( $nstarter_post_id ) ) {
+if ( 'ss' === $nstarter_source_slug ) {
 	$nstarter_html = (string) preg_replace(
 		'#<figcaption\b[^>]*>.*?</figcaption>#is',
 		'',
@@ -74,9 +75,11 @@ $nstarter_html = (string) preg_replace(
 	$nstarter_html
 );
 
-ob_start();
-cammino_render_site_header();
-$nstarter_html = (string) ob_get_clean() . $nstarter_html;
+if ( 'events' !== $nstarter_source_slug ) {
+	ob_start();
+	cammino_render_site_header();
+	$nstarter_html = (string) ob_get_clean() . $nstarter_html;
+}
 
 $nstarter_html = (string) preg_replace(
 	'#<footer\b[^>]*class=["\'][^"\']*\bsite-footer\b[^>]*>.*?</footer>#is',
