@@ -34,21 +34,6 @@
     pointer-events: none !important;
 }
 
-/* A collection is presented as one variable element, not as a nested live section. */
-.nstarter-editor-preview.nstarter-mode-text [data-nstarter-variable-control="collection"] > [data-nstarter-live-section],
-.nstarter-editor-preview.nstarter-mode-media [data-nstarter-variable-control="collection"] > [data-nstarter-live-section],
-.nstarter-editor-preview.nstarter-mode-link [data-nstarter-variable-control="collection"] > [data-nstarter-live-section] {
-    min-height: 0;
-    outline: 0;
-    cursor: default;
-}
-
-.nstarter-editor-preview.nstarter-mode-text [data-nstarter-variable-control="collection"] > [data-nstarter-live-section]::before,
-.nstarter-editor-preview.nstarter-mode-media [data-nstarter-variable-control="collection"] > [data-nstarter-live-section]::before,
-.nstarter-editor-preview.nstarter-mode-link [data-nstarter-variable-control="collection"] > [data-nstarter-live-section]::before {
-    display: none;
-}
-
 .nstarter-editor-preview a[href] {
     cursor: not-allowed;
 }

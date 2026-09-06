@@ -54,7 +54,6 @@ body.nstarter-editor-shell {
 
 .nstarter-mode-field,
 .nstarter-control--order,
-.nstarter-control--content,
 .nstarter-control--quiet {
     grid-column: 1 / -1;
 }
@@ -537,55 +536,6 @@ body.nstarter-editor-shell {
     color: #fff;
     background: #6d5dfc;
 }
-
-.nstarter-collection-dialog {
-    width: min(620px, calc(100vw - 32px));
-    max-height: min(760px, calc(100vh - 32px));
-    padding: 18px;
-    border: 1px solid #aaa;
-    border-radius: 5px;
-    color: #222;
-    background: #fff;
-    font-family: inherit;
-}
-
-.nstarter-collection-dialog::backdrop {
-    background: rgb(0 0 0 / 38%);
-}
-
-.nstarter-collection-dialog form {
-    display: grid;
-    gap: 14px;
-}
-
-.nstarter-collection-dialog h2,
-.nstarter-collection-dialog p {
-    margin: 0;
-}
-
-.nstarter-collection-dialog h2 { font-size: 17px; }
-.nstarter-collection-dialog p { color: #666; font-size: 12px; line-height: 1.45; }
-
-.nstarter-collection-dialog button {
-    min-height: 34px;
-    padding: 0 10px;
-    border: 1px solid #aaa;
-    border-radius: 3px;
-    background: #fff;
-    cursor: pointer;
-    font: 600 12px/1 inherit;
-}
-
-.nstarter-collection-dialog button:disabled { cursor: default; opacity: .35; }
-.nstarter-collection-dialog label { display: grid; gap: 5px; font-size: 13px; }
-.nstarter-collection-dialog input, .nstarter-collection-dialog select { width: 100%; min-height: 36px; margin: 0; }
-.nstarter-collection-dialog [hidden] { display: none !important; }
-[data-collection-results], [data-collection-selected] { display: grid; gap: 6px; margin-top: 10px; }
-[data-collection-results] { max-height: 210px; overflow-y: auto; }
-[data-collection-results] button, [data-collection-selected] button { height: auto; min-height: 36px; padding: 8px !important; text-align: left; line-height: 1.4 !important; }
-[data-collection-selected] button { color: #5142df; background: #f1efff; }
-.nstarter-collection-dialog__actions { display: flex; justify-content: flex-end; gap: 8px; }
-.nstarter-collection-dialog__actions button { border-color: #5142df; color: #fff; background: #6d5dfc; }
 
 @media (max-width: 480px) {
     .nstarter-editor-panel {

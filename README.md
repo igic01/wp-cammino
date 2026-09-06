@@ -38,7 +38,6 @@ impact stories.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
 - `inc/posts.php` stores the selected event/project/impact-story type and optional
   details, preserves legacy articles, and provides type-aware starter content.
-- `inc/post-collections.php` renders configurable live collections of other posts
   and provides authenticated search and preview for the visual editor.
 - `templates/single-post.php` renders all three types using the shared article
   layout with type-specific labels, accents, and factual summaries.
@@ -126,39 +125,22 @@ empty body and the inline add controls. Changing a type never regenerates a save
 body or overwrites existing content. **Reset content** remains an explicit reset
 to the current WordPress content or an empty body.
 
-## Article body and bottom recommendations
+## Article body builder
 
 All three post types use the same dedicated content-builder element below the
 cover image. Its three large inline buttons add unlimited headings, paragraphs,
 and placeholder images. Text is editable in the preview; clicking an image opens
 the WordPress media library. The small buttons below each block change its order
 or remove it. The standard floating editor panel remains available for modes,
-Save, View, and reset.
-
-Use the purple variable-section control on **Related posts** to configure the
-separate bottom section:
-
-- Browse or search the list of published posts and select up to six.
-- Selected posts appear in display order; click a selected item marked **×** to remove it.
-- An empty selection renders no Related Posts section on the public post.
-
-Press **Apply**, then use the standard **Save** button in the editor panel.
-The bottom section always follows the article body. Cards read current titles,
-images and links on each render.
-The current post, drafts, private and password-protected posts are excluded.
-Empty sections are hidden publicly.
-
-Existing saved content is preserved. The last old collection becomes the bottom
-section; any earlier inline collections remain editable for compatibility.
-A previously removed collection stays hidden. Legacy article classifications
-remain unchanged until explicitly reclassified.
+Save, View, and reset. Existing saved content is preserved, and legacy article
+classifications remain unchanged until explicitly reclassified.
 
 ## Post workflow checks
 
 Run `php tests/post-workflow.php` for standalone regression checks using WordPress
 test doubles. They cover migration, type changes, saved-content preservation,
-collection ordering, live updates, visibility, configuration validation, and
-authenticated endpoints. These checks do not require or modify a WordPress database.
+the inline builder, and removal of legacy Related Posts markup. These checks do
+not require or modify a WordPress database.
 
 The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.

@@ -751,36 +751,17 @@ function cammino_get_post_visual_content( int $post_id ): string {
 	$html = (string) get_post_meta( $post_id, CAMMINO_POST_SNAPSHOT_META, true );
 
 	$html = '' !== trim( $html ) ? $html : cammino_render_post_visual_content( $post_id );
-	if ( ! str_contains( $html, 'data-cammino-post-bottom' ) ) {
-		// Retain older inline collections; promote the last one to the fixed footer.
-		$html = preg_replace( '#<template\b[^>]*data-nstarter-content-template="posts"[^>]*>.*?</template>#is', '', $html );
-		$pattern = '#<div\b[^>]*data-nstarter-content-type="posts"[^>]*>\s*<div\b[^>]*data-nstarter-live-section="cammino_post_collection"[^>]*>\s*</div>\s*</div>#is';
-		preg_match_all( $pattern, $html, $matches, PREG_OFFSET_CAPTURE );
-		$last = end( $matches[0] );
-		if ( $last ) {
-			$bottom = $last[0];
-			$html = substr_replace( $html, '', $last[1], strlen( $last[0] ) );
-		} else {
-			$bottom = cammino_get_post_collection_block();
-		}
-		$bottom = preg_replace( '/data-nstarter-content-item(?:="[^"]*")?\s+data-nstarter-content-type="posts"/', 'data-cammino-post-bottom', $bottom );
-		$html .= $bottom;
-	}
 
-	// Existing fixed collections gain the same variable-section control without regeneration.
-	if ( function_exists( 'cammino_get_post_collection_variable_attributes' ) ) {
-		$variable_attributes = cammino_get_post_collection_variable_attributes();
-		$html = (string) preg_replace_callback(
-			'#<div\b(?=[^>]*\bdata-cammino-post-bottom\b)[^>]*#i',
-			static function ( array $match ) use ( $variable_attributes ): string {
-				return str_contains( $match[0], 'data-nstarter-variable-section' )
-					? $match[0]
-					: $match[0] . $variable_attributes;
-			},
-			$html,
-			1
-		);
-	}
+	// Related-post collections were removed. Strip their old templates and
+	// saved empty live markers so existing post snapshots are clean as well.
+	$html = (string) preg_replace( '#<template\b[^>]*data-nstarter-content-template="posts"[^>]*>.*?</template>#is', '', $html );
+	$html = (string) preg_replace(
+		'#<div\b(?=[^>]*(?:data-cammino-post-bottom|data-nstarter-content-type="posts"))[^>]*>\s*<div\b[^>]*data-nstarter-live-section="cammino_post_collection"[^>]*>\s*</div>\s*</div>#is',
+		'',
+		$html
+	);
+	$html = str_replace( '<!-- cammino-post-collections-v1 -->', '', $html );
+
 	return $html;
 }
 

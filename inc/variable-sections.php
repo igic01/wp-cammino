@@ -14,7 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Repeat controls resize elements inside `data-nstarter-variable-items`.
  * Text controls update nodes marked with `data-nstarter-variable-output`.
- * Collection controls are handled by their dedicated editor dialog.
  *
  * @param string              $id     Stable variable-section ID.
  * @param array<string,mixed> $config Variable configuration.
@@ -26,10 +25,10 @@ function nstarter_variable_section_attributes( string $id, array $config = array
 		return;
 	}
 
-	$type    = isset( $config['type'] ) && in_array( $config['type'], array( 'text', 'boolean', 'collection' ), true )
+	$type    = isset( $config['type'] ) && in_array( $config['type'], array( 'text', 'boolean' ), true )
 		? $config['type']
 		: 'number';
-	$control = isset( $config['control'] ) && in_array( $config['control'], array( 'text', 'collection' ), true )
+	$control = isset( $config['control'] ) && 'text' === $config['control']
 		? $config['control']
 		: 'repeat';
 	$value   = isset( $config['value'] ) && is_scalar( $config['value'] ) ? (string) $config['value'] : '';

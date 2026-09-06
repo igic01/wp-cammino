@@ -34,7 +34,7 @@ if ( $cammino_thumbnail ) {
 	$cammino_caption = (string) wp_get_attachment_caption( $cammino_thumbnail );
 }
 
-$cammino_content = cammino_expand_post_live_content( cammino_get_post_visual_content( $cammino_post_id ), $cammino_post_id );
+$cammino_content = cammino_get_post_visual_content( $cammino_post_id );
 $cammino_facts = array();
 if ( 'event' === $cammino_placement ) {
 	foreach ( array( CAMMINO_EVENT_LOCATION_META => 'Miesto', CAMMINO_EVENT_STATUS_META => 'Stav' ) as $key => $label ) {

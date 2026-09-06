@@ -247,22 +247,6 @@ function nstarter_maybe_render_editor(): void {
 				</form>
 			</dialog>
 
-			<dialog class="nstarter-collection-dialog" data-collection-dialog>
-				<form data-collection-form>
-					<h2>Related posts</h2>
-					<p>Choose up to 6 published posts. Click a post to add it, or click a selected post marked × to remove it. If the selection is empty, nothing appears on the post page.</p>
-					<label>Section heading<input name="title" type="text" maxlength="160"></label>
-					<div data-collection-picker>
-						<label>Search posts<input name="search" type="search" autocomplete="off"></label>
-						<p><strong>Selected posts</strong></p>
-						<div data-collection-selected></div>
-						<p><strong>Available posts</strong></p>
-						<div data-collection-results></div>
-					</div>
-					<p role="status" data-collection-status></p>
-					<div class="nstarter-collection-dialog__actions"><button type="button" data-collection-cancel>Cancel</button><button type="submit">Apply</button></div>
-				</form>
-			</dialog>
 		</div>
 		<?php wp_footer(); ?>
 	</body>

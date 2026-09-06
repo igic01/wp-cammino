@@ -1,77 +1,63 @@
 <?php
 /** Run with `php tests/post-workflow.php`. No WordPress/database changes. */
 require __DIR__ . '/post-fixtures.php';
+
 $checks = 0;
-function expect( $condition, $message ) { global $checks; ++$checks; if ( ! $condition ) { throw new RuntimeException( $message ); } }
-function ids( $posts ) { return array_map( static fn( $p ) => $p->ID, $posts ); }
+function expect( $condition, $message ) {
+	global $checks;
+	++$checks;
+	if ( ! $condition ) {
+		throw new RuntimeException( $message );
+	}
+}
+
 expect( array_keys( cammino_get_post_placements() ) === array( 'event', 'project', 'impact-story' ), 'Three selectable types' );
-expect( 'article' === cammino_get_post_placement(4), 'Legacy articles retain their type' );
-expect( 'impact-story' === cammino_get_post_placement(8), 'Unstored metadata uses registered default' );
-expect( cammino_get_post_collection_posts( array(), 1 ) === array(), 'Default related-post selection is empty' );
+expect( 'article' === cammino_get_post_placement( 4 ), 'Legacy articles retain their type' );
+expect( 'impact-story' === cammino_get_post_placement( 8 ), 'Unstored metadata uses registered default' );
+
 cammino_migrate_post_placements_from_slugs();
-expect( 'article' === cammino_get_post_placement(8) && 'event' === cammino_get_post_placement(1), 'Upgrade preserves old untyped articles and events' );
+expect( 'article' === cammino_get_post_placement( 8 ) && 'event' === cammino_get_post_placement( 1 ), 'Upgrade preserves old untyped articles and events' );
 $GLOBALS['test_meta'][8][CAMMINO_POST_PLACEMENT_META] = 'project';
 cammino_migrate_post_placements_from_slugs();
-expect( 'project' === cammino_get_post_placement(8), 'Migration is idempotent' );
-expect( ids( cammino_get_post_collection_posts( array( 'ids'=>array(2,5,6,7,8) ), 8 ) ) === array(2), 'Manual selection excludes current, drafts, private and password posts' );
-$before = count($GLOBALS['test_queries']);
-expect( cammino_get_post_collection_posts( array('mode'=>'selected','ids'=>array()), 1 ) === array(), 'Empty manual selection is empty' );
-expect( count($GLOBALS['test_queries']) === $before, 'Empty selection never issues an unbounded post__in query' );
-expect( ids(cammino_get_post_collection_posts(array('mode'=>'selected','ids'=>array(3,1,2,5,6,7)),1)) === array(3,2), 'Manual order and visibility are preserved' );
-$args = cammino_sanitize_post_collection(array('title'=>'<b>Úsmev</b>','mode'=>'bad','type'=>'bad','limit'=>999,'ids'=>array(2,2,0,'bad',array(),3)));
-expect( $args['title']==='Úsmev' && $args['type']==='all' && $args['mode']==='selected' && $args['limit']===6 && $args['ids']===array(2,3), 'Configuration is normalized to manual selection' );
-expect( '' === cammino_render_post_collection(array('mode'=>'selected','ids'=>array()),1), 'Empty section hidden publicly' );
-expect( str_contains(cammino_render_post_collection(array('mode'=>'selected','ids'=>array()),1,true),'cammino-collection-empty'), 'Editor explains empty selection' );
-$marker = cammino_get_post_collection_block(array('title'=>'Súvisiace príbehy','mode'=>'selected','ids'=>array(3)));
-expect(str_contains($marker,'data-nstarter-variable-section="cammino_related_posts"') && str_contains($marker,'data-nstarter-variable-control="collection"'), 'Related posts is a collection variable section');
-$automatic_marker = cammino_get_post_collection_block(array('mode'=>'latest'));
-expect(!str_contains(cammino_expand_post_live_content($automatic_marker,1),'related-card'), 'Legacy automatic collections no longer display posts');
-$html = cammino_expand_post_live_content($marker.cammino_get_post_collection_template(),1);
-expect( str_contains($html,'Príbeh Gama'), 'Live block renders selected post' );
-$inert = substr($html,strpos($html,'<template'));
-expect( ! str_contains($inert,'related-card'), 'Builder template stays inert and contains no stale cards' );
-$GLOBALS['test_posts'][3]->post_title = 'Aktualizovaný príbeh';
-expect( str_contains(cammino_expand_post_live_content($marker,1),'Aktualizovaný príbeh'), 'Published title changes appear without resaving host post' );
-$GLOBALS['test_posts'][3]->post_status = 'draft';
-expect( ! str_contains(cammino_expand_post_live_content($marker,1),'Aktualizovaný príbeh'), 'Unpublished selections disappear' );
-$GLOBALS['test_posts'][3]->post_status = 'publish';
+expect( 'project' === cammino_get_post_placement( 8 ), 'Migration is idempotent' );
+
 $saved = '<p data-nstarter-content-item data-nstarter-content-type="paragraph">Zachovať moje úpravy.</p>';
-cammino_update_post_visual_content(4,$saved);
-$upgraded = cammino_get_post_visual_content(4);
-expect( str_contains($upgraded,$saved) && str_contains($upgraded,'data-cammino-post-bottom') && str_contains($upgraded,'data-nstarter-variable-section="cammino_related_posts"'), 'Saved body gains variable tools without regeneration' );
-expect( strpos($upgraded,'data-cammino-post-bottom') > strpos($upgraded,$saved), 'Bottom collection follows the body' );
-cammino_update_post_visual_content(4,$upgraded);
-expect( cammino_get_post_visual_content(4)===$upgraded, 'Upgrade is stable after save/reload' );
-cammino_update_post_visual_content(4,$saved.'<!-- cammino-post-collections-v1 -->'.cammino_get_post_collection_template());
-expect( !str_contains(cammino_expand_post_live_content(cammino_get_post_visual_content(4),4),'related-card'), 'Removed default block does not respawn; bottom remains hidden' );
-$fresh_body = cammino_render_post_visual_content(1);
-$fresh_visible_body = preg_replace('#<template\b[^>]*>.*?</template>#is', '', $fresh_body);
-expect(!str_contains($fresh_visible_body,'data-nstarter-content-item'), 'New post body starts empty');
-expect(substr_count($fresh_body,'data-nstarter-content-template=')===3, 'Inline builder provides title, paragraph and image templates');
-expect(str_contains($fresh_body,'/assets/images/placeholder.webp'), 'New image template uses the local placeholder');
-$_POST = array('cammino_post_settings_nonce'=>'test-nonce','cammino_post_placement'=>'project','cammino_project_period'=>'2026–2027');
-cammino_save_post_settings(4);
-expect(get_post_meta(4,CAMMINO_POST_SNAPSHOT_META,true)===$saved.'<!-- cammino-post-collections-v1 -->'.cammino_get_post_collection_template(),'Type changes preserve visual snapshot');
-expect(cammino_get_post_placement(4)==='project' && get_post_meta(4,'_cammino_project_period',true)==='2026–2027','WordPress settings save');
-$GLOBALS['test_can_edit']=false;
-$_POST['cammino_post_placement']='event';
-cammino_save_post_settings(4);
-expect(cammino_get_post_placement(4)==='project','Unauthorized metadata update refused');
-$_POST=array('post_id'=>1,'nonce'=>'test-nonce','settings'=>'{}');
-try { cammino_ajax_post_collection(); } catch(TestJsonResponse $r) { expect($r->status===403,'Unauthorized AJAX refused'); }
-$GLOBALS['test_can_edit']=true;
-$_POST['nonce']='invalid';
-try { cammino_ajax_post_collection(); } catch(TestJsonResponse $r) { expect($r->status===403,'Invalid nonce refused'); }
-$_POST=array('post_id'=>1,'nonce'=>'test-nonce','settings'=>'{"type":"project"}','search'=>'Beta');
-try { cammino_ajax_post_collection(); } catch(TestJsonResponse $r) { expect(array_column($r->payload['data']['posts'],'id')===array(2),'Authenticated search returns matching published posts'); }
-$_POST=array('post_id'=>1,'nonce'=>'test-nonce','settings'=>'{}','search'=>'');
-try { cammino_ajax_post_collection(); } catch(TestJsonResponse $r) { expect(array_column($r->payload['data']['posts'],'id')===array(8,4,3,2),'Variable picker lists all eligible posts'); }
-expect(cammino_render_post_collection(array(),1)==='', 'Empty selection is invisible publicly');
-$legacy = str_replace('data-nstarter-content-item ', 'data-nstarter-content-item="" ', cammino_get_post_collection_block(array('mode'=>'selected','ids'=>array(2))));
-cammino_update_post_visual_content(1,$saved.$legacy.cammino_get_post_collection_template());
-$upgraded = cammino_get_post_visual_content(1);
-expect(substr_count($upgraded,'data-cammino-post-bottom')===1 && !str_contains($upgraded,'data-nstarter-content-type="posts"'), 'Browser-serialized collection becomes fixed bottom');
-expect(str_contains(cammino_expand_post_live_content($upgraded,1),'Projekt Beta'), 'Migration preserves manual selection');
-cammino_update_post_visual_content(1,$upgraded);
-expect(cammino_get_post_visual_content(1)===$upgraded, 'Bottom upgrade is idempotent');
+cammino_update_post_visual_content( 4, $saved );
+expect( cammino_get_post_visual_content( 4 ) === $saved, 'Saved article content is preserved' );
+
+$legacy_marker = '<div data-nstarter-live-section="cammino_post_collection" data-nstarter-live-args=""></div>';
+$legacy_inline = '<div class="article-content-block article-content-block--posts" data-nstarter-content-item="" data-nstarter-content-type="posts">' . $legacy_marker . '</div>';
+$legacy_bottom = '<div class="article-content-block article-content-block--posts" data-cammino-post-bottom data-nstarter-variable-section="cammino_related_posts">' . $legacy_marker . '</div>';
+$legacy_template = '<template data-nstarter-content-template="posts">' . $legacy_inline . '</template>';
+cammino_update_post_visual_content( 4, $saved . '<!-- cammino-post-collections-v1 -->' . $legacy_inline . $legacy_bottom . $legacy_template );
+$cleaned = cammino_get_post_visual_content( 4 );
+expect( str_contains( $cleaned, $saved ), 'Legacy cleanup keeps the article body' );
+expect( ! str_contains( $cleaned, 'cammino_post_collection' ), 'Legacy Related Posts live markers are removed' );
+expect( ! str_contains( $cleaned, 'data-cammino-post-bottom' ), 'Legacy bottom Related Posts elements are removed' );
+expect( ! str_contains( $cleaned, 'data-nstarter-content-template="posts"' ), 'Legacy Related Posts templates are removed' );
+expect( ! str_contains( $cleaned, 'cammino-post-collections-v1' ), 'Legacy collection migration comments are removed' );
+cammino_update_post_visual_content( 4, $cleaned );
+expect( cammino_get_post_visual_content( 4 ) === $cleaned, 'Related Posts cleanup is stable after save and reload' );
+
+$fresh_body = cammino_render_post_visual_content( 1 );
+$fresh_visible_body = preg_replace( '#<template\b[^>]*>.*?</template>#is', '', $fresh_body );
+expect( ! str_contains( $fresh_visible_body, 'data-nstarter-content-item' ), 'New post body starts empty' );
+expect( substr_count( $fresh_body, 'data-nstarter-content-template=' ) === 3, 'Inline builder provides title, paragraph and image templates' );
+expect( str_contains( $fresh_body, '/assets/images/placeholder.webp' ), 'New image template uses the local placeholder' );
+expect( ! str_contains( $fresh_body, 'content-template="posts"' ), 'Fresh post body has no Related Posts element' );
+
+$_POST = array(
+	'cammino_post_settings_nonce' => 'test-nonce',
+	'cammino_post_placement'      => 'project',
+	'cammino_project_period'      => '2026–2027',
+);
+cammino_save_post_settings( 4 );
+expect( get_post_meta( 4, CAMMINO_POST_SNAPSHOT_META, true ) === $cleaned, 'Type changes preserve the cleaned visual snapshot' );
+expect( cammino_get_post_placement( 4 ) === 'project' && get_post_meta( 4, '_cammino_project_period', true ) === '2026–2027', 'WordPress settings save' );
+
+$GLOBALS['test_can_edit'] = false;
+$_POST['cammino_post_placement'] = 'event';
+cammino_save_post_settings( 4 );
+expect( cammino_get_post_placement( 4 ) === 'project', 'Unauthorized metadata update refused' );
+
 echo "Passed $checks post workflow checks.\n";

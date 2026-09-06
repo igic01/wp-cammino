@@ -115,6 +115,4 @@ function render_block( $block ) { return $block['innerHTML']; }
 require NSTARTER_PATH . '/inc/live-sections.php';
 require NSTARTER_PATH . '/inc/variable-sections.php';
 require NSTARTER_PATH . '/inc/posts.php';
-require NSTARTER_PATH . '/inc/post-collections.php';
 cammino_register_post_meta();
-nstarter_register_live_section( 'cammino_post_collection', 'cammino_render_post_collection' );
