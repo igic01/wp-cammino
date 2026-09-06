@@ -54,7 +54,6 @@ body.nstarter-editor-shell {
 
 .nstarter-mode-field,
 .nstarter-control--order,
-.nstarter-control--post-details,
 .nstarter-control--quiet {
     grid-column: 1 / -1;
 }

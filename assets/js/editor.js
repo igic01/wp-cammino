@@ -32,7 +32,6 @@
     const sectionOrderForm = document.querySelector('[data-nstarter-section-order-form]');
     const sectionOrderList = document.querySelector('[data-nstarter-section-order-list]');
     const sectionOrderCancel = document.querySelector('[data-nstarter-section-order-cancel]');
-    const postDetailsButton = document.querySelector('[data-cammino-post-details]');
     const postDetailsDialog = document.querySelector('[data-cammino-post-details-dialog]');
     const postDetailsForm = document.querySelector('[data-cammino-post-details-form]');
     const postDetailsCancel = document.querySelector('[data-cammino-post-details-cancel]');
@@ -651,7 +650,15 @@
         variableToolsLayer.className = 'nstarter-variable-tools';
         variableToolsLayer.setAttribute('contenteditable', 'false');
 
-        root.querySelectorAll('[data-nstarter-variable-section]').forEach(function (section) {
+        const sections = Array.from(root.querySelectorAll('[data-nstarter-variable-section]'));
+        const postDetailsSection = config.isPost
+            ? doc.querySelector('[data-cammino-post-details-element][data-nstarter-variable-section]')
+            : null;
+        if (postDetailsSection && !sections.includes(postDetailsSection)) {
+            sections.unshift(postDetailsSection);
+        }
+
+        sections.forEach(function (section) {
             if (isInLiveSection(section)) {
                 return;
             }
@@ -679,6 +686,11 @@
     }
 
     function openVariableEditor(section) {
+        if (section && section.dataset.nstarterVariableControl === 'post-details') {
+            openPostDetails();
+            return;
+        }
+
         if (!variableDialog || !variableInput || !section) {
             return;
         }
@@ -1379,9 +1391,6 @@
         if (sectionOrderButton) {
             sectionOrderButton.disabled = nextBusy;
         }
-        if (postDetailsButton) {
-            postDetailsButton.disabled = nextBusy;
-        }
         const builder = contentBuilder();
         if (builder) {
             builder.querySelectorAll('[data-nstarter-inline-action]').forEach(function (button) {
@@ -1482,8 +1491,7 @@
     saveButton.addEventListener('click', save);
     regenerateButton.addEventListener('click', regenerate);
     panelToggle.addEventListener('click', togglePanel);
-    if (postDetailsButton && postDetailsDialog && postDetailsForm && postDetailsCancel) {
-        postDetailsButton.addEventListener('click', openPostDetails);
+    if (postDetailsDialog && postDetailsForm && postDetailsCancel) {
         postDetailsForm.addEventListener('submit', applyPostDetails);
         postDetailsCancel.addEventListener('click', closePostDetails);
         postDetailsDialog.addEventListener('cancel', function (event) {

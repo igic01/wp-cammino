@@ -114,9 +114,9 @@ Card copy and images remain editable through the normal Text and Media modes.
 3. Fill the optional fields for that type: event date/time, location and status;
    project period, countries/location and status; or impact result and reporting
    period. Only populated fields for the current type appear publicly.
-4. Open **Cammino visual editor**. Use **Event details** to update an event's
-   title, date/time, and location; those details appear prominently below its
-   title. Use the three buttons directly below the body to add a heading,
+4. Open **Cammino visual editor**. Use the purple variable control attached to
+   the **Event details** element to update its title, date/time, and location;
+   those details appear prominently below the title. Use the three buttons directly below the body to add a heading,
    paragraph, or placeholder image. Edit text in place; click an image to
    replace it, and use the small controls below a block to move or remove it.
 5. Publish the post. Events appear in the existing event listing; projects,

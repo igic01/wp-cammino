@@ -73,16 +73,18 @@ foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 					<a href="<?php echo esc_url( $cammino_news_url . ( 'event' === $cammino_placement ? '#events' : '#articles' ) ); ?>" class="article-tag article-tag--primary"><?php echo esc_html( $cammino_type_label ); ?></a>
 					<span class="article-tag"><?php echo esc_html( $cammino_category['name'] ); ?></span>
 				</div>
-				<h1 data-cammino-post-title data-article-reveal="up" data-delay="120"><?php echo cammino_format_display_title( get_the_title( $cammino_post ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
-				<?php if ( '' !== $cammino_deck ) : ?>
-					<p class="article-deck" data-article-reveal="up" data-delay="180"><?php echo esc_html( $cammino_deck ); ?></p>
-				<?php endif; ?>
-				<?php if ( 'event' === $cammino_placement ) : ?>
-					<div class="cammino-event-summary" data-cammino-event-summary data-article-reveal="up" data-delay="240">
-						<span><i class="fa-regular fa-calendar" aria-hidden="true"></i><time data-cammino-event-date datetime="<?php echo esc_attr( $cammino_event_date ); ?>"><?php echo esc_html( $cammino_timestamp ? wp_date( get_option( 'date_format' ) . ' · H:i', $cammino_timestamp ) : __( 'Dátum bude doplnený', 'cammino' ) ); ?></time></span>
-						<span><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span data-cammino-event-location><?php echo esc_html( '' !== $cammino_event_location ? $cammino_event_location : __( 'Miesto bude doplnené', 'cammino' ) ); ?></span></span>
-					</div>
-				<?php endif; ?>
+				<div class="cammino-post-details-variable" data-cammino-post-details-element data-nstarter-variable-section="cammino_post_details" data-nstarter-variable-label="<?php echo esc_attr( 'event' === $cammino_placement ? __( 'Event details', 'cammino' ) : __( 'Post title', 'cammino' ) ); ?>" data-nstarter-variable-type="text" data-nstarter-variable-control="post-details">
+					<h1 data-cammino-post-title data-article-reveal="up" data-delay="120"><?php echo cammino_format_display_title( get_the_title( $cammino_post ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
+					<?php if ( '' !== $cammino_deck ) : ?>
+						<p class="article-deck" data-article-reveal="up" data-delay="180"><?php echo esc_html( $cammino_deck ); ?></p>
+					<?php endif; ?>
+					<?php if ( 'event' === $cammino_placement ) : ?>
+						<div class="cammino-event-summary" data-cammino-event-summary data-article-reveal="up" data-delay="240">
+							<span><i class="fa-regular fa-calendar" aria-hidden="true"></i><time data-cammino-event-date datetime="<?php echo esc_attr( $cammino_event_date ); ?>"><?php echo esc_html( $cammino_timestamp ? wp_date( get_option( 'date_format' ) . ' · H:i', $cammino_timestamp ) : __( 'Dátum bude doplnený', 'cammino' ) ); ?></time></span>
+							<span><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span data-cammino-event-location><?php echo esc_html( '' !== $cammino_event_location ? $cammino_event_location : __( 'Miesto bude doplnené', 'cammino' ) ); ?></span></span>
+						</div>
+					<?php endif; ?>
+				</div>
 			</header>
 
 			<div class="container article-cover" data-article-reveal="scale">
