@@ -144,6 +144,8 @@
   font-weight: 700;
 }
 
+.cammino-event-summary > span[hidden] { display: none; }
+
 .cammino-event-summary i { color: var(--color-coral); }
 
 .article-cover { max-width: 1260px; margin-top: clamp(3rem, 6vw, 5rem); }

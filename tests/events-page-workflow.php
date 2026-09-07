@@ -31,24 +31,18 @@ class WP_Query {
 }
 
 $GLOBALS['test_event_directory_posts'] = array();
-$event_types = array(
-	(object) array( 'slug' => 'workshop', 'name' => 'Workshopy' ),
-	(object) array( 'slug' => 'webinar', 'name' => 'Webináre' ),
-	(object) array( 'slug' => 'komunita', 'name' => 'Komunita' ),
-);
+$event_types = array( 'Workshop', 'Webinár', 'Komunita' );
 for ( $id = 100; $id < 108; ++$id ) {
 	$post = new WP_Post( $id, 'Podujatie ' . $id );
 	$GLOBALS['test_posts'][ $id ] = $post;
 	$GLOBALS['test_meta'][ $id ][ CAMMINO_POST_PLACEMENT_META ] = 'event';
 	$GLOBALS['test_meta'][ $id ][ CAMMINO_EVENT_DATE_META ] = '2026-10-15T16:00';
 	$GLOBALS['test_meta'][ $id ][ CAMMINO_EVENT_LOCATION_META ] = 'Bratislava';
-	$GLOBALS['test_categories'][ $id ] = array( $event_types[ ( $id - 100 ) % count( $event_types ) ] );
+	if ( $id < 107 ) {
+		$GLOBALS['test_meta'][ $id ][ CAMMINO_EVENT_TYPE_META ] = $event_types[ ( $id - 100 ) % count( $event_types ) ];
+	}
 	$GLOBALS['test_event_directory_posts'][] = $post;
 }
-$GLOBALS['test_categories'][100] = array(
-	(object) array( 'slug' => 'uncategorized', 'name' => 'Uncategorized' ),
-	$event_types[0],
-);
 
 $_GET = array();
 $directory = cammino_render_all_events( array(), 4 );
@@ -59,8 +53,9 @@ events_expect( ! str_contains( $directory, 'type="date"' ), 'Directory does not 
 events_expect( ! str_contains( $directory, 'events-pager' ), 'Small event collections do not use pagination' );
 events_expect( 24 === substr_count( $directory, '<time' ), 'Every event renders its date tile, full date, and time' );
 events_expect( 8 === substr_count( $directory, 'fa-location-dot' ), 'Every event renders a location' );
-events_expect( str_contains( $directory, 'data-event-type="workshop"' ), 'Event categories supply the type-filter value' );
-events_expect( ! str_contains( $directory, 'Uncategorized' ), 'The default WordPress category is not exposed as an event type' );
+events_expect( str_contains( $directory, 'data-event-type="workshop"' ), 'Optional event types supply the filter value' );
+events_expect( ! str_contains( $directory, '>Podujatie <span>' ), 'Empty event types do not create a redundant Podujatie filter' );
+events_expect( str_contains( $directory, 'data-event-type=""' ), 'Events without a type remain visible under Všetky' );
 events_expect( ! str_contains( $directory, 'data-reveal' ), 'Event content is visible without reveal JavaScript' );
 
 echo "Passed $checks event directory checks.\n";

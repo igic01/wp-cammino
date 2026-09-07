@@ -116,12 +116,14 @@ Card copy and images remain editable through the normal Text and Media modes.
    shows this type in its own column. Event posts are automatically assigned to
    the dedicated WordPress **Podujatia** category and removed from that category
    if their type changes.
-3. Fill the optional fields for that type: event date/time and location;
+3. Fill the optional fields for that type: event date/time, location, and an
+   optional free-text event type used by the directory filters;
    project period, countries/location and status; or impact result and reporting
    period. Only populated fields for the current type appear publicly.
 4. Open **Cammino visual editor**. Use the purple variable control attached to
-   the **Event details** element to update its title, date/time, location, and
-   cover-photo visibility; those details appear prominently below the title.
+   the **Event details** element to update its title, date/time, location,
+   optional event type, and cover-photo visibility; those details appear
+   prominently below the title.
    Use the three buttons directly below the body to add a heading,
    paragraph, or placeholder image. Edit text in place; click an image to
    replace it, and use the small controls below a block to move or remove it.

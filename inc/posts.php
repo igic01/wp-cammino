@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 const CAMMINO_EVENT_DATE_META     = '_cammino_event_date';
 const CAMMINO_EVENT_LOCATION_META = '_cammino_event_location';
+const CAMMINO_EVENT_TYPE_META     = '_cammino_event_type';
 const CAMMINO_EVENT_HIDE_IMAGE_META = '_cammino_event_hide_image';
 const CAMMINO_EVENT_CATEGORY_SLUG = 'podujatia';
 const CAMMINO_POST_PLACEMENT_META = '_cammino_post_placement';
@@ -138,6 +139,7 @@ function cammino_register_post_meta(): void {
 
 	register_post_meta( 'post', CAMMINO_EVENT_DATE_META, array_merge( $common, array( 'type' => 'string' ) ) );
 	register_post_meta( 'post', CAMMINO_EVENT_LOCATION_META, array_merge( $common, array( 'type' => 'string' ) ) );
+	register_post_meta( 'post', CAMMINO_EVENT_TYPE_META, array_merge( $common, array( 'type' => 'string' ) ) );
 	register_post_meta( 'post', CAMMINO_EVENT_HIDE_IMAGE_META, array_merge( $common, array( 'type' => 'string' ) ) );
 	foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 		register_post_meta( 'post', '_cammino_' . $key, array_merge( $common, array( 'type' => 'string' ) ) );
@@ -261,6 +263,7 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	$placements = cammino_get_post_placements();
 	$date       = (string) get_post_meta( $post->ID, CAMMINO_EVENT_DATE_META, true );
 	$location   = (string) get_post_meta( $post->ID, CAMMINO_EVENT_LOCATION_META, true );
+	$event_type = (string) get_post_meta( $post->ID, CAMMINO_EVENT_TYPE_META, true );
 	$hide_image = '1' === (string) get_post_meta( $post->ID, CAMMINO_EVENT_HIDE_IMAGE_META, true );
 
 	wp_nonce_field( 'cammino_save_post_settings', 'cammino_post_settings_nonce' );
@@ -288,6 +291,10 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	<p>
 		<label for="cammino-event-location"><?php esc_html_e( 'Miesto', 'cammino' ); ?></label>
 		<input id="cammino-event-location" name="cammino_event_location" type="text" value="<?php echo esc_attr( $location ); ?>" style="width:100%">
+	</p>
+	<p>
+		<label for="cammino-event-type"><?php esc_html_e( 'Typ podujatia (voliteľné)', 'cammino' ); ?></label>
+		<input id="cammino-event-type" name="cammino_event_type" type="text" value="<?php echo esc_attr( $event_type ); ?>" maxlength="100" placeholder="<?php esc_attr_e( 'Napr. workshop alebo webinár', 'cammino' ); ?>" style="width:100%">
 	</p>
 	<p><label><input name="cammino_event_hide_image" type="checkbox" value="1" <?php checked( $hide_image ); ?>> <?php esc_html_e( 'Skryť fotografiu na stránke podujatia', 'cammino' ); ?></label></p>
 	</div>
@@ -322,6 +329,7 @@ function cammino_save_post_settings( int $post_id ): void {
 		CAMMINO_POST_PLACEMENT_META => isset( $_POST['cammino_post_placement'] ) ? cammino_sanitize_post_placement( wp_unslash( $_POST['cammino_post_placement'] ) ) : cammino_get_post_placement( $post_id ),
 		CAMMINO_EVENT_DATE_META     => isset( $_POST['cammino_event_date'] ) ? sanitize_text_field( wp_unslash( $_POST['cammino_event_date'] ) ) : '',
 		CAMMINO_EVENT_LOCATION_META => isset( $_POST['cammino_event_location'] ) ? sanitize_text_field( wp_unslash( $_POST['cammino_event_location'] ) ) : '',
+		CAMMINO_EVENT_TYPE_META     => isset( $_POST['cammino_event_type'] ) ? sanitize_text_field( wp_unslash( $_POST['cammino_event_type'] ) ) : '',
 		CAMMINO_EVENT_HIDE_IMAGE_META => isset( $_POST['cammino_event_hide_image'] ) ? '1' : '',
 	);
 	foreach ( cammino_get_post_detail_fields() as $key => $field ) {
@@ -348,7 +356,7 @@ function cammino_save_post_settings( int $post_id ): void {
 /**
  * Save the fields exposed by the visual post-details editor.
  */
-function cammino_update_visual_post_details( int $post_id, string $title, string $event_date = '', string $event_location = '', bool $hide_image = false ): bool {
+function cammino_update_visual_post_details( int $post_id, string $title, string $event_date = '', string $event_location = '', bool $hide_image = false, string $event_type = '' ): bool {
 	if ( 'post' !== get_post_type( $post_id ) ) {
 		return false;
 	}
@@ -356,6 +364,7 @@ function cammino_update_visual_post_details( int $post_id, string $title, string
 	$title          = sanitize_text_field( $title );
 	$event_date     = sanitize_text_field( $event_date );
 	$event_location = sanitize_text_field( $event_location );
+	$event_type     = sanitize_text_field( $event_type );
 	$placement      = cammino_get_post_placement( $post_id );
 
 	if ( '' === $title || ( '' !== $event_date && ! preg_match( '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $event_date ) ) ) {
@@ -374,7 +383,7 @@ function cammino_update_visual_post_details( int $post_id, string $title, string
 	}
 
 	if ( 'event' === $placement ) {
-		foreach ( array( CAMMINO_EVENT_DATE_META => $event_date, CAMMINO_EVENT_LOCATION_META => $event_location, CAMMINO_EVENT_HIDE_IMAGE_META => $hide_image ? '1' : '' ) as $meta_key => $value ) {
+		foreach ( array( CAMMINO_EVENT_DATE_META => $event_date, CAMMINO_EVENT_LOCATION_META => $event_location, CAMMINO_EVENT_TYPE_META => $event_type, CAMMINO_EVENT_HIDE_IMAGE_META => $hide_image ? '1' : '' ) as $meta_key => $value ) {
 			if ( '' === $value ) {
 				delete_post_meta( $post_id, $meta_key );
 			} else {
@@ -390,6 +399,7 @@ function cammino_update_visual_post_details( int $post_id, string $title, string
 		&& ( 'event' !== $placement || (
 			$event_date === (string) get_post_meta( $post_id, CAMMINO_EVENT_DATE_META, true )
 			&& $event_location === (string) get_post_meta( $post_id, CAMMINO_EVENT_LOCATION_META, true )
+			&& $event_type === (string) get_post_meta( $post_id, CAMMINO_EVENT_TYPE_META, true )
 			&& ( $hide_image ? '1' : '' ) === (string) get_post_meta( $post_id, CAMMINO_EVENT_HIDE_IMAGE_META, true )
 		) );
 }
@@ -720,24 +730,17 @@ function cammino_render_news_events(): string {
 }
 
 /**
- * Return the category used as an event type, excluding the required event
- * directory category that WordPress adds automatically.
+ * Return the optional event type used by directory labels and filters.
  *
  * @return array{slug:string,name:string,icon:string}
  */
 function cammino_get_event_display_type( int $post_id ): array {
-	$categories = get_the_category( $post_id );
-	$type       = null;
-
-	foreach ( $categories as $category ) {
-		if ( ! in_array( $category->slug, array( CAMMINO_EVENT_CATEGORY_SLUG, 'uncategorized' ), true ) ) {
-			$type = $category;
-			break;
-		}
+	$name = sanitize_text_field( (string) get_post_meta( $post_id, CAMMINO_EVENT_TYPE_META, true ) );
+	$slug = '' !== $name ? sanitize_title( $name ) : '';
+	if ( in_array( $slug, array( 'podujatie', 'podujatia', 'uncategorized' ), true ) ) {
+		$name = '';
+		$slug = '';
 	}
-
-	$slug = $type ? sanitize_title( $type->slug ) : 'podujatie';
-	$name = $type ? $type->name : __( 'Podujatie', 'cammino' );
 	$icon = 'fa-calendar-days';
 
 	if ( str_contains( $slug, 'workshop' ) ) {
@@ -785,6 +788,9 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 
 	foreach ( $events as $event ) {
 		$type = cammino_get_event_display_type( (int) $event->ID );
+		if ( '' === $type['slug'] ) {
+			continue;
+		}
 		if ( ! isset( $types[ $type['slug'] ] ) ) {
 			$types[ $type['slug'] ] = array( 'name' => $type['name'], 'count' => 0 );
 		}
@@ -795,18 +801,20 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 		return function_exists( 'mb_strtoupper' ) ? mb_strtoupper( $value, 'UTF-8' ) : strtoupper( $value );
 	};
 	$card_styles = array( 'event-card--apricot', 'event-card--sage', 'event-card--cream', 'event-card--coral' );
+	$event_count = count( $events );
+	$count_label = 1 === $event_count ? __( 'podujatie', 'cammino' ) : ( $event_count >= 2 && $event_count <= 4 ? __( 'podujatia', 'cammino' ) : __( 'podujatí', 'cammino' ) );
 
 	ob_start();
 	?>
 	<div class="event-toolbar">
 		<div class="filter-label"><i class="fa-solid fa-sliders" aria-hidden="true"></i><span><?php esc_html_e( 'Typ podujatia', 'cammino' ); ?></span></div>
 		<div class="event-filters" role="group" aria-label="<?php esc_attr_e( 'Filtrovať podujatia podľa typu', 'cammino' ); ?>">
-			<button class="event-filter is-active" type="button" data-event-filter="all" aria-pressed="true"><?php esc_html_e( 'Všetky', 'cammino' ); ?> <span><?php echo esc_html( (string) count( $events ) ); ?></span></button>
+			<button class="event-filter is-active" type="button" data-event-filter="all" aria-pressed="true"><?php esc_html_e( 'Všetky', 'cammino' ); ?> <span><?php echo esc_html( (string) $event_count ); ?></span></button>
 			<?php foreach ( $types as $slug => $type ) : ?>
 				<button class="event-filter" type="button" data-event-filter="<?php echo esc_attr( $slug ); ?>" aria-pressed="false"><?php echo esc_html( $type['name'] ); ?> <span><?php echo esc_html( (string) $type['count'] ); ?></span></button>
 			<?php endforeach; ?>
 		</div>
-		<p class="result-count" aria-live="polite"><strong data-visible-count><?php echo esc_html( (string) count( $events ) ); ?></strong> <span data-count-label><?php esc_html_e( 'podujatí', 'cammino' ); ?></span></p>
+		<p class="result-count" aria-live="polite"><strong data-visible-count><?php echo esc_html( (string) $event_count ); ?></strong> <span data-count-label><?php echo esc_html( $count_label ); ?></span></p>
 	</div>
 
 	<?php if ( empty( $events ) ) : ?>
@@ -823,7 +831,7 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 				<article class="event-card <?php echo esc_attr( $card_styles[ $index % count( $card_styles ) ] ); ?>" data-event-card data-event-type="<?php echo esc_attr( $type['slug'] ); ?>">
 					<time class="event-card__date" datetime="<?php echo esc_attr( $raw_date ); ?>"><span><?php echo esc_html( $uppercase( wp_date( 'M', $timestamp ) ) ); ?></span><strong><?php echo esc_html( wp_date( 'd', $timestamp ) ); ?></strong><small><?php echo esc_html( $uppercase( wp_date( 'D', $timestamp ) ) ); ?></small></time>
 					<div class="event-card__main">
-						<span class="event-label"><i class="fa-solid <?php echo esc_attr( $type['icon'] ); ?>" aria-hidden="true"></i> <?php echo esc_html( $type['name'] ); ?></span>
+						<?php if ( '' !== $type['name'] ) : ?><span class="event-label"><i class="fa-solid <?php echo esc_attr( $type['icon'] ); ?>" aria-hidden="true"></i> <?php echo esc_html( $type['name'] ); ?></span><?php endif; ?>
 						<h2><a href="<?php echo esc_url( get_permalink( $event ) ); ?>"><?php echo esc_html( get_the_title( $event ) ); ?></a></h2>
 						<div class="event-facts">
 							<span><i class="fa-regular fa-calendar" aria-hidden="true"></i><time datetime="<?php echo esc_attr( substr( $raw_date, 0, 10 ) ); ?>"><?php echo esc_html( wp_date( get_option( 'date_format' ), $timestamp ) ); ?></time></span>

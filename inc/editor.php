@@ -112,6 +112,7 @@ function nstarter_maybe_render_editor(): void {
 				'title'         => get_the_title( $post ),
 				'eventDate'     => $is_event ? (string) get_post_meta( $post_id, CAMMINO_EVENT_DATE_META, true ) : '',
 				'eventLocation' => $is_event ? (string) get_post_meta( $post_id, CAMMINO_EVENT_LOCATION_META, true ) : '',
+				'eventType'     => $is_event ? (string) get_post_meta( $post_id, CAMMINO_EVENT_TYPE_META, true ) : '',
 				'hideImage'     => $is_event && '1' === (string) get_post_meta( $post_id, CAMMINO_EVENT_HIDE_IMAGE_META, true ),
 			) : array(),
 			'placeholderUrl' => NSTARTER_URL . '/assets/images/placeholder.webp',
@@ -267,6 +268,7 @@ function nstarter_maybe_render_editor(): void {
 						<?php if ( $is_event ) : ?>
 							<label><?php esc_html_e( 'Event date and time', 'cammino' ); ?><input name="event_date" type="datetime-local" required></label>
 							<label><?php esc_html_e( 'Location', 'cammino' ); ?><input name="event_location" type="text" maxlength="200" required></label>
+							<label><?php esc_html_e( 'Event type (optional)', 'cammino' ); ?><input name="event_type" type="text" maxlength="100" placeholder="<?php esc_attr_e( 'For example: workshop or webinar', 'cammino' ); ?>"></label>
 							<label class="nstarter-post-details-dialog__check"><input name="hide_image" type="checkbox"> <?php esc_html_e( 'Hide the event photo', 'cammino' ); ?></label>
 							<p><?php esc_html_e( 'These details appear directly below the event title.', 'cammino' ); ?></p>
 						<?php endif; ?>
@@ -309,11 +311,14 @@ function nstarter_ajax_save_snapshot(): void {
 		$location = isset( $_POST['event_location'] )
 			? (string) wp_unslash( $_POST['event_location'] )
 			: (string) get_post_meta( $post_id, CAMMINO_EVENT_LOCATION_META, true );
+		$event_type = isset( $_POST['event_type'] )
+			? (string) wp_unslash( $_POST['event_type'] )
+			: (string) get_post_meta( $post_id, CAMMINO_EVENT_TYPE_META, true );
 		$hide_image = isset( $_POST['hide_image'] )
 			? '1' === sanitize_text_field( wp_unslash( $_POST['hide_image'] ) )
 			: '1' === (string) get_post_meta( $post_id, CAMMINO_EVENT_HIDE_IMAGE_META, true );
 
-		if ( ! cammino_update_visual_post_details( $post_id, $title, $date, $location, $hide_image ) ) {
+		if ( ! cammino_update_visual_post_details( $post_id, $title, $date, $location, $hide_image, $event_type ) ) {
 			wp_send_json_error( array( 'message' => __( 'The post details could not be saved. Check the title, date, and location.', 'cammino' ) ), 400 );
 		}
 	}

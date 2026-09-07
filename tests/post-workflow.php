@@ -27,10 +27,12 @@ $GLOBALS['test_meta'][8][CAMMINO_POST_PLACEMENT_META] = 'project';
 cammino_migrate_post_placements_from_slugs();
 expect( 'project' === cammino_get_post_placement( 8 ), 'Migration is idempotent' );
 
-expect( cammino_update_visual_post_details( 1, 'Nový názov podujatia', '2026-10-15T16:00', 'Bratislava', true ), 'Visual editor saves event title, date, location, and photo visibility' );
+expect( cammino_update_visual_post_details( 1, 'Nový názov podujatia', '2026-10-15T16:00', 'Bratislava', true, 'Workshop' ), 'Visual editor saves event title, date, location, type, and photo visibility' );
 expect( get_the_title( 1 ) === 'Nový názov podujatia', 'Visual editor updates the WordPress post title' );
 expect( get_post_meta( 1, CAMMINO_EVENT_DATE_META, true ) === '2026-10-15T16:00' && get_post_meta( 1, CAMMINO_EVENT_LOCATION_META, true ) === 'Bratislava', 'Visual editor updates event metadata' );
+expect( get_post_meta( 1, CAMMINO_EVENT_TYPE_META, true ) === 'Workshop', 'Visual editor updates the optional event type' );
 expect( get_post_meta( 1, CAMMINO_EVENT_HIDE_IMAGE_META, true ) === '1', 'Visual editor can hide the event photo' );
+expect( cammino_update_visual_post_details( 1, 'Nový názov podujatia', '2026-10-15T16:00', 'Bratislava', true, '' ) && '' === get_post_meta( 1, CAMMINO_EVENT_TYPE_META, true ), 'Event type can be left empty' );
 expect( ! cammino_update_visual_post_details( 1, '', 'not-a-date', 'Bratislava' ), 'Invalid visual event details are rejected' );
 
 $saved = '<p data-nstarter-content-item data-nstarter-content-type="paragraph">Zachovať moje úpravy.</p>';
