@@ -19,6 +19,7 @@ $GLOBALS['test_categories'][2] = array(
 	(object) array( 'slug' => 'komunita', 'name' => 'Komunita' ),
 	(object) array( 'slug' => 'uncategorized', 'name' => 'Uncategorized' ),
 );
+$GLOBALS['test_meta'][2][CAMMINO_PROJECT_HIDE_IMAGE_META] = '1';
 
 $directory = cammino_render_all_projects();
 $query     = end( $GLOBALS['test_queries'] );
@@ -39,6 +40,7 @@ projects_expect( ! str_contains( $directory, 'project-category-selector__heading
 projects_expect( str_contains( $directory, '<a class="project-card' ), 'The whole project card is a link.' );
 projects_expect( str_contains( $directory, 'Projekt Beta' ), 'The project title is displayed.' );
 projects_expect( str_contains( $directory, 'Krátky popis projektu.' ), 'The project description is displayed.' );
+projects_expect( str_contains( $directory, 'project-card--no-image' ) && ! str_contains( $directory, 'project-card__media' ), 'A project configured without an image renders a text-only card.' );
 
 $template = file_get_contents( NSTARTER_PATH . '/snapshot-templates/projects.php' );
 projects_expect( ! preg_match( '/<header class="projects-heading">.*?<p>/s', $template ), 'The removed introductory header paragraph is not rendered.' );

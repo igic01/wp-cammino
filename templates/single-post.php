@@ -29,6 +29,9 @@ $cammino_event_type = 'event' === $cammino_placement
 	: '';
 $cammino_hide_event_image = 'event' === $cammino_placement
 	&& '1' === (string) get_post_meta( $cammino_post_id, CAMMINO_EVENT_HIDE_IMAGE_META, true );
+$cammino_hide_project_image = 'project' === $cammino_placement
+	&& '1' === (string) get_post_meta( $cammino_post_id, CAMMINO_PROJECT_HIDE_IMAGE_META, true );
+$cammino_hide_cover_image = $cammino_hide_event_image || $cammino_hide_project_image;
 $cammino_timestamp  = '' !== $cammino_event_date ? cammino_get_event_timestamp( $cammino_post_id ) : 0;
 $cammino_type_label  = cammino_get_post_type_label( $cammino_placement );
 $cammino_deck        = has_excerpt( $cammino_post )
@@ -86,7 +89,7 @@ foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 				</div>
 			</header>
 
-			<div class="container article-cover" data-article-reveal="scale" data-cammino-event-cover<?php echo $cammino_hide_event_image ? ' hidden' : ''; ?>>
+			<div class="container article-cover" data-article-reveal="scale" data-cammino-event-cover<?php echo $cammino_hide_cover_image ? ' hidden' : ''; ?>>
 				<div class="article-cover__frame">
 					<img src="<?php echo esc_url( $cammino_image ); ?>" alt="<?php echo esc_attr( get_the_title( $cammino_post ) ); ?>" width="1600" height="1000"<?php echo $cammino_thumbnail ? ' data-attachment-id="' . esc_attr( (string) $cammino_thumbnail ) . '"' : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 				</div>

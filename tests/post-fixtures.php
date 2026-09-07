@@ -134,6 +134,9 @@ function get_posts( $args ) {
 }
 function get_the_title( $post ) { return get_post( $post )->post_title ?? ''; }
 function get_the_category( $post_id ) { return $GLOBALS['test_categories'][ (int) $post_id ] ?? array(); }
+function get_categories( $args = array() ) {
+	return array_map( static fn( $id, $term ) => (object) array( 'term_id' => $id, 'slug' => $term['slug'], 'name' => $term['name'] ), array_keys( $GLOBALS['test_terms'] ), $GLOBALS['test_terms'] );
+}
 function get_permalink( $post ) { return '/live/post-preview.php?id=' . get_post( $post )->ID; }
 function get_the_date( $format = '', $post = null ) { return date( $format ?: 'j. F Y', 1788600000 ); }
 function get_the_post_thumbnail_url( $id, $size ) { return '/assets/images/placeholder.webp'; }
@@ -144,6 +147,7 @@ function wp_timezone() { return new DateTimeZone( 'Europe/Bratislava' ); }
 function wp_date( $format, $timestamp ) { return ( new DateTimeImmutable( '@' . $timestamp ) )->setTimezone( wp_timezone() )->format( $format ); }
 function wp_nonce_field( $action, $name ) { echo '<input type="hidden" name="' . esc_attr($name) . '" value="test-nonce">'; }
 function selected( $value, $expected ) { if ( $value === $expected ) { echo 'selected'; } }
+function checked( $value, $expected = true ) { if ( (bool) $value === (bool) $expected ) { echo 'checked'; } }
 function parse_blocks( $content ) { return array( array( 'blockName' => null, 'innerHTML' => $content ) ); }
 function render_block( $block ) { return $block['innerHTML']; }
 require NSTARTER_PATH . '/inc/live-sections.php';

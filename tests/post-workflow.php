@@ -12,6 +12,7 @@ function expect( $condition, $message ) {
 }
 
 expect( array_keys( cammino_get_post_placements() ) === array( 'event', 'project', 'impact-story' ), 'Three selectable types' );
+expect( array_keys( cammino_get_post_detail_fields() ) === array( 'impact_result', 'impact_period' ), 'Projects no longer expose period, location, or status fields' );
 expect( 'article' === cammino_get_post_placement( 4 ), 'Legacy articles retain their type' );
 expect( 'impact-story' === cammino_get_post_placement( 8 ), 'Unstored metadata uses registered default' );
 
@@ -63,11 +64,24 @@ expect( ! str_contains( $fresh_body, 'content-template="posts"' ), 'Fresh post b
 $_POST = array(
 	'cammino_post_settings_nonce' => 'test-nonce',
 	'cammino_post_placement'      => 'project',
-	'cammino_project_period'      => '2026–2027',
+	'cammino_project_category'    => '2',
 );
 cammino_save_post_settings( 4 );
 expect( get_post_meta( 4, CAMMINO_POST_SNAPSHOT_META, true ) === $cleaned, 'Type changes preserve the cleaned visual snapshot' );
-expect( cammino_get_post_placement( 4 ) === 'project' && get_post_meta( 4, '_cammino_project_period', true ) === '2026–2027', 'WordPress settings save' );
+expect( cammino_get_post_placement( 4 ) === 'project' && $GLOBALS['test_post_terms'][4] === array( 2 ), 'Project category saves from the simplified settings' );
+expect( get_post_meta( 4, CAMMINO_PROJECT_HIDE_IMAGE_META, true ) === '1', 'An unchecked project image option hides the project image' );
+
+$_POST['cammino_project_show_image'] = '1';
+cammino_save_post_settings( 4 );
+expect( '' === get_post_meta( 4, CAMMINO_PROJECT_HIDE_IMAGE_META, true ), 'The project image can be enabled again' );
+
+$GLOBALS['test_terms'][2] = array( 'slug' => 'vzdelavanie', 'name' => 'Vzdelávanie' );
+$GLOBALS['test_categories'][2] = array( (object) array( 'term_id' => 2, 'slug' => 'vzdelavanie', 'name' => 'Vzdelávanie' ) );
+ob_start();
+cammino_render_post_settings_meta_box( $GLOBALS['test_posts'][2] );
+$project_settings = (string) ob_get_clean();
+expect( str_contains( $project_settings, 'cammino_project_category' ) && str_contains( $project_settings, 'cammino_project_show_image' ), 'Project settings contain only category and image controls' );
+expect( ! str_contains( $project_settings, 'cammino_project_period' ) && ! str_contains( $project_settings, 'cammino_project_location' ) && ! str_contains( $project_settings, 'cammino_project_status' ), 'Removed project controls are absent from the editor' );
 
 $GLOBALS['test_can_edit'] = false;
 $_POST['cammino_post_placement'] = 'event';
