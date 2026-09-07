@@ -89,8 +89,11 @@ function nstarter_maybe_render_editor(): void {
 		);
 	}
 
-	$is_post  = 'post' === $post->post_type;
-	$is_event = $is_post && 'event' === cammino_get_post_placement( $post_id );
+	$is_post    = 'post' === $post->post_type;
+	$placement  = $is_post ? cammino_get_post_placement( $post_id ) : '';
+	$is_event   = 'event' === $placement;
+	$is_project = 'project' === $placement;
+	$editable_category = $is_post ? cammino_get_editable_post_category( $post_id ) : array( 'name' => '' );
 
 	show_admin_bar( false );
 	remove_action( 'wp_head', '_admin_bar_bump_cb' );
@@ -108,12 +111,15 @@ function nstarter_maybe_render_editor(): void {
 			'viewUrl'    => get_permalink( $post_id ),
 			'isPost'     => $is_post,
 			'isEvent'    => $is_event,
+			'isProject'  => $is_project,
 			'postDetails' => $is_post ? array(
 				'title'         => get_the_title( $post ),
+				'category'      => $editable_category['name'],
 				'eventDate'     => $is_event ? (string) get_post_meta( $post_id, CAMMINO_EVENT_DATE_META, true ) : '',
 				'eventLocation' => $is_event ? (string) get_post_meta( $post_id, CAMMINO_EVENT_LOCATION_META, true ) : '',
 				'eventType'     => $is_event ? (string) get_post_meta( $post_id, CAMMINO_EVENT_TYPE_META, true ) : '',
-				'hideImage'     => $is_event && '1' === (string) get_post_meta( $post_id, CAMMINO_EVENT_HIDE_IMAGE_META, true ),
+				'hideImage'     => ( $is_event && '1' === (string) get_post_meta( $post_id, CAMMINO_EVENT_HIDE_IMAGE_META, true ) )
+					|| ( $is_project && '1' === (string) get_post_meta( $post_id, CAMMINO_PROJECT_HIDE_IMAGE_META, true ) ),
 			) : array(),
 			'placeholderUrl' => NSTARTER_URL . '/assets/images/placeholder.webp',
 			'strings'    => array(
@@ -263,14 +269,17 @@ function nstarter_maybe_render_editor(): void {
 			<?php if ( $is_post ) : ?>
 				<dialog class="nstarter-post-details-dialog" data-cammino-post-details-dialog>
 					<form data-cammino-post-details-form>
-						<h2><?php echo esc_html( $is_event ? __( 'Edit event details', 'cammino' ) : __( 'Edit post title', 'cammino' ) ); ?></h2>
+						<h2><?php echo esc_html( $is_event ? __( 'Edit event details', 'cammino' ) : ( $is_project ? __( 'Edit project details', 'cammino' ) : __( 'Edit post title', 'cammino' ) ) ); ?></h2>
 						<label><?php esc_html_e( 'Title', 'cammino' ); ?><input name="title" type="text" maxlength="200" required></label>
 						<?php if ( $is_event ) : ?>
 							<label><?php esc_html_e( 'Event date and time', 'cammino' ); ?><input name="event_date" type="datetime-local" required></label>
 							<label><?php esc_html_e( 'Location', 'cammino' ); ?><input name="event_location" type="text" maxlength="200" required></label>
 							<label><?php esc_html_e( 'Event type (optional)', 'cammino' ); ?><input name="event_type" type="text" maxlength="100" placeholder="<?php esc_attr_e( 'For example: workshop or webinar', 'cammino' ); ?>"></label>
-							<label class="nstarter-post-details-dialog__check"><input name="hide_image" type="checkbox"> <?php esc_html_e( 'Hide the event photo', 'cammino' ); ?></label>
-							<p><?php esc_html_e( 'These details appear directly below the event title.', 'cammino' ); ?></p>
+						<?php endif; ?>
+						<?php if ( $is_event || $is_project ) : ?>
+							<label><?php esc_html_e( 'Category', 'cammino' ); ?><input name="category" type="text" maxlength="100" placeholder="<?php esc_attr_e( 'Enter a category name', 'cammino' ); ?>"></label>
+							<label class="nstarter-post-details-dialog__check"><input name="hide_image" type="checkbox"> <?php echo esc_html( $is_event ? __( 'Hide the event photo', 'cammino' ) : __( 'Hide the project image', 'cammino' ) ); ?></label>
+							<p><?php esc_html_e( 'The title, category, and image setting are saved directly to this post.', 'cammino' ); ?></p>
 						<?php endif; ?>
 						<div><button type="button" data-cammino-post-details-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button><button type="submit"><?php esc_html_e( 'Apply', 'cammino' ); ?></button></div>
 					</form>
@@ -316,9 +325,14 @@ function nstarter_ajax_save_snapshot(): void {
 			: (string) get_post_meta( $post_id, CAMMINO_EVENT_TYPE_META, true );
 		$hide_image = isset( $_POST['hide_image'] )
 			? '1' === sanitize_text_field( wp_unslash( $_POST['hide_image'] ) )
-			: '1' === (string) get_post_meta( $post_id, CAMMINO_EVENT_HIDE_IMAGE_META, true );
+			: ( 'event' === cammino_get_post_placement( $post_id )
+				? '1' === (string) get_post_meta( $post_id, CAMMINO_EVENT_HIDE_IMAGE_META, true )
+				: '1' === (string) get_post_meta( $post_id, CAMMINO_PROJECT_HIDE_IMAGE_META, true ) );
+		$category = isset( $_POST['category'] )
+			? (string) wp_unslash( $_POST['category'] )
+			: cammino_get_editable_post_category( $post_id )['name'];
 
-		if ( ! cammino_update_visual_post_details( $post_id, $title, $date, $location, $hide_image, $event_type ) ) {
+		if ( ! cammino_update_visual_post_details( $post_id, $title, $date, $location, $hide_image, $event_type, $category ) ) {
 			wp_send_json_error( array( 'message' => __( 'The post details could not be saved. Check the title, date, and location.', 'cammino' ) ), 400 );
 		}
 	}

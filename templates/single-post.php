@@ -17,6 +17,7 @@ $cammino_post       = get_post( $cammino_post_id );
 $cammino_placement  = cammino_get_post_placement( $cammino_post_id );
 $cammino_news_url   = cammino_get_news_page_url();
 $cammino_category   = cammino_get_post_category( $cammino_post_id );
+$cammino_editable_category = cammino_get_editable_post_category( $cammino_post_id );
 $cammino_image      = cammino_get_post_image_url( $cammino_post_id, 'full' );
 $cammino_event_date = 'event' === $cammino_placement
 	? (string) get_post_meta( $cammino_post_id, CAMMINO_EVENT_DATE_META, true )
@@ -72,9 +73,13 @@ foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 				</a>
 				<div class="article-tags" data-article-reveal="up" data-delay="60">
 					<a href="<?php echo esc_url( $cammino_news_url . ( 'event' === $cammino_placement ? '#events' : '#articles' ) ); ?>" class="article-tag article-tag--primary"><?php echo esc_html( $cammino_type_label ); ?></a>
-					<?php if ( 'event' !== $cammino_placement ) : ?><span class="article-tag"><?php echo esc_html( $cammino_category['name'] ); ?></span><?php endif; ?>
+					<?php if ( in_array( $cammino_placement, array( 'event', 'project' ), true ) ) : ?>
+						<span class="article-tag" data-cammino-post-category<?php echo '' === $cammino_editable_category['name'] ? ' hidden' : ''; ?>><?php echo esc_html( $cammino_editable_category['name'] ); ?></span>
+					<?php else : ?>
+						<span class="article-tag"><?php echo esc_html( $cammino_category['name'] ); ?></span>
+					<?php endif; ?>
 				</div>
-				<div class="cammino-post-details-variable" data-cammino-post-details-element data-nstarter-variable-section="cammino_post_details" data-nstarter-variable-label="<?php echo esc_attr( 'event' === $cammino_placement ? __( 'Event details', 'cammino' ) : __( 'Post title', 'cammino' ) ); ?>" data-nstarter-variable-type="text" data-nstarter-variable-control="post-details">
+				<div class="cammino-post-details-variable" data-cammino-post-details-element data-nstarter-variable-section="cammino_post_details" data-nstarter-variable-label="<?php echo esc_attr( 'event' === $cammino_placement ? __( 'Event details', 'cammino' ) : ( 'project' === $cammino_placement ? __( 'Project details', 'cammino' ) : __( 'Post title', 'cammino' ) ) ); ?>" data-nstarter-variable-type="text" data-nstarter-variable-control="post-details">
 					<h1 data-cammino-post-title data-article-reveal="up" data-delay="120"><?php echo cammino_format_display_title( get_the_title( $cammino_post ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
 					<?php if ( '' !== $cammino_deck ) : ?>
 						<p class="article-deck" data-article-reveal="up" data-delay="180"><?php echo esc_html( $cammino_deck ); ?></p>

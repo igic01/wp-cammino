@@ -41,8 +41,8 @@ shared single-post design for events, projects, and impact stories.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
 - `inc/posts.php` stores the selected event/project/impact-story type and optional
   details, preserves legacy articles, and provides type-aware starter content.
-- `templates/single-post.php` renders all three types using the shared article
-  layout with type-specific labels, accents, and factual summaries.
+- `templates/single-post.php` renders events, projects, and existing legacy impact
+  stories using the shared article layout.
 - `inc/` and `assets/js/editor.js` provide the copied visual snapshot editor.
 - `assets/fonts/` contains the Fredoka and Varela Round families used by custom
   Cammino pages.
@@ -112,25 +112,24 @@ control sets the number of story cards. Every card has its own 0–4 photo contr
 and a text control that writes the destination of its **Celý príbeh** link.
 Card copy and images remain editable through the normal Text and Media modes.
 
-## Publish an event, project, or impact story
+## Publish an event or project
 
 1. Create or edit a normal WordPress post and set its title, excerpt, featured
    image, and categories. Every post automatically uses the shared Cammino
    article design. These remain normal WordPress posts with a type dropdown,
    preserving their URLs and compatibility with the existing visual editor.
-2. In **Cammino príspevok → Typ príspevku**, choose **Podujatie** (event),
-   **Projekt** (project), or **Príbeh pomoci** (impact story). The posts list also
-   shows this type in its own column. Event posts are automatically assigned to
+2. In **Cammino príspevok → Typ príspevku**, choose **Podujatie** (event) or
+   **Projekt** (project). The removed impact-story choice remains supported only
+   on posts that already used it. The posts list also shows the type in its own
+   column. Event posts are automatically assigned to
    the dedicated WordPress **Podujatia** category and removed from that category
    if their type changes.
-3. Fill the fields for that type: event date/time, location, and an optional
-   free-text event type used by the directory filters; for a project, choose its
-   category and whether its image should be shown; or add the optional impact
-   result and reporting period for an impact story.
+3. Fill the fields for that type: event date/time, location, optional event type,
+   category, and photo visibility; for a project, enter its category and choose
+   whether its image should be shown. A new category name is created automatically.
 4. Open **Cammino visual editor**. Use the purple variable control attached to
-   the **Event details** element to update its title, date/time, location,
-   optional event type, and cover-photo visibility; those details appear
-   prominently below the title.
+   **Event details** or **Project details**. Both edit title, category, and image
+   visibility; events additionally edit date/time, location, and event type.
    Use the three buttons directly below the body to add a heading,
    paragraph, or placeholder image. Edit text in place; click an image to
    replace it, and use the small controls below a block to move or remove it.
@@ -147,7 +146,7 @@ the current WordPress content or an empty body.
 
 ## Article body builder
 
-All three post types use the same dedicated content-builder element below the
+Managed posts use the same dedicated content-builder element below the
 cover image. Its three large inline buttons add unlimited headings, paragraphs,
 and placeholder images. Text is editable in the preview; clicking an image opens
 the WordPress media library. The small buttons below each block change its order

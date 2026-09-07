@@ -32,6 +32,11 @@ function cammino_get_post_placements(): array {
 	);
 }
 
+/** Return only the post types available when creating or changing a post. */
+function cammino_get_selectable_post_placements(): array {
+	return array_intersect_key( cammino_get_post_placements(), array( 'event' => true, 'project' => true ) );
+}
+
 /** Return the dedicated WordPress category ID used by event posts. */
 function cammino_get_event_category_id( bool $create = true ): int {
 	$term = term_exists( CAMMINO_EVENT_CATEGORY_SLUG, 'category' );
@@ -83,7 +88,7 @@ function cammino_get_post_placement( int $post_id ): string {
 	$placement = sanitize_key( (string) get_post_meta( $post_id, CAMMINO_POST_PLACEMENT_META, true ) );
 
 	// Retain legacy articles without silently reclassifying existing content.
-	return 'article' === $placement || isset( cammino_get_post_placements()[ $placement ] ) ? $placement : 'impact-story';
+	return 'article' === $placement || isset( cammino_get_post_placements()[ $placement ] ) ? $placement : 'project';
 }
 
 /**
@@ -94,7 +99,7 @@ function cammino_get_post_placement( int $post_id ): string {
 function cammino_sanitize_post_placement( $value ): string {
 	$placement = sanitize_key( (string) $value );
 
-	return 'article' === $placement || isset( cammino_get_post_placements()[ $placement ] ) ? $placement : 'impact-story';
+	return 'article' === $placement || isset( cammino_get_post_placements()[ $placement ] ) ? $placement : 'project';
 }
 
 /** Shared labels and cover treatments for all three designs and legacy articles. */
@@ -104,6 +109,42 @@ function cammino_get_post_type_label( string $type ): string {
 
 function cammino_get_post_type_icon( string $type ): string {
 	return array( 'event' => 'fa-calendar-days', 'project' => 'fa-seedling', 'impact-story' => 'fa-hand-holding-heart' )[ $type ] ?? 'fa-book-open';
+}
+
+/** Return the editable category, excluding the automatic event category. */
+function cammino_get_editable_post_category( int $post_id ): array {
+	foreach ( get_the_category( $post_id ) as $category ) {
+		if ( CAMMINO_EVENT_CATEGORY_SLUG !== (string) $category->slug ) {
+			return array(
+				'id'   => (int) $category->term_id,
+				'slug' => sanitize_title( (string) $category->slug ),
+				'name' => (string) $category->name,
+			);
+		}
+	}
+
+	return array( 'id' => 0, 'slug' => '', 'name' => '' );
+}
+
+/** Find or create one category and make it the post's editable category. */
+function cammino_set_post_category( int $post_id, string $category_name ): bool {
+	$category_name = sanitize_text_field( $category_name );
+	if ( '' === $category_name || 'post' !== get_post_type( $post_id ) ) {
+		return false;
+	}
+
+	$term = term_exists( $category_name, 'category' );
+	if ( ! $term ) {
+		$term = wp_insert_term( $category_name, 'category', array( 'slug' => sanitize_title( $category_name ) ) );
+	}
+	if ( is_wp_error( $term ) || ! $term ) {
+		return false;
+	}
+
+	$term_id = (int) ( is_array( $term ) ? $term['term_id'] : $term );
+	$result  = wp_set_post_terms( $post_id, array( $term_id ), 'category', false );
+
+	return ! is_wp_error( $result );
 }
 
 /** Optional facts edited in WordPress, independent of the visual body. */
@@ -150,7 +191,7 @@ function cammino_register_post_meta(): void {
 			$common,
 			array(
 				'type'              => 'string',
-				'default'           => 'impact-story',
+				'default'           => 'project',
 				'sanitize_callback' => 'cammino_sanitize_post_placement',
 			)
 		)
@@ -259,41 +300,34 @@ function cammino_add_post_settings_meta_box(): void {
  */
 function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	$placement  = cammino_get_post_placement( $post->ID );
-	$placements = cammino_get_post_placements();
+	$placements = cammino_get_selectable_post_placements();
 	$date       = (string) get_post_meta( $post->ID, CAMMINO_EVENT_DATE_META, true );
 	$location   = (string) get_post_meta( $post->ID, CAMMINO_EVENT_LOCATION_META, true );
 	$event_type = (string) get_post_meta( $post->ID, CAMMINO_EVENT_TYPE_META, true );
 	$hide_image = '1' === (string) get_post_meta( $post->ID, CAMMINO_EVENT_HIDE_IMAGE_META, true );
 	$show_project_image = '1' !== (string) get_post_meta( $post->ID, CAMMINO_PROJECT_HIDE_IMAGE_META, true );
-	$project_categories = get_categories( array( 'taxonomy' => 'category', 'hide_empty' => false ) );
-	$selected_project_category = 0;
-
-	foreach ( get_the_category( $post->ID ) as $category ) {
-		if ( CAMMINO_EVENT_CATEGORY_SLUG !== $category->slug ) {
-			$selected_project_category = (int) $category->term_id;
-			break;
-		}
-	}
-
-	if ( ! $selected_project_category ) {
-		$selected_project_category = (int) get_option( 'default_category' );
-	}
+	$editable_category = cammino_get_editable_post_category( $post->ID );
 
 	wp_nonce_field( 'cammino_save_post_settings', 'cammino_post_settings_nonce' );
 	?>
-	<p>
-		<label for="cammino-post-placement"><strong><?php esc_html_e( 'Typ príspevku', 'cammino' ); ?></strong></label>
-		<select id="cammino-post-placement" name="cammino_post_placement" style="width:100%;margin-top:6px">
-			<?php if ( 'article' === $placement ) : ?>
-				<option value="article" selected disabled><?php esc_html_e( 'Pôvodný článok — vyberte nový typ', 'cammino' ); ?></option>
-			<?php endif; ?>
-			<?php foreach ( $placements as $value => $label ) : ?>
-				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $placement, $value ); ?>><?php echo esc_html( $label ); ?></option>
-			<?php endforeach; ?>
-		</select>
-	</p>
+	<?php if ( 'impact-story' === $placement ) : ?>
+		<input id="cammino-post-placement" name="cammino_post_placement" type="hidden" value="impact-story">
+		<p><strong><?php esc_html_e( 'Typ príspevku', 'cammino' ); ?></strong><br><?php esc_html_e( 'Existujúci príbeh pomoci', 'cammino' ); ?></p>
+	<?php else : ?>
+		<p>
+			<label for="cammino-post-placement"><strong><?php esc_html_e( 'Typ príspevku', 'cammino' ); ?></strong></label>
+			<select id="cammino-post-placement" name="cammino_post_placement" style="width:100%;margin-top:6px">
+				<?php if ( 'article' === $placement ) : ?>
+					<option value="article" selected disabled><?php esc_html_e( 'Pôvodný článok — vyberte nový typ', 'cammino' ); ?></option>
+				<?php endif; ?>
+				<?php foreach ( $placements as $value => $label ) : ?>
+					<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $placement, $value ); ?>><?php echo esc_html( $label ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</p>
+	<?php endif; ?>
 	<p class="description">
-		<?php esc_html_e( 'Podujatie, projekt alebo príbeh pomoci. Obsah upravíte vo vizuálnom editore; zmena typu ho neprepíše.', 'cammino' ); ?>
+		<?php esc_html_e( 'Podujatie alebo projekt. Obsah upravíte vo vizuálnom editore; zmena typu ho neprepíše.', 'cammino' ); ?>
 	</p>
 	<div data-cammino-fields="event">
 	<p style="margin-top:14px"><strong><?php esc_html_e( 'Údaje podujatia', 'cammino' ); ?></strong></p>
@@ -309,18 +343,16 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 		<label for="cammino-event-type"><?php esc_html_e( 'Typ podujatia (voliteľné)', 'cammino' ); ?></label>
 		<input id="cammino-event-type" name="cammino_event_type" type="text" value="<?php echo esc_attr( $event_type ); ?>" maxlength="100" placeholder="<?php esc_attr_e( 'Napr. workshop alebo webinár', 'cammino' ); ?>" style="width:100%">
 	</p>
+	<p>
+		<label for="cammino-event-category"><?php esc_html_e( 'Kategória', 'cammino' ); ?></label>
+		<input id="cammino-event-category" name="cammino_event_category" type="text" value="<?php echo esc_attr( $editable_category['name'] ); ?>" maxlength="100" placeholder="<?php esc_attr_e( 'Napíšte názov kategórie', 'cammino' ); ?>" style="width:100%">
+	</p>
 	<p><label><input name="cammino_event_hide_image" type="checkbox" value="1" <?php checked( $hide_image ); ?>> <?php esc_html_e( 'Skryť fotografiu na stránke podujatia', 'cammino' ); ?></label></p>
 	</div>
 	<div data-cammino-fields="project">
 		<p>
 			<label for="cammino-project-category"><?php esc_html_e( 'Kategória', 'cammino' ); ?></label>
-			<select id="cammino-project-category" name="cammino_project_category" style="width:100%;margin-top:6px">
-				<?php foreach ( $project_categories as $category ) : ?>
-					<?php if ( CAMMINO_EVENT_CATEGORY_SLUG !== $category->slug ) : ?>
-						<option value="<?php echo esc_attr( (string) $category->term_id ); ?>" <?php selected( $selected_project_category, (int) $category->term_id ); ?>><?php echo esc_html( $category->name ); ?></option>
-					<?php endif; ?>
-				<?php endforeach; ?>
-			</select>
+			<input id="cammino-project-category" name="cammino_project_category" type="text" value="<?php echo esc_attr( $editable_category['name'] ); ?>" maxlength="100" placeholder="<?php esc_attr_e( 'Napíšte názov kategórie', 'cammino' ); ?>" style="width:100%;margin-top:6px">
 		</p>
 		<p><label><input name="cammino_project_show_image" type="checkbox" value="1" <?php checked( $show_project_image ); ?>> <?php esc_html_e( 'Zobraziť obrázok projektu', 'cammino' ); ?></label></p>
 	</div>
@@ -331,7 +363,7 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	<?php
 }
 
-add_action( 'save_post_post', 'cammino_save_post_settings' );
+add_action( 'save_post_post', 'cammino_save_post_settings', 50 );
 
 /**
  * Save optional event fields.
@@ -379,10 +411,10 @@ function cammino_save_post_settings( int $post_id ): void {
 	}
 
 	if ( 'project' === $placement && isset( $_POST['cammino_project_category'] ) ) {
-		$category_id = absint( wp_unslash( $_POST['cammino_project_category'] ) );
-		if ( $category_id ) {
-			wp_set_post_terms( $post_id, array( $category_id ), 'category', false );
-		}
+		cammino_set_post_category( $post_id, (string) wp_unslash( $_POST['cammino_project_category'] ) );
+	}
+	if ( 'event' === $placement && isset( $_POST['cammino_event_category'] ) ) {
+		cammino_set_post_category( $post_id, (string) wp_unslash( $_POST['cammino_event_category'] ) );
 	}
 
 	cammino_sync_event_category( $post_id, $fields[ CAMMINO_POST_PLACEMENT_META ] );
@@ -391,7 +423,7 @@ function cammino_save_post_settings( int $post_id ): void {
 /**
  * Save the fields exposed by the visual post-details editor.
  */
-function cammino_update_visual_post_details( int $post_id, string $title, string $event_date = '', string $event_location = '', bool $hide_image = false, string $event_type = '' ): bool {
+function cammino_update_visual_post_details( int $post_id, string $title, string $event_date = '', string $event_location = '', bool $hide_image = false, string $event_type = '', string $category_name = '' ): bool {
 	if ( 'post' !== get_post_type( $post_id ) ) {
 		return false;
 	}
@@ -400,6 +432,7 @@ function cammino_update_visual_post_details( int $post_id, string $title, string
 	$event_date     = sanitize_text_field( $event_date );
 	$event_location = sanitize_text_field( $event_location );
 	$event_type     = sanitize_text_field( $event_type );
+	$category_name  = sanitize_text_field( $category_name );
 	$placement      = cammino_get_post_placement( $post_id );
 
 	if ( '' === $title || ( '' !== $event_date && ! preg_match( '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $event_date ) ) ) {
@@ -426,17 +459,30 @@ function cammino_update_visual_post_details( int $post_id, string $title, string
 			}
 		}
 	}
+	if ( 'project' === $placement ) {
+		if ( $hide_image ) {
+			update_post_meta( $post_id, CAMMINO_PROJECT_HIDE_IMAGE_META, '1' );
+		} else {
+			delete_post_meta( $post_id, CAMMINO_PROJECT_HIDE_IMAGE_META );
+		}
+	}
+	$category_saved = true;
+	if ( in_array( $placement, array( 'event', 'project' ), true ) && '' !== $category_name ) {
+		$category_saved = cammino_set_post_category( $post_id, $category_name );
+	}
 
 	cammino_sync_event_category( $post_id, $placement );
 	clean_post_cache( $post_id );
 
 	return $title === (string) get_post_field( 'post_title', $post_id )
+		&& $category_saved
 		&& ( 'event' !== $placement || (
 			$event_date === (string) get_post_meta( $post_id, CAMMINO_EVENT_DATE_META, true )
 			&& $event_location === (string) get_post_meta( $post_id, CAMMINO_EVENT_LOCATION_META, true )
 			&& $event_type === (string) get_post_meta( $post_id, CAMMINO_EVENT_TYPE_META, true )
 			&& ( $hide_image ? '1' : '' ) === (string) get_post_meta( $post_id, CAMMINO_EVENT_HIDE_IMAGE_META, true )
-		) );
+		) )
+		&& ( 'project' !== $placement || ( $hide_image ? '1' : '' ) === (string) get_post_meta( $post_id, CAMMINO_PROJECT_HIDE_IMAGE_META, true ) );
 }
 
 /**

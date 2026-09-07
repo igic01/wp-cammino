@@ -53,7 +53,7 @@
     let orderedSections = [];
     let sectionOrderParent = null;
     let transientState = new Map();
-    let postDetails = Object.assign({ title: '', eventDate: '', eventLocation: '', eventType: '', hideImage: false }, config.postDetails || {});
+    let postDetails = Object.assign({ title: '', category: '', eventDate: '', eventLocation: '', eventType: '', hideImage: false }, config.postDetails || {});
 
     function frameDocument() {
         return frame.contentDocument || frame.contentWindow.document;
@@ -1103,8 +1103,17 @@
 
     function refreshPostDetailsPreview() {
         renderPostTitle(postDetails.title);
-        if (!config.isEvent) return;
         const doc = frameDocument();
+        const category = doc.querySelector('[data-cammino-post-category]');
+        if (category && (config.isEvent || config.isProject)) {
+            category.hidden = !postDetails.category;
+            category.textContent = postDetails.category;
+        }
+        const cover = doc.querySelector('[data-cammino-event-cover]');
+        if (cover && (config.isEvent || config.isProject)) {
+            cover.hidden = Boolean(postDetails.hideImage);
+        }
+        if (!config.isEvent) return;
         const date = doc.querySelector('[data-cammino-event-date]');
         const location = doc.querySelector('[data-cammino-event-location]');
         const eventType = doc.querySelector('[data-cammino-event-type]');
@@ -1120,10 +1129,6 @@
             const value = eventType.querySelector('[data-cammino-event-type-value]');
             if (value) value.textContent = postDetails.eventType;
         }
-        const cover = doc.querySelector('[data-cammino-event-cover]');
-        if (cover) {
-            cover.hidden = Boolean(postDetails.hideImage);
-        }
     }
 
     function openPostDetails() {
@@ -1133,6 +1138,9 @@
             postDetailsForm.elements.event_date.value = postDetails.eventDate;
             postDetailsForm.elements.event_location.value = postDetails.eventLocation;
             postDetailsForm.elements.event_type.value = postDetails.eventType;
+        }
+        if (config.isEvent || config.isProject) {
+            postDetailsForm.elements.category.value = postDetails.category;
             postDetailsForm.elements.hide_image.checked = Boolean(postDetails.hideImage);
         }
         postDetailsDialog.showModal();
@@ -1152,6 +1160,9 @@
             postDetails.eventDate = postDetailsForm.elements.event_date.value;
             postDetails.eventLocation = postDetailsForm.elements.event_location.value.trim();
             postDetails.eventType = postDetailsForm.elements.event_type.value.trim();
+        }
+        if (config.isEvent || config.isProject) {
+            postDetails.category = postDetailsForm.elements.category.value.trim();
             postDetails.hideImage = postDetailsForm.elements.hide_image.checked;
         }
         refreshPostDetailsPreview();
@@ -1463,6 +1474,7 @@
                 event_date: postDetails.eventDate,
                 event_location: postDetails.eventLocation,
                 event_type: postDetails.eventType,
+                category: postDetails.category,
                 hide_image: postDetails.hideImage ? '1' : '0'
             });
             dirty = false;
