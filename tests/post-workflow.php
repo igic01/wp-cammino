@@ -59,8 +59,10 @@ expect( cammino_get_post_visual_content( 4 ) === $cleaned, 'Related Posts cleanu
 $fresh_body = cammino_render_post_visual_content( 1 );
 $fresh_visible_body = preg_replace( '#<template\b[^>]*>.*?</template>#is', '', $fresh_body );
 expect( ! str_contains( $fresh_visible_body, 'data-nstarter-content-item' ), 'New post body starts empty' );
-expect( substr_count( $fresh_body, 'data-nstarter-content-template=' ) === 3, 'Inline builder provides title, paragraph and image templates' );
+expect( substr_count( $fresh_body, 'data-nstarter-content-template=' ) === 5, 'Inline builder provides title, paragraph, image, impact-story, and important-link templates' );
 expect( str_contains( $fresh_body, '/assets/images/placeholder.webp' ), 'New image template uses the local placeholder' );
+expect( str_contains( $fresh_body, 'data-nstarter-content-template="impact-story"' ) && str_contains( $fresh_body, 'article-impact-story__eyebrow' ) && str_contains( $fresh_body, 'Prečítať príbeh' ), 'Impact-story template contains an editable title, description, and linked button' );
+expect( str_contains( $fresh_body, 'data-nstarter-content-template="important-link"' ) && str_contains( $fresh_body, 'article-important-link' ) && str_contains( $fresh_body, '<a href="#">' ), 'Important-link template appears inside normal text' );
 expect( ! str_contains( $fresh_body, 'content-template="posts"' ), 'Fresh post body has no Related Posts element' );
 
 $_POST = array(
@@ -99,6 +101,7 @@ $editor_js = file_get_contents( NSTARTER_PATH . '/assets/js/editor.js' );
 $single_template = file_get_contents( NSTARTER_PATH . '/templates/single-post.php' );
 expect( str_contains( $editor_php, "'isProject'" ) && str_contains( $editor_php, 'name="category"' ), 'Visual editor exposes project mode and category editing' );
 expect( str_contains( $editor_js, 'category: postDetails.category' ) && str_contains( $editor_js, 'config.isEvent || config.isProject' ), 'Visual editor sends and previews category and image settings for both types' );
+expect( str_contains( $editor_js, "'add-impact-story'" ) && str_contains( $editor_js, "'add-important-link'" ) && str_contains( $editor_js, "'edit-link'" ), 'Visual editor adds both reusable blocks and exposes their link destination control' );
 expect( str_contains( $single_template, 'data-cammino-post-category' ) && str_contains( $single_template, "__( 'Project details'" ), 'Project pages expose the project details variable element and category label' );
 
 $GLOBALS['test_can_edit'] = false;

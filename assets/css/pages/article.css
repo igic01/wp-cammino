@@ -303,6 +303,52 @@
 .article-inline-image img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 2rem 5rem 2rem 2rem; box-shadow: var(--shadow-soft); }
 .article-inline-image figcaption { margin-top: 0.7rem; color: rgba(39, 36, 35, 0.55); font-size: 0.76rem; }
 
+.article-impact-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1.25rem, 4vw, 2.5rem);
+  margin: clamp(2.5rem, 6vw, 4.5rem) 0;
+  padding: clamp(1.5rem, 4vw, 2.35rem);
+  border: 1px solid rgba(100, 54, 75, 0.12);
+  border-radius: 2rem 2rem 4rem 2rem;
+  background: var(--color-sage);
+}
+
+.article-impact-story__eyebrow {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-coral);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.cammino-article-page .article-impact-story h3 {
+  margin: 0 0 0.45rem;
+  color: var(--color-plum);
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+  line-height: 1.2;
+}
+
+.article-impact-story p { max-width: 34rem; margin: 0; line-height: 1.55; }
+.article-impact-story .button { flex: 0 0 auto; white-space: nowrap; }
+
+.article-important-link { color: #4d4745; }
+.article-important-link a {
+  display: inline;
+  color: var(--color-plum);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--color-coral);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+}
+.article-important-link a:hover,
+.article-important-link a:focus-visible { color: var(--color-coral); }
+.article-important-link i { margin-left: 0.28em; font-size: 0.78em; }
+
 .article-closing { display: flex; align-items: center; gap: 1.25rem; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--color-border); }
 .article-closing i {
   flex: 0 0 auto;
@@ -353,6 +399,8 @@
   .article-share button { width: 40px; }
   .article-content blockquote { margin-inline: -0.35rem; padding: 1.7rem; border-radius: 1.6rem 1.6rem 3.5rem 1.6rem; }
   .article-inline-image img { border-radius: 1.5rem 3.5rem 1.5rem 1.5rem; }
+  .article-impact-story { grid-template-columns: 1fr; align-items: start; border-radius: 1.5rem 1.5rem 3rem 1.5rem; }
+  .article-impact-story .button { justify-self: start; white-space: normal; }
 }
 
 @media (prefers-reduced-motion: reduce) {

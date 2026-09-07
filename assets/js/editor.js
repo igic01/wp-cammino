@@ -97,6 +97,14 @@
             image.height = 800;
             image.loading = 'lazy';
             item.appendChild(image);
+        } else if (type === 'impact-story') {
+            item = doc.createElement('div');
+            item.className = 'article-impact-story';
+            item.innerHTML = '<div class="article-impact-story__copy"><span class="article-impact-story__eyebrow">Príbeh s dopadom</span><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div><a class="button button--coral" href="#">Prečítať príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>';
+        } else if (type === 'important-link') {
+            item = doc.createElement('p');
+            item.className = 'article-important-link';
+            item.innerHTML = 'Viac informácií nájdete v <a href="#">dôležitom odkaze <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a>.';
         }
 
         if (item) {
@@ -179,6 +187,12 @@
                 tools.appendChild(edit);
             }
 
+            if (item.querySelector('a[href]')) {
+                const editLink = createInlineButton(doc, 'edit-link', config.strings.editLink, config.strings.editLink, 'nstarter-post-item-tools__edit');
+                editLink.nstarterContentItem = item;
+                tools.appendChild(editLink);
+            }
+
             const up = createInlineButton(doc, 'move-up', config.strings.contentItemUp, '↑');
             const down = createInlineButton(doc, 'move-down', config.strings.contentItemDown, '↓');
             const remove = createInlineButton(doc, 'delete', config.strings.contentItemDelete, '×', 'nstarter-post-item-tools__delete');
@@ -200,7 +214,9 @@
         addRow.append(
             createInlineButton(doc, 'add-title', config.strings.addHeading, '+ ' + config.strings.addHeading),
             createInlineButton(doc, 'add-paragraph', config.strings.addParagraph, '+ ' + config.strings.addParagraph),
-            createInlineButton(doc, 'add-image', config.strings.addImage, '+ ' + config.strings.addImage)
+            createInlineButton(doc, 'add-image', config.strings.addImage, '+ ' + config.strings.addImage),
+            createInlineButton(doc, 'add-impact-story', config.strings.addImpactStory, '+ ' + config.strings.addImpactStory),
+            createInlineButton(doc, 'add-important-link', config.strings.addImportantLink, '+ ' + config.strings.addImportantLink)
         );
 
         controls.appendChild(addRow);
@@ -242,6 +258,11 @@
         if (action === 'edit-image') {
             const image = item.querySelector('img');
             if (image) openMediaPicker(image, true);
+            return true;
+        }
+        if (action === 'edit-link') {
+            const link = item.querySelector('a[href]');
+            if (link) openLinkEditor(link);
             return true;
         }
 
