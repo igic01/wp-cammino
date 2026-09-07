@@ -102,8 +102,8 @@
 
 .event-filter span { display: grid; min-width: 1.45rem; height: 1.45rem; padding-inline: 0.35rem; place-items: center; border-radius: 50%; background: var(--color-white); font-size: 0.62rem; }
 .event-filter:hover,
-.event-filter:focus-visible { border-color: var(--color-coral); color: var(--color-plum); background: var(--color-white); transform: translateY(-2px); }
-.event-filter.is-active { color: var(--color-white); background: var(--color-plum); box-shadow: 0 8px 20px rgba(100, 54, 75, 0.18); }
+.event-filter:focus-visible { border-color: var(--color-coral); color: var(--color-plum); background: var(--color-white); }
+.event-filter.is-active { color: var(--color-white); background: var(--color-plum); }
 .event-filter.is-active span { color: var(--color-plum); background: var(--color-apricot); }
 
 .result-count { margin: 0; padding: 0 0.55rem; color: #827773; font-size: 0.72rem; white-space: nowrap; }
