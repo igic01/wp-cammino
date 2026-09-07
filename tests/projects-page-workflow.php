@@ -27,8 +27,12 @@ projects_expect( -1 === $query['posts_per_page'], 'The project directory request
 projects_expect( 'project' === $query['meta_query'][0]['value'], 'Only posts placed as projects are queried.' );
 projects_expect( str_contains( $directory, 'data-project-filter="vzdelavanie"' ), 'A project category becomes a filter.' );
 projects_expect( str_contains( $directory, 'data-project-filter="komunita"' ), 'Every meaningful project category becomes a filter.' );
-projects_expect( ! str_contains( $directory, 'data-project-filter="uncategorized"' ), 'Uncategorized is not shown as a filter.' );
-projects_expect( str_contains( $directory, 'data-project-categories="vzdelavanie komunita"' ), 'Cards expose all their categories to the client filter.' );
+projects_expect( str_contains( $directory, 'data-project-filter="uncategorized"' ), 'Every category used by a project is shown.' );
+projects_expect( ! str_contains( $directory, 'data-project-filter="all"' ), 'The redesigned selector starts with categories rather than an all-projects filter.' );
+projects_expect( str_contains( $directory, 'class="project-category-card"' ), 'Categories use the large selectable card design.' );
+projects_expect( str_contains( $directory, 'data-project-categories="vzdelavanie komunita uncategorized"' ), 'Cards expose all their categories to the client filter.' );
+projects_expect( str_contains( $directory, 'data-project-prompt' ), 'The results area prompts for a category before displaying projects.' );
+projects_expect( str_contains( $directory, 'data-project-grid hidden' ), 'Projects are initially hidden until a category is selected.' );
 projects_expect( str_contains( $directory, '<a class="project-card' ), 'The whole project card is a link.' );
 projects_expect( str_contains( $directory, 'Projekt Beta' ), 'The project title is displayed.' );
 projects_expect( str_contains( $directory, 'Krátky popis projektu.' ), 'The project description is displayed.' );

@@ -877,14 +877,13 @@ function cammino_render_all_projects( array $args = array(), int $page_id = 0 ):
 
 	$project_categories = array();
 	$categories         = array();
-	$excluded_slugs     = array( 'uncategorized', CAMMINO_EVENT_CATEGORY_SLUG );
 
 	foreach ( $projects as $project ) {
 		$post_categories = array();
 
 		foreach ( get_the_category( (int) $project->ID ) as $category ) {
 			$slug = sanitize_title( (string) $category->slug );
-			if ( '' === $slug || in_array( $slug, $excluded_slugs, true ) ) {
+			if ( '' === $slug ) {
 				continue;
 			}
 
@@ -895,6 +894,14 @@ function cammino_render_all_projects( array $args = array(), int $page_id = 0 ):
 			++$categories[ $slug ]['count'];
 		}
 
+		if ( empty( $post_categories ) ) {
+			$post_categories['ostatne'] = __( 'Ostatné', 'cammino' );
+			if ( ! isset( $categories['ostatne'] ) ) {
+				$categories['ostatne'] = array( 'name' => __( 'Ostatné', 'cammino' ), 'count' => 0 );
+			}
+			++$categories['ostatne']['count'];
+		}
+
 		$project_categories[ (int) $project->ID ] = $post_categories;
 	}
 
@@ -903,25 +910,8 @@ function cammino_render_all_projects( array $args = array(), int $page_id = 0 ):
 		static fn( array $first, array $second ): int => strcasecmp( $first['name'], $second['name'] )
 	);
 
-	$project_count = count( $projects );
-	$count_label   = 1 === $project_count ? __( 'projekt', 'cammino' ) : ( $project_count >= 2 && $project_count <= 4 ? __( 'projekty', 'cammino' ) : __( 'projektov', 'cammino' ) );
-
 	ob_start();
 	?>
-	<div class="project-category-panel">
-		<div class="project-category-intro">
-			<span><?php esc_html_e( 'Kategórie projektov', 'cammino' ); ?></span>
-			<p><?php esc_html_e( 'Vyberte kategóriu a zobrazia sa projekty, ktoré do nej patria.', 'cammino' ); ?></p>
-		</div>
-		<div class="project-categories" role="group" aria-label="<?php esc_attr_e( 'Filtrovať projekty podľa kategórie', 'cammino' ); ?>">
-			<button class="project-filter is-active" type="button" data-project-filter="all" aria-pressed="true"><?php esc_html_e( 'Všetky', 'cammino' ); ?> <span><?php echo esc_html( (string) $project_count ); ?></span></button>
-			<?php foreach ( $categories as $slug => $category ) : ?>
-				<button class="project-filter" type="button" data-project-filter="<?php echo esc_attr( $slug ); ?>" aria-pressed="false"><?php echo esc_html( $category['name'] ); ?> <span><?php echo esc_html( (string) $category['count'] ); ?></span></button>
-			<?php endforeach; ?>
-		</div>
-		<p class="project-result-count" aria-live="polite"><strong data-project-visible-count><?php echo esc_html( (string) $project_count ); ?></strong> <span data-project-count-label><?php echo esc_html( $count_label ); ?></span></p>
-	</div>
-
 	<?php if ( empty( $projects ) ) : ?>
 		<div class="empty-projects empty-projects--initial">
 			<i class="fa-regular fa-folder-open" aria-hidden="true"></i>
@@ -929,8 +919,36 @@ function cammino_render_all_projects( array $args = array(), int $page_id = 0 ):
 			<p><?php esc_html_e( 'Čoskoro tu nájdete viac o tom, na čom pracujeme.', 'cammino' ); ?></p>
 		</div>
 	<?php else : ?>
-		<div class="project-grid" data-project-grid>
-			<?php foreach ( $projects as $project ) :
+		<div class="project-category-browser">
+			<section class="project-category-selector" aria-labelledby="project-category-title">
+				<div class="project-category-selector__heading">
+					<span><?php esc_html_e( '01 — Kategórie', 'cammino' ); ?></span>
+					<h2 id="project-category-title"><?php esc_html_e( 'Vyberte si kategóriu', 'cammino' ); ?></h2>
+				</div>
+				<div class="project-categories" role="group" aria-label="<?php esc_attr_e( 'Vybrať kategóriu projektov', 'cammino' ); ?>">
+					<?php foreach ( $categories as $slug => $category ) : ?>
+						<button class="project-category-card" type="button" data-project-filter="<?php echo esc_attr( $slug ); ?>" data-project-category-name="<?php echo esc_attr( $category['name'] ); ?>" aria-pressed="false" aria-controls="project-results">
+							<span class="project-category-card__icon"><i class="fa-regular fa-folder" aria-hidden="true"></i></span>
+							<strong><?php echo esc_html( $category['name'] ); ?></strong>
+							<small><?php echo esc_html( (string) $category['count'] ); ?> <?php echo esc_html( 1 === $category['count'] ? __( 'projekt', 'cammino' ) : ( $category['count'] >= 2 && $category['count'] <= 4 ? __( 'projekty', 'cammino' ) : __( 'projektov', 'cammino' ) ) ); ?></small>
+							<i class="fa-solid fa-arrow-right-long project-category-card__arrow" aria-hidden="true"></i>
+						</button>
+					<?php endforeach; ?>
+				</div>
+			</section>
+
+			<section class="project-results" id="project-results" aria-labelledby="project-results-title">
+				<div class="project-results__prompt" data-project-prompt>
+					<span class="project-results__prompt-icon"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></span>
+					<div><strong><?php esc_html_e( 'Vyberte kategóriu vyššie', 'cammino' ); ?></strong><p><?php esc_html_e( 'Tu sa následne zobrazia projekty z vybranej oblasti.', 'cammino' ); ?></p></div>
+				</div>
+				<header class="project-results__heading" hidden data-project-results-heading>
+					<div><span><?php esc_html_e( '02 — Projekty', 'cammino' ); ?></span><h2 id="project-results-title" data-project-selected-name></h2></div>
+					<p class="project-result-count" aria-live="polite"><strong data-project-visible-count>0</strong> <span data-project-count-label><?php esc_html_e( 'projektov', 'cammino' ); ?></span></p>
+				</header>
+
+				<div class="project-grid" data-project-grid hidden>
+					<?php foreach ( $projects as $project ) :
 				$project_id   = (int) $project->ID;
 				$project_cats = $project_categories[ $project_id ];
 				$image_url    = get_the_post_thumbnail_url( $project_id, 'medium_large' );
@@ -955,14 +973,14 @@ function cammino_render_all_projects( array $args = array(), int $page_id = 0 ):
 						<span class="project-card__action"><?php esc_html_e( 'Pozrieť projekt', 'cammino' ); ?> <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></span>
 					</div>
 				</a>
-			<?php endforeach; ?>
-		</div>
+					<?php endforeach; ?>
+				</div>
 
-		<div class="empty-projects" hidden data-empty-projects>
-			<i class="fa-regular fa-folder-open" aria-hidden="true"></i>
-			<h2><?php esc_html_e( 'V tejto kategórii zatiaľ nič nie je', 'cammino' ); ?></h2>
-			<p><?php esc_html_e( 'Skúste si pozrieť všetky naše projekty.', 'cammino' ); ?></p>
-			<button class="button button--coral" type="button" data-project-show-all><?php esc_html_e( 'Zobraziť všetky', 'cammino' ); ?></button>
+				<div class="empty-projects" hidden data-empty-projects>
+					<i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+					<h2><?php esc_html_e( 'V tejto kategórii zatiaľ nič nie je', 'cammino' ); ?></h2>
+				</div>
+			</section>
 		</div>
 	<?php endif; ?>
 	<?php
