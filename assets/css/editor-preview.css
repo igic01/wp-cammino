@@ -181,6 +181,13 @@
     padding-inline: 0.9rem;
 }
 
+.nstarter-post-item-tools__link-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-right: auto;
+}
+
 .nstarter-post-builder-controls {
     display: grid;
     margin: 2.5rem 0;

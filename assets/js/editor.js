@@ -46,6 +46,10 @@
     let mediaFrame = null;
     let mediaTarget = null;
     let linkTarget = null;
+    let pendingLinkRange = null;
+    let pendingLinkItem = null;
+    let paragraphSelectionRange = null;
+    let paragraphSelectionItem = null;
     let pendingVideoAttachment = null;
     let videoToolsLayer = null;
     let variableToolsLayer = null;
@@ -100,11 +104,7 @@
         } else if (type === 'impact-story') {
             item = doc.createElement('div');
             item.className = 'article-impact-story';
-            item.innerHTML = '<div class="article-impact-story__copy"><span class="article-impact-story__eyebrow">Príbeh s dopadom</span><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div><a class="button button--coral" href="#">Prečítať príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>';
-        } else if (type === 'important-link') {
-            item = doc.createElement('p');
-            item.className = 'article-important-link';
-            item.innerHTML = 'Viac informácií nájdete v <a href="#">dôležitom odkaze <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a>.';
+            item.innerHTML = '<div class="article-impact-story__copy"><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div><a class="button button--coral" href="#">Prečítať príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>';
         }
 
         if (item) {
@@ -187,7 +187,15 @@
                 tools.appendChild(edit);
             }
 
-            if (item.querySelector('a[href]')) {
+            if (item.dataset.nstarterContentType === 'paragraph') {
+                const linkActions = doc.createElement('div');
+                linkActions.className = 'nstarter-post-item-tools__link-actions';
+                const addLink = createInlineButton(doc, 'link-selected-text', config.strings.linkSelectedText, config.strings.linkSelectedText);
+                const removeLink = createInlineButton(doc, 'remove-text-link', config.strings.removeTextLink, config.strings.removeTextLink);
+                addLink.nstarterContentItem = removeLink.nstarterContentItem = item;
+                linkActions.append(addLink, removeLink);
+                tools.appendChild(linkActions);
+            } else if (item.querySelector('a[href]')) {
                 const editLink = createInlineButton(doc, 'edit-link', config.strings.editLink, config.strings.editLink, 'nstarter-post-item-tools__edit');
                 editLink.nstarterContentItem = item;
                 tools.appendChild(editLink);
@@ -215,8 +223,7 @@
             createInlineButton(doc, 'add-title', config.strings.addHeading, '+ ' + config.strings.addHeading),
             createInlineButton(doc, 'add-paragraph', config.strings.addParagraph, '+ ' + config.strings.addParagraph),
             createInlineButton(doc, 'add-image', config.strings.addImage, '+ ' + config.strings.addImage),
-            createInlineButton(doc, 'add-impact-story', config.strings.addImpactStory, '+ ' + config.strings.addImpactStory),
-            createInlineButton(doc, 'add-important-link', config.strings.addImportantLink, '+ ' + config.strings.addImportantLink)
+            createInlineButton(doc, 'add-impact-story', config.strings.addImpactStory, '+ ' + config.strings.addImpactStory)
         );
 
         controls.appendChild(addRow);
@@ -263,6 +270,14 @@
         if (action === 'edit-link') {
             const link = item.querySelector('a[href]');
             if (link) openLinkEditor(link);
+            return true;
+        }
+        if (action === 'link-selected-text') {
+            openParagraphLinkEditor(item);
+            return true;
+        }
+        if (action === 'remove-text-link') {
+            removeParagraphLinks(item);
             return true;
         }
 
@@ -492,21 +507,161 @@
         return !/^[a-z][a-z\d+.-]*:/i.test(url) || /^(https?:|mailto:|tel:)/i.test(url);
     }
 
-    function openLinkEditor(link) {
-        if (!linkDialog || !linkInput || !isEditableLink(link)) {
+    function elementForNode(node) {
+        return node && (node.nodeType === 1 ? node : node.parentElement);
+    }
+
+    function rangeBelongsToParagraph(range, item) {
+        return Boolean(
+            range
+            && item
+            && item.dataset.nstarterContentType === 'paragraph'
+            && range.startContainer.isConnected
+            && range.endContainer.isConnected
+            && item.contains(range.startContainer)
+            && item.contains(range.endContainer)
+        );
+    }
+
+    function rememberParagraphSelection() {
+        const selection = frameDocument().getSelection();
+        const range = selection && selection.rangeCount ? selection.getRangeAt(0) : null;
+        const startElement = range && elementForNode(range.startContainer);
+        const item = startElement && startElement.closest('[data-nstarter-content-type="paragraph"]');
+
+        if (!rangeBelongsToParagraph(range, item)) {
+            paragraphSelectionRange = null;
+            paragraphSelectionItem = null;
             return;
         }
 
-        linkTarget = link;
-        linkInput.value = link.getAttribute('href') || '';
+        paragraphSelectionRange = range.cloneRange();
+        paragraphSelectionItem = item;
+    }
+
+    function paragraphRange(item, allowCollapsed) {
+        rememberParagraphSelection();
+        if (
+            paragraphSelectionItem !== item
+            || !rangeBelongsToParagraph(paragraphSelectionRange, item)
+            || (!allowCollapsed && paragraphSelectionRange.collapsed)
+        ) {
+            return null;
+        }
+
+        return paragraphSelectionRange.cloneRange();
+    }
+
+    function closestLinkInItem(node, item) {
+        const element = elementForNode(node);
+        const link = element && element.closest('a[href]');
+        return link && item.contains(link) ? link : null;
+    }
+
+    function linksIntersectingRange(item, range) {
+        return Array.from(item.querySelectorAll('a[href]')).filter(function (link) {
+            try {
+                return range.intersectsNode(link);
+            } catch (error) {
+                return false;
+            }
+        });
+    }
+
+    function showLinkDialog(url) {
+        linkInput.value = url || '';
         linkInput.setCustomValidity('');
         linkDialog.showModal();
         linkInput.focus();
         linkInput.select();
     }
 
+    function openLinkEditor(link) {
+        if (!linkDialog || !linkInput || !isEditableLink(link)) {
+            return;
+        }
+
+        linkTarget = link;
+        pendingLinkRange = null;
+        pendingLinkItem = null;
+        showLinkDialog(link.getAttribute('href') || '');
+    }
+
+    function openParagraphLinkEditor(item) {
+        if (!linkDialog || !linkInput) {
+            return;
+        }
+
+        const range = paragraphRange(item, false);
+        if (!range || !range.toString().trim()) {
+            setStatus(config.strings.selectTextForLink, 'error');
+            return;
+        }
+
+        const links = linksIntersectingRange(item, range);
+        if (links.length) {
+            const startLink = closestLinkInItem(range.startContainer, item);
+            const endLink = closestLinkInItem(range.endContainer, item);
+            if (links.length === 1 && startLink === links[0] && endLink === links[0]) {
+                openLinkEditor(links[0]);
+                return;
+            }
+
+            setStatus(config.strings.overlappingTextLink, 'error');
+            return;
+        }
+
+        linkTarget = null;
+        pendingLinkRange = range.cloneRange();
+        pendingLinkItem = item;
+        showLinkDialog('');
+    }
+
+    function unwrapLink(link) {
+        const parent = link.parentNode;
+        if (!parent) return;
+        while (link.firstChild) {
+            parent.insertBefore(link.firstChild, link);
+        }
+        link.remove();
+        parent.normalize();
+    }
+
+    function removeParagraphLinks(item) {
+        const range = paragraphRange(item, true);
+        if (!range) {
+            setStatus(config.strings.selectLinkedText, 'error');
+            return;
+        }
+
+        let links = [];
+        if (range.collapsed) {
+            const link = closestLinkInItem(range.startContainer, item);
+            if (link) links.push(link);
+        } else {
+            links = linksIntersectingRange(item, range);
+        }
+
+        if (!links.length) {
+            setStatus(config.strings.selectLinkedText, 'error');
+            return;
+        }
+
+        if (links.length > 1) {
+            setStatus(config.strings.selectOneTextLink, 'error');
+            return;
+        }
+
+        links.forEach(unwrapLink);
+        paragraphSelectionRange = null;
+        paragraphSelectionItem = null;
+        markDirty();
+    }
+
     function closeLinkEditor() {
         linkTarget = null;
+        pendingLinkRange = null;
+        pendingLinkItem = null;
         if (linkDialog && linkDialog.open) {
             linkDialog.close();
         }
@@ -515,7 +670,7 @@
     function applyLink(event) {
         event.preventDefault();
 
-        if (!linkTarget || !linkInput) {
+        if ((!linkTarget && !pendingLinkRange) || !linkInput) {
             closeLinkEditor();
             return;
         }
@@ -528,9 +683,20 @@
         }
 
         linkInput.setCustomValidity('');
-        if (linkTarget.getAttribute('href') !== url) {
+        if (linkTarget && linkTarget.getAttribute('href') !== url) {
             linkTarget.setAttribute('href', url);
             markDirty();
+        } else if (pendingLinkRange && rangeBelongsToParagraph(pendingLinkRange, pendingLinkItem)) {
+            const link = pendingLinkItem.ownerDocument.createElement('a');
+            link.setAttribute('href', url);
+            link.appendChild(pendingLinkRange.extractContents());
+            pendingLinkRange.insertNode(link);
+            pendingLinkItem.normalize();
+            paragraphSelectionRange = null;
+            paragraphSelectionItem = null;
+            markDirty();
+        } else if (pendingLinkRange) {
+            setStatus(config.strings.selectTextForLink, 'error');
         }
         closeLinkEditor();
     }
@@ -1192,6 +1358,13 @@
     }
 
     function stopPreviewInteraction(event) {
+        const paragraphLinkAction = event.target.closest
+            && event.target.closest('[data-nstarter-inline-action="link-selected-text"], [data-nstarter-inline-action="remove-text-link"]');
+        if (mode === 'text' && paragraphLinkAction) {
+            rememberParagraphSelection();
+            event.preventDefault();
+        }
+
         if (mode === 'interaction') {
             return;
         }
@@ -1217,14 +1390,6 @@
                 return;
             }
 
-            const inlineLink = event.target.closest('[data-nstarter-content-builder] a[href]');
-            if (inlineLink && isEditableLink(inlineLink)) {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                event.stopPropagation();
-                openLinkEditor(inlineLink);
-                return;
-            }
         }
 
         const link = event.target.closest && event.target.closest('a[href]');

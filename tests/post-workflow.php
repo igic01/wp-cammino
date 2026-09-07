@@ -46,23 +46,28 @@ $legacy_marker = '<div data-nstarter-live-section="cammino_post_collection" data
 $legacy_inline = '<div class="article-content-block article-content-block--posts" data-nstarter-content-item="" data-nstarter-content-type="posts">' . $legacy_marker . '</div>';
 $legacy_bottom = '<div class="article-content-block article-content-block--posts" data-cammino-post-bottom data-nstarter-variable-section="cammino_related_posts">' . $legacy_marker . '</div>';
 $legacy_template = '<template data-nstarter-content-template="posts">' . $legacy_inline . '</template>';
-cammino_update_post_visual_content( 4, $saved . '<!-- cammino-post-collections-v1 -->' . $legacy_inline . $legacy_bottom . $legacy_template );
+$legacy_important_link = '<template data-nstarter-content-template="important-link"><p>Starý samostatný odkaz</p></template>';
+$legacy_impact_story = '<div class="article-impact-story"><span class="article-impact-story__eyebrow">Príbeh s dopadom</span><h3>Zachovaný príbeh</h3></div>';
+cammino_update_post_visual_content( 4, $saved . '<!-- cammino-post-collections-v1 -->' . $legacy_inline . $legacy_bottom . $legacy_template . $legacy_important_link . $legacy_impact_story );
 $cleaned = cammino_get_post_visual_content( 4 );
 expect( str_contains( $cleaned, $saved ), 'Legacy cleanup keeps the article body' );
 expect( ! str_contains( $cleaned, 'cammino_post_collection' ), 'Legacy Related Posts live markers are removed' );
 expect( ! str_contains( $cleaned, 'data-cammino-post-bottom' ), 'Legacy bottom Related Posts elements are removed' );
 expect( ! str_contains( $cleaned, 'data-nstarter-content-template="posts"' ), 'Legacy Related Posts templates are removed' );
 expect( ! str_contains( $cleaned, 'cammino-post-collections-v1' ), 'Legacy collection migration comments are removed' );
+expect( ! str_contains( $cleaned, 'data-nstarter-content-template="important-link"' ), 'Legacy standalone important-link templates are removed' );
+expect( ! str_contains( $cleaned, 'article-impact-story__eyebrow' ) && str_contains( $cleaned, 'Zachovaný príbeh' ), 'Old impact-story eyebrow labels are removed without removing their content block' );
 cammino_update_post_visual_content( 4, $cleaned );
 expect( cammino_get_post_visual_content( 4 ) === $cleaned, 'Related Posts cleanup is stable after save and reload' );
 
 $fresh_body = cammino_render_post_visual_content( 1 );
 $fresh_visible_body = preg_replace( '#<template\b[^>]*>.*?</template>#is', '', $fresh_body );
 expect( ! str_contains( $fresh_visible_body, 'data-nstarter-content-item' ), 'New post body starts empty' );
-expect( substr_count( $fresh_body, 'data-nstarter-content-template=' ) === 5, 'Inline builder provides title, paragraph, image, impact-story, and important-link templates' );
+expect( substr_count( $fresh_body, 'data-nstarter-content-template=' ) === 4, 'Inline builder provides title, paragraph, image, and impact-story templates' );
 expect( str_contains( $fresh_body, '/assets/images/placeholder.webp' ), 'New image template uses the local placeholder' );
-expect( str_contains( $fresh_body, 'data-nstarter-content-template="impact-story"' ) && str_contains( $fresh_body, 'article-impact-story__eyebrow' ) && str_contains( $fresh_body, 'Prečítať príbeh' ), 'Impact-story template contains an editable title, description, and linked button' );
-expect( str_contains( $fresh_body, 'data-nstarter-content-template="important-link"' ) && str_contains( $fresh_body, 'article-important-link' ) && str_contains( $fresh_body, '<a href="#">' ), 'Important-link template appears inside normal text' );
+expect( str_contains( $fresh_body, 'data-nstarter-content-template="impact-story"' ) && str_contains( $fresh_body, 'Prečítať príbeh' ), 'Impact-story template contains an editable title, description, and linked button' );
+expect( ! str_contains( $fresh_body, 'article-impact-story__eyebrow' ), 'Impact-story template has no eyebrow label' );
+expect( ! str_contains( $fresh_body, 'data-nstarter-content-template="important-link"' ), 'The separate important-link block has been removed' );
 expect( ! str_contains( $fresh_body, 'content-template="posts"' ), 'Fresh post body has no Related Posts element' );
 
 $_POST = array(
@@ -101,7 +106,8 @@ $editor_js = file_get_contents( NSTARTER_PATH . '/assets/js/editor.js' );
 $single_template = file_get_contents( NSTARTER_PATH . '/templates/single-post.php' );
 expect( str_contains( $editor_php, "'isProject'" ) && str_contains( $editor_php, 'name="category"' ), 'Visual editor exposes project mode and category editing' );
 expect( str_contains( $editor_js, 'category: postDetails.category' ) && str_contains( $editor_js, 'config.isEvent || config.isProject' ), 'Visual editor sends and previews category and image settings for both types' );
-expect( str_contains( $editor_js, "'add-impact-story'" ) && str_contains( $editor_js, "'add-important-link'" ) && str_contains( $editor_js, "'edit-link'" ), 'Visual editor adds both reusable blocks and exposes their link destination control' );
+expect( str_contains( $editor_js, "'add-impact-story'" ) && str_contains( $editor_js, "'link-selected-text'" ) && str_contains( $editor_js, "'remove-text-link'" ), 'Visual editor adds impact stories and safe paragraph link controls' );
+expect( ! str_contains( $editor_js, "'add-important-link'" ), 'Visual editor no longer exposes the separate important-link block' );
 expect( str_contains( $single_template, 'data-cammino-post-category' ) && str_contains( $single_template, "__( 'Project details'" ), 'Project pages expose the project details variable element and category label' );
 
 $GLOBALS['test_can_edit'] = false;

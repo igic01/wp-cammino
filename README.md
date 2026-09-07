@@ -130,10 +130,11 @@ Card copy and images remain editable through the normal Text and Media modes.
 4. Open **Cammino visual editor**. Use the purple variable control attached to
    **Event details** or **Project details**. Both edit title, category, and image
    visibility; events additionally edit date/time, location, and event type.
-   Use the five buttons directly below the body to add a heading, paragraph,
-   placeholder image, impact-story callout, or important link. Edit text in
-   place; click an image to replace it, and use the small controls below a block
-   to edit its link destination, move it, or remove it.
+   Use the four buttons directly below the body to add a heading, paragraph,
+   placeholder image, or impact-story callout. Edit text in place; click an
+   image to replace it, and use the small controls below a block to move or
+   remove it. To add a link, select words in a paragraph and choose **Link
+   selected text**. Select linked words and choose **Remove link** to undo it.
 5. Publish the post. Events appear in the event listing; projects appear in the
    project directory and news listing; impact stories and legacy articles appear
    in the main news listing.
@@ -148,11 +149,12 @@ the current WordPress content or an empty body.
 ## Article body builder
 
 Managed posts use the same dedicated content-builder element below the
-cover image. Its five inline buttons add unlimited headings, paragraphs,
-placeholder images, compact impact-story calls to action, and important links
-inside regular text. Text is editable in the preview; clicking an image opens
-the WordPress media library, while linked blocks expose a direct destination
-control. The small buttons below each block change its order or remove it. The standard floating editor panel remains available for modes,
+cover image. Its four inline buttons add unlimited headings, paragraphs,
+placeholder images, and compact impact-story calls to action. Every paragraph
+has safe controls for turning selected words into a link, editing an existing
+selected link, or removing links without replacing the paragraph. Text is
+editable in the preview; clicking an image opens the WordPress media library.
+The small buttons below each block change its order or remove it. The standard floating editor panel remains available for modes,
 Save, View, and reset. Existing saved content is preserved, and legacy article
 classifications remain unchanged until explicitly reclassified.
 

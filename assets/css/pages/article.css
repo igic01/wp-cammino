@@ -315,16 +315,6 @@
   background: var(--color-sage);
 }
 
-.article-impact-story__eyebrow {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--color-coral);
-  font-size: 0.74rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-}
-
 .cammino-article-page .article-impact-story h3 {
   margin: 0 0 0.45rem;
   color: var(--color-plum);
@@ -335,7 +325,7 @@
 .article-impact-story p { max-width: 34rem; margin: 0; line-height: 1.55; }
 .article-impact-story .button { flex: 0 0 auto; white-space: nowrap; }
 
-.article-important-link { color: #4d4745; }
+.article-content [data-nstarter-content-type="paragraph"] a,
 .article-important-link a {
   display: inline;
   color: var(--color-plum);
@@ -345,9 +335,10 @@
   text-decoration-thickness: 2px;
   text-underline-offset: 0.22em;
 }
+.article-content [data-nstarter-content-type="paragraph"] a:hover,
+.article-content [data-nstarter-content-type="paragraph"] a:focus-visible,
 .article-important-link a:hover,
 .article-important-link a:focus-visible { color: var(--color-coral); }
-.article-important-link i { margin-left: 0.28em; font-size: 0.78em; }
 
 .article-closing { display: flex; align-items: center; gap: 1.25rem; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--color-border); }
 .article-closing i {

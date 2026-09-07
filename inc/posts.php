@@ -1184,7 +1184,7 @@ function cammino_get_visual_items_from_blocks( array $blocks ): array {
  * Build the type-specific editable body when no visual snapshot exists.
  *
  * Existing WordPress content is split into movable content items. New posts
- * start with an empty builder and five templates used by the inline editor.
+ * start with an empty builder and four templates used by the inline editor.
  */
 function cammino_render_post_visual_content( int $post_id ): string {
 	$post_content = trim( (string) get_post_field( 'post_content', $post_id ) );
@@ -1205,8 +1205,7 @@ function cammino_render_post_visual_content( int $post_id ): string {
 	<template data-nstarter-content-template="title"><h2 class="article-content-block" data-nstarter-content-item data-nstarter-content-type="title">Nový nadpis</h2></template>
 	<template data-nstarter-content-template="paragraph"><p class="article-content-block" data-nstarter-content-item data-nstarter-content-type="paragraph">Nový odsek textu.</p></template>
 	<template data-nstarter-content-template="image"><figure class="article-inline-image article-content-block" data-nstarter-content-item data-nstarter-content-type="image"><img src="<?php echo esc_url( $placeholder ); ?>" alt="" width="1200" height="800" loading="lazy"></figure></template>
-	<template data-nstarter-content-template="impact-story"><div class="article-impact-story article-content-block" data-nstarter-content-item data-nstarter-content-type="impact-story"><div class="article-impact-story__copy"><span class="article-impact-story__eyebrow">Príbeh s dopadom</span><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div><a class="button button--coral" href="#">Prečítať príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a></div></template>
-	<template data-nstarter-content-template="important-link"><p class="article-important-link article-content-block" data-nstarter-content-item data-nstarter-content-type="important-link">Viac informácií nájdete v <a href="#">dôležitom odkaze <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a>.</p></template>
+	<template data-nstarter-content-template="impact-story"><div class="article-impact-story article-content-block" data-nstarter-content-item data-nstarter-content-type="impact-story"><div class="article-impact-story__copy"><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div><a class="button button--coral" href="#">Prečítať príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a></div></template>
 	<?php
 
 	return (string) ob_get_clean();
@@ -1223,6 +1222,8 @@ function cammino_get_post_visual_content( int $post_id ): string {
 	// Related-post collections were removed. Strip their old templates and
 	// saved empty live markers so existing post snapshots are clean as well.
 	$html = (string) preg_replace( '#<template\b[^>]*data-nstarter-content-template="posts"[^>]*>.*?</template>#is', '', $html );
+	$html = (string) preg_replace( '#<template\b[^>]*data-nstarter-content-template="important-link"[^>]*>.*?</template>#is', '', $html );
+	$html = (string) preg_replace( '#<span\b[^>]*class="[^"]*article-impact-story__eyebrow[^"]*"[^>]*>.*?</span>#is', '', $html );
 	$html = (string) preg_replace(
 		'#<div\b(?=[^>]*(?:data-cammino-post-bottom|data-nstarter-content-type="posts"))[^>]*>\s*<div\b[^>]*data-nstarter-live-section="cammino_post_collection"[^>]*>\s*</div>\s*</div>#is',
 		'',
