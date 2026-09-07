@@ -11,7 +11,7 @@
 
 .events-listing {
   min-height: 70vh;
-  padding-top: clamp(9rem, 14vw, 12rem);
+  padding-top: 20px;
   overflow: hidden;
   background: rgba(255, 253, 249, 0.54);
 }
@@ -195,7 +195,6 @@
 }
 
 @media (max-width: 720px) {
-  .events-listing { padding-top: 8rem; }
   .listing-heading { grid-template-columns: 1fr; gap: 1rem; }
   .event-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .event-filters::-webkit-scrollbar { display: none; }
