@@ -730,7 +730,7 @@ function cammino_get_event_display_type( int $post_id ): array {
 	$type       = null;
 
 	foreach ( $categories as $category ) {
-		if ( CAMMINO_EVENT_CATEGORY_SLUG !== $category->slug ) {
+		if ( ! in_array( $category->slug, array( CAMMINO_EVENT_CATEGORY_SLUG, 'uncategorized' ), true ) ) {
 			$type = $category;
 			break;
 		}
@@ -798,7 +798,7 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 
 	ob_start();
 	?>
-	<div class="event-toolbar" data-reveal="up" data-delay="80">
+	<div class="event-toolbar">
 		<div class="filter-label"><i class="fa-solid fa-sliders" aria-hidden="true"></i><span><?php esc_html_e( 'Typ podujatia', 'cammino' ); ?></span></div>
 		<div class="event-filters" role="group" aria-label="<?php esc_attr_e( 'Filtrovať podujatia podľa typu', 'cammino' ); ?>">
 			<button class="event-filter is-active" type="button" data-event-filter="all" aria-pressed="true"><?php esc_html_e( 'Všetky', 'cammino' ); ?> <span><?php echo esc_html( (string) count( $events ) ); ?></span></button>
@@ -819,9 +819,8 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 				$timestamp = cammino_get_event_timestamp( $event_id );
 				$location = (string) get_post_meta( $event_id, CAMMINO_EVENT_LOCATION_META, true );
 				$type = cammino_get_event_display_type( $event_id );
-				$delay = 70 * ( $index % 3 );
 				?>
-				<article class="event-card <?php echo esc_attr( $card_styles[ $index % count( $card_styles ) ] ); ?>" data-event-card data-event-type="<?php echo esc_attr( $type['slug'] ); ?>" data-reveal="up" data-delay="<?php echo esc_attr( (string) $delay ); ?>">
+				<article class="event-card <?php echo esc_attr( $card_styles[ $index % count( $card_styles ) ] ); ?>" data-event-card data-event-type="<?php echo esc_attr( $type['slug'] ); ?>">
 					<time class="event-card__date" datetime="<?php echo esc_attr( $raw_date ); ?>"><span><?php echo esc_html( $uppercase( wp_date( 'M', $timestamp ) ) ); ?></span><strong><?php echo esc_html( wp_date( 'd', $timestamp ) ); ?></strong><small><?php echo esc_html( $uppercase( wp_date( 'D', $timestamp ) ) ); ?></small></time>
 					<div class="event-card__main">
 						<span class="event-label"><i class="fa-solid <?php echo esc_attr( $type['icon'] ); ?>" aria-hidden="true"></i> <?php echo esc_html( $type['name'] ); ?></span>

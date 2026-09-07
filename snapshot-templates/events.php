@@ -10,7 +10,7 @@
 <main id="main-content" class="events-directory-main">
 	<section class="events-listing section" id="vsetky-podujatia" aria-labelledby="all-events-title">
 		<div class="container">
-			<div class="listing-heading" data-reveal="up">
+			<div class="listing-heading">
 				<div>
 					<span class="eyebrow">Vyberte si svoj ďalší krok</span>
 					<h1 id="all-events-title">Čo nás <em>čaká</em></h1>

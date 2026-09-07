@@ -1,26 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const revealElements = document.querySelectorAll("[data-reveal]");
-
-  revealElements.forEach((element) => {
-    element.setAttribute("data-nstarter-transient-class", "is-visible");
-  });
-
-  if (reducedMotion || !("IntersectionObserver" in window)) {
-    revealElements.forEach((element) => element.classList.add("is-visible"));
-  } else {
-    const observer = new IntersectionObserver((entries, revealObserver) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const delay = Number(entry.target.dataset.delay || 0);
-        window.setTimeout(() => entry.target.classList.add("is-visible"), delay);
-        revealObserver.unobserve(entry.target);
-      });
-    }, { threshold: 0.08, rootMargin: "0px 0px -12px" });
-
-    revealElements.forEach((element) => observer.observe(element));
-  }
-
   const filterButtons = [...document.querySelectorAll("[data-event-filter]")];
   const eventCards = [...document.querySelectorAll("[data-event-card]")];
   const visibleCount = document.querySelector("[data-visible-count]");

@@ -45,6 +45,10 @@ for ( $id = 100; $id < 108; ++$id ) {
 	$GLOBALS['test_categories'][ $id ] = array( $event_types[ ( $id - 100 ) % count( $event_types ) ] );
 	$GLOBALS['test_event_directory_posts'][] = $post;
 }
+$GLOBALS['test_categories'][100] = array(
+	(object) array( 'slug' => 'uncategorized', 'name' => 'Uncategorized' ),
+	$event_types[0],
+);
 
 $_GET = array();
 $directory = cammino_render_all_events( array(), 4 );
@@ -56,5 +60,7 @@ events_expect( ! str_contains( $directory, 'events-pager' ), 'Small event collec
 events_expect( 24 === substr_count( $directory, '<time' ), 'Every event renders its date tile, full date, and time' );
 events_expect( 8 === substr_count( $directory, 'fa-location-dot' ), 'Every event renders a location' );
 events_expect( str_contains( $directory, 'data-event-type="workshop"' ), 'Event categories supply the type-filter value' );
+events_expect( ! str_contains( $directory, 'Uncategorized' ), 'The default WordPress category is not exposed as an event type' );
+events_expect( ! str_contains( $directory, 'data-reveal' ), 'Event content is visible without reveal JavaScript' );
 
 echo "Passed $checks event directory checks.\n";
