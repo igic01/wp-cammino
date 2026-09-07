@@ -15,11 +15,6 @@
   overflow: hidden;
 }
 
-.events-listing::before,
-.events-listing::after { position: absolute; z-index: -1; border-radius: 50%; content: ""; pointer-events: none; }
-.events-listing::before { top: 4rem; left: -12rem; width: 31rem; aspect-ratio: 1; background: rgba(201, 216, 192, 0.16); }
-.events-listing::after { right: -12rem; bottom: 3rem; width: 27rem; aspect-ratio: 1; border: 4rem solid rgba(242, 182, 109, 0.1); }
-
 .listing-heading {
   display: grid;
   grid-template-columns: 1fr minmax(300px, 0.52fr);
