@@ -61,11 +61,4 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-
-  document.querySelector("[data-cover-sticker]")?.addEventListener("click", (event) => {
-    const sticker = event.currentTarget;
-    sticker.classList.remove("is-pulsing");
-    requestAnimationFrame(() => sticker.classList.add("is-pulsing"));
-    window.setTimeout(() => sticker.classList.remove("is-pulsing"), 580);
-  });
 });

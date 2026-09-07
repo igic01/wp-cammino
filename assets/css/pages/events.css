@@ -65,17 +65,28 @@
 
 .event-filters {
   display: flex;
+  flex-wrap: nowrap;
   gap: 0.45rem;
   min-width: 0;
-  padding-left: 1rem;
+  padding: 0 0 0.2rem 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
   flex: 1;
   border-left: 1px solid var(--color-border);
+  overscroll-behavior-inline: contain;
+  scrollbar-color: rgba(100, 54, 75, 0.35) transparent;
+  scrollbar-width: thin;
 }
+
+.event-filters::-webkit-scrollbar { height: 6px; }
+.event-filters::-webkit-scrollbar-track { background: transparent; }
+.event-filters::-webkit-scrollbar-thumb { border-radius: var(--radius-pill); background: rgba(100, 54, 75, 0.35); }
 
 .event-filter {
   display: inline-flex;
   min-height: 0;
   align-items: center;
+  flex: 0 0 auto;
   gap: 0.5rem;
   padding: 0.68rem 0.85rem;
   border: 1px solid transparent;
@@ -190,9 +201,6 @@
 
 @media (max-width: 720px) {
   .listing-heading { grid-template-columns: 1fr; gap: 1rem; }
-  .event-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
-  .event-filters::-webkit-scrollbar { display: none; }
-  .event-filter { flex: 0 0 auto; }
   .event-card { grid-template-columns: 68px minmax(0, 1fr); gap: 1rem; }
   .event-card__date { width: 68px; height: 104px; }
   .circle-action { grid-column: 2; justify-self: end; }
