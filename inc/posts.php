@@ -828,19 +828,19 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 				$location = (string) get_post_meta( $event_id, CAMMINO_EVENT_LOCATION_META, true );
 				$type = cammino_get_event_display_type( $event_id );
 				?>
-				<article class="event-card <?php echo esc_attr( $card_styles[ $index % count( $card_styles ) ] ); ?>" data-event-card data-event-type="<?php echo esc_attr( $type['slug'] ); ?>">
+				<a class="event-card <?php echo esc_attr( $card_styles[ $index % count( $card_styles ) ] ); ?>" href="<?php echo esc_url( get_permalink( $event ) ); ?>" data-event-card data-event-type="<?php echo esc_attr( $type['slug'] ); ?>">
 					<time class="event-card__date" datetime="<?php echo esc_attr( $raw_date ); ?>"><span><?php echo esc_html( $uppercase( wp_date( 'M', $timestamp ) ) ); ?></span><strong><?php echo esc_html( wp_date( 'd', $timestamp ) ); ?></strong><small><?php echo esc_html( $uppercase( wp_date( 'D', $timestamp ) ) ); ?></small></time>
 					<div class="event-card__main">
 						<?php if ( '' !== $type['name'] ) : ?><span class="event-label"><i class="fa-solid <?php echo esc_attr( $type['icon'] ); ?>" aria-hidden="true"></i> <?php echo esc_html( $type['name'] ); ?></span><?php endif; ?>
-						<h2><a href="<?php echo esc_url( get_permalink( $event ) ); ?>"><?php echo esc_html( get_the_title( $event ) ); ?></a></h2>
+						<h2><?php echo esc_html( get_the_title( $event ) ); ?></h2>
 						<div class="event-facts">
 							<span><i class="fa-regular fa-calendar" aria-hidden="true"></i><time datetime="<?php echo esc_attr( substr( $raw_date, 0, 10 ) ); ?>"><?php echo esc_html( wp_date( get_option( 'date_format' ), $timestamp ) ); ?></time></span>
 							<span><i class="fa-regular fa-clock" aria-hidden="true"></i><time datetime="<?php echo esc_attr( wp_date( 'H:i', $timestamp ) ); ?>"><?php echo esc_html( wp_date( 'H:i', $timestamp ) ); ?></time></span>
 							<span><i class="fa-solid fa-location-dot" aria-hidden="true"></i><?php echo esc_html( '' !== $location ? $location : __( 'Miesto bude doplnené', 'cammino' ) ); ?></span>
 						</div>
 					</div>
-					<a class="circle-action" href="<?php echo esc_url( get_permalink( $event ) ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Zobraziť podujatie: %s', 'cammino' ), get_the_title( $event ) ) ); ?>"><i class="fa-solid fa-arrow-right-long icon-diagonal" aria-hidden="true"></i></a>
-				</article>
+					<span class="circle-action" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span>
+				</a>
 			<?php endforeach; ?>
 		</div>
 

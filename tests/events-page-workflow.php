@@ -48,6 +48,8 @@ $_GET = array();
 $directory = cammino_render_all_events( array(), 4 );
 events_expect( 10 === $GLOBALS['test_event_query_args']['posts_per_page'], 'Directory query has a safe ten-event ceiling' );
 events_expect( 8 === substr_count( $directory, 'data-event-card' ), 'Directory renders every event in the compact set' );
+events_expect( 8 === substr_count( $directory, '<a class="event-card ' ), 'Every event card is a full-card link' );
+events_expect( ! str_contains( $directory, '<a class="circle-action"' ), 'Event cards do not contain a nested arrow-only link' );
 events_expect( 4 === substr_count( $directory, 'data-event-filter=' ), 'Directory renders all and three event-type filters' );
 events_expect( ! str_contains( $directory, 'type="date"' ), 'Directory does not render a date search' );
 events_expect( ! str_contains( $directory, 'events-pager' ), 'Small event collections do not use pagination' );
