@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.8' );
+define( 'NSTARTER_VERSION', '1.9.9' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
@@ -181,6 +181,7 @@ function cammino_render_shared_menu( bool $with_cta_icon = false ): void {
 		array( home_url( '/' ), __( 'Domov', 'cammino' ) ),
 		array( nstarter_get_source_page_url( 'about-us', '/o-nas/' ), __( 'O nás', 'cammino' ) ),
 		array( nstarter_get_source_page_url( 'ss', '/pribehy/' ), __( 'Príbehy', 'cammino' ) ),
+		array( nstarter_get_source_page_url( 'projects', '/projekty/' ), __( 'Projekty', 'cammino' ) ),
 		array( nstarter_get_source_page_url( 'news', '/novinky/' ) . '#events', __( 'Podujatia', 'cammino' ) ),
 		array( nstarter_get_source_page_url( 'news', '/novinky/' ), __( 'Novinky', 'cammino' ) ),
 		array( nstarter_get_source_page_url( 'contact', '/kontakt/' ), __( 'Kontakt', 'cammino' ) ),
@@ -287,6 +288,7 @@ function cammino_register_live_sections(): void {
 	nstarter_register_live_section( 'cammino_news_events', 'cammino_render_news_events' );
 	nstarter_register_live_section( 'cammino_news_articles', 'cammino_render_news_articles' );
 	nstarter_register_live_section( 'cammino_all_events', 'cammino_render_all_events' );
+	nstarter_register_live_section( 'cammino_all_projects', 'cammino_render_all_projects' );
 }
 
 add_action( 'wp_enqueue_scripts', 'cammino_enqueue_child_styles', 15 );
@@ -360,6 +362,11 @@ function cammino_enqueue_visual_page_assets(): void {
 			'handle' => 'cammino-events',
 			'style'  => '/assets/css/pages/events.css',
 			'script' => '/assets/js/pages/events.js',
+		),
+		'projects' => array(
+			'handle' => 'cammino-projects',
+			'style'  => '/assets/css/pages/projects.css',
+			'script' => '/assets/js/pages/projects.js',
 		),
 		'donate'   => array(
 			'handle' => 'cammino-donate',
@@ -547,6 +554,7 @@ function cammino_visual_page_body_classes( array $classes ): array {
 			'ss'            => array( 'stories-page' ),
 			'news'          => array( 'news-page' ),
 			'events'        => array( 'events-page' ),
+			'projects'      => array( 'projects-page' ),
 			'donate'        => array( 'donation-page' ),
 			'donate-us'     => array( 'donate-us-page' ),
 			'donate-now'    => array( 'contact-page', 'donate-now-page' ),

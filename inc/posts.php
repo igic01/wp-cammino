@@ -858,6 +858,119 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 }
 
 /**
+ * Render the category-filterable project directory.
+ */
+function cammino_render_all_projects( array $args = array(), int $page_id = 0 ): string {
+	$projects = get_posts(
+		array(
+			'post_type'           => 'post',
+			'post_status'         => 'publish',
+			'posts_per_page'      => -1,
+			'has_password'        => false,
+			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+			'meta_query'          => cammino_get_placement_meta_query( 'project' ),
+			'orderby'             => 'date',
+			'order'               => 'DESC',
+		)
+	);
+
+	$project_categories = array();
+	$categories         = array();
+	$excluded_slugs     = array( 'uncategorized', CAMMINO_EVENT_CATEGORY_SLUG );
+
+	foreach ( $projects as $project ) {
+		$post_categories = array();
+
+		foreach ( get_the_category( (int) $project->ID ) as $category ) {
+			$slug = sanitize_title( (string) $category->slug );
+			if ( '' === $slug || in_array( $slug, $excluded_slugs, true ) ) {
+				continue;
+			}
+
+			$post_categories[ $slug ] = (string) $category->name;
+			if ( ! isset( $categories[ $slug ] ) ) {
+				$categories[ $slug ] = array( 'name' => (string) $category->name, 'count' => 0 );
+			}
+			++$categories[ $slug ]['count'];
+		}
+
+		$project_categories[ (int) $project->ID ] = $post_categories;
+	}
+
+	uasort(
+		$categories,
+		static fn( array $first, array $second ): int => strcasecmp( $first['name'], $second['name'] )
+	);
+
+	$project_count = count( $projects );
+	$count_label   = 1 === $project_count ? __( 'projekt', 'cammino' ) : ( $project_count >= 2 && $project_count <= 4 ? __( 'projekty', 'cammino' ) : __( 'projektov', 'cammino' ) );
+
+	ob_start();
+	?>
+	<div class="project-category-panel">
+		<div class="project-category-intro">
+			<span><?php esc_html_e( 'Kategórie projektov', 'cammino' ); ?></span>
+			<p><?php esc_html_e( 'Vyberte kategóriu a zobrazia sa projekty, ktoré do nej patria.', 'cammino' ); ?></p>
+		</div>
+		<div class="project-categories" role="group" aria-label="<?php esc_attr_e( 'Filtrovať projekty podľa kategórie', 'cammino' ); ?>">
+			<button class="project-filter is-active" type="button" data-project-filter="all" aria-pressed="true"><?php esc_html_e( 'Všetky', 'cammino' ); ?> <span><?php echo esc_html( (string) $project_count ); ?></span></button>
+			<?php foreach ( $categories as $slug => $category ) : ?>
+				<button class="project-filter" type="button" data-project-filter="<?php echo esc_attr( $slug ); ?>" aria-pressed="false"><?php echo esc_html( $category['name'] ); ?> <span><?php echo esc_html( (string) $category['count'] ); ?></span></button>
+			<?php endforeach; ?>
+		</div>
+		<p class="project-result-count" aria-live="polite"><strong data-project-visible-count><?php echo esc_html( (string) $project_count ); ?></strong> <span data-project-count-label><?php echo esc_html( $count_label ); ?></span></p>
+	</div>
+
+	<?php if ( empty( $projects ) ) : ?>
+		<div class="empty-projects empty-projects--initial">
+			<i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+			<h2><?php esc_html_e( 'Projekty práve pripravujeme', 'cammino' ); ?></h2>
+			<p><?php esc_html_e( 'Čoskoro tu nájdete viac o tom, na čom pracujeme.', 'cammino' ); ?></p>
+		</div>
+	<?php else : ?>
+		<div class="project-grid" data-project-grid>
+			<?php foreach ( $projects as $project ) :
+				$project_id   = (int) $project->ID;
+				$project_cats = $project_categories[ $project_id ];
+				$image_url    = get_the_post_thumbnail_url( $project_id, 'medium_large' );
+				$description  = trim( (string) get_the_excerpt( $project ) );
+
+				if ( '' === $description ) {
+					$description = wp_trim_words( wp_strip_all_tags( strip_shortcodes( (string) get_post_field( 'post_content', $project_id ) ) ), 28 );
+				}
+				?>
+				<a class="project-card<?php echo $image_url ? '' : ' project-card--no-image'; ?>" href="<?php echo esc_url( get_permalink( $project ) ); ?>" data-project-card data-project-categories="<?php echo esc_attr( implode( ' ', array_keys( $project_cats ) ) ); ?>">
+					<?php if ( $image_url ) : ?>
+						<figure class="project-card__media"><img src="<?php echo esc_url( $image_url ); ?>" alt="" loading="lazy" decoding="async"></figure>
+					<?php endif; ?>
+					<div class="project-card__body">
+						<?php if ( ! empty( $project_cats ) ) : ?>
+							<div class="project-card__categories" aria-label="<?php esc_attr_e( 'Kategórie', 'cammino' ); ?>">
+								<?php foreach ( $project_cats as $category_name ) : ?><span><?php echo esc_html( $category_name ); ?></span><?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+						<h2><?php echo esc_html( get_the_title( $project ) ); ?></h2>
+						<?php if ( '' !== $description ) : ?><p><?php echo esc_html( $description ); ?></p><?php endif; ?>
+						<span class="project-card__action"><?php esc_html_e( 'Pozrieť projekt', 'cammino' ); ?> <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></span>
+					</div>
+				</a>
+			<?php endforeach; ?>
+		</div>
+
+		<div class="empty-projects" hidden data-empty-projects>
+			<i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+			<h2><?php esc_html_e( 'V tejto kategórii zatiaľ nič nie je', 'cammino' ); ?></h2>
+			<p><?php esc_html_e( 'Skúste si pozrieť všetky naše projekty.', 'cammino' ); ?></p>
+			<button class="button button--coral" type="button" data-project-show-all><?php esc_html_e( 'Zobraziť všetky', 'cammino' ); ?></button>
+		</div>
+	<?php endif; ?>
+	<?php
+
+	return (string) ob_get_clean();
+}
+
+/**
  * Render searchable article cards on the News page.
  */
 function cammino_render_news_articles(): string {

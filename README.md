@@ -4,7 +4,7 @@ This repository contains a minimal child theme for [Astra](https://wpastra.com/)
 It deliberately relies on Astra's normal template hierarchy, so existing Astra
 and Elementor pages continue to work unchanged while new Cammino features are
 built incrementally. The opt-in custom pages currently include the editable
-**Domov**, **O nás**, **Naše aktivity**, **Darujme úsmev**, **Kontakt**, **Príbehy úspechov**, **Novinky**, **Všetky podujatia**, and donation designs, plus a
+**Domov**, **O nás**, **Naše aktivity**, **Darujme úsmev**, **Kontakt**, **Príbehy úspechov**, **Novinky**, **Všetky podujatia**, **Projekty**, and donation designs, plus a
 shared single-post design for events, projects, and impact stories.
 
 ## Requirements
@@ -34,6 +34,8 @@ shared single-post design for events, projects, and impact stories.
 - `snapshot-templates/news.php` is the editable shell around live post listings.
 - `snapshot-templates/events.php` is the compact directory of upcoming events,
   with the shared Cammino header and client-side event-type filtering.
+- `snapshot-templates/projects.php` is the project directory without a hero. It
+  lists post categories first and filters linked project cards on the page.
 - `snapshot-templates/donate.php` provides the editable donation-options page.
 - `snapshot-templates/donate-us.php` provides the unrestricted-donation page.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
@@ -65,6 +67,11 @@ For the event directory, assign **Cammino — Všetky podujatia** to a page. It
 uses the shared header and a compact, photo-free card grid focused on event
 title, type, date, time, and location. Because the collection stays below ten
 events, visitors filter it by event type without date search or pagination.
+
+For the project directory, assign **Cammino — Projekty** to a page. Published
+posts whose Cammino type is **Projekt** appear automatically. WordPress post
+categories create the filter buttons; each card shows its title, excerpt (or a
+shortened body), and the featured image only when one is set.
 
 The saved HTML is stored in ACF when ACF is active, with private post meta as a
 fallback. **Regenerate page** resets the editable snapshot from
@@ -127,8 +134,9 @@ Card copy and images remain editable through the normal Text and Media modes.
    Use the three buttons directly below the body to add a heading,
    paragraph, or placeholder image. Edit text in place; click an image to
    replace it, and use the small controls below a block to move or remove it.
-5. Publish the post. Events appear in the existing event listing; projects,
-   impact stories and legacy articles appear in the main news listing.
+5. Publish the post. Events appear in the event listing; projects appear in the
+   project directory and news listing; impact stories and legacy articles appear
+   in the main news listing.
 
 Titles, excerpts and type-specific facts can be edited in WordPress. Post titles
 and the event date/location are also editable in the visual editor. Body sections,
