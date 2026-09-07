@@ -32,8 +32,8 @@ shared single-post design for events, projects, and impact stories.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
 - `snapshot-templates/ss.php` is the variable-card source for Príbehy úspechov.
 - `snapshot-templates/news.php` is the editable shell around live post listings.
-- `snapshot-templates/events.php` is the header-free directory of all events,
-  with calendar filtering and 30 events per page.
+- `snapshot-templates/events.php` is the compact directory of upcoming events,
+  with the shared Cammino header and client-side event-type filtering.
 - `snapshot-templates/donate.php` provides the editable donation-options page.
 - `snapshot-templates/donate-us.php` provides the unrestricted-donation page.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
@@ -62,9 +62,9 @@ For the homepage, assign **Cammino — Domov** to a page and then select that pa
 under **Settings → Reading → Your homepage displays**.
 
 For the event directory, assign **Cammino — Všetky podujatia** to a page. It
-starts directly with a date picker and the event list, omits the shared header,
-uses title/date/location-focused cards without photos, and paginates after 30
-events.
+uses the shared header and a compact, photo-free card grid focused on event
+title, type, date, time, and location. Because the collection stays below ten
+events, visitors filter it by event type without date search or pagination.
 
 The saved HTML is stored in ACF when ACF is active, with private post meta as a
 fallback. **Regenerate page** resets the editable snapshot from
@@ -149,8 +149,8 @@ classifications remain unchanged until explicitly reclassified.
 
 Run `php tests/post-workflow.php` and `php tests/events-page-workflow.php` for
 standalone regression checks using WordPress test doubles. They cover migration,
-event-category assignment, visual event details, photo visibility, 30-item event
-pagination, calendar filtering, type changes, saved-content preservation, the
+event-category assignment, visual event details, photo visibility, compact event
+cards and type filtering, type changes, saved-content preservation, the
 inline builder, and removal of legacy Related Posts markup. These checks do not
 require or modify a WordPress database.
 

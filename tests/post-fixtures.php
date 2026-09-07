@@ -22,6 +22,7 @@ $GLOBALS['test_can_edit'] = true;
 $GLOBALS['test_queries'] = array();
 $GLOBALS['test_terms'] = array();
 $GLOBALS['test_post_terms'] = array();
+$GLOBALS['test_categories'] = array();
 foreach ( array( 1 => 'Podujatie Alfa', 2 => 'Projekt Beta', 3 => 'Príbeh Gama', 4 => 'Pôvodný článok', 5 => 'Koncept', 6 => 'Súkromný projekt', 7 => 'Heslom chránený', 8 => 'Bez metadát' ) as $id => $title ) {
 	$GLOBALS['test_posts'][ $id ] = new WP_Post( $id, $title );
 }
@@ -41,6 +42,7 @@ function esc_url( $text ) { return esc_html( $text ); }
 function esc_html_e( $text, $domain = '' ) { echo esc_html( $text ); }
 function esc_attr_e( $text, $domain = '' ) { echo esc_attr( $text ); }
 function sanitize_key( $text ) { return preg_replace( '/[^a-z0-9_-]/', '', strtolower( (string) $text ) ); }
+function sanitize_title( $text ) { return sanitize_key( $text ); }
 function sanitize_text_field( $text ) { return trim( strip_tags( (string) $text ) ); }
 function absint( $value ) { return abs( (int) $value ); }
 function wp_json_encode( $value ) { return json_encode( $value ); }
@@ -131,6 +133,7 @@ function get_posts( $args ) {
 	return ( $args['fields'] ?? '' ) === 'ids' ? array_map( static fn( $p ) => $p->ID, $posts ) : $posts;
 }
 function get_the_title( $post ) { return get_post( $post )->post_title ?? ''; }
+function get_the_category( $post_id ) { return $GLOBALS['test_categories'][ (int) $post_id ] ?? array(); }
 function get_permalink( $post ) { return '/live/post-preview.php?id=' . get_post( $post )->ID; }
 function get_the_date( $format = '', $post = null ) { return date( $format ?: 'j. F Y', 1788600000 ); }
 function get_the_post_thumbnail_url( $id, $size ) { return '/assets/images/placeholder.webp'; }

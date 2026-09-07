@@ -75,11 +75,9 @@ $nstarter_html = (string) preg_replace(
 	$nstarter_html
 );
 
-if ( 'events' !== $nstarter_source_slug ) {
-	ob_start();
-	cammino_render_site_header();
-	$nstarter_html = (string) ob_get_clean() . $nstarter_html;
-}
+ob_start();
+cammino_render_site_header();
+$nstarter_html = (string) ob_get_clean() . $nstarter_html;
 
 $nstarter_html = (string) preg_replace(
 	'#<footer\b[^>]*class=["\'][^"\']*\bsite-footer\b[^>]*>.*?</footer>#is',
