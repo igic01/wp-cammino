@@ -42,5 +42,10 @@ projects_expect( str_contains( $directory, 'Krátky popis projektu.' ), 'The pro
 
 $template = file_get_contents( NSTARTER_PATH . '/snapshot-templates/projects.php' );
 projects_expect( ! preg_match( '/<header class="projects-heading">.*?<p>/s', $template ), 'The removed introductory header paragraph is not rendered.' );
+projects_expect( str_contains( $template, 'class="projects-feature"' ), 'A permanent featured-project hero is rendered.' );
+projects_expect( str_contains( $template, '<h1 id="featured-project-title">' ), 'The featured project provides the page heading.' );
+projects_expect( str_contains( $template, 'class="projects-feature__copy"' ) && str_contains( $template, 'class="button button--coral"' ), 'The hero contains description copy and a CTA.' );
+projects_expect( str_contains( $template, 'class="projects-feature__media"' ) && str_contains( $template, '<img ' ), 'The hero contains a replaceable image.' );
+projects_expect( strpos( $template, 'class="projects-feature"' ) < strpos( $template, 'class="projects-listing section"' ), 'The featured hero remains above the category directory.' );
 
 echo "Passed $checks project directory checks.\n";

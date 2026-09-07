@@ -34,8 +34,8 @@ shared single-post design for events, projects, and impact stories.
 - `snapshot-templates/news.php` is the editable shell around live post listings.
 - `snapshot-templates/events.php` is the compact directory of upcoming events,
   with the shared Cammino header and client-side event-type filtering.
-- `snapshot-templates/projects.php` is the project directory without a hero. It
-  lists post categories first and filters linked project cards on the page.
+- `snapshot-templates/projects.php` opens with a permanent featured-project hero,
+  then lists post categories and replaces them with linked project cards after a selection.
 - `snapshot-templates/donate.php` provides the editable donation-options page.
 - `snapshot-templates/donate-us.php` provides the unrestricted-donation page.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
