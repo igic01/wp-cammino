@@ -14,7 +14,6 @@
 						<span>Naša práca</span>
 						<h1 id="projects-title">Projekty</h1>
 					</div>
-					<p>Najskôr si vyberte oblasť, ktorá vás zaujíma. Následne sa zobrazia všetky projekty z danej kategórie.</p>
 				</header>
 
 				<?php nstarter_live_section( 'cammino_all_projects' ); ?>

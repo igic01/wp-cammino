@@ -31,10 +31,16 @@ projects_expect( str_contains( $directory, 'data-project-filter="uncategorized"'
 projects_expect( ! str_contains( $directory, 'data-project-filter="all"' ), 'The redesigned selector starts with categories rather than an all-projects filter.' );
 projects_expect( str_contains( $directory, 'class="project-category-card"' ), 'Categories use the large selectable card design.' );
 projects_expect( str_contains( $directory, 'data-project-categories="vzdelavanie komunita uncategorized"' ), 'Cards expose all their categories to the client filter.' );
-projects_expect( str_contains( $directory, 'data-project-prompt' ), 'The results area prompts for a category before displaying projects.' );
-projects_expect( str_contains( $directory, 'data-project-grid hidden' ), 'Projects are initially hidden until a category is selected.' );
+projects_expect( str_contains( $directory, 'data-project-category-view' ), 'The initial panel state contains the category view.' );
+projects_expect( str_contains( $directory, 'data-project-results' ), 'The same panel contains the replacement project view.' );
+projects_expect( str_contains( $directory, 'data-project-selected-name' ), 'The selected category name is displayed above its projects.' );
+projects_expect( str_contains( $directory, 'data-project-back' ), 'Visitors can return from projects to the category list.' );
+projects_expect( ! str_contains( $directory, 'project-category-selector__heading' ), 'The removed category heading is not rendered.' );
 projects_expect( str_contains( $directory, '<a class="project-card' ), 'The whole project card is a link.' );
 projects_expect( str_contains( $directory, 'Projekt Beta' ), 'The project title is displayed.' );
 projects_expect( str_contains( $directory, 'Krátky popis projektu.' ), 'The project description is displayed.' );
+
+$template = file_get_contents( NSTARTER_PATH . '/snapshot-templates/projects.php' );
+projects_expect( ! preg_match( '/<header class="projects-heading">.*?<p>/s', $template ), 'The removed introductory header paragraph is not rendered.' );
 
 echo "Passed $checks project directory checks.\n";

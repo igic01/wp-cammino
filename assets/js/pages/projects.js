@@ -4,10 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const visibleCount = document.querySelector("[data-project-visible-count]");
   const countLabel = document.querySelector("[data-project-count-label]");
   const emptyState = document.querySelector("[data-empty-projects]");
-  const prompt = document.querySelector("[data-project-prompt]");
-  const resultsHeading = document.querySelector("[data-project-results-heading]");
+  const categoryView = document.querySelector("[data-project-category-view]");
+  const resultsView = document.querySelector("[data-project-results]");
   const selectedName = document.querySelector("[data-project-selected-name]");
   const projectGrid = document.querySelector("[data-project-grid]");
+  const backButton = document.querySelector("[data-project-back]");
 
   const slovakCountLabel = (count) => {
     if (count === 1) return "projekt";
@@ -37,12 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (visibleCount) visibleCount.textContent = String(count);
     if (countLabel) countLabel.textContent = slovakCountLabel(count);
     if (emptyState) emptyState.hidden = count !== 0;
-    if (prompt) prompt.hidden = true;
-    if (resultsHeading) resultsHeading.hidden = false;
+    if (categoryView) categoryView.hidden = true;
+    if (resultsView) resultsView.hidden = false;
     if (projectGrid) projectGrid.hidden = count === 0;
+  };
+
+  const showCategories = () => {
+    if (categoryView) categoryView.hidden = false;
+    if (resultsView) resultsView.hidden = true;
+    filterButtons.forEach((button) => {
+      button.classList.remove("is-active");
+      button.setAttribute("aria-pressed", "false");
+    });
   };
 
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => applyFilter(button.dataset.projectFilter || ""));
   });
+
+  backButton?.addEventListener("click", showCategories);
 });
