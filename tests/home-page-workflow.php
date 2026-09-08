@@ -45,5 +45,10 @@ home_expect( str_contains( $template, 'class="section home-involvement"' ) && st
 home_expect( str_contains( $template, 'Dobrovoľníctvo' ) && str_contains( $template, 'Partnerstvo' ) && str_contains( $template, 'Podpora' ), 'The involvement CTA presents all three participation paths.' );
 home_expect( str_contains( $styles, '.home-involvement__card' ) && str_contains( $styles, '.home-involvement__paths' ), 'The involvement CTA has responsive homepage styling.' );
 home_expect( str_contains( $template, 'class="home-partners__box"' ) && str_contains( $styles, '.home-partners__box' ), 'The partner title and logos are grouped in a distinct visual panel.' );
+home_expect( str_contains( $template, '<h2 id="home-partners-title">Partneri</h2>' ), 'The partner section uses the concise requested title.' );
+home_expect( str_contains( $template, "'home_partner_count'" ) && str_contains( $template, "'label'   => 'Počet partnerov'" ), 'The visual editor exposes the partner count.' );
+home_expect( str_contains( $template, 'data-nstarter-variable-items' ) && str_contains( $template, '<template data-nstarter-variable-template>' ), 'Partner logos support repeat resizing.' );
+home_expect( str_contains( $styles, '.home-partners[data-nstarter-variable-value="0"]' ), 'A partner section with no logos is hidden outside the editor.' );
+home_expect( str_contains( $styles, 'background: transparent;' ) && str_contains( $styles, 'border: 1px solid rgba(100, 54, 75, 0.24);' ), 'The compact partner panel is transparent with a visible border.' );
 
 echo "Passed $checks home page checks.\n";

@@ -384,15 +384,29 @@ $cammino_partners    = array(
       </div>
     </section>
 
-    <section class="section home-partners" aria-labelledby="home-partners-title">
+    <section class="section home-partners" aria-labelledby="home-partners-title"<?php
+    nstarter_variable_section_attributes(
+      'home_partner_count',
+      array(
+        'label'   => 'Počet partnerov',
+        'type'    => 'number',
+        'control' => 'repeat',
+        'value'   => count( $cammino_partners ),
+        'min'     => 0,
+        'max'     => 30,
+        'step'    => 1,
+        'token'   => 'partner',
+      )
+    );
+    ?>>
       <div class="container">
         <div class="home-partners__box">
           <div class="home-partners__heading" data-reveal="up">
-            <h2 id="home-partners-title">Partneri projektu:</h2>
+            <h2 id="home-partners-title">Partneri</h2>
           </div>
-          <ul class="home-partners__grid" aria-label="Logá partnerov projektu">
+          <ul class="home-partners__grid" aria-label="Logá partnerov" data-nstarter-variable-items>
             <?php foreach ( $cammino_partners as $cammino_partner_index => $cammino_partner ) : ?>
-              <li class="home-partner" data-reveal="up" data-delay="<?php echo esc_attr( (string) ( 45 * ( $cammino_partner_index % 6 ) ) ); ?>">
+              <li class="home-partner" data-nstarter-variable-item data-reveal="up" data-delay="<?php echo esc_attr( (string) ( 35 * ( $cammino_partner_index % 8 ) ) ); ?>">
                 <img
                   src="<?php echo esc_url( NSTARTER_URL . '/assets/partners/' . $cammino_partner['file'] ); ?>"
                   alt="<?php echo esc_attr( sprintf( 'Logo partnera %s', $cammino_partner['name'] ) ); ?>"
@@ -404,6 +418,11 @@ $cammino_partners    = array(
               </li>
             <?php endforeach; ?>
           </ul>
+          <template data-nstarter-variable-template>
+            <li class="home-partner" data-nstarter-variable-item>
+              <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Logo partnera {{partner}}" width="600" height="300" loading="lazy" decoding="async">
+            </li>
+          </template>
         </div>
       </div>
     </section>
