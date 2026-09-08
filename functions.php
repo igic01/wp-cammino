@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.45' );
+define( 'NSTARTER_VERSION', '1.9.46' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
@@ -336,6 +336,14 @@ function cammino_enqueue_visual_page_assets(): void {
 			'style'  => '/assets/css/pages/home.css',
 			'script' => '/assets/js/pages/home.js',
 		),
+		'home-v2'  => array(
+			'handle' => 'cammino-home-v2',
+			'style'  => '/assets/home-v2/home-v2.css',
+			'script' => '/assets/js/pages/home.js',
+			'before_styles' => array(
+				'cammino-home-v2-base' => '/assets/css/pages/home.css',
+			),
+		),
 		'about-us' => array(
 			'handle' => 'cammino-about-us',
 			'style'  => '/assets/css/pages/about-us.css',
@@ -555,6 +563,7 @@ function cammino_visual_page_body_classes( array $classes ): array {
 		$slug         = nstarter_get_native_source_template_slug( get_queried_object_id() );
 		$page_classes = array(
 			'home'          => array( 'home-page' ),
+			'home-v2'       => array( 'home-page', 'home-v2-page' ),
 			'about-us'      => array( 'about-page' ),
 			'activities'    => array( 'activities-page' ),
 			'contact'       => array( 'contact-page' ),
