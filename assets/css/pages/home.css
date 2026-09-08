@@ -1821,7 +1821,8 @@ body:not(.nstarter-editor-preview) .home-partners[data-nstarter-variable-value="
   padding: clamp(1.25rem, 3vw, 2.25rem);
   border: 1px solid rgba(100, 54, 75, 0.24);
   border-radius: var(--radius-md);
-  background: transparent;
+  background: #fff;
+  text-align: center;
 }
 
 .home-partners__heading {
@@ -1841,6 +1842,7 @@ body:not(.nstarter-editor-preview) .home-partners[data-nstarter-variable-value="
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
   margin: 0;
   padding: 0;
