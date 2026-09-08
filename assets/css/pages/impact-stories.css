@@ -1,0 +1,190 @@
+/* Impact stories page */
+.impact-stories-main {
+  overflow: hidden;
+}
+
+.impact-stories-hero {
+  position: relative;
+  padding-block: clamp(3.5rem, 8vw, 7rem);
+  overflow: hidden;
+}
+
+.impact-stories-hero::before {
+  position: absolute;
+  top: 10%;
+  right: -8rem;
+  width: 22rem;
+  height: 22rem;
+  border: 4rem solid rgba(217, 111, 93, 0.1);
+  border-radius: 50%;
+  content: "";
+}
+
+.impact-stories-hero__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(24rem, 1.1fr);
+  align-items: center;
+  gap: clamp(2.5rem, 7vw, 6.5rem);
+}
+
+.impact-stories-hero__copy {
+  max-width: 39rem;
+}
+
+.impact-stories-hero__copy h1 {
+  margin-bottom: 1.35rem;
+  font-size: clamp(2.8rem, 6vw, 5.6rem);
+}
+
+.impact-stories-hero__copy h1 em {
+  color: var(--color-coral);
+}
+
+.impact-stories-hero__copy p {
+  margin: 0;
+  color: rgba(39, 36, 35, 0.72);
+  font-size: clamp(1.02rem, 1.7vw, 1.2rem);
+}
+
+.impact-stories-hero__media {
+  position: relative;
+  min-height: clamp(22rem, 44vw, 37rem);
+  margin: 0;
+  overflow: hidden;
+  border-radius: 48% 52% 46% 54% / 43% 48% 52% 57%;
+  background: var(--color-sage);
+  box-shadow: var(--shadow-soft);
+  transform: rotate(1.5deg);
+}
+
+.impact-stories-hero__media img {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  object-fit: cover;
+  transition: transform 650ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.impact-stories-list {
+  background: rgba(255, 253, 249, 0.52);
+}
+
+body:not(.nstarter-editor-preview) .impact-stories-list[data-nstarter-variable-value="0"] {
+  display: none;
+}
+
+.impact-stories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.impact-story {
+  min-width: 0;
+  padding: clamp(1.6rem, 3.5vw, 2.5rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  transition: border-color 280ms ease, box-shadow 320ms ease, transform 320ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.impact-story:nth-child(4n + 2) {
+  background: rgba(201, 216, 192, 0.42);
+}
+
+.impact-story:nth-child(4n + 3) {
+  background: rgba(242, 182, 109, 0.22);
+}
+
+.impact-story:nth-child(4n + 4) {
+  background: rgba(217, 111, 93, 0.12);
+}
+
+.impact-story h2 {
+  margin-bottom: 0.8rem;
+  color: var(--color-plum);
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+}
+
+.impact-story p {
+  margin: 0;
+  color: rgba(39, 36, 35, 0.7);
+  font-size: 0.94rem;
+}
+
+[data-impact-stories-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 650ms ease, transform 750ms cubic-bezier(.16, 1, .3, 1);
+}
+
+[data-impact-stories-reveal="left"] {
+  transform: translateX(-28px);
+}
+
+[data-impact-stories-reveal="right"] {
+  transform: translateX(28px) rotate(1.5deg);
+}
+
+[data-impact-stories-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.impact-stories-hero__media[data-impact-stories-reveal].is-visible {
+  transform: rotate(1.5deg);
+}
+
+.nstarter-editor-preview .impact-stories-grid:empty::before {
+  display: block;
+  grid-column: 1 / -1;
+  padding: 2rem;
+  border: 1px dashed rgba(100, 54, 75, 0.3);
+  border-radius: var(--radius-md);
+  color: rgba(39, 36, 35, 0.68);
+  content: "Pridajte príbehy cez nastavenie Počet príbehov.";
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .impact-story:hover {
+    border-color: rgba(217, 111, 93, 0.35);
+    box-shadow: 0 20px 42px rgba(80, 45, 54, 0.1);
+    transform: translateY(-6px);
+  }
+
+  .impact-stories-hero__media:hover img {
+    transform: scale(1.04);
+  }
+}
+
+@media (max-width: 780px) {
+  .impact-stories-hero__grid,
+  .impact-stories-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .impact-stories-hero__media {
+    min-height: clamp(20rem, 85vw, 31rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-impact-stories-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .impact-stories-hero__media[data-impact-stories-reveal],
+  .impact-stories-hero__media[data-impact-stories-reveal].is-visible {
+    transform: rotate(1.5deg);
+  }
+
+  .impact-story,
+  .impact-stories-hero__media img {
+    transition: none;
+  }
+}
