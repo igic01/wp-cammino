@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.24' );
+define( 'NSTARTER_VERSION', '1.9.25' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
@@ -283,6 +283,17 @@ function cammino_register_live_sections(): void {
 		}
 	);
 
+	nstarter_register_live_section(
+		'cammino_contact2_form',
+		static function (): string {
+			if ( ! shortcode_exists( 'contact-form-7' ) ) {
+				return '<p class="cammino-live-section-error">' . esc_html__( 'Contact Form 7 is required to display this form.', 'cammino' ) . '</p>';
+			}
+
+			return (string) do_shortcode( '[contact-form-7 id="5554de4" title="Zapojte sa"]' );
+		}
+	);
+
 	nstarter_register_live_section( 'cammino_all_events', 'cammino_render_all_events' );
 	nstarter_register_live_section( 'cammino_all_projects', 'cammino_render_all_projects' );
 }
@@ -339,6 +350,11 @@ function cammino_enqueue_visual_page_assets(): void {
 			'style'  => '/assets/css/pages/contact.css',
 			'script' => '/assets/js/pages/contact.js',
 		),
+		'contact2' => array(
+			'handle' => 'cammino-contact2',
+			'style'  => '/assets/css/pages/contact2.css',
+			'script' => '/assets/js/pages/contact2.js',
+		),
 		'events'   => array(
 			'handle' => 'cammino-events',
 			'style'  => '/assets/css/pages/events.css',
@@ -385,7 +401,7 @@ function cammino_enqueue_visual_page_assets(): void {
 
 	$page = $pages[ $slug ];
 
-	if ( 'contact' === $slug ) {
+	if ( in_array( $slug, array( 'contact', 'contact2' ), true ) ) {
 		if ( function_exists( 'wpcf7_enqueue_styles' ) ) {
 			wpcf7_enqueue_styles();
 		}
@@ -536,6 +552,7 @@ function cammino_visual_page_body_classes( array $classes ): array {
 			'about-us'      => array( 'about-page' ),
 			'activities'    => array( 'activities-page' ),
 			'contact'       => array( 'contact-page' ),
+			'contact2'      => array( 'contact2-page' ),
 			'events'        => array( 'events-page' ),
 			'projects'      => array( 'projects-page' ),
 			'main-project'  => array( 'main-project-page' ),

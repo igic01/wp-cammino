@@ -4,7 +4,7 @@ This repository contains a minimal child theme for [Astra](https://wpastra.com/)
 It deliberately relies on Astra's normal template hierarchy, so existing Astra
 and Elementor pages continue to work unchanged while new Cammino features are
 built incrementally. The opt-in custom pages currently include the editable
-**Domov**, **O nás**, **Naše aktivity**, **Kontakt**, **Všetky podujatia**, **Projekty**, **Hlavný projekt**, and donation designs, plus a
+**Domov**, **O nás**, **Naše aktivity**, **Kontakt**, **Zapojte sa**, **Všetky podujatia**, **Projekty**, **Hlavný projekt**, and donation designs, plus a
 shared single-post design for events, projects, and impact stories.
 
 ## Requirements
@@ -13,7 +13,7 @@ shared single-post design for events, projects, and impact stories.
 - PHP 8.0 or newer
 - Astra installed as the parent theme in `wp-content/themes/astra`
 - Elementor installed when existing Elementor pages require it
-- Contact Form 7 installed and active for the Kontakt page
+- Contact Form 7 installed and active for the Kontakt and Zapojte sa pages
 
 ## Current structure
 
@@ -30,6 +30,8 @@ shared single-post design for events, projects, and impact stories.
   activity areas, scroll reveals, and an animated illustration using the shared
   design tokens. Choose **Cammino — Naše aktivity** for `/nase-aktivity/`.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
+- `snapshot-templates/contact2.php` provides the two-column **Zapojte sa** page
+  backed by Contact Form 7 form `5554de4`.
 - `snapshot-templates/events.php` is the compact directory of upcoming events,
   with the shared Cammino header and client-side event-type filtering.
 - `snapshot-templates/projects.php` opens with a permanent featured-project hero,
@@ -77,9 +79,10 @@ The saved HTML is stored in ACF when ACF is active, with private post meta as a
 fallback. **Regenerate page** resets the editable snapshot from
 the selected file in `snapshot-templates/`.
 
-The Kontakt template renders Contact Form 7 form `d43ca6f` at request time.
-Its surrounding copy remains editable, while the live form itself is locked in
-the visual editor so a snapshot save cannot replace or stale its shortcode.
+The Kontakt and Zapojte sa templates render Contact Form 7 forms `d43ca6f` and
+`5554de4` at request time. Their surrounding copy remains editable, while each
+live form is locked in the visual editor so a snapshot save cannot replace or
+stale its shortcode.
 
 The Naše aktivity template uses the usual Text, Media, and Link editing modes.
 Its two image placeholders can be replaced in Media mode; add appropriate alt
@@ -138,7 +141,8 @@ classifications remain unchanged until explicitly reclassified.
 ## Post workflow checks
 
 Run `php tests/post-workflow.php`, `php tests/events-page-workflow.php`,
-`php tests/projects-page-workflow.php`, and `php tests/main-project-page-workflow.php` for
+`php tests/projects-page-workflow.php`, `php tests/main-project-page-workflow.php`,
+and `php tests/contact2-page-workflow.php` for
 standalone regression checks using WordPress test doubles. They cover migration,
 event-category assignment, visual event details, photo visibility, compact event
 cards and type filtering, type changes, saved-content preservation, the
