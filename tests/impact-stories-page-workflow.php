@@ -25,6 +25,7 @@ impact_stories_expect( str_contains( $template, "'max'     => 100" ), 'The colle
 impact_stories_expect( str_contains( $template, 'data-nstarter-variable-items' ) && str_contains( $template, 'data-nstarter-variable-template' ), 'The variable collection has an item container and clone template.' );
 impact_stories_expect( preg_match( '/<article class="impact-story"[^>]*data-nstarter-variable-item[^>]*>\s*<h2>.*?<\/h2>\s*<p>.*?<\/p>\s*<\/article>/s', $template ), 'Every story item consists of exactly a title and paragraph.' );
 impact_stories_expect( str_contains( $styles, '.impact-stories-hero__grid' ) && str_contains( $styles, '.impact-stories-grid' ), 'The hero and repeatable story grid are styled.' );
+impact_stories_expect( preg_match( '/\.impact-stories-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/s', $styles ), 'Stories use one full-width column.' );
 impact_stories_expect( str_contains( $styles, '.impact-stories-list[data-nstarter-variable-value="0"]' ), 'An empty public story collection is hidden.' );
 impact_stories_expect( str_contains( $script, 'IntersectionObserver' ) && str_contains( $script, 'editorPreview' ), 'Reveal animation is progressive and editor-safe.' );
 impact_stories_expect( str_contains( $theme, "'impact-stories' => array(" ) && str_contains( $theme, '/assets/css/pages/impact-stories.css' ) && str_contains( $theme, '/assets/js/pages/impact-stories.js' ), 'The theme registers the new page assets.' );
