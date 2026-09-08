@@ -50,6 +50,6 @@ home_expect( str_contains( $template, "'home_partner_count'" ) && str_contains( 
 home_expect( str_contains( $template, 'data-nstarter-variable-items' ) && str_contains( $template, '<template data-nstarter-variable-template>' ), 'Partner logos support repeat resizing.' );
 home_expect( str_contains( $styles, '.home-partners[data-nstarter-variable-value="0"]' ), 'A partner section with no logos is hidden outside the editor.' );
 home_expect( str_contains( $styles, 'background: transparent;' ) && str_contains( $styles, 'border: 1px solid rgba(100, 54, 75, 0.24);' ), 'The compact partner panel is transparent with a visible border.' );
-home_expect( str_contains( $styles, '.home-partners > .container' ) && str_contains( $styles, 'max-width: none;' ), 'The partner panel spans the full page width.' );
+home_expect( ! str_contains( $styles, '.home-partners > .container' ), 'The partner panel keeps the standard homepage container width.' );
 
 echo "Passed $checks home page checks.\n";
