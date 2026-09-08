@@ -581,3 +581,414 @@ body.home-v2-page .newsletter {
     color: #fff;
   }
 }
+
+/*
+ * Modern art direction
+ * The spectrum now lives on the page canvas. Sections use solid fields,
+ * transparency and focused light instead of repeating their own gradients.
+ */
+body.home-v2-page {
+  color: #15163f;
+  background-color: #fff5ed;
+  background-image:
+    radial-gradient(circle at 12% 14%, rgba(255, 245, 237, 0.98) 0%, rgba(255, 245, 237, 0) 34%),
+    radial-gradient(circle at 44% 28%, rgba(239, 199, 202, 0.72) 0%, rgba(239, 199, 202, 0) 36%),
+    radial-gradient(circle at 68% 56%, rgba(162, 142, 191, 0.72) 0%, rgba(162, 142, 191, 0) 40%),
+    radial-gradient(circle at 96% 82%, rgba(88, 152, 204, 0.9) 0%, rgba(88, 152, 204, 0) 46%),
+    var(--v2-spectrum);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-attachment: fixed;
+}
+
+body.home-v2-page .site-header,
+body.home-v2-page .site-header.is-scrolled {
+  border-bottom-color: rgba(21, 22, 63, 0.1);
+  background-color: rgba(255, 245, 237, 0.78);
+  background-image: none;
+  box-shadow: 0 12px 42px rgba(49, 48, 104, 0.1);
+  backdrop-filter: blur(22px) saturate(1.25);
+}
+
+body.home-v2-page .site-header.is-scrolled {
+  background-color: rgba(255, 245, 237, 0.92);
+  box-shadow: 0 14px 46px rgba(49, 48, 104, 0.16);
+}
+
+body.home-v2-page .site-nav > a:last-child,
+body.home-v2-page .site-nav > a:last-child:hover,
+body.home-v2-page .site-nav > a:last-child:focus-visible {
+  background-color: #a28ebf;
+  background-image: none;
+  box-shadow: 0 12px 28px rgba(82, 70, 129, 0.22);
+}
+
+body.home-v2-page .site-nav > a:last-child:hover,
+body.home-v2-page .site-nav > a:last-child:focus-visible {
+  background-color: #5898cc;
+  box-shadow: 0 16px 34px rgba(57, 100, 148, 0.3);
+}
+
+.home-v2 .hero,
+.home-v2 .home-projects,
+.home-v2 .home-involvement,
+.home-v2 .home-partners,
+.home-v2 .home-subscribe {
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  animation: none;
+}
+
+.home-v2 .hero {
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.34);
+}
+
+.home-v2 .hero-copy h1 em {
+  color: #477fac;
+  background: none;
+}
+
+.home-v2 .hero-visual {
+  filter: drop-shadow(0 32px 45px rgba(47, 51, 111, 0.2));
+}
+
+.home-v2 .image-tint {
+  background: radial-gradient(circle at 72% 18%, rgba(255, 245, 237, 0.5), transparent 44%);
+}
+
+.home-v2 .hero-note {
+  border-color: rgba(255, 245, 237, 0.84);
+  background: rgba(255, 245, 237, 0.9);
+  box-shadow: 18px 20px 50px rgba(88, 152, 204, 0.24);
+}
+
+.home-v2 .note-icon,
+.home-v2 .button--coral,
+.home-v2 .button--coral:hover,
+.home-v2 .button--coral:focus-visible {
+  color: #fff;
+  background-color: #5898cc;
+  background-image: none;
+}
+
+.home-v2 .button--coral:hover,
+.home-v2 .button--coral:focus-visible {
+  background-color: #a28ebf;
+}
+
+.home-v2 .about,
+.home-v2 .events {
+  background-color: #fff5ed;
+  background-image: none;
+  animation: none;
+}
+
+.home-v2 .about {
+  box-shadow: inset -30vw 0 150px rgba(239, 199, 202, 0.42);
+}
+
+.home-v2 .events {
+  box-shadow: inset 30vw 0 160px rgba(88, 152, 204, 0.1);
+}
+
+.home-v2 .support-card,
+.home-v2 .support-card--sage {
+  background-color: #efc7ca;
+  background-image: none;
+}
+
+.home-v2 .support-card--apricot {
+  background-color: #fff5ed;
+  background-image: none;
+}
+
+.home-v2 .support-card--cream {
+  background-color: #5898cc;
+  background-image: none;
+  box-shadow: inset -80px -70px 110px rgba(255, 245, 237, 0.18);
+}
+
+.home-v2 .support-card h3,
+.home-v2 .support-card a,
+.home-v2 .support-card .support-number,
+.home-v2 .support-card:first-child h3,
+.home-v2 .support-card:first-child a,
+.home-v2 .support-card:first-child .support-number,
+.home-v2 .support-card:nth-child(2) h3,
+.home-v2 .support-card:nth-child(2) a,
+.home-v2 .support-card:nth-child(2) .support-number,
+.home-v2 .support-card:nth-child(3) h3,
+.home-v2 .support-card:nth-child(3) a,
+.home-v2 .support-card:nth-child(3) .support-number {
+  color: #15163f;
+}
+
+.home-v2 .support-card:first-child .support-icon,
+.home-v2 .support-card:nth-child(2) .support-icon,
+.home-v2 .support-card:nth-child(3) .support-icon {
+  color: #fff;
+  background: #a28ebf;
+}
+
+.home-v2 .support-card:nth-child(2) .support-icon {
+  background: #5898cc;
+}
+
+.home-v2 .support-card:nth-child(3) .support-icon {
+  color: #15163f;
+  background: #fff5ed;
+}
+
+.home-v2 .home-project-card,
+.home-v2 .home-project-card:nth-child(3n + 2),
+.home-v2 .home-project-card:nth-child(3n + 3) {
+  border-color: rgba(21, 22, 63, 0.09);
+  background-color: #fff5ed;
+  background-image: none;
+  box-shadow: 0 18px 44px rgba(46, 47, 105, 0.13);
+}
+
+.home-v2 .home-project-card:nth-child(3n + 2) {
+  background-color: #efc7ca;
+}
+
+.home-v2 .home-project-card:nth-child(3n + 3) {
+  background-color: #a28ebf;
+  box-shadow: inset -90px -80px 130px rgba(88, 152, 204, 0.2), 0 18px 44px rgba(46, 47, 105, 0.14);
+}
+
+.home-v2 .home-project-card__symbol,
+.home-v2 .circle-link,
+.home-v2 .event-date,
+.home-v2 .event-row .event-date {
+  color: #fff;
+  background: #5898cc;
+}
+
+.home-v2 .event-card--featured {
+  border-color: rgba(21, 22, 63, 0.08);
+  background: #efc7ca;
+  box-shadow: 0 18px 46px rgba(75, 61, 109, 0.14);
+}
+
+.home-v2 .event-list {
+  border-color: rgba(21, 22, 63, 0.08);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 18px 46px rgba(75, 61, 109, 0.1);
+}
+
+.home-v2 .story-section {
+  color: #15163f;
+  background-color: #a28ebf;
+  background-image: none;
+  box-shadow: inset -34vw -8vw 190px rgba(88, 152, 204, 0.6), inset 18vw 0 150px rgba(255, 245, 237, 0.12);
+  animation: none;
+}
+
+.home-v2 .story-copy h2 {
+  color: #15163f;
+}
+
+.home-v2 .story-copy > p {
+  color: rgba(21, 22, 63, 0.78);
+}
+
+.home-v2 .quote-mark {
+  color: #15163f;
+  background: #fff5ed;
+}
+
+.home-v2 .story-copy h2 em,
+.home-v2 .community-cta-copy h2 em,
+.home-v2 .donate-copy h2 em {
+  color: #fff5ed;
+  background: none;
+}
+
+.home-v2 .community-cta {
+  color: #15163f;
+  background-color: #5898cc;
+  background-image: none;
+  box-shadow: inset 30vw 0 180px rgba(162, 142, 191, 0.5);
+  animation: none;
+}
+
+.home-v2 .community-cta-card,
+.home-v2 .community-cta-copy h2,
+.home-v2 .community-cta .smile-impact-stat > span,
+.home-v2 .community-cta .smile-impact-stat strong {
+  color: #15163f;
+}
+
+.home-v2 .community-cta-media {
+  background: #fff5ed;
+  box-shadow: 22px 24px 55px rgba(37, 45, 100, 0.24);
+}
+
+.home-v2 .community-cta .smile-impact-stat {
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 245, 237, 0.14);
+}
+
+.home-v2 .community-cta .button--coral,
+.home-v2 .community-cta .button--coral:hover,
+.home-v2 .community-cta .button--coral:focus-visible {
+  color: #15163f;
+  background: #fff5ed;
+}
+
+.home-v2 .home-involvement__card {
+  border-color: rgba(21, 22, 63, 0.1);
+  background-color: #fff5ed;
+  background-image: none;
+  box-shadow: -28px 30px 0 rgba(239, 199, 202, 0.66), 28px -28px 0 rgba(88, 152, 204, 0.22);
+  animation: none;
+}
+
+.home-v2 .home-involvement__paths li {
+  border-color: rgba(21, 22, 63, 0.08);
+  background: rgba(239, 199, 202, 0.34);
+}
+
+.home-v2 .home-involvement__paths li span,
+.home-v2 .home-involvement__paths li:nth-child(2) span,
+.home-v2 .home-involvement__paths li:nth-child(3) span {
+  color: #fff;
+  background: #a28ebf;
+}
+
+.home-v2 .home-involvement__paths li:nth-child(2) span {
+  background: #5898cc;
+}
+
+.home-v2 .home-involvement__paths li:nth-child(3) span {
+  color: #15163f;
+  background: #efc7ca;
+}
+
+.home-v2 .donate {
+  background-color: #efc7ca;
+  background-image: none;
+  box-shadow: inset -28vw 0 160px rgba(255, 245, 237, 0.46);
+}
+
+.home-v2 .donate-card {
+  color: #15163f;
+  border-color: rgba(255, 255, 255, 0.34);
+  background-color: #5898cc;
+  background-image: none;
+  box-shadow: 26px 28px 0 rgba(162, 142, 191, 0.46);
+  animation: none;
+}
+
+.home-v2 .donate-copy h2 {
+  color: #15163f;
+}
+
+.home-v2 .donate-copy > p:last-child,
+.home-v2 .donate-action small {
+  color: rgba(21, 22, 63, 0.76);
+}
+
+.home-v2 .home-partners__box {
+  border-color: rgba(21, 22, 63, 0.12);
+  background: #fff5ed;
+  box-shadow: 0 22px 60px rgba(45, 48, 108, 0.16), inset 0 -50px 100px rgba(239, 199, 202, 0.15);
+}
+
+.home-v2 .subscribe-card {
+  color: #15163f;
+  border-color: rgba(255, 255, 255, 0.28);
+  background-color: #a28ebf;
+  background-image: none;
+  box-shadow: -24px 26px 0 rgba(88, 152, 204, 0.38), inset -100px -80px 150px rgba(88, 152, 204, 0.28);
+  animation: none;
+}
+
+.home-v2 .subscribe-card h2 {
+  color: #15163f;
+}
+
+.home-v2 .subscribe-card__copy p {
+  color: rgba(21, 22, 63, 0.76);
+}
+
+.home-v2 .subscribe-card__icon {
+  color: #15163f;
+  background: #fff5ed;
+}
+
+body.home-v2-page .site-footer {
+  color: rgba(21, 22, 63, 0.82);
+  background-color: #5898cc;
+  background-image: none;
+  box-shadow: inset 38vw 0 190px rgba(162, 142, 191, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+body.home-v2-page .site-footer h2 {
+  color: #15163f;
+}
+
+body.home-v2-page .footer-links a:hover,
+body.home-v2-page .footer-contact a:hover {
+  color: #fff5ed;
+}
+
+body.home-v2-page .social-links a {
+  color: #15163f;
+  border-color: rgba(21, 22, 63, 0.22);
+}
+
+body.home-v2-page .social-links a:hover,
+body.home-v2-page .social-links a:focus-visible,
+body.home-v2-page .newsletter button,
+body.home-v2-page .newsletter button:hover,
+body.home-v2-page .newsletter button:focus-visible {
+  color: #15163f;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: #fff5ed;
+}
+
+body.home-v2-page .newsletter {
+  border-color: rgba(21, 22, 63, 0.22);
+  background: rgba(255, 245, 237, 0.18);
+}
+
+body.home-v2-page .newsletter input,
+body.home-v2-page .newsletter input:hover,
+body.home-v2-page .newsletter input:focus {
+  color: #15163f;
+}
+
+body.home-v2-page .newsletter input::placeholder {
+  color: rgba(21, 22, 63, 0.58);
+}
+
+body.home-v2-page .footer-bottom {
+  border-top-color: rgba(21, 22, 63, 0.18);
+}
+
+@media (max-width: 1100px) {
+  body.home-v2-page.nav-open .site-header,
+  body.home-v2-page.nav-open .site-header.is-scrolled {
+    color: #15163f;
+    background-color: rgba(255, 245, 237, 0.97);
+    background-image: none;
+  }
+
+  body.home-v2-page.nav-open .site-nav {
+    color: #15163f;
+  }
+}
+
+@media (max-width: 760px) {
+  body.home-v2-page {
+    background-attachment: scroll;
+  }
+
+  .home-v2 .home-involvement__card,
+  .home-v2 .donate-card,
+  .home-v2 .subscribe-card {
+    box-shadow: 0 18px 46px rgba(45, 48, 108, 0.18);
+  }
+}
