@@ -1935,8 +1935,14 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
   background: rgba(242, 182, 109, 0.25);
 }
 
-.home-project-card__media {
+.home-project-card__media,
+.home-project-card__symbol {
   height: 10.5rem;
+  min-height: 10.5rem;
+  flex: 0 0 10.5rem;
+}
+
+.home-project-card__media {
   margin: 0;
   overflow: hidden;
   background: var(--color-cream-deep);
@@ -1951,7 +1957,6 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
 
 .home-project-card__symbol {
   display: grid;
-  height: 8.5rem;
   place-items: center;
   color: var(--color-plum);
   background: rgba(201, 216, 192, 0.55);
