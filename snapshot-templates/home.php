@@ -102,82 +102,6 @@ $cammino_partners    = array(
       </div>
     </section>
 
-    <section class="section news-subscribe home-subscribe" aria-labelledby="subscribe-title">
-      <div class="container">
-        <div class="subscribe-card" data-reveal="scale">
-          <div class="subscribe-card__icon" aria-hidden="true"><i class="fa-solid fa-envelope-open-text"></i></div>
-          <div class="subscribe-card__copy">
-            <h2 id="subscribe-title">Dobré správy rovno do vašej schránky</h2>
-            <p>Raz za mesiac pošleme výber príbehov, príležitostí a noviniek z Cammina.</p>
-          </div>
-          <form class="subscribe-form" action="#" method="post" data-newsletter-placeholder>
-            <label class="sr-only" for="cammino-home-subscribe-email">Váš e-mail</label>
-            <input id="cammino-home-subscribe-email" type="email" name="email" placeholder="vas@email.sk" required>
-            <button class="button button--cream" type="submit" aria-label="Prihlásiť sa na odber"><span>Chcem novinky</span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-            <span class="newsletter-status" role="status" data-newsletter-status></span>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <section class="section community-cta" aria-labelledby="community-cta-title">
-      <div class="container">
-        <div class="community-cta-card">
-          <div class="community-cta-media" data-reveal="left">
-            <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Ľudia spojení komunitnými aktivitami OZ Cammino" width="1200" height="800" loading="lazy">
-          </div>
-          <div class="community-cta-copy" data-reveal="right" data-delay="120">
-            <h2 id="community-cta-title"><span>Spoznajte nášho partnera</span><em>Darujme úsmev</em></h2>
-            <div class="smile-impact-stats" aria-label="Dopad iniciatívy Darujme úsmev">
-              <div class="smile-impact-stat"<?php
-              nstarter_variable_section_attributes(
-                'darujme_usmev_deti',
-                array(
-                  'label'   => 'Počet detí',
-                  'type'    => 'number',
-                  'control' => 'text',
-                  'value'   => 5361,
-                  'min'     => 0,
-                  'max'     => 9999999,
-                  'step'    => 1,
-                )
-              );
-              ?>>
-                <span>DETÍ</span>
-                <strong>
-                  <span data-impact-counter aria-hidden="true">5,361</span>
-                  <span class="sr-only" data-nstarter-variable-output>5361</span>
-                </strong>
-              </div>
-
-              <div class="smile-impact-stat"<?php
-              nstarter_variable_section_attributes(
-                'darujme_usmev_rodiny',
-                array(
-                  'label'   => 'Počet rodín',
-                  'type'    => 'number',
-                  'control' => 'text',
-                  'value'   => 1562,
-                  'min'     => 0,
-                  'max'     => 9999999,
-                  'step'    => 1,
-                )
-              );
-              ?>>
-                <span>RODÍN</span>
-                <strong>
-                  <span data-impact-counter aria-hidden="true">1,562</span>
-                  <span class="sr-only" data-nstarter-variable-output>1562</span>
-                </strong>
-              </div>
-            </div>
-            <a class="button button--coral" href="<?php echo esc_url( $cammino_main_project_url ); ?>">Viac o projekte <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
-          </div>
-          <div class="community-cta-shape" aria-hidden="true"></div>
-        </div>
-      </div>
-    </section>
-
     <section class="section home-projects" aria-labelledby="home-projects-title"<?php
     nstarter_variable_section_attributes(
       'home_selected_projects',
@@ -338,11 +262,65 @@ $cammino_partners    = array(
         <div class="story-copy" data-reveal="right" data-delay="160">
           <h2 id="story-title">Zo skicára vznikla <em>prvá vlastná výstava</em></h2>
           <p>Nina svoje kresby dlho nikomu neukazovala. Bezpečný priestor, trpezlivá mentorka a skupina rovesníkov jej pomohli veriť vlastnému pohľadu a ukázať svoj talent.</p>
-          <div class="story-person">
-            <span>N</span>
-            <p><strong>Nina</strong><br>príbeh odvahy ukázať svoj talent</p>
-          </div>
           <a class="button button--cream" href="<?php echo esc_url( $cammino_story_url ); ?>">Prečítať celý príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section community-cta" aria-labelledby="community-cta-title">
+      <div class="container">
+        <div class="community-cta-card">
+          <div class="community-cta-media" data-reveal="left">
+            <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Ľudia spojení komunitnými aktivitami OZ Cammino" width="1200" height="800" loading="lazy">
+          </div>
+          <div class="community-cta-copy" data-reveal="right" data-delay="120">
+            <h2 id="community-cta-title"><span>Spoznajte nášho partnera</span><em>Darujme úsmev</em></h2>
+            <div class="smile-impact-stats" aria-label="Dopad iniciatívy Darujme úsmev">
+              <div class="smile-impact-stat"<?php
+              nstarter_variable_section_attributes(
+                'darujme_usmev_deti',
+                array(
+                  'label'   => 'Počet detí',
+                  'type'    => 'number',
+                  'control' => 'text',
+                  'value'   => 5361,
+                  'min'     => 0,
+                  'max'     => 9999999,
+                  'step'    => 1,
+                )
+              );
+              ?>>
+                <span>DETÍ</span>
+                <strong>
+                  <span data-impact-counter aria-hidden="true">5,361</span>
+                  <span class="sr-only" data-nstarter-variable-output>5361</span>
+                </strong>
+              </div>
+
+              <div class="smile-impact-stat"<?php
+              nstarter_variable_section_attributes(
+                'darujme_usmev_rodiny',
+                array(
+                  'label'   => 'Počet rodín',
+                  'type'    => 'number',
+                  'control' => 'text',
+                  'value'   => 1562,
+                  'min'     => 0,
+                  'max'     => 9999999,
+                  'step'    => 1,
+                )
+              );
+              ?>>
+                <span>RODÍN</span>
+                <strong>
+                  <span data-impact-counter aria-hidden="true">1,562</span>
+                  <span class="sr-only" data-nstarter-variable-output>1562</span>
+                </strong>
+              </div>
+            </div>
+            <a class="button button--coral" href="<?php echo esc_url( $cammino_main_project_url ); ?>">Viac o projekte <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
+          </div>
+          <div class="community-cta-shape" aria-hidden="true"></div>
         </div>
       </div>
     </section>
@@ -423,6 +401,24 @@ $cammino_partners    = array(
               <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Logo partnera {{partner}}" width="600" height="300" loading="lazy" decoding="async">
             </li>
           </template>
+        </div>
+      </div>
+    </section>
+
+    <section class="section news-subscribe home-subscribe" aria-labelledby="subscribe-title">
+      <div class="container">
+        <div class="subscribe-card" data-reveal="scale">
+          <div class="subscribe-card__icon" aria-hidden="true"><i class="fa-solid fa-envelope-open-text"></i></div>
+          <div class="subscribe-card__copy">
+            <h2 id="subscribe-title">Dobré správy rovno do vašej schránky</h2>
+            <p>Raz za mesiac pošleme výber príbehov, príležitostí a noviniek z Cammina.</p>
+          </div>
+          <form class="subscribe-form" action="#" method="post" data-newsletter-placeholder>
+            <label class="sr-only" for="cammino-home-subscribe-email">Váš e-mail</label>
+            <input id="cammino-home-subscribe-email" type="email" name="email" placeholder="vas@email.sk" required>
+            <button class="button button--cream" type="submit" aria-label="Prihlásiť sa na odber"><span>Chcem novinky</span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+            <span class="newsletter-status" role="status" data-newsletter-status></span>
+          </form>
         </div>
       </div>
     </section>

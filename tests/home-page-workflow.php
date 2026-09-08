@@ -54,5 +54,24 @@ home_expect( ! str_contains( $styles, '.home-partners > .container' ), 'The part
 home_expect( str_contains( $styles, 'justify-content: center;' ) && str_contains( $styles, 'text-align: center;' ), 'The partner heading and wrapped logo rows are centered.' );
 home_expect( str_contains( $styles, '--home-section-space: clamp(2.25rem, 4vw, 3.5rem);' ) && str_contains( $styles, '#main-content > .section:not(.hero)' ), 'All reorderable homepage sections use one shared compact vertical spacing value.' );
 home_expect( ! str_contains( $styles, '.story-section + .donate' ), 'Donation spacing no longer depends on the preceding section.' );
+home_expect( ! str_contains( $template, 'class="story-person"' ) && ! str_contains( $styles, '.story-person' ), 'The Nina attribution element and its unused styles are removed.' );
+
+$ordered_sections = array(
+	'class="section about"',
+	'class="section home-projects"',
+	'class="section events"',
+	'class="section story-section"',
+	'class="section community-cta"',
+	'class="section home-involvement"',
+	'class="section donate"',
+	'class="section home-partners"',
+	'class="section news-subscribe home-subscribe"',
+);
+$last_section_position = -1;
+foreach ( $ordered_sections as $section_marker ) {
+	$section_position = strpos( $template, $section_marker );
+	home_expect( false !== $section_position && $section_position > $last_section_position, 'Homepage sections follow the intended narrative order.' );
+	$last_section_position = $section_position;
+}
 
 echo "Passed $checks home page checks.\n";
