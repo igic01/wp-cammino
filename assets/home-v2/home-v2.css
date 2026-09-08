@@ -12,19 +12,19 @@ body.home-v2-page {
   --v2-orange: #f09910;
   --v2-blue: #0299b5;
 
-  /* Accessible depth and quiet tints derived from the core palette. */
-  --v2-red-dark: #b52624;
-  --v2-orange-dark: #995800;
-  --v2-blue-dark: #00687c;
+  /* Keep accents on the three supplied colours; opacity creates quiet areas. */
+  --v2-red-dark: var(--v2-red);
+  --v2-orange-dark: var(--v2-orange);
+  --v2-blue-dark: var(--v2-blue);
   --v2-ink: #17343b;
-  --v2-muted: #52686d;
-  --v2-paper: #fffaf4;
+  --v2-muted: rgba(23, 52, 59, 0.72);
   --v2-white: #ffffff;
-  --v2-red-soft: #fbd8d7;
-  --v2-orange-soft: #fce7c5;
-  --v2-blue-soft: #d2eef3;
+  --v2-paper: var(--v2-white);
+  --v2-red-soft: rgba(232, 59, 57, 0.1);
+  --v2-orange-soft: rgba(240, 153, 16, 0.1);
+  --v2-blue-soft: rgba(2, 153, 181, 0.1);
   --v2-line: rgba(23, 52, 59, 0.14);
-  --v2-canvas: #fffaf4;
+  --v2-canvas: var(--v2-white);
 
   /* Repaint the inherited tokens without touching the font tokens. */
   --color-plum: var(--v2-blue-dark);
@@ -60,7 +60,7 @@ body.home-v2-page .site-header {
 
 body.home-v2-page .site-header.is-scrolled {
   border-bottom-color: var(--v2-line);
-  background-color: rgba(255, 250, 244, 0.96);
+  background-color: rgba(255, 255, 255, 0.96);
   background-image: none;
   box-shadow: 0 12px 36px rgba(23, 52, 59, 0.12);
 }
@@ -77,14 +77,14 @@ body.home-v2-page .site-nav > a:last-child {
   color: var(--v2-white);
   background-color: var(--v2-red-dark);
   background-image: none;
-  box-shadow: 0 10px 24px rgba(181, 38, 36, 0.24);
+  box-shadow: 0 10px 24px rgba(232, 59, 57, 0.24);
 }
 
 body.home-v2-page .site-nav > a:last-child:hover,
 body.home-v2-page .site-nav > a:last-child:focus-visible {
   color: var(--v2-white);
   background-color: var(--v2-blue-dark);
-  box-shadow: 0 14px 30px rgba(0, 104, 124, 0.26);
+  box-shadow: 0 14px 30px rgba(2, 153, 181, 0.26);
 }
 
 body.home-v2-page .language-link {
@@ -112,7 +112,7 @@ body.home-v2-page .nav-toggle {
 }
 
 .home-v2 .hero-copy h1 em::after {
-  border-color: rgba(255, 250, 244, 0.92);
+  border-color: rgba(255, 255, 255, 0.92);
 }
 
 .home-v2 .hero-lead {
@@ -135,7 +135,7 @@ body.home-v2-page .nav-toggle {
 .home-v2 .hero-note {
   border-color: rgba(255, 255, 255, 0.72);
   color: var(--v2-ink);
-  background-color: rgba(255, 250, 244, 0.93);
+  background-color: rgba(255, 255, 255, 0.93);
   box-shadow: 0 16px 34px rgba(23, 52, 59, 0.16);
 }
 
@@ -164,14 +164,14 @@ body.home-v2-page .nav-toggle {
   color: var(--v2-white);
   background-color: var(--v2-red-dark);
   background-image: none;
-  box-shadow: 0 12px 26px rgba(181, 38, 36, 0.23);
+  box-shadow: 0 12px 26px rgba(232, 59, 57, 0.23);
 }
 
 .home-v2 .button--coral:hover,
 .home-v2 .button--coral:focus-visible {
   color: var(--v2-white);
   background-color: var(--v2-blue-dark);
-  box-shadow: 0 16px 34px rgba(0, 104, 124, 0.26);
+  box-shadow: 0 16px 34px rgba(2, 153, 181, 0.26);
 }
 
 .home-v2 .text-link {
@@ -387,7 +387,7 @@ body.home-v2-page .nav-toggle {
 .home-v2 .event-list.is-visible .event-row:hover,
 .home-v2 .event-list.is-visible .event-row:focus-within {
   color: var(--v2-ink);
-  background-color: rgba(255, 250, 244, 0.86);
+  background-color: rgba(255, 255, 255, 0.86);
   box-shadow: 0 18px 38px rgba(23, 52, 59, 0.14);
 }
 
@@ -453,7 +453,7 @@ body.home-v2-page .nav-toggle {
 }
 
 .home-v2 .story-blob {
-  border-color: rgba(252, 231, 197, 0.14);
+  border-color: rgba(240, 153, 16, 0.14);
 }
 
 .home-v2 .story-section .button--cream {
@@ -499,7 +499,7 @@ body.home-v2-page .nav-toggle {
 
 .home-v2 .community-cta .smile-impact-stat {
   border-color: rgba(23, 52, 59, 0.14);
-  background-color: rgba(255, 250, 244, 0.66);
+  background-color: rgba(255, 255, 255, 0.66);
   box-shadow: 0 14px 34px rgba(23, 52, 59, 0.1);
 }
 
@@ -518,7 +518,7 @@ body.home-v2-page .nav-toggle {
 .home-v2 .community-cta .button--coral {
   color: var(--v2-white);
   background-color: var(--v2-red-dark);
-  box-shadow: 0 12px 26px rgba(181, 38, 36, 0.22);
+  box-shadow: 0 12px 26px rgba(232, 59, 57, 0.22);
 }
 
 .home-v2 .community-cta .button--coral:hover,
@@ -546,7 +546,7 @@ body.home-v2-page .nav-toggle {
 
 .home-v2 .home-involvement__paths li {
   border-color: rgba(23, 52, 59, 0.1);
-  background-color: rgba(255, 250, 244, 0.72);
+  background-color: rgba(255, 255, 255, 0.72);
 }
 
 .home-v2 .home-involvement__paths li:hover {
@@ -586,7 +586,7 @@ body.home-v2-page .nav-toggle {
   color: var(--v2-white);
   background-color: var(--v2-red-dark);
   background-image: none;
-  box-shadow: 0 24px 58px rgba(181, 38, 36, 0.22);
+  box-shadow: 0 24px 58px rgba(232, 59, 57, 0.22);
 }
 
 .home-v2 .donate-copy h2 {
@@ -661,7 +661,7 @@ body.home-v2-page .nav-toggle {
 }
 
 .home-v2 .subscribe-card::after {
-  border-color: rgba(252, 231, 197, 0.14);
+  border-color: rgba(240, 153, 16, 0.14);
 }
 
 .home-v2 .subscribe-card h2 {
