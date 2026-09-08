@@ -1191,7 +1191,7 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 }
 
 .home-page .community-cta {
-  background: #17343b;
+  background: #1976d2;
 }
 
 .community-cta::before {
@@ -1318,7 +1318,8 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
   max-width: 37rem;
   margin: 0 0 1.8rem;
   color: rgba(255, 255, 255, 0.78);
-  font-size: 1rem;
+  font-family: var(--font-body);
+  font-size: 1.02rem;
   line-height: 1.7;
 }
 
