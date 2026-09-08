@@ -20,6 +20,7 @@ main_project_expect( str_contains( $template, 'Snapshot Name: Hlavný projekt' )
 main_project_expect( str_contains( $template, '<h1 id="main-project-title">Darujme <em>úsmev</em></h1>' ), 'The page introduces the supplied project.' );
 main_project_expect( ! str_contains( strtolower( $template ), 'eyebrow' ), 'The page does not render eyebrow elements.' );
 main_project_expect( 1 === substr_count( $template, '1500+' ) && 1 === substr_count( $template, '300+' ), 'Supplied impact totals are not repeated.' );
+main_project_expect( 3 === substr_count( $template, 'data-main-project-counter' ), 'Every numeric impact value is marked for count-up animation.' );
 main_project_expect( str_contains( $template, 'Identifikácia rodín a detí' ), 'The first project step is present.' );
 main_project_expect( str_contains( $template, 'Zapojenie dobrovoľníkov a partnerov' ), 'The second project step is present.' );
 main_project_expect( str_contains( $template, 'Distribúcia pomoci' ), 'The third project step is present.' );
@@ -33,5 +34,6 @@ main_project_expect( strrpos( $template, '<section' ) === strpos( $template, '<s
 main_project_expect( str_contains( $template, '>Chcem pomôcť <' ), 'The reused donation call to action keeps the requested label.' );
 main_project_expect( str_contains( $theme, "'main-project' => array(" ) && str_contains( $theme, '/assets/css/pages/main-project.css' ) && str_contains( $theme, '/assets/js/pages/main-project.js' ), 'The theme loads the dedicated main-project assets.' );
 main_project_expect( str_contains( $script, 'IntersectionObserver' ), 'The page animation is progressive and viewport-aware.' );
+main_project_expect( str_contains( $script, 'animateCounter' ) && str_contains( $script, 'editorPreview' ), 'Impact counters animate publicly without mutating editable preview text.' );
 
 echo "Passed $checks main project page checks.\n";

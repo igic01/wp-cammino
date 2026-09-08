@@ -220,6 +220,27 @@
   letter-spacing: -0.04em;
 }
 
+.main-project-impact__card strong,
+.main-project-impact__card > p {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 480ms ease, transform 600ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.main-project-impact__card.is-visible strong,
+.main-project-impact__card.is-visible > p {
+  opacity: 1;
+  transform: none;
+}
+
+.main-project-impact__card.is-visible strong {
+  transition-delay: 120ms;
+}
+
+.main-project-impact__card.is-visible > p {
+  transition-delay: 310ms;
+}
+
 .main-project-impact__card p {
   max-width: 22rem;
   margin: 2rem 0 0;
@@ -684,9 +705,23 @@ body:not(.nstarter-editor-preview) .main-project-stories[data-nstarter-variable-
     transition: none;
   }
 
+  .main-project-impact__card strong,
+  .main-project-impact__card > p {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
   .main-project-main .donate-card.is-visible .donate-step {
     animation: none;
   }
+}
+
+.nstarter-editor-preview .main-project-impact__card strong,
+.nstarter-editor-preview .main-project-impact__card > p {
+  opacity: 1;
+  transform: none;
+  transition: none;
 }
 
 .nstarter-editor-preview .main-project-stories[data-nstarter-variable-value="0"] .main-project-stories__grid::before {

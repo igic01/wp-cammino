@@ -45,11 +45,11 @@ $cammino_donate_url         = CAMMINO_DONATE_URL;
 
 			<div class="main-project-impact__grid">
 				<article class="main-project-impact__card main-project-impact__card--coral" data-main-project-reveal="up">
-					<strong>1500+</strong>
+					<strong data-main-project-counter>1500+</strong>
 					<p>detí dostalo konkrétnu pomoc a podporu</p>
 				</article>
 				<article class="main-project-impact__card main-project-impact__card--sage" data-main-project-reveal="up" data-delay="60">
-					<strong>300+</strong>
+					<strong data-main-project-counter>300+</strong>
 					<p>rodinám sme pomohli zvládnuť náročnú situáciu</p>
 				</article>
 				<article class="main-project-impact__card main-project-impact__card--apricot" data-main-project-reveal="up" data-delay="120">
@@ -57,7 +57,7 @@ $cammino_donate_url         = CAMMINO_DONATE_URL;
 					<p>dobrovoľníci a pomoc v regiónoch po celej krajine</p>
 				</article>
 				<article class="main-project-impact__card main-project-impact__card--cream" data-main-project-reveal="up" data-delay="180">
-					<strong>6 domovov</strong>
+					<strong data-main-project-counter>6 domovov</strong>
 					<p>pre deti na Ukrajine získalo našu podporu</p>
 				</article>
 				<article class="main-project-impact__card main-project-impact__card--plum" data-main-project-reveal="up" data-delay="240">
