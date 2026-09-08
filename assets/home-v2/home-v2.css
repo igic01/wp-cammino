@@ -304,9 +304,9 @@ body.home-v2-page {
   --v2-spectrum-peach: #efc7ca;
   --v2-spectrum-violet: #a28ebf;
   --v2-spectrum-blue: #5898cc;
-  /* Weighted visually as 35 / 20 / 20 / 35, with softly overlapping transitions. */
-  --v2-spectrum: linear-gradient(110deg, var(--v2-spectrum-light) 0%, var(--v2-spectrum-light) 23%, var(--v2-spectrum-peach) 43%, var(--v2-spectrum-violet) 57%, var(--v2-spectrum-blue) 77%, var(--v2-spectrum-blue) 100%);
-  --v2-spectrum-dark: linear-gradient(110deg, #553746 0%, #553746 23%, #70475f 43%, #5f5488 57%, #276d98 77%, #276d98 100%);
+  /* Weighted visually in the requested 25 / 20 / 20 / 45 ratio. */
+  --v2-spectrum: linear-gradient(110deg, var(--v2-spectrum-light) 0%, var(--v2-spectrum-light) 13%, var(--v2-spectrum-peach) 33%, var(--v2-spectrum-violet) 49%, var(--v2-spectrum-blue) 69%, var(--v2-spectrum-blue) 100%);
+  --v2-spectrum-dark: linear-gradient(110deg, #553746 0%, #553746 13%, #70475f 33%, #5f5488 49%, #276d98 69%, #276d98 100%);
   background-color: var(--v2-spectrum-violet);
   background-image: var(--v2-spectrum);
   background-attachment: fixed;
@@ -320,7 +320,7 @@ body.home-v2-page .home-v2 {
 body.home-v2-page .site-header {
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   background-color: rgba(194, 164, 188, 0.88);
-  background-image: linear-gradient(90deg, #fff5ed 0%, #fff5ed 23%, #efc7ca 43%, #a28ebf 57%, #5898cc 77%, #5898cc 100%);
+  background-image: linear-gradient(90deg, #fff5ed 0%, #fff5ed 13%, #efc7ca 33%, #a28ebf 49%, #5898cc 69%, #5898cc 100%);
   background-size: 100% 100%;
   box-shadow: 0 10px 34px rgba(39, 42, 96, 0.08);
   backdrop-filter: blur(18px) saturate(1.18);
@@ -328,7 +328,7 @@ body.home-v2-page .site-header {
 
 body.home-v2-page .site-header.is-scrolled {
   background-color: rgba(194, 164, 188, 0.96);
-  background-image: linear-gradient(90deg, #fff5ed 0%, #fff5ed 23%, #efc7ca 43%, #a28ebf 57%, #5898cc 77%, #5898cc 100%);
+  background-image: linear-gradient(90deg, #fff5ed 0%, #fff5ed 13%, #efc7ca 33%, #a28ebf 49%, #5898cc 69%, #5898cc 100%);
   background-size: 100% 100%;
   box-shadow: 0 12px 38px rgba(39, 42, 96, 0.18);
 }
