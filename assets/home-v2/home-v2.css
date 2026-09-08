@@ -22,6 +22,15 @@ body.home-v2-page {
   --v2-blue: #2d6e91;
   --v2-green: #476b5b;
   --v2-line: rgba(33, 26, 51, 0.13);
+  --v2-canvas: #fff2c7;
+  --v2-sun: #ffe08a;
+  --v2-mint: #b9e5cf;
+  --v2-bright-sky: #bfe4f5;
+  --v2-bright-rose: #ffcbd2;
+  --v2-bright-lilac: #dacbf3;
+  --v2-story-blue: #4665a8;
+  --v2-news-blue: #356f9f;
+  --v2-footer-violet: #51406f;
 
   /* Repaint the inherited tokens without touching the font tokens. */
   --color-plum: var(--v2-plum);
@@ -38,13 +47,13 @@ body.home-v2-page {
   --color-border: var(--v2-line);
 
   color: var(--v2-ink);
-  background: var(--v2-paper) !important;
+  background: var(--v2-canvas) !important;
 }
 
 body.home-v2-page #nstarter-snapshot,
 .home-v2 {
   color: var(--v2-ink);
-  background: var(--v2-paper);
+  background: var(--v2-canvas);
 }
 
 /* Header */
@@ -182,7 +191,7 @@ body.home-v2-page .nav-toggle {
 
 /* About and values */
 .home-v2 .about {
-  background-color: var(--v2-paper);
+  background-color: #fff8dc;
   background-image: none;
   box-shadow: inset 0 -1px 0 var(--v2-line);
 }
@@ -213,15 +222,15 @@ body.home-v2-page .nav-toggle {
 }
 
 .home-v2 .support-card--sage {
-  background-color: var(--v2-rose);
+  background-color: var(--v2-bright-rose);
 }
 
 .home-v2 .support-card--apricot {
-  background-color: var(--v2-apricot);
+  background-color: var(--v2-sun);
 }
 
 .home-v2 .support-card--cream {
-  background-color: var(--v2-sky);
+  background-color: var(--v2-bright-sky);
 }
 
 .home-v2 .support-card:hover,
@@ -267,7 +276,7 @@ body.home-v2-page .nav-toggle {
 
 /* Projects */
 .home-v2 .home-projects {
-  background-color: #f1ece6;
+  background-color: #ffe7a8;
   background-image: none;
 }
 
@@ -285,11 +294,11 @@ body.home-v2-page .nav-toggle {
 }
 
 .home-v2 .home-project-card:nth-child(3n + 2) {
-  background-color: var(--v2-rose);
+  background-color: var(--v2-bright-rose);
 }
 
 .home-v2 .home-project-card:nth-child(3n + 3) {
-  background-color: var(--v2-sky);
+  background-color: var(--v2-bright-sky);
 }
 
 .home-v2 .home-project-card:hover,
@@ -323,7 +332,7 @@ body.home-v2-page .nav-toggle {
 
 /* Events */
 .home-v2 .events {
-  background-color: var(--v2-lilac);
+  background-color: var(--v2-bright-lilac);
   background-image: none;
 }
 
@@ -399,7 +408,7 @@ body.home-v2-page .nav-toggle {
 /* Impact story */
 .home-v2 .story-section {
   color: var(--v2-white);
-  background-color: var(--v2-plum-dark);
+  background-color: var(--v2-story-blue);
   background-image: none;
 }
 
@@ -467,7 +476,7 @@ body.home-v2-page .nav-toggle {
 /* Partner spotlight */
 .home-v2 .community-cta {
   color: var(--v2-ink);
-  background-color: var(--v2-sky);
+  background-color: var(--v2-mint);
   background-image: none;
 }
 
@@ -526,13 +535,13 @@ body.home-v2-page .nav-toggle {
 
 /* Ways to help */
 .home-v2 .home-involvement {
-  background-color: var(--v2-paper);
+  background-color: #fff8dc;
   background-image: none;
 }
 
 .home-v2 .home-involvement__card {
   border: 1px solid rgba(33, 26, 51, 0.1);
-  background-color: var(--v2-rose);
+  background-color: var(--v2-bright-rose);
   background-image: none;
   box-shadow: 0 22px 52px rgba(45, 36, 58, 0.11);
 }
@@ -575,13 +584,13 @@ body.home-v2-page .nav-toggle {
 
 /* Donation */
 .home-v2 .donate {
-  background-color: var(--v2-lilac);
+  background-color: var(--v2-bright-lilac);
   background-image: none;
 }
 
 .home-v2 .donate-card {
   color: var(--v2-white);
-  background-color: var(--v2-coral-dark);
+  background-color: #c54954;
   background-image: none;
   box-shadow: 0 24px 58px rgba(87, 58, 104, 0.2);
 }
@@ -621,7 +630,7 @@ body.home-v2-page .nav-toggle {
 
 /* Partners */
 .home-v2 .home-partners {
-  background-color: #f1ece6;
+  background-color: #cfe9f8;
   background-image: none;
 }
 
@@ -646,13 +655,13 @@ body.home-v2-page .nav-toggle {
 
 /* Newsletter */
 .home-v2 .home-subscribe {
-  background-color: var(--v2-paper);
+  background-color: #ffe7a8;
   background-image: none;
 }
 
 .home-v2 .subscribe-card {
   color: var(--v2-white);
-  background-color: var(--v2-plum);
+  background-color: var(--v2-news-blue);
   background-image: none;
   box-shadow: 0 24px 58px rgba(45, 36, 58, 0.2);
 }
@@ -713,7 +722,7 @@ body.home-v2-page .nav-toggle {
 /* Footer */
 body.home-v2-page .site-footer {
   color: rgba(255, 255, 255, 0.72);
-  background-color: var(--v2-plum-dark);
+  background-color: var(--v2-footer-violet);
   background-image: none;
 }
 

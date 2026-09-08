@@ -23,7 +23,7 @@ home_v2_expect( str_contains( $template, 'class="home-v2"' ), 'The alternative d
 home_v2_expect( ! str_contains( $home, 'home-v2' ) && ! str_contains( $home_css, 'home-v2' ), 'The original homepage source and stylesheet remain unchanged.' );
 home_v2_expect( 1 === substr_count( $styles, 'gradient(' ), 'The design contains exactly one gradient.' );
 home_v2_expect( str_contains( $styles, '.home-v2 .hero {' ) && str_contains( $styles, 'background-image: linear-gradient(110deg, #fff5ed 0%, #fff5ed 13%, #efc7ca 33%, #a28ebf 49%, #5898cc 69%, #5898cc 100%);' ), 'The four-color gradient is applied to the hero only.' );
-home_v2_expect( str_contains( $styles, 'background: var(--v2-paper) !important;' ), 'The shared body artwork is explicitly replaced by a solid background.' );
+home_v2_expect( str_contains( $styles, '--v2-canvas: #fff2c7;' ) && str_contains( $styles, 'background: var(--v2-canvas) !important;' ), 'The shared body artwork is explicitly replaced by a vibrant solid background.' );
 home_v2_expect( str_contains( $styles, '--v2-paper: #fff9f2;' ) && str_contains( $styles, '--v2-rose: #f3d6d4;' ) && str_contains( $styles, '--v2-sky: #cfe3ee;' ) && str_contains( $styles, '--v2-plum: #573a68;' ), 'The solid section palette is defined centrally.' );
 home_v2_expect( str_contains( $styles, '.home-v2 .about {' ) && str_contains( $styles, '.home-v2 .events {' ) && str_contains( $styles, '.home-v2 .story-section {' ), 'The redesign covers the complete homepage rather than the hero alone.' );
 home_v2_expect( str_contains( $styles, 'body.home-v2-page .site-header.is-scrolled {' ) && str_contains( $styles, 'body.home-v2-page .site-footer {' ), 'The new art direction includes both header and footer.' );
