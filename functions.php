@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.52' );
+define( 'NSTARTER_VERSION', '1.9.53' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
