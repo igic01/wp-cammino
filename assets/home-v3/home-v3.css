@@ -274,14 +274,6 @@ body.home-v3-page .nav-toggle {
   box-shadow: 0 16px 38px rgba(21, 54, 61, 0.09);
 }
 
-.home-v3 .home-project-card:nth-child(3n + 2) {
-  background-color: var(--v3-blue-wash);
-}
-
-.home-v3 .home-project-card:nth-child(3n + 3) {
-  background-color: var(--v3-red-wash);
-}
-
 .home-v3 .home-project-card:hover,
 .home-v3 .home-project-card:focus-visible {
   border-color: rgba(232, 59, 57, 0.34);
@@ -456,8 +448,8 @@ body.home-v3-page .nav-toggle {
 
 /* Partner spotlight */
 .home-v3 .community-cta {
-  color: var(--v3-ink);
-  background-color: var(--v3-red-wash);
+  color: var(--v3-white);
+  background-color: #17343b;
   background-image: none;
 }
 
@@ -468,7 +460,7 @@ body.home-v3-page .nav-toggle {
 }
 
 .home-v3 .community-cta-card {
-  color: var(--v3-ink);
+  color: var(--v3-white);
 }
 
 .home-v3 .community-cta-media {
@@ -477,11 +469,15 @@ body.home-v3-page .nav-toggle {
 }
 
 .home-v3 .community-cta-copy h2 {
-  color: var(--v3-ink);
+  color: var(--v3-white);
 }
 
 .home-v3 .community-cta-copy h2 em {
-  color: var(--v3-red-deep);
+  color: var(--v3-orange);
+}
+
+.home-v3 .community-cta-copy > p {
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .home-v3 .community-cta .smile-impact-stat {

@@ -275,6 +275,7 @@ $cammino_partners    = array(
           </div>
           <div class="community-cta-copy" data-reveal="right" data-delay="120">
             <h2 id="community-cta-title"><span>Spoznajte nášho partnera</span><em>Darujme úsmev</em></h2>
+            <p>Darujme úsmev je komunitná iniciatíva, ktorá spája ľudí z celého Slovenska, aby prinášali radosť a konkrétnu pomoc deťom a rodinám v náročných životných situáciách.</p>
             <div class="smile-impact-stats" aria-label="Dopad iniciatívy Darujme úsmev">
               <div class="smile-impact-stat"<?php
               nstarter_variable_section_attributes(

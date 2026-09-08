@@ -28,6 +28,7 @@ home_expect( ! str_contains( $template, 'smile-impact-title' ), 'The removed sec
 home_expect( 1 === substr_count( $template, 'class="smile-impact-stats"' ), 'The impact statistics render only once.' );
 home_expect( str_contains( $community, 'class="smile-impact-stats"' ), 'Impact statistics are inside the community CTA.' );
 home_expect( str_contains( $community, "'darujme_usmev_deti'" ) && str_contains( $community, "'darujme_usmev_rodiny'" ), 'Both editable counters moved together.' );
+home_expect( str_contains( $community, '<p>Darujme úsmev je komunitná iniciatíva' ), 'The community CTA includes explanatory project copy.' );
 home_expect( strpos( $community, 'class="smile-impact-stats"' ) < strpos( $community, '>Viac o projekte <' ), 'The statistics appear above the project button.' );
 home_expect( 2 === substr_count( $community, 'data-impact-counter' ), 'Both public counter animations remain connected.' );
 home_expect( 2 === substr_count( $community, 'data-nstarter-variable-output' ), 'Both visual-editor values remain connected.' );
@@ -40,6 +41,8 @@ home_expect( str_contains( $template, "nstarter_live_section( 'cammino_home_proj
 home_expect( str_contains( $editor, 'populateProjectPicker' ) && str_contains( $editor, 'updateProjectPickerSection' ), 'The visual editor supports selecting and previewing existing projects.' );
 home_expect( str_contains( $variables, "'projects'" ) && str_contains( $variables, "'project-picker'" ), 'The variable schema accepts project-picker controls.' );
 home_expect( str_contains( $styles, '.home-projects__grid > .nstarter-live-section' ) && str_contains( $styles, '.home-project-card' ), 'The selected-project section and cards are styled.' );
+home_expect( ! str_contains( $styles, '.home-project-card:nth-child' ), 'All homepage project cards keep the same surface color.' );
+home_expect( str_contains( $styles, 'background: #17343b;' ) && str_contains( $styles, '.community-cta-copy > p' ), 'The community CTA has a deep-blue background and styled project copy.' );
 home_expect( str_contains( $template, "nstarter_get_source_page_url( 'contact2', '/zapojte-sa/' )" ), 'The involvement CTA resolves the page using the contact2 template.' );
 home_expect( str_contains( $template, 'class="section home-involvement"' ) && str_contains( $template, 'Chcem sa zapojiť' ), 'The homepage includes a clear involvement call to action.' );
 home_expect( str_contains( $template, 'Dobrovoľníctvo' ) && str_contains( $template, 'Partnerstvo' ) && str_contains( $template, 'Podpora' ), 'The involvement CTA presents all three participation paths.' );
