@@ -42,7 +42,7 @@ home_expect( str_contains( $editor, 'populateProjectPicker' ) && str_contains( $
 home_expect( str_contains( $variables, "'projects'" ) && str_contains( $variables, "'project-picker'" ), 'The variable schema accepts project-picker controls.' );
 home_expect( str_contains( $styles, '.home-projects__grid > .nstarter-live-section' ) && str_contains( $styles, '.home-project-card' ), 'The selected-project section and cards are styled.' );
 home_expect( str_contains( $styles, '.home-page .home-project-card' ), 'The standard homepage gives all project cards the same surface color.' );
-home_expect( str_contains( $styles, '.home-page .community-cta' ) && str_contains( $styles, 'background: #1976d2;' ) && str_contains( $styles, '.community-cta-copy > p' ), 'The standard homepage community CTA has a blue background and styled project copy.' );
+home_expect( str_contains( $styles, '.home-page .community-cta' ) && str_contains( $styles, 'background: #145da0;' ) && str_contains( $styles, '.community-cta-copy > p' ), 'The standard homepage community CTA has a blue background and styled project copy.' );
 home_expect( str_contains( $template, "nstarter_get_source_page_url( 'contact2', '/zapojte-sa/' )" ), 'The involvement CTA resolves the page using the contact2 template.' );
 home_expect( str_contains( $template, 'class="section home-involvement"' ) && str_contains( $template, 'Chcem sa zapojiť' ), 'The homepage includes a clear involvement call to action.' );
 home_expect( str_contains( $template, 'Dobrovoľníctvo' ) && str_contains( $template, 'Partnerstvo' ) && str_contains( $template, 'Podpora' ), 'The involvement CTA presents all three participation paths.' );
