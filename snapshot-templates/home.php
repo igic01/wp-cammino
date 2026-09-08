@@ -386,23 +386,25 @@ $cammino_partners    = array(
 
     <section class="section home-partners" aria-labelledby="home-partners-title">
       <div class="container">
-        <div class="home-partners__heading" data-reveal="up">
-          <h2 id="home-partners-title">Partneri projektu:</h2>
+        <div class="home-partners__box">
+          <div class="home-partners__heading" data-reveal="up">
+            <h2 id="home-partners-title">Partneri projektu:</h2>
+          </div>
+          <ul class="home-partners__grid" aria-label="Logá partnerov projektu">
+            <?php foreach ( $cammino_partners as $cammino_partner_index => $cammino_partner ) : ?>
+              <li class="home-partner" data-reveal="up" data-delay="<?php echo esc_attr( (string) ( 45 * ( $cammino_partner_index % 6 ) ) ); ?>">
+                <img
+                  src="<?php echo esc_url( NSTARTER_URL . '/assets/partners/' . $cammino_partner['file'] ); ?>"
+                  alt="<?php echo esc_attr( sprintf( 'Logo partnera %s', $cammino_partner['name'] ) ); ?>"
+                  width="<?php echo esc_attr( (string) $cammino_partner['width'] ); ?>"
+                  height="<?php echo esc_attr( (string) $cammino_partner['height'] ); ?>"
+                  loading="lazy"
+                  decoding="async"
+                >
+              </li>
+            <?php endforeach; ?>
+          </ul>
         </div>
-        <ul class="home-partners__grid" aria-label="Logá partnerov projektu">
-          <?php foreach ( $cammino_partners as $cammino_partner_index => $cammino_partner ) : ?>
-            <li class="home-partner" data-reveal="up" data-delay="<?php echo esc_attr( (string) ( 45 * ( $cammino_partner_index % 6 ) ) ); ?>">
-              <img
-                src="<?php echo esc_url( NSTARTER_URL . '/assets/partners/' . $cammino_partner['file'] ); ?>"
-                alt="<?php echo esc_attr( sprintf( 'Logo partnera %s', $cammino_partner['name'] ) ); ?>"
-                width="<?php echo esc_attr( (string) $cammino_partner['width'] ); ?>"
-                height="<?php echo esc_attr( (string) $cammino_partner['height'] ); ?>"
-                loading="lazy"
-                decoding="async"
-              >
-            </li>
-          <?php endforeach; ?>
-        </ul>
       </div>
     </section>
   </main>

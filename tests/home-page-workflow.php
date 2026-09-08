@@ -44,5 +44,6 @@ home_expect( str_contains( $template, "nstarter_get_source_page_url( 'contact2',
 home_expect( str_contains( $template, 'class="section home-involvement"' ) && str_contains( $template, 'Chcem sa zapojiť' ), 'The homepage includes a clear involvement call to action.' );
 home_expect( str_contains( $template, 'Dobrovoľníctvo' ) && str_contains( $template, 'Partnerstvo' ) && str_contains( $template, 'Podpora' ), 'The involvement CTA presents all three participation paths.' );
 home_expect( str_contains( $styles, '.home-involvement__card' ) && str_contains( $styles, '.home-involvement__paths' ), 'The involvement CTA has responsive homepage styling.' );
+home_expect( str_contains( $template, 'class="home-partners__box"' ) && str_contains( $styles, '.home-partners__box' ), 'The partner title and logos are grouped in a distinct visual panel.' );
 
 echo "Passed $checks home page checks.\n";

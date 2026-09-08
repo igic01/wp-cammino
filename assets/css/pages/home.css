@@ -1813,6 +1813,13 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
   background: transparent;
 }
 
+.home-partners__box {
+  padding: clamp(2rem, 5vw, 4.5rem);
+  border: 1px solid rgba(100, 54, 75, 0.08);
+  border-radius: var(--radius-lg);
+  background: rgba(201, 216, 192, 0.42);
+}
+
 .home-partners__heading {
   margin-bottom: clamp(2.25rem, 5vw, 4rem);
 }
@@ -1871,6 +1878,7 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 }
 
 @media (max-width: 460px) {
+  .home-partners__box { padding: 2rem 1.25rem; border-radius: var(--radius-md); }
   .home-partners__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.25rem; }
   .home-partner img { max-height: 5.5rem; }
 }
