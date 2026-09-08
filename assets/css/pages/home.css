@@ -1,6 +1,6 @@
 /* Home page */
 #main-content {
-  --home-section-space: clamp(4.5rem, 8vw, 7rem);
+  --home-section-space: clamp(2.25rem, 4vw, 3.5rem);
 }
 
 #main-content > .section:not(.hero) {
