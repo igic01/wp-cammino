@@ -11,6 +11,19 @@ $cammino_story_url   = home_url( '/pribeh/' );
 $cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
 $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 $cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
+$cammino_partners    = array(
+  array( 'file' => 'logo-02-fma.webp', 'name' => 'FMA', 'width' => 47, 'height' => 47 ),
+  array( 'file' => 'logo-03-domka-00.webp', 'name' => 'DOMKA', 'width' => 140, 'height' => 47 ),
+  array( 'file' => 'logo-04-vdb.webp', 'name' => 'VDB', 'width' => 93, 'height' => 47 ),
+  array( 'file' => 'logo-05-slovo-plus-02.webp', 'name' => 'Slovo+', 'width' => 116, 'height' => 47 ),
+  array( 'file' => 'male_Logo_CB_transparent.webp', 'name' => 'Exallievi Don Bosca', 'width' => 740, 'height' => 220 ),
+  array( 'file' => 'zlate_zrnko_logo-1.webp', 'name' => 'Zlaté Zrnko', 'width' => 658, 'height' => 657 ),
+  array( 'file' => 'logo-06-dm.webp', 'name' => 'dm', 'width' => 73, 'height' => 47 ),
+  array( 'file' => 'PM-Profimarket-logo.webp', 'name' => 'ProfiMarket', 'width' => 820, 'height' => 384 ),
+  array( 'file' => 'logoeasydeal.webp', 'name' => 'Easy Deal', 'width' => 236, 'height' => 63 ),
+  array( 'file' => 'logo-07-final-cd.webp', 'name' => 'FINAL-CD', 'width' => 121, 'height' => 47 ),
+  array( 'file' => 'GrapePR_CMYK_logo-1536x418.webp', 'name' => 'Grape PR', 'width' => 1536, 'height' => 418 ),
+);
 ?>
 <main id="main-content">
     <section class="hero section" aria-labelledby="hero-title">
@@ -332,6 +345,28 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
             <small>Podpora vzdelávania, komunít a solidarity</small>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="section home-partners" aria-labelledby="home-partners-title">
+      <div class="container">
+        <div class="home-partners__heading" data-reveal="up">
+          <h2 id="home-partners-title">Partneri projektu:</h2>
+        </div>
+        <ul class="home-partners__grid" aria-label="Logá partnerov projektu">
+          <?php foreach ( $cammino_partners as $cammino_partner_index => $cammino_partner ) : ?>
+            <li class="home-partner" data-reveal="up" data-delay="<?php echo esc_attr( (string) ( 45 * ( $cammino_partner_index % 6 ) ) ); ?>">
+              <img
+                src="<?php echo esc_url( NSTARTER_URL . '/assets/partners/' . $cammino_partner['file'] ); ?>"
+                alt="<?php echo esc_attr( sprintf( 'Logo partnera %s', $cammino_partner['name'] ) ); ?>"
+                width="<?php echo esc_attr( (string) $cammino_partner['width'] ); ?>"
+                height="<?php echo esc_attr( (string) $cammino_partner['height'] ); ?>"
+                loading="lazy"
+                decoding="async"
+              >
+            </li>
+          <?php endforeach; ?>
+        </ul>
       </div>
     </section>
   </main>
