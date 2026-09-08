@@ -344,6 +344,14 @@ function cammino_enqueue_visual_page_assets(): void {
 				'cammino-home-v2-base' => '/assets/css/pages/home.css',
 			),
 		),
+		'home-v3'  => array(
+			'handle' => 'cammino-home-v3',
+			'style'  => '/assets/home-v3/home-v3.css',
+			'script' => '/assets/js/pages/home.js',
+			'before_styles' => array(
+				'cammino-home-v3-base' => '/assets/css/pages/home.css',
+			),
+		),
 		'about-us' => array(
 			'handle' => 'cammino-about-us',
 			'style'  => '/assets/css/pages/about-us.css',
@@ -564,6 +572,7 @@ function cammino_visual_page_body_classes( array $classes ): array {
 		$page_classes = array(
 			'home'          => array( 'home-page' ),
 			'home-v2'       => array( 'home-page', 'home-v2-page' ),
+			'home-v3'       => array( 'home-page', 'home-v3-page' ),
 			'about-us'      => array( 'about-page' ),
 			'activities'    => array( 'activities-page' ),
 			'contact'       => array( 'contact-page' ),
