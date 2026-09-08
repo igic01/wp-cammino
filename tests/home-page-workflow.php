@@ -52,5 +52,7 @@ home_expect( str_contains( $styles, '.home-partners[data-nstarter-variable-value
 home_expect( str_contains( $styles, 'background: #fff;' ) && str_contains( $styles, 'border: 1px solid rgba(100, 54, 75, 0.24);' ), 'The compact partner panel is white with a visible border.' );
 home_expect( ! str_contains( $styles, '.home-partners > .container' ), 'The partner panel keeps the standard homepage container width.' );
 home_expect( str_contains( $styles, 'justify-content: center;' ) && str_contains( $styles, 'text-align: center;' ), 'The partner heading and wrapped logo rows are centered.' );
+home_expect( str_contains( $styles, '--home-section-space: clamp(4.5rem, 8vw, 7rem);' ) && str_contains( $styles, '#main-content > .section:not(.hero)' ), 'All reorderable homepage sections use one shared vertical spacing value.' );
+home_expect( ! str_contains( $styles, '.story-section + .donate' ), 'Donation spacing no longer depends on the preceding section.' );
 
 echo "Passed $checks home page checks.\n";

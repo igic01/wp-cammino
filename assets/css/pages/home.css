@@ -1,4 +1,12 @@
 /* Home page */
+#main-content {
+  --home-section-space: clamp(4.5rem, 8vw, 7rem);
+}
+
+#main-content > .section:not(.hero) {
+  padding-block: var(--home-section-space);
+}
+
 .hero {
   --hero-shift-x: 0px;
   --hero-shift-y: 0px;
@@ -1086,13 +1094,7 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 }
 
 .donate {
-  padding-top: 0;
   background: transparent;
-}
-
-.story-section + .donate {
-  padding-top: clamp(4rem, 8vw, 7rem);
-  padding-bottom: clamp(4rem, 8vw, 7rem);
 }
 
 .donate-card {
@@ -1218,7 +1220,6 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 }
 
 .community-cta {
-  padding-block: clamp(4.5rem, 8vw, 7rem);
   overflow: hidden;
   background: #3b482b;
 }
@@ -1401,7 +1402,6 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 }
 
 .home-subscribe {
-  padding-top: 0;
   background: transparent;
 }
 
@@ -1809,7 +1809,6 @@ body:not(.nstarter-editor-preview) .event-list[data-nstarter-variable-value="0"]
 
 /* Project partners */
 .home-partners {
-  padding-block: clamp(2.5rem, 5vw, 4rem);
   background: transparent;
 }
 
@@ -1897,7 +1896,6 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
 }
 
 .home-projects {
-  padding-block: clamp(4.5rem, 8vw, 7rem);
   background: transparent;
 }
 
@@ -2092,7 +2090,6 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
 
 /* Involvement call to action */
 .home-involvement {
-  padding-block: clamp(3.5rem, 7vw, 6rem);
   background: transparent;
 }
 
