@@ -1910,14 +1910,14 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
 
 .home-projects__grid > .nstarter-live-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
 }
 
 .home-project-card {
   position: relative;
   display: flex;
-  min-height: 30rem;
+  min-height: 23rem;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--color-border);
@@ -1936,7 +1936,7 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
 }
 
 .home-project-card__media {
-  height: 14rem;
+  height: 10.5rem;
   margin: 0;
   overflow: hidden;
   background: var(--color-cream-deep);
@@ -1951,11 +1951,11 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
 
 .home-project-card__symbol {
   display: grid;
-  height: 11rem;
+  height: 8.5rem;
   place-items: center;
   color: var(--color-plum);
   background: rgba(201, 216, 192, 0.55);
-  font-size: 3.2rem;
+  font-size: 2.6rem;
 }
 
 .home-project-card__symbol i {
@@ -1967,7 +1967,7 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
   min-height: 0;
   flex: 1;
   flex-direction: column;
-  padding: clamp(1.4rem, 3vw, 2rem);
+  padding: clamp(1.2rem, 2.4vw, 1.6rem);
 }
 
 .home-project-card__category {
@@ -1982,16 +1982,16 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
 }
 
 .home-project-card h3 {
-  margin-bottom: 0.85rem;
-  font-size: clamp(1.55rem, 2.5vw, 2rem);
+  margin-bottom: 0.7rem;
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
 }
 
 .home-project-card p {
   display: -webkit-box;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.1rem;
   overflow: hidden;
   color: rgba(39, 36, 35, 0.68);
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
@@ -2047,12 +2047,22 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
 }
 
 @media (max-width: 720px) {
+  .home-projects__grid > .nstarter-live-section {
+    grid-template-columns: 1fr;
+  }
+
   .home-project-card {
     min-height: 0;
   }
 
   .home-projects__heading .text-link {
     margin-top: 1.25rem;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 980px) {
+  .home-projects__grid > .nstarter-live-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
