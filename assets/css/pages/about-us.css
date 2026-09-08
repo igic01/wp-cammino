@@ -60,7 +60,7 @@
 .about-hero {
   position: relative;
   min-height: 0;
-  padding: clamp(2.5rem, 5vw, 4rem) 0 clamp(2.75rem, 5vw, 4.5rem);
+  padding-bottom: clamp(2.75rem, 5vw, 4.5rem);
   overflow: hidden;
   background: transparent;
 }
@@ -866,7 +866,7 @@
 }
 
 @media (max-width: 760px) {
-  .about-hero { padding-block: 2.5rem 3rem; }
+  .about-hero { padding-bottom: 3rem; }
   .about-hero h1 { font-size: clamp(3.2rem, 14vw, 4.5rem); }
   .about-hero__visual { min-height: 460px; }
   .about-hero__image {
@@ -913,7 +913,7 @@
 }
 
 @media (max-width: 560px) {
-  .about-hero { padding-block: 2rem 2.5rem; }
+  .about-hero { padding-bottom: 2.5rem; }
   .about-hero__visual { min-height: 390px; }
   .about-hero__image { inset: 2.5rem 0 1.5rem; border-width: 5px; }
 

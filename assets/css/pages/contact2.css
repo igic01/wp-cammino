@@ -6,7 +6,7 @@
 
 .contact2-section {
   position: relative;
-  padding: clamp(2rem, 5vw, 4rem) 0 clamp(4.5rem, 8vw, 7rem);
+  padding-bottom: clamp(4.5rem, 8vw, 7rem);
 }
 
 .contact2-section::before,
@@ -245,7 +245,11 @@
 }
 
 .contact2-form-card .wpcf7 select {
+  display: block;
+  height: 3.45rem !important;
   min-height: 3.45rem;
+  padding: 0 2.5rem 0 1rem !important;
+  line-height: 1.25 !important;
   cursor: pointer;
 }
 
@@ -445,6 +449,10 @@
   .contact2-form-card::before {
     width: 9rem;
     height: 9rem;
+  }
+
+  .contact2-form-card .wpcf7 select {
+    font-size: 1rem !important;
   }
 }
 

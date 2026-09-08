@@ -13,7 +13,6 @@
 
 .donation-options {
   min-height: 100vh;
-  padding-top: clamp(3rem, 7vw, 5rem);
   overflow: hidden;
   background: transparent;
 }
@@ -63,7 +62,6 @@
 }
 
 @media (max-width: 640px) {
-  .donation-options { padding-top: 2.5rem; }
   .donation-options__heading h1 { font-size: clamp(3.15rem,15vw,4.6rem); }
   .donation-card { border-radius: 2rem; }
   .donation-card__image { height: 220px; }

@@ -60,6 +60,7 @@
   --container: 1180px;
   --gutter: clamp(1.25rem, 4vw, 2.5rem);
   --section-space: clamp(5rem, 10vw, 8.5rem);
+  --page-start-space: clamp(1.25rem, 2.5vw, 2rem);
   --radius-sm: 16px;
   --radius-md: 28px;
   --radius-lg: 44px;
@@ -107,6 +108,15 @@ body.cammino-visual-page #nstarter-snapshot > .skip-link {
 body.cammino-visual-page #nstarter-snapshot > main#main-content,
 body.cammino-article-page > main#main-content {
   padding-top: clamp(5.75rem, 8vw, 6.75rem);
+}
+
+/* Page templates share one small gap below the absolute site header. */
+body.cammino-visual-page:not(.donate-detail-page) #nstarter-snapshot > main#main-content > :first-child {
+  padding-top: var(--page-start-space);
+}
+
+body.cammino-article-page > main#main-content > article:first-child > .article-hero:first-child {
+  padding-top: var(--page-start-space);
 }
 
 body.cammino-visual-page #nstarter-snapshot h1,

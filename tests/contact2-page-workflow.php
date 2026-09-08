@@ -27,6 +27,7 @@ contact2_expect( str_contains( $functions, "'contact2' => array(" ) && str_conta
 contact2_expect( str_contains( $functions, "array( 'contact', 'contact2' )" ), 'Contact Form 7 assets load on both contact templates.' );
 contact2_expect( str_contains( $functions, "'contact2'      => array( 'contact2-page' )" ), 'Contact2 receives an isolated body class.' );
 contact2_expect( str_contains( $styles, '.contact2-form-card .wpcf7 select' ), 'The involvement selector is styled.' );
+contact2_expect( str_contains( $styles, 'height: 3.45rem !important;' ) && str_contains( $styles, 'line-height: 1.25 !important;' ), 'The native select value remains vertically visible on phones.' );
 contact2_expect( str_contains( $styles, '.contact2-form-card .wpcf7-checkbox' ) && str_contains( $styles, '.wpcf7-acceptance' ), 'Checkbox and consent controls are styled.' );
 contact2_expect( str_contains( $styles, '.contact2-form-card .wpcf7-submit' ), 'The submit control uses the Cammino design.' );
 contact2_expect( str_contains( $styles, '@media (max-width: 760px)' ), 'The two-column page has a mobile layout.' );

@@ -63,7 +63,7 @@
 .contact-hero {
   position: relative;
   min-height: 0;
-  padding: clamp(2.5rem, 5vw, 4rem) 0 clamp(3.5rem, 6vw, 5rem);
+  padding-bottom: clamp(3.5rem, 6vw, 5rem);
   overflow: hidden;
   background: transparent;
 }
@@ -77,7 +77,7 @@
   gap: clamp(3rem, 7vw, 7rem);
 }
 
-.contact-intro { padding-top: 1.4rem; }
+.contact-intro { padding-top: 0; }
 .contact-intro h1 { font-size: clamp(3.7rem, 6.5vw, 5.8rem); }
 
 .contact-lead {
@@ -729,7 +729,7 @@
 }
 
 @media (max-width: 760px) {
-  .contact-hero { min-height: 0; padding-block: 2.5rem 3rem; }
+  .contact-hero { min-height: 0; padding-bottom: 3rem; }
   .contact-intro h1 { font-size: clamp(3.2rem, 14vw, 4.5rem); }
   .contact-form-card .wpcf7-form { grid-template-columns: 1fr; }
   .contact-form-card .wpcf7-form > p:nth-of-type(n + 3),
@@ -760,7 +760,7 @@
 }
 
 @media (max-width: 540px) {
-  .contact-hero { padding-block: 2rem 2.5rem; }
+  .contact-hero { padding-bottom: 2.5rem; }
   .person-card { grid-template-columns: 1fr; }
   .person-card:hover, .person-card:nth-child(2):hover { transform: translateY(-6px); }
   .contact-form-card { border-radius: var(--radius-md); }

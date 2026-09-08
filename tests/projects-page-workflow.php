@@ -54,11 +54,13 @@ projects_expect( str_contains( $home_projects, '<a class="home-project-card' ) &
 projects_expect( str_contains( $home_projects, 'Krátky popis projektu.' ), 'The homepage project card displays its description.' );
 
 $template = file_get_contents( NSTARTER_PATH . '/snapshot-templates/projects.php' );
+$styles   = file_get_contents( NSTARTER_PATH . '/assets/css/pages/projects.css' );
 projects_expect( ! preg_match( '/<header class="projects-heading">.*?<p>/s', $template ), 'The removed introductory header paragraph is not rendered.' );
 projects_expect( str_contains( $template, 'class="projects-feature"' ), 'A permanent featured-project hero is rendered.' );
 projects_expect( str_contains( $template, '<h1 id="featured-project-title">' ), 'The featured project provides the page heading.' );
 projects_expect( str_contains( $template, 'class="projects-feature__copy"' ) && str_contains( $template, 'class="button button--coral"' ), 'The hero contains description copy and a CTA.' );
 projects_expect( str_contains( $template, 'class="projects-feature__media"' ) && str_contains( $template, '<img ' ), 'The hero contains a replaceable image.' );
 projects_expect( strpos( $template, 'class="projects-feature"' ) < strpos( $template, 'class="projects-listing section"' ), 'The featured hero remains above the category directory.' );
+projects_expect( str_contains( $styles, 'box-shadow: 0 18px 48px rgba(80, 45, 54, 0.07);' ), 'The featured project uses the same soft shadow as the directory panel.' );
 
 echo "Passed $checks project directory checks.\n";

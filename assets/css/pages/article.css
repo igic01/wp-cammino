@@ -1,9 +1,5 @@
 /* Article detail page */
 
-.cammino-article-page .article-hero {
-  padding-top: clamp(3rem, 6vw, 5rem);
-}
-
 .cammino-article-page .article-content > p:first-child {
   margin-top: 0;
   color: var(--color-plum);
@@ -59,7 +55,6 @@
 
 .article-hero {
   max-width: 950px;
-  padding-top: clamp(7.5rem, 13vw, 11rem);
   text-align: center;
 }
 
@@ -378,7 +373,6 @@
 }
 
 @media (max-width: 640px) {
-  .article-hero { padding-top: 6.7rem; }
   .article-back { margin-bottom: 1.8rem; }
   .article-hero h1 { font-size: clamp(2.75rem, 14vw, 4rem); }
   .article-deck { margin-top: 1.2rem; }

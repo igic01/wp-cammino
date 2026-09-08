@@ -5,7 +5,7 @@
 
 .impact-stories-hero {
   position: relative;
-  padding-block: clamp(3.5rem, 8vw, 7rem);
+  padding-bottom: clamp(3.5rem, 8vw, 7rem);
   overflow: hidden;
 }
 

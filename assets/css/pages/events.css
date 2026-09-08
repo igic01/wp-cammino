@@ -1,5 +1,3 @@
-.events-page #nstarter-snapshot > main#main-content { padding-top: 0; }
-
 /* Saved snapshots may still contain reveal hooks. Events must remain visible
    even when the page script is unavailable or blocked by caching. */
 .events-listing [data-reveal] {
@@ -11,7 +9,6 @@
 
 .events-listing {
   min-height: 70vh;
-  padding-top: 20px;
   overflow: hidden;
 }
 
