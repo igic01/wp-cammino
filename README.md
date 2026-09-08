@@ -23,8 +23,9 @@ shared single-post design for events, projects, and impact stories.
   and footer as locked live sections on visual pages and uses the same renderers
   outside the editable content of managed posts.
 - `snapshot-templates/home.php` is the editable Cammino homepage source.
-  Its final section displays every color logo from `assets/partners/` in a
-  responsive partner grid.
+  Its project picker displays up to three published Project posts, and its final
+  section displays every color logo from `assets/partners/` in a responsive
+  partner grid.
 - `snapshot-templates/about-us.php` is the clean PHP source for the O nás page.
 - `snapshot-templates/activities.php` provides the Naše aktivity page with four
   activity areas, scroll reveals, and an animated illustration using the shared
@@ -74,6 +75,10 @@ For the project directory, assign **Cammino — Projekty** to a page. Published
 posts whose Cammino type is **Projekt** appear automatically. WordPress post
 categories create the filter buttons; each card shows its title, excerpt (or a
 shortened body), and the featured image only when one is set.
+
+On the homepage, use the **Vybrané projekty** variable control to choose zero to
+three published Project posts. The live cards keep their titles, descriptions,
+links, categories, and optional images synchronized with the source posts.
 
 The saved HTML is stored in ACF when ACF is active, with private post meta as a
 fallback. **Regenerate page** resets the editable snapshot from

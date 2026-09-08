@@ -381,7 +381,8 @@ body.nstarter-editor-shell {
     font-size: 17px;
 }
 
-.nstarter-variable-dialog label {
+.nstarter-variable-dialog label,
+.nstarter-variable-dialog__field {
     display: grid;
     gap: 6px;
     font-size: 13px;
@@ -415,10 +416,61 @@ body.nstarter-editor-shell {
     line-height: 1.45;
 }
 
-.nstarter-variable-dialog form > div {
+.nstarter-variable-dialog__actions {
     display: flex;
     justify-content: flex-end;
     gap: 7px;
+}
+
+.nstarter-variable-project-picker {
+    display: grid;
+    max-height: min(46vh, 340px);
+    gap: 7px;
+    padding: 8px;
+    overflow-y: auto;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    background: #f6f7f7;
+}
+
+.nstarter-variable-project-picker[hidden] {
+    display: none;
+}
+
+.nstarter-variable-project-picker label {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    align-items: center;
+    gap: 9px;
+    padding: 9px;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.nstarter-variable-project-picker label:has(input:checked) {
+    border-color: #6d5dfc;
+    background: #f0efff;
+}
+
+.nstarter-variable-project-picker label:has(input:disabled) {
+    opacity: 0.48;
+    cursor: not-allowed;
+}
+
+.nstarter-variable-project-picker input[type="checkbox"] {
+    margin: 0;
+}
+
+.nstarter-variable-project-picker__empty {
+    margin: 0;
+    padding: 12px;
+    color: #646970;
+    font-size: 12px;
+    text-align: center;
 }
 
 .nstarter-variable-dialog button {

@@ -26,6 +26,7 @@
     const variableTitle = document.querySelector('[data-nstarter-variable-title]');
     const variableLabel = document.querySelector('[data-nstarter-variable-label]');
     const variableInput = document.querySelector('[data-nstarter-variable-input]');
+    const variableProjectPicker = document.querySelector('[data-nstarter-variable-project-picker]');
     const variableCancel = document.querySelector('[data-nstarter-variable-cancel]');
     const sectionOrderButton = document.querySelector('[data-nstarter-section-order]');
     const sectionOrderDialog = document.querySelector('[data-nstarter-section-order-dialog]');
@@ -872,6 +873,97 @@
         positionVariableTools();
     }
 
+    function selectedProjectIds(section) {
+        return (section.dataset.nstarterVariableValue || '')
+            .split(',')
+            .map(function (id) { return String(Number(id.trim())); })
+            .filter(function (id) { return id !== '0' && id !== 'NaN'; });
+    }
+
+    function refreshProjectPickerLimit(section) {
+        if (!variableProjectPicker) {
+            return;
+        }
+
+        const maximum = Math.max(0, Number(section.dataset.nstarterVariableMax || 3));
+        const checkboxes = Array.from(variableProjectPicker.querySelectorAll('input[type="checkbox"]'));
+        const checkedCount = checkboxes.filter(function (checkbox) { return checkbox.checked; }).length;
+
+        checkboxes.forEach(function (checkbox) {
+            checkbox.disabled = !checkbox.checked && checkedCount >= maximum;
+        });
+    }
+
+    function populateProjectPicker(section) {
+        if (!variableProjectPicker) {
+            return;
+        }
+
+        variableProjectPicker.replaceChildren();
+        const selected = new Set(selectedProjectIds(section));
+        const projects = Array.isArray(config.projectOptions) ? config.projectOptions : [];
+
+        if (!projects.length) {
+            const empty = document.createElement('p');
+            empty.className = 'nstarter-variable-project-picker__empty';
+            empty.textContent = config.strings.noProjectsAvailable;
+            variableProjectPicker.appendChild(empty);
+            return;
+        }
+
+        projects.forEach(function (project) {
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            const title = document.createElement('span');
+            checkbox.type = 'checkbox';
+            checkbox.value = String(project.id);
+            checkbox.checked = selected.has(String(project.id));
+            title.textContent = project.title;
+            label.append(checkbox, title);
+            variableProjectPicker.appendChild(label);
+            checkbox.addEventListener('change', function () {
+                refreshProjectPickerLimit(section);
+            });
+        });
+
+        refreshProjectPickerLimit(section);
+    }
+
+    function updateProjectPickerSection(section, projectIds) {
+        const liveSection = section.querySelector('[data-nstarter-live-section="cammino_home_projects"]');
+        if (!liveSection) {
+            return false;
+        }
+
+        liveSection.dataset.nstarterLiveArgs = window.btoa(JSON.stringify({
+            ids: projectIds.map(function (id) { return Number(id); })
+        }));
+        liveSection.replaceChildren();
+
+        const projectsById = new Map(
+            (Array.isArray(config.projectOptions) ? config.projectOptions : []).map(function (project) {
+                return [String(project.id), project];
+            })
+        );
+
+        projectIds.forEach(function (id) {
+            const project = projectsById.get(String(id));
+            if (project && project.html) {
+                liveSection.insertAdjacentHTML('beforeend', project.html);
+            }
+        });
+
+        if (!projectIds.length) {
+            const empty = liveSection.ownerDocument.createElement('p');
+            empty.className = 'home-projects__editor-empty';
+            empty.textContent = config.strings.noProjectsSelected;
+            liveSection.appendChild(empty);
+        }
+
+        liveSection.setAttribute('contenteditable', 'false');
+        return true;
+    }
+
     function openVariableEditor(section) {
         if (section && section.dataset.nstarterVariableControl === 'post-details') {
             openPostDetails();
@@ -885,10 +977,17 @@
         activeVariableSection = section;
         const label = section.dataset.nstarterVariableLabel || config.strings.editSectionVariable;
         const variableType = section.dataset.nstarterVariableType || 'number';
-        const inputType = variableType === 'text' ? 'text' : (variableType === 'boolean' ? 'checkbox' : 'number');
+        const control = section.dataset.nstarterVariableControl || 'repeat';
+        const isProjectPicker = variableType === 'projects' && control === 'project-picker';
+        const inputType = variableType === 'text' || isProjectPicker ? 'text' : (variableType === 'boolean' ? 'checkbox' : 'number');
 
         variableTitle.textContent = config.strings.editSectionVariable;
         variableLabel.textContent = variableType === 'boolean' ? label + ' (áno / nie)' : label;
+        variableInput.hidden = isProjectPicker;
+        variableInput.disabled = isProjectPicker;
+        if (variableProjectPicker) {
+            variableProjectPicker.hidden = !isProjectPicker;
+        }
         variableInput.type = inputType;
         if (inputType === 'checkbox') {
             variableInput.checked = section.dataset.nstarterVariableValue === '1';
@@ -903,9 +1002,18 @@
             }
         });
 
+        if (isProjectPicker) {
+            populateProjectPicker(section);
+        }
+
         variableDialog.showModal();
-        variableInput.focus();
-        variableInput.select();
+        if (isProjectPicker) {
+            const firstProject = variableProjectPicker && variableProjectPicker.querySelector('input:not(:disabled)');
+            (firstProject || variableCancel).focus();
+        } else {
+            variableInput.focus();
+            variableInput.select();
+        }
     }
 
     function cancelVariableEditor() {
@@ -980,8 +1088,29 @@
         }
 
         const type = section.dataset.nstarterVariableType || 'number';
-        const control = section.dataset.nstarterVariableControl === 'text' ? 'text' : 'repeat';
+        const configuredControl = section.dataset.nstarterVariableControl || 'repeat';
+        const control = configuredControl === 'text' || configuredControl === 'project-picker' ? configuredControl : 'repeat';
         let value = type === 'boolean' ? (variableInput.checked ? 1 : 0) : variableInput.value;
+
+        if (type === 'projects') {
+            if (control !== 'project-picker' || !variableProjectPicker) {
+                setStatus(config.strings.unsupportedVariable, 'error');
+                return;
+            }
+
+            const projectIds = Array.from(variableProjectPicker.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(function (checkbox) { return checkbox.value; });
+            const maximum = Math.max(0, Number(section.dataset.nstarterVariableMax || 3));
+            if (projectIds.length > maximum) {
+                setStatus(config.strings.selectUpToProjects.replace('%d', String(maximum)), 'error');
+                return;
+            }
+            if (!updateProjectPickerSection(section, projectIds)) {
+                setStatus(config.strings.unsupportedVariable, 'error');
+                return;
+            }
+            value = projectIds.join(',');
+        }
 
         if (type === 'number') {
             value = Number(value);
@@ -998,7 +1127,9 @@
             }
         }
 
-        if (control === 'repeat') {
+        if (type === 'projects') {
+            // The project picker already updated its live section above.
+        } else if (control === 'repeat') {
             const resized = type === 'number' || type === 'boolean' ? resizeRepeatSection(section, value) : false;
             if (resized === null) {
                 return;

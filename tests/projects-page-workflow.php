@@ -42,6 +42,17 @@ projects_expect( str_contains( $directory, 'Projekt Beta' ), 'The project title 
 projects_expect( str_contains( $directory, 'Krátky popis projektu.' ), 'The project description is displayed.' );
 projects_expect( str_contains( $directory, 'project-card--no-image' ) && ! str_contains( $directory, 'project-card__media' ), 'A project configured without an image renders a text-only card.' );
 
+$picker_options = cammino_get_project_picker_options();
+projects_expect( 1 === count( $picker_options ) && 2 === $picker_options[0]['id'], 'The visual picker offers only published, public project posts.' );
+projects_expect( 'Projekt Beta' === $picker_options[0]['title'], 'Picker options use the current project title.' );
+projects_expect( str_contains( $picker_options[0]['html'], 'home-project-card--no-image' ), 'Picker previews honor the project image setting.' );
+
+$home_projects = cammino_render_home_projects( array( 'ids' => array( 2 ) ) );
+$home_query    = end( $GLOBALS['test_queries'] );
+projects_expect( 3 === $home_query['posts_per_page'] && array( 2 ) === $home_query['post__in'], 'The homepage renderer requests only the selected IDs with a three-project limit.' );
+projects_expect( str_contains( $home_projects, '<a class="home-project-card' ) && str_contains( $home_projects, 'Projekt Beta' ), 'A selected project renders as a fully linked homepage card.' );
+projects_expect( str_contains( $home_projects, 'Krátky popis projektu.' ), 'The homepage project card displays its description.' );
+
 $template = file_get_contents( NSTARTER_PATH . '/snapshot-templates/projects.php' );
 projects_expect( ! preg_match( '/<header class="projects-heading">.*?<p>/s', $template ), 'The removed introductory header paragraph is not rendered.' );
 projects_expect( str_contains( $template, 'class="projects-feature"' ), 'A permanent featured-project hero is rendered.' );

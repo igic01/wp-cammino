@@ -5,6 +5,8 @@ $root     = dirname( __DIR__ );
 $template = file_get_contents( $root . '/snapshot-templates/home.php' );
 $styles   = file_get_contents( $root . '/assets/css/pages/home.css' );
 $script   = file_get_contents( $root . '/assets/js/pages/home.js' );
+$editor   = file_get_contents( $root . '/assets/js/editor.js' );
+$variables = file_get_contents( $root . '/inc/variable-sections.php' );
 $checks   = 0;
 
 function home_expect( $condition, $message ) {
@@ -32,5 +34,11 @@ home_expect( 2 === substr_count( $community, 'data-nstarter-variable-output' ), 
 home_expect( ! str_contains( $styles, '.story-section.smile-impact' ) && ! str_contains( $styles, '.smile-impact .story-' ), 'Styles for the removed standalone section are cleaned up.' );
 home_expect( str_contains( $styles, '.community-cta .smile-impact-stat:hover' ), 'The relocated cards have CTA-specific interaction styling.' );
 home_expect( str_contains( $script, '[data-impact-counter]' ), 'The homepage counter script still discovers the relocated values.' );
+home_expect( str_contains( $template, "'home_selected_projects'" ) && str_contains( $template, "'control' => 'project-picker'" ), 'The homepage exposes a dedicated selected-projects variable.' );
+home_expect( str_contains( $template, "'max'     => 3" ), 'The homepage project picker is limited to three projects.' );
+home_expect( str_contains( $template, "nstarter_live_section( 'cammino_home_projects'" ), 'Selected project cards are rendered from a live section.' );
+home_expect( str_contains( $editor, 'populateProjectPicker' ) && str_contains( $editor, 'updateProjectPickerSection' ), 'The visual editor supports selecting and previewing existing projects.' );
+home_expect( str_contains( $variables, "'projects'" ) && str_contains( $variables, "'project-picker'" ), 'The variable schema accepts project-picker controls.' );
+home_expect( str_contains( $styles, '.home-projects__grid > .nstarter-live-section' ) && str_contains( $styles, '.home-project-card' ), 'The selected-project section and cards are styled.' );
 
 echo "Passed $checks home page checks.\n";

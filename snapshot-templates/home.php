@@ -9,9 +9,14 @@ $cammino_about_url   = nstarter_get_source_page_url( 'about-us', '/o-nas/' );
 $cammino_donate_url  = CAMMINO_DONATE_URL;
 $cammino_story_url   = home_url( '/pribeh/' );
 $cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
+$cammino_projects_url = nstarter_get_source_page_url( 'projects', '/projekty/' );
 $cammino_main_project_url = nstarter_get_source_page_url( 'main-project', '/darujme-usmev/' );
 $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 $cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
+$cammino_home_project_ids = array_map(
+  static fn( WP_Post $project ): int => (int) $project->ID,
+  array_slice( cammino_get_project_picker_posts(), 0, 3 )
+);
 $cammino_partners    = array(
   array( 'file' => 'logo-02-fma.webp', 'name' => 'FMA', 'width' => 47, 'height' => 47 ),
   array( 'file' => 'logo-03-domka-00.webp', 'name' => 'DOMKA', 'width' => 140, 'height' => 47 ),
@@ -168,6 +173,34 @@ $cammino_partners    = array(
             <a class="button button--coral" href="<?php echo esc_url( $cammino_main_project_url ); ?>">Viac o projekte <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
           </div>
           <div class="community-cta-shape" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section home-projects" aria-labelledby="home-projects-title"<?php
+    nstarter_variable_section_attributes(
+      'home_selected_projects',
+      array(
+        'label'   => 'Vybrané projekty',
+        'type'    => 'projects',
+        'control' => 'project-picker',
+        'value'   => implode( ',', $cammino_home_project_ids ),
+        'min'     => 0,
+        'max'     => 3,
+      )
+    );
+    ?>>
+      <div class="container">
+        <div class="section-topline home-projects__heading" data-reveal="up">
+          <div>
+            <h2 id="home-projects-title">Projekty, ktoré menia <em>možnosti na realitu</em></h2>
+            <p>Vybrané iniciatívy, na ktorých práve pracujeme.</p>
+          </div>
+          <a class="text-link" href="<?php echo esc_url( $cammino_projects_url ); ?>">Všetky projekty <span aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
+        </div>
+
+        <div class="home-projects__grid">
+          <?php nstarter_live_section( 'cammino_home_projects', array( 'ids' => $cammino_home_project_ids ) ); ?>
         </div>
       </div>
     </section>

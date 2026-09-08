@@ -522,6 +522,99 @@ function cammino_get_placement_meta_query( string $placement ): array {
 }
 
 /**
+ * Get public project posts available to visual-editor project pickers.
+ *
+ * @return WP_Post[]
+ */
+function cammino_get_project_picker_posts(): array {
+	return array_values(
+		array_filter(
+			cammino_get_placed_posts( 'project', 100 ),
+			static fn( WP_Post $project ): bool => '' === (string) $project->post_password
+		)
+	);
+}
+
+/**
+ * Render one compact project card for the homepage.
+ */
+function cammino_render_home_project_card( WP_Post $project ): string {
+	$project_id  = (int) $project->ID;
+	$hide_image  = '1' === (string) get_post_meta( $project_id, CAMMINO_PROJECT_HIDE_IMAGE_META, true );
+	$image_url   = $hide_image ? false : get_the_post_thumbnail_url( $project_id, 'medium_large' );
+	$description = trim( (string) get_the_excerpt( $project ) );
+	$categories  = get_the_category( $project_id );
+
+	if ( '' === $description ) {
+		$description = wp_trim_words( wp_strip_all_tags( strip_shortcodes( (string) get_post_field( 'post_content', $project_id ) ) ), 24 );
+	}
+
+	ob_start();
+	?>
+	<a class="home-project-card<?php echo $image_url ? '' : ' home-project-card--no-image'; ?>" href="<?php echo esc_url( get_permalink( $project ) ); ?>">
+		<?php if ( $image_url ) : ?>
+			<figure class="home-project-card__media"><img src="<?php echo esc_url( $image_url ); ?>" alt="" loading="lazy" decoding="async"></figure>
+		<?php else : ?>
+			<div class="home-project-card__symbol" aria-hidden="true"><i class="fa-solid fa-seedling"></i></div>
+		<?php endif; ?>
+		<div class="home-project-card__body">
+			<?php if ( ! empty( $categories ) ) : ?><span class="home-project-card__category"><?php echo esc_html( (string) $categories[0]->name ); ?></span><?php endif; ?>
+			<h3><?php echo esc_html( get_the_title( $project ) ); ?></h3>
+			<?php if ( '' !== $description ) : ?><p><?php echo esc_html( $description ); ?></p><?php endif; ?>
+			<span class="home-project-card__action"><?php esc_html_e( 'Pozrieť projekt', 'cammino' ); ?> <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></span>
+		</div>
+	</a>
+	<?php
+
+	return (string) ob_get_clean();
+}
+
+/**
+ * Provide safe project data to the visual editor's project picker.
+ *
+ * @return array<int,array{id:int,title:string,html:string}>
+ */
+function cammino_get_project_picker_options(): array {
+	return array_map(
+		static fn( WP_Post $project ): array => array(
+			'id'    => (int) $project->ID,
+			'title' => (string) get_the_title( $project ),
+			'html'  => cammino_render_home_project_card( $project ),
+		),
+		cammino_get_project_picker_posts()
+	);
+}
+
+/**
+ * Render up to three selected projects while preserving their selected order.
+ */
+function cammino_render_home_projects( array $args = array(), int $page_id = 0 ): string {
+	$ids = isset( $args['ids'] ) && is_array( $args['ids'] )
+		? array_slice( array_values( array_unique( array_filter( array_map( 'absint', $args['ids'] ) ) ) ), 0, 3 )
+		: array();
+
+	if ( empty( $ids ) ) {
+		return '';
+	}
+
+	$projects = get_posts(
+		array(
+			'post_type'           => 'post',
+			'post_status'         => 'publish',
+			'posts_per_page'      => 3,
+			'post__in'            => $ids,
+			'has_password'        => false,
+			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+			'meta_query'          => cammino_get_placement_meta_query( 'project' ),
+			'orderby'             => 'post__in',
+		)
+	);
+
+	return implode( '', array_map( 'cammino_render_home_project_card', $projects ) );
+}
+
+/**
  * Return a post image, with the local design placeholder as fallback.
  */
 function cammino_get_post_image_url( int $post_id, string $size = 'large' ): string {

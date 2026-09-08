@@ -93,6 +93,7 @@ function nstarter_maybe_render_editor(): void {
 	$placement  = $is_post ? cammino_get_post_placement( $post_id ) : '';
 	$is_event   = 'event' === $placement;
 	$is_project = 'project' === $placement;
+	$is_home_page = ! $is_post && 'home' === nstarter_get_native_source_template_slug( $post_id );
 	$editable_category = $is_post ? cammino_get_editable_post_category( $post_id ) : array( 'name' => '' );
 
 	show_admin_bar( false );
@@ -112,6 +113,9 @@ function nstarter_maybe_render_editor(): void {
 			'isPost'     => $is_post,
 			'isEvent'    => $is_event,
 			'isProject'  => $is_project,
+			'projectOptions' => $is_home_page && function_exists( 'cammino_get_project_picker_options' )
+				? cammino_get_project_picker_options()
+				: array(),
 			'postDetails' => $is_post ? array(
 				'title'         => get_the_title( $post ),
 				'category'      => $editable_category['name'],
@@ -133,6 +137,9 @@ function nstarter_maybe_render_editor(): void {
 				'editSectionVariable' => __( 'Edit section variable', 'nstarter' ),
 				'confirmRemoveItems'  => __( 'Reducing this value removes %d editable item(s). Continue?', 'nstarter' ),
 				'unsupportedVariable' => __( 'This section variable is not configured correctly.', 'nstarter' ),
+				'selectUpToProjects'   => __( 'Select no more than %d projects.', 'cammino' ),
+				'noProjectsAvailable'  => __( 'No published projects are available.', 'cammino' ),
+				'noProjectsSelected'   => __( 'Choose up to three projects using this section control.', 'cammino' ),
 				'unsupportedMedia'    => __( 'Please choose an image or video.', 'nstarter' ),
 				'sectionOrderUp'      => __( 'Move section up', 'nstarter' ),
 				'sectionOrderDown'    => __( 'Move section down', 'nstarter' ),
@@ -250,12 +257,13 @@ function nstarter_maybe_render_editor(): void {
 			<dialog class="nstarter-variable-dialog" data-nstarter-variable-dialog>
 				<form data-nstarter-variable-form>
 					<h2 data-nstarter-variable-title><?php esc_html_e( 'Edit section variable', 'nstarter' ); ?></h2>
-					<label>
+					<div class="nstarter-variable-dialog__field">
 						<span data-nstarter-variable-label><?php esc_html_e( 'Value', 'nstarter' ); ?></span>
 						<input type="number" data-nstarter-variable-input>
-					</label>
+						<div class="nstarter-variable-project-picker" data-nstarter-variable-project-picker hidden></div>
+					</div>
 					<p><?php esc_html_e( 'This changes the editable snapshot immediately. Use the main Save button afterward to persist it.', 'nstarter' ); ?></p>
-					<div>
+					<div class="nstarter-variable-dialog__actions">
 						<button type="button" data-nstarter-variable-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>
 						<button type="submit"><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
 					</div>
