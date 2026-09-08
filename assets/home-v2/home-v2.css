@@ -27,10 +27,8 @@
 }
 
 .home-v2 .hero-copy h1 em {
-  color: #fff;
-  background: linear-gradient(110deg, #de3650, #ee7785 56%, #f4a058);
-  background-size: 180% 100%;
-  animation: home-v2-accent-flow 7s ease-in-out infinite alternate;
+  color: #d83259;
+  background: none;
 }
 
 .home-v2 .hero-copy h1 em::after {
@@ -76,10 +74,8 @@
 .home-v2 .section-topline h2 em,
 .home-v2 .home-projects__heading h2 em,
 .home-v2 .home-involvement__copy h2 em {
-  color: var(--v2-ink);
-  background-image: linear-gradient(transparent 60%, rgba(244, 167, 125, 0.62) 60%, rgba(244, 167, 125, 0.62) 91%, transparent 91%);
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  color: #d83259;
+  background: none;
 }
 
 .home-v2 .about {
@@ -200,7 +196,7 @@
 
 .home-v2 .story-copy h2 em {
   color: #ffd99d;
-  background-image: linear-gradient(transparent 62%, rgba(238, 112, 133, 0.52) 62%, rgba(238, 112, 133, 0.52) 93%, transparent 93%);
+  background: none;
 }
 
 .home-v2 .community-cta {
@@ -267,8 +263,8 @@
 }
 
 .home-v2 .donate-copy h2 em {
-  color: var(--v2-ink);
-  background: linear-gradient(100deg, #fff0b9, #fff8e8);
+  color: #fff0b9;
+  background: none;
 }
 
 .home-v2 .home-partners__box {
@@ -318,8 +314,7 @@
   .home-v2 .community-cta,
   .home-v2 .home-involvement__card,
   .home-v2 .donate-card,
-  .home-v2 .subscribe-card,
-  .home-v2 .hero-copy h1 em {
+  .home-v2 .subscribe-card {
     animation: none;
   }
 }

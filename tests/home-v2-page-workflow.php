@@ -22,7 +22,8 @@ home_v2_expect( str_contains( $template, "require __DIR__ . '/home.php'" ), 'Ver
 home_v2_expect( str_contains( $template, 'class="home-v2"' ), 'The alternative design has an isolated scope class.' );
 home_v2_expect( ! str_contains( $home, 'home-v2' ) && ! str_contains( $home_css, 'home-v2' ), 'The original homepage source and stylesheet remain unchanged.' );
 home_v2_expect( substr_count( $styles, 'linear-gradient(' ) >= 20, 'The color concept uses gradients throughout the page.' );
-home_v2_expect( str_contains( $styles, 'background-image: linear-gradient(transparent 60%' ), 'Headings receive marker-style color highlights.' );
+home_v2_expect( str_contains( $styles, '.home-v2 .hero-copy h1 em {' ) && str_contains( $styles, 'color: #d83259;' ), 'Emphasized heading text receives an accent text color.' );
+home_v2_expect( ! str_contains( $styles, 'linear-gradient(transparent 60%' ) && ! str_contains( $styles, 'linear-gradient(transparent 62%' ), 'Emphasized text does not use colored background highlights.' );
 home_v2_expect( ! str_contains( $styles, 'border-radius:' ) && ! str_contains( $styles, 'clip-path:' ), 'The alternative color layer does not change existing element shapes.' );
 home_v2_expect( str_contains( $styles, '.home-v2 .story-blob' ) && str_contains( $styles, '.home-v2 .community-cta-shape' ), 'Large floating circle decorations are disabled.' );
 home_v2_expect( str_contains( $styles, '@keyframes home-v2-gradient-drift' ) && str_contains( $styles, '@media (prefers-reduced-motion: reduce)' ), 'Gradient motion includes an accessible reduced-motion fallback.' );
