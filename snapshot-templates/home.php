@@ -11,6 +11,7 @@ $cammino_story_url   = home_url( '/pribeh/' );
 $cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
 $cammino_projects_url = nstarter_get_source_page_url( 'projects', '/projekty/' );
 $cammino_main_project_url = nstarter_get_source_page_url( 'main-project', '/darujme-usmev/' );
+$cammino_join_url     = nstarter_get_source_page_url( 'contact2', '/zapojte-sa/' );
 $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 $cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
 $cammino_home_project_ids = array_map(
@@ -342,6 +343,26 @@ $cammino_partners    = array(
             <p><strong>Nina</strong><br>príbeh odvahy ukázať svoj talent</p>
           </div>
           <a class="button button--cream" href="<?php echo esc_url( $cammino_story_url ); ?>">Prečítať celý príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section home-involvement" aria-labelledby="home-involvement-title">
+      <div class="container">
+        <div class="home-involvement__card" data-reveal="scale">
+          <div class="home-involvement__copy">
+            <h2 id="home-involvement-title">Staňte sa súčasťou <em>dobrej zmeny</em></h2>
+            <p>Darujte svoj čas, spojte s nami svoju organizáciu alebo podporte pomoc tam, kde je najviac potrebná.</p>
+            <a class="button button--coral" href="<?php echo esc_url( $cammino_join_url ); ?>">Chcem sa zapojiť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
+          </div>
+
+          <ul class="home-involvement__paths" aria-label="Možnosti zapojenia">
+            <li><span><i class="fa-solid fa-people-group" aria-hidden="true"></i></span><strong>Dobrovoľníctvo</strong></li>
+            <li><span><i class="fa-solid fa-handshake" aria-hidden="true"></i></span><strong>Partnerstvo</strong></li>
+            <li><span><i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i></span><strong>Podpora</strong></li>
+          </ul>
+
+          <div class="home-involvement__shape" aria-hidden="true"></div>
         </div>
       </div>
     </section>

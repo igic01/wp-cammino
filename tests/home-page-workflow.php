@@ -40,5 +40,9 @@ home_expect( str_contains( $template, "nstarter_live_section( 'cammino_home_proj
 home_expect( str_contains( $editor, 'populateProjectPicker' ) && str_contains( $editor, 'updateProjectPickerSection' ), 'The visual editor supports selecting and previewing existing projects.' );
 home_expect( str_contains( $variables, "'projects'" ) && str_contains( $variables, "'project-picker'" ), 'The variable schema accepts project-picker controls.' );
 home_expect( str_contains( $styles, '.home-projects__grid > .nstarter-live-section' ) && str_contains( $styles, '.home-project-card' ), 'The selected-project section and cards are styled.' );
+home_expect( str_contains( $template, "nstarter_get_source_page_url( 'contact2', '/zapojte-sa/' )" ), 'The involvement CTA resolves the page using the contact2 template.' );
+home_expect( str_contains( $template, 'class="section home-involvement"' ) && str_contains( $template, 'Chcem sa zapojiť' ), 'The homepage includes a clear involvement call to action.' );
+home_expect( str_contains( $template, 'Dobrovoľníctvo' ) && str_contains( $template, 'Partnerstvo' ) && str_contains( $template, 'Podpora' ), 'The involvement CTA presents all three participation paths.' );
+home_expect( str_contains( $styles, '.home-involvement__card' ) && str_contains( $styles, '.home-involvement__paths' ), 'The involvement CTA has responsive homepage styling.' );
 
 echo "Passed $checks home page checks.\n";
