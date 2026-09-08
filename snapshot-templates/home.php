@@ -60,68 +60,6 @@ $cammino_partners    = array(
 
     </section>
 
-    <section class="section story-section smile-impact" aria-labelledby="smile-impact-title">
-      <div class="story-blob" aria-hidden="true"></div>
-      <div class="container story-grid">
-        <div class="story-visual" data-reveal="left">
-          <div class="story-image">
-            <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Komunitná iniciatíva Darujme úsmev" width="1200" height="800" loading="lazy">
-          </div>
-          <div class="quote-mark smile-impact-mark" aria-hidden="true"><i class="fa-solid fa-people-group"></i></div>
-          <div class="story-tag"><span aria-hidden="true"><i class="fa-solid fa-hand-holding-heart"></i></span> Pomoc, ktorá spája</div>
-        </div>
-
-        <div class="story-copy" data-reveal="right" data-delay="160">
-          <h2 id="smile-impact-title">Darujme <em>úsmev</em></h2>
-          <p>Komunitná iniciatíva, ktorá spája ľudí z celého Slovenska, aby prinášali radosť a pomoc deťom a rodinám v náročných situáciách.</p>
-
-          <div class="smile-impact-stats" aria-label="Dopad iniciatívy Darujme úsmev">
-            <div class="smile-impact-stat"<?php
-            nstarter_variable_section_attributes(
-              'darujme_usmev_deti',
-              array(
-                'label'   => 'Počet detí',
-                'type'    => 'number',
-                'control' => 'text',
-                'value'   => 5361,
-                'min'     => 0,
-                'max'     => 9999999,
-                'step'    => 1,
-              )
-            );
-            ?>>
-              <span>DETÍ</span>
-              <strong>
-                <span data-impact-counter aria-hidden="true">5,361</span>
-                <span class="sr-only" data-nstarter-variable-output>5361</span>
-              </strong>
-            </div>
-
-            <div class="smile-impact-stat"<?php
-            nstarter_variable_section_attributes(
-              'darujme_usmev_rodiny',
-              array(
-                'label'   => 'Počet rodín',
-                'type'    => 'number',
-                'control' => 'text',
-                'value'   => 1562,
-                'min'     => 0,
-                'max'     => 9999999,
-                'step'    => 1,
-              )
-            );
-            ?>>
-              <span>RODÍN</span>
-              <strong>
-                <span data-impact-counter aria-hidden="true">1,562</span>
-                <span class="sr-only" data-nstarter-variable-output>1562</span>
-              </strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="section about" id="about" aria-labelledby="about-title">
       <div class="container about-grid">
         <div class="section-heading" data-reveal="left">
@@ -184,6 +122,49 @@ $cammino_partners    = array(
           </div>
           <div class="community-cta-copy" data-reveal="right" data-delay="120">
             <h2 id="community-cta-title"><span>Spoznajte nášho partnera</span><em>Darujme úsmev</em></h2>
+            <div class="smile-impact-stats" aria-label="Dopad iniciatívy Darujme úsmev">
+              <div class="smile-impact-stat"<?php
+              nstarter_variable_section_attributes(
+                'darujme_usmev_deti',
+                array(
+                  'label'   => 'Počet detí',
+                  'type'    => 'number',
+                  'control' => 'text',
+                  'value'   => 5361,
+                  'min'     => 0,
+                  'max'     => 9999999,
+                  'step'    => 1,
+                )
+              );
+              ?>>
+                <span>DETÍ</span>
+                <strong>
+                  <span data-impact-counter aria-hidden="true">5,361</span>
+                  <span class="sr-only" data-nstarter-variable-output>5361</span>
+                </strong>
+              </div>
+
+              <div class="smile-impact-stat"<?php
+              nstarter_variable_section_attributes(
+                'darujme_usmev_rodiny',
+                array(
+                  'label'   => 'Počet rodín',
+                  'type'    => 'number',
+                  'control' => 'text',
+                  'value'   => 1562,
+                  'min'     => 0,
+                  'max'     => 9999999,
+                  'step'    => 1,
+                )
+              );
+              ?>>
+                <span>RODÍN</span>
+                <strong>
+                  <span data-impact-counter aria-hidden="true">1,562</span>
+                  <span class="sr-only" data-nstarter-variable-output>1562</span>
+                </strong>
+              </div>
+            </div>
             <a class="button button--coral" href="<?php echo esc_url( $cammino_main_project_url ); ?>">Viac o projekte <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
           </div>
           <div class="community-cta-shape" aria-hidden="true"></div>

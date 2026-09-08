@@ -142,7 +142,7 @@ classifications remain unchanged until explicitly reclassified.
 
 Run `php tests/post-workflow.php`, `php tests/events-page-workflow.php`,
 `php tests/projects-page-workflow.php`, `php tests/main-project-page-workflow.php`,
-and `php tests/contact2-page-workflow.php` for
+`php tests/contact2-page-workflow.php`, and `php tests/home-page-workflow.php` for
 standalone regression checks using WordPress test doubles. They cover migration,
 event-category assignment, visual event details, photo visibility, compact event
 cards and type filtering, type changes, saved-content preservation, the
