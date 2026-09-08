@@ -38,15 +38,13 @@ body.home-v2-page {
   --color-border: var(--v2-line);
 
   color: var(--v2-ink);
-  background-color: var(--v2-paper);
-  background-image: none;
+  background: var(--v2-paper) !important;
 }
 
 body.home-v2-page #nstarter-snapshot,
 .home-v2 {
   color: var(--v2-ink);
-  background-color: var(--v2-paper);
-  background-image: none;
+  background: var(--v2-paper);
 }
 
 /* Header */
