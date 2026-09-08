@@ -32,7 +32,7 @@ $cammino_partners    = array(
   array( 'file' => 'GrapePR_CMYK_logo-1536x418.webp', 'name' => 'Grape PR', 'width' => 1536, 'height' => 418 ),
 );
 ?>
-<main id="main-content">
+<main id="main-content" class="home-gradient-concept">
     <section class="hero section" aria-labelledby="hero-title">
       <div class="container hero-grid">
         <div class="hero-copy" data-reveal="left">
