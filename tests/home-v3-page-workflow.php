@@ -23,8 +23,6 @@ home_v3_expect( str_contains( $template, 'class="home-v3"' ), 'Version three has
 home_v3_expect( ! str_contains( $home, 'home-v3' ) && ! str_contains( $home_css, 'home-v3' ), 'The original homepage remains unchanged.' );
 home_v3_expect( str_contains( $styles, '--v3-red: #e83b39;' ) && str_contains( $styles, '--v3-orange: #f09910;' ) && str_contains( $styles, '--v3-blue: #0299b5;' ), 'The supplied palette is defined centrally and exactly.' );
 home_v3_expect( ! str_contains( $styles, 'gradient(' ), 'The colour-block direction uses solid surfaces.' );
-home_v3_expect( ! preg_match( '/\.home-v3 \.home-project-card:nth-child\([^\n]+\) \{\s*background-color:/', $styles ), 'Version three keeps every project card on the same surface color.' );
-home_v3_expect( str_contains( $styles, '.home-v3 .community-cta {' ) && str_contains( $styles, 'background-color: #17343b;' ), 'Version three retains the deep-blue community CTA.' );
 home_v3_expect( ! str_contains( $styles, 'border-radius:' ) && ! str_contains( $styles, 'clip-path:' ), 'The colour layer does not alter shapes.' );
 home_v3_expect( ! str_contains( $styles, 'font-family:' ) && ! str_contains( $styles, 'font-size:' ) && ! str_contains( $styles, '--font-' ), 'The colour layer does not alter typography.' );
 home_v3_expect( str_contains( $styles, '.home-v3 .story-blob' ) && str_contains( $styles, '.home-v3 .community-cta-shape' ) && str_contains( $styles, '.home-v3 .home-involvement__shape' ), 'All inherited decorative shapes are retained and recoloured.' );

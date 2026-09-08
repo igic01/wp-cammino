@@ -5,6 +5,7 @@
  * @package Cammino
  */
 
+$cammino_home_variant = isset( $cammino_home_variant ) ? (string) $cammino_home_variant : 'home';
 $cammino_about_url   = nstarter_get_source_page_url( 'about-us', '/o-nas/' );
 $cammino_donate_url  = CAMMINO_DONATE_URL;
 $cammino_story_url   = home_url( '/pribeh/' );
@@ -275,7 +276,9 @@ $cammino_partners    = array(
           </div>
           <div class="community-cta-copy" data-reveal="right" data-delay="120">
             <h2 id="community-cta-title"><span>Spoznajte nášho partnera</span><em>Darujme úsmev</em></h2>
+            <?php if ( 'home' === $cammino_home_variant ) : ?>
             <p>Darujme úsmev je komunitná iniciatíva, ktorá spája ľudí z celého Slovenska, aby prinášali radosť a konkrétnu pomoc deťom a rodinám v náročných životných situáciách.</p>
+            <?php endif; ?>
             <div class="smile-impact-stats" aria-label="Dopad iniciatívy Darujme úsmev">
               <div class="smile-impact-stat"<?php
               nstarter_variable_section_attributes(

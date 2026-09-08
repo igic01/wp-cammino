@@ -6,6 +6,7 @@
  */
 
 ob_start();
+$cammino_home_variant = 'home-v2';
 require __DIR__ . '/home.php';
 $cammino_home_v2_html = (string) ob_get_clean();
 $cammino_home_v2_html = str_replace(
