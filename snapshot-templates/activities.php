@@ -8,8 +8,9 @@
 $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 $cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
 $cammino_contact_url = nstarter_get_source_page_url( 'contact', '/kontakt/' );
-$cammino_news_url    = nstarter_get_source_page_url( 'news', '/novinky/' );
-$cammino_stories_url = nstarter_get_source_page_url( 'ss', '/pribehy/' );
+$cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
+$cammino_projects_url = nstarter_get_source_page_url( 'projects', '/projekty/' );
+$cammino_stories_url = nstarter_get_source_page_url( 'home', '/' ) . '#stories';
 ?>
 <main id="main-content" class="activities-main">
   <section class="activities-hero" aria-labelledby="activities-title">
@@ -63,7 +64,7 @@ $cammino_stories_url = nstarter_get_source_page_url( 'ss', '/pribehy/' );
           <h2 id="education-title">Každý v sebe má<br><em>niečo výnimočné.</em></h2>
           <p class="activities-lead">Pomáhame mladým ľuďom objaviť silné stránky a nájsť odvahu urobiť ďalší krok.</p>
           <p>Prostredníctvom workshopov, diskusií a vzdelávacích programov rozvíjame zručnosti, sebavedomie a kritické myslenie. Prepájame učenie s praktickými situáciami, ktoré prináša každodenný život.</p>
-          <a class="text-link" href="<?php echo esc_url( $cammino_news_url . '#events' ); ?>">Spoznajte naše podujatia <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+          <a class="text-link" href="<?php echo esc_url( $cammino_events_url ); ?>">Spoznajte naše podujatia <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         </div>
         <div class="activities-photo-composition" data-activities-reveal="right" data-delay="100">
           <div class="activities-photo activities-photo--arch">
@@ -115,7 +116,7 @@ $cammino_stories_url = nstarter_get_source_page_url( 'ss', '/pribehy/' );
         <ul class="activities-topics" aria-label="Témy medzinárodných projektov">
           <li>Duševné zdravie</li><li>Finančná gramotnosť</li><li>Mediálna gramotnosť</li><li>Digitálna bezpečnosť</li><li>Inklúzia mladých</li><li>Medzigeneračné učenie</li>
         </ul>
-        <a class="text-link" href="<?php echo esc_url( $cammino_news_url ); ?>">Novinky z našich projektov <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        <a class="text-link" href="<?php echo esc_url( $cammino_projects_url ); ?>">Pozrite si naše projekty <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
       </div>
     </div>
   </section>

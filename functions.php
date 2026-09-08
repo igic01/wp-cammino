@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.16' );
+define( 'NSTARTER_VERSION', '1.9.18' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
@@ -180,10 +180,8 @@ function cammino_render_shared_menu( bool $with_cta_icon = false ): void {
 	$fallback_links = array(
 		array( home_url( '/' ), __( 'Domov', 'cammino' ) ),
 		array( nstarter_get_source_page_url( 'about-us', '/o-nas/' ), __( 'O nás', 'cammino' ) ),
-		array( nstarter_get_source_page_url( 'ss', '/pribehy/' ), __( 'Príbehy', 'cammino' ) ),
 		array( nstarter_get_source_page_url( 'projects', '/projekty/' ), __( 'Projekty', 'cammino' ) ),
-		array( nstarter_get_source_page_url( 'news', '/novinky/' ) . '#events', __( 'Podujatia', 'cammino' ) ),
-		array( nstarter_get_source_page_url( 'news', '/novinky/' ), __( 'Novinky', 'cammino' ) ),
+		array( nstarter_get_source_page_url( 'events', '/podujatia/' ), __( 'Podujatia', 'cammino' ) ),
 		array( nstarter_get_source_page_url( 'contact', '/kontakt/' ), __( 'Kontakt', 'cammino' ) ),
 	);
 
@@ -285,8 +283,6 @@ function cammino_register_live_sections(): void {
 		}
 	);
 
-	nstarter_register_live_section( 'cammino_news_events', 'cammino_render_news_events' );
-	nstarter_register_live_section( 'cammino_news_articles', 'cammino_render_news_articles' );
 	nstarter_register_live_section( 'cammino_all_events', 'cammino_render_all_events' );
 	nstarter_register_live_section( 'cammino_all_projects', 'cammino_render_all_projects' );
 }
@@ -347,16 +343,6 @@ function cammino_enqueue_visual_page_assets(): void {
 			'handle' => 'cammino-contact',
 			'style'  => '/assets/css/pages/contact.css',
 			'script' => '/assets/js/pages/contact.js',
-		),
-		'ss'       => array(
-			'handle' => 'cammino-success-stories',
-			'style'  => '/assets/css/pages/ss.css',
-			'script' => '/assets/js/pages/ss.js',
-		),
-		'news'     => array(
-			'handle' => 'cammino-news',
-			'style'  => '/assets/css/pages/news.css',
-			'script' => '/assets/js/pages/news.js',
 		),
 		'events'   => array(
 			'handle' => 'cammino-events',
@@ -551,8 +537,6 @@ function cammino_visual_page_body_classes( array $classes ): array {
 			'activities'    => array( 'activities-page' ),
 			'darujme-usmev' => array( 'smile-page' ),
 			'contact'       => array( 'contact-page' ),
-			'ss'            => array( 'stories-page' ),
-			'news'          => array( 'news-page' ),
 			'events'        => array( 'events-page' ),
 			'projects'      => array( 'projects-page' ),
 			'donate'        => array( 'donation-page' ),

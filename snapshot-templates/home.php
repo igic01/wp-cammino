@@ -7,9 +7,8 @@
 
 $cammino_about_url   = nstarter_get_source_page_url( 'about-us', '/o-nas/' );
 $cammino_donate_url  = CAMMINO_DONATE_URL;
-$cammino_news_url    = nstarter_get_source_page_url( 'news', '/novinky/' );
-$cammino_stories_url = nstarter_get_source_page_url( 'ss', '/pribehy/' );
-$cammino_events_url  = $cammino_news_url . '#events';
+$cammino_story_url   = home_url( '/pribeh/' );
+$cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
 $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 $cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
 ?>
@@ -314,7 +313,7 @@ $cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
             <span>N</span>
             <p><strong>Nina</strong><br>príbeh odvahy ukázať svoj talent</p>
           </div>
-          <a class="button button--cream" href="<?php echo esc_url( $cammino_stories_url ); ?>">Prečítať celý príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
+          <a class="button button--cream" href="<?php echo esc_url( $cammino_story_url ); ?>">Prečítať celý príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
         </div>
       </div>
     </section>

@@ -4,7 +4,7 @@ This repository contains a minimal child theme for [Astra](https://wpastra.com/)
 It deliberately relies on Astra's normal template hierarchy, so existing Astra
 and Elementor pages continue to work unchanged while new Cammino features are
 built incrementally. The opt-in custom pages currently include the editable
-**Domov**, **O nás**, **Naše aktivity**, **Darujme úsmev**, **Kontakt**, **Príbehy úspechov**, **Novinky**, **Všetky podujatia**, **Projekty**, and donation designs, plus a
+**Domov**, **O nás**, **Naše aktivity**, **Darujme úsmev**, **Kontakt**, **Všetky podujatia**, **Projekty**, and donation designs, plus a
 shared single-post design for events, projects, and impact stories.
 
 ## Requirements
@@ -30,8 +30,6 @@ shared single-post design for events, projects, and impact stories.
 - `snapshot-templates/darujme-usmev.php` provides the Darujme úsmev campaign
   page. Choose **Cammino — Darujme úsmev** for `/darujme-usmev/`.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
-- `snapshot-templates/ss.php` is the variable-card source for Príbehy úspechov.
-- `snapshot-templates/news.php` is the editable shell around live post listings.
 - `snapshot-templates/events.php` is the compact directory of upcoming events,
   with the shared Cammino header and client-side event-type filtering.
 - `snapshot-templates/projects.php` opens with a permanent featured-project hero,
@@ -54,7 +52,7 @@ shared single-post design for events, projects, and impact stories.
 1. Create or edit a WordPress page.
 2. In the page **Template** selector, choose the required **Cammino — ...**
    design, such as **Cammino — Domov**, **Cammino — O nás**, **Cammino —
-   Novinky**, or one of the donation templates, then save.
+   Projekty**, or one of the donation templates, then save.
 3. Use the **Cammino visual editor** meta box or the **Visual editor** admin-bar
    link to open the editor.
 4. Edit text in Text mode, replace images or videos in Media mode, and press
@@ -84,7 +82,7 @@ the visual editor so a snapshot save cannot replace or stale its shortcode.
 The Naše aktivity template uses the usual Text, Media, and Link editing modes.
 Its two image placeholders can be replaced in Media mode; add appropriate alt
 text when adding real photos. Motion is disabled in the editor and respects
-reduced-motion preferences. Project news, stories, and contact links resolve to
+reduced-motion preferences. Project, story, and contact links resolve to
 their assigned templates; Darujme úsmev uses the same project URL as the homepage.
 The impact section uses qualitative outcomes until verified figures and reporting
 periods are available.
@@ -106,11 +104,6 @@ snapshot. The story section uses general introductory copy until a verified stor
 is available. Support links lead to the existing Kontakt template to arrange
 volunteering, partnership or a project donation; set a verified project payment URL
 in Link mode when available.
-
-The Príbehy úspechov template uses nested visual-editor variables. The outer
-control sets the number of story cards. Every card has its own 0–4 photo control
-and a text control that writes the destination of its **Celý príbeh** link.
-Card copy and images remain editable through the normal Text and Media modes.
 
 ## Publish an event or project
 
@@ -135,9 +128,8 @@ Card copy and images remain editable through the normal Text and Media modes.
    image to replace it, and use the small controls below a block to move or
    remove it. To add a link, select words in a paragraph and choose **Link
    selected text**. Select linked words and choose **Remove link** to undo it.
-5. Publish the post. Events appear in the event listing; projects appear in the
-   project directory and news listing; impact stories and legacy articles appear
-   in the main news listing.
+5. Publish the post. Events appear in the event listing and projects appear in
+   the project directory. Impact stories keep their individual post pages.
 
 Titles, excerpts and type-specific facts can be edited in WordPress. Post titles
 and the event date/location are also editable in the visual editor. Body sections,

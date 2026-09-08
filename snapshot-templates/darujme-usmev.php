@@ -7,7 +7,7 @@
 
 $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 $cammino_contact_url = nstarter_get_source_page_url( 'contact', '/kontakt/' );
-$cammino_stories_url = nstarter_get_source_page_url( 'ss', '/pribehy/' );
+$cammino_stories_url = nstarter_get_source_page_url( 'home', '/' ) . '#stories';
 $cammino_gallery_captions = array( 'Keď sa ľudia spoja', 'Pripravené s láskou', 'Radosť, ktorú zdieľame' );
 ?>
 <main id="main-content" class="smile-main">

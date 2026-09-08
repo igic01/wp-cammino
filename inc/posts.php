@@ -548,23 +548,9 @@ function cammino_get_post_category( int $post_id ): array {
 	}
 
 	return array(
-		'slug' => 'novinky',
-		'name' => __( 'Novinky', 'cammino' ),
+		'slug' => 'nezaradene',
+		'name' => __( 'Nezaradené', 'cammino' ),
 	);
-}
-
-/**
- * Estimate reading time from the post body.
- */
-function cammino_get_reading_minutes( int $post_id ): int {
-	$visual_content = (string) get_post_meta( $post_id, CAMMINO_POST_SNAPSHOT_META, true );
-	$content        = '' !== trim( $visual_content )
-		? preg_replace( '#<template\b[^>]*>.*?</template>#is', '', $visual_content )
-		: (string) get_post_field( 'post_content', $post_id );
-	$text    = wp_strip_all_tags( strip_shortcodes( $content ) );
-	$words   = preg_match_all( '/[\p{L}\p{N}]+/u', $text, $matches );
-
-	return max( 1, (int) ceil( ( false === $words ? 0 : $words ) / 200 ) );
 }
 
 /**
@@ -666,24 +652,6 @@ function cammino_is_post_content_empty( string $content ): bool {
 }
 
 /**
- * Resolve the page currently assigned to the Cammino News design.
- */
-function cammino_get_news_page_url(): string {
-	$pages = get_posts(
-		array(
-			'post_type'      => 'page',
-			'post_status'    => 'publish',
-			'posts_per_page' => 1,
-			'fields'         => 'ids',
-			'meta_key'       => '_wp_page_template',
-			'meta_value'     => nstarter_get_source_template_path( 'news' ),
-		)
-	);
-
-	return ! empty( $pages ) ? (string) get_permalink( (int) $pages[0] ) : (string) home_url( '/novinky/' );
-}
-
-/**
  * Get the timestamp used on event listing cards.
  */
 function cammino_get_event_timestamp( int $post_id ): int {
@@ -713,101 +681,6 @@ function cammino_format_display_title( string $title ): string {
 	$last = array_pop( $parts );
 
 	return esc_html( implode( ' ', $parts ) ) . ' <em>' . esc_html( (string) $last ) . '</em>';
-}
-
-/**
- * Render the event placement on the News page.
- */
-function cammino_render_news_events(): string {
-	$events = cammino_get_placed_posts( 'event', 20 );
-	$now    = current_datetime()->getTimestamp();
-
-	usort(
-		$events,
-		static function ( WP_Post $first, WP_Post $second ) use ( $now ): int {
-			$first_time  = cammino_get_event_timestamp( $first->ID );
-			$second_time = cammino_get_event_timestamp( $second->ID );
-			$first_past  = $first_time < $now;
-			$second_past = $second_time < $now;
-
-			if ( $first_past !== $second_past ) {
-				return $first_past ? 1 : -1;
-			}
-
-			return $first_past ? $second_time <=> $first_time : $first_time <=> $second_time;
-		}
-	);
-
-	if ( empty( $events ) ) {
-		return '<div class="news-live-empty"><strong>' . esc_html__( 'Zatiaľ nie sú publikované žiadne podujatia.', 'cammino' ) . '</strong><span>' . esc_html__( 'V editore príspevku nastavte typ Podujatie.', 'cammino' ) . '</span></div>';
-	}
-
-	$featured = array_shift( $events );
-	$events   = array_slice( $events, 0, 2 );
-	$render_date = static function ( int $post_id ): array {
-		$timestamp = cammino_get_event_timestamp( $post_id );
-
-		return array(
-			'day'   => wp_date( 'd', $timestamp ),
-			'month' => mb_strtoupper( wp_date( 'M', $timestamp ) ),
-			'time'  => wp_date( 'H:i', $timestamp ),
-			'iso'   => wp_date( 'c', $timestamp ),
-		);
-	};
-
-	ob_start();
-	?>
-	<div class="active-events-grid<?php echo empty( $events ) ? ' active-events-grid--single' : ''; ?>">
-		<?php
-		$date      = $render_date( $featured->ID );
-		$category  = cammino_get_post_category( $featured->ID );
-		$location  = (string) get_post_meta( $featured->ID, CAMMINO_EVENT_LOCATION_META, true );
-		$location  = '' !== $location ? $location : __( 'Cammino', 'cammino' );
-		$permalink = get_permalink( $featured );
-		?>
-		<article class="active-event active-event--featured" data-news-reveal="left">
-			<a class="active-event__image" href="<?php echo esc_url( $permalink ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Zobraziť podujatie: %s', 'cammino' ), get_the_title( $featured ) ) ); ?>">
-				<img src="<?php echo esc_url( cammino_get_post_image_url( $featured->ID, 'large' ) ); ?>" alt="<?php echo esc_attr( get_the_title( $featured ) ); ?>" width="1200" height="800">
-			</a>
-			<div class="active-event__content">
-				<div class="active-event__topline">
-					<time class="active-event__date" datetime="<?php echo esc_attr( $date['iso'] ); ?>"><strong><?php echo esc_html( $date['day'] ); ?></strong><span><?php echo esc_html( $date['month'] ); ?></span></time>
-					<div><span><?php esc_html_e( 'Čas začiatku', 'cammino' ); ?></span><strong><?php echo esc_html( $date['time'] ); ?></strong></div>
-				</div>
-				<span class="active-event__type"><?php echo esc_html( $category['name'] ); ?></span>
-				<h2><?php echo esc_html( get_the_title( $featured ) ); ?></h2>
-				<p><?php echo esc_html( wp_trim_words( get_the_excerpt( $featured ), 28 ) ); ?></p>
-				<div class="active-event__footer">
-					<span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <?php echo esc_html( $location ); ?></span>
-					<a href="<?php echo esc_url( $permalink ); ?>"><?php esc_html_e( 'Zobraziť podujatie', 'cammino' ); ?> <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a>
-				</div>
-			</div>
-		</article>
-
-		<?php if ( ! empty( $events ) ) : ?>
-			<div class="active-events-list">
-				<?php foreach ( $events as $index => $event ) : ?>
-					<?php
-					$date     = $render_date( $event->ID );
-					$location = (string) get_post_meta( $event->ID, CAMMINO_EVENT_LOCATION_META, true );
-					$location = '' !== $location ? $location : __( 'Cammino', 'cammino' );
-					?>
-					<a class="active-event active-event--compact <?php echo 0 === $index % 2 ? 'active-event--sage' : 'active-event--apricot'; ?>" href="<?php echo esc_url( get_permalink( $event ) ); ?>" data-news-reveal="right" data-delay="<?php echo esc_attr( (string) ( 90 * ( $index + 1 ) ) ); ?>">
-						<time class="active-event__date" datetime="<?php echo esc_attr( $date['iso'] ); ?>"><strong><?php echo esc_html( $date['day'] ); ?></strong><span><?php echo esc_html( $date['month'] ); ?></span></time>
-						<div class="active-event__compact-copy">
-							<span class="active-event__type"><?php echo esc_html( $location . ' · ' . $date['time'] ); ?></span>
-							<h2><?php echo esc_html( get_the_title( $event ) ); ?></h2>
-							<p><?php echo esc_html( wp_trim_words( get_the_excerpt( $event ), 20 ) ); ?></p>
-						</div>
-						<span class="active-event__arrow"><i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></span>
-					</a>
-				<?php endforeach; ?>
-			</div>
-		<?php endif; ?>
-	</div>
-	<?php
-
-	return (string) ob_get_clean();
 }
 
 /**
@@ -1061,77 +934,6 @@ function cammino_render_all_projects( array $args = array(), int $page_id = 0 ):
 			</section>
 		</div>
 	<?php endif; ?>
-	<?php
-
-	return (string) ob_get_clean();
-}
-
-/**
- * Render searchable article cards on the News page.
- */
-function cammino_render_news_articles(): string {
-	$posts      = get_posts( array(
-		'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => 24,
-		'has_password' => false, 'ignore_sticky_posts' => true,
-		'meta_query' => array( 'relation' => 'OR', array( 'key' => CAMMINO_POST_PLACEMENT_META, 'value' => array( 'article', 'project', 'impact-story' ), 'compare' => 'IN' ), array( 'key' => CAMMINO_POST_PLACEMENT_META, 'compare' => 'NOT EXISTS' ) ),
-	) );
-	$categories = array();
-
-	foreach ( $posts as $post ) {
-		$category                         = cammino_get_post_category( $post->ID );
-		$categories[ $category['slug'] ] = $category['name'];
-	}
-
-	ob_start();
-	?>
-	<div class="article-toolbar" data-news-reveal="up" data-delay="80">
-		<label class="article-search" for="cammino-article-search">
-			<i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-			<span class="sr-only"><?php esc_html_e( 'Hľadať články', 'cammino' ); ?></span>
-			<input id="cammino-article-search" type="search" placeholder="<?php esc_attr_e( 'Hľadať článok', 'cammino' ); ?>" autocomplete="off" data-article-search>
-		</label>
-		<div class="category-filters" role="group" aria-label="<?php esc_attr_e( 'Filtrovať články podľa kategórie', 'cammino' ); ?>">
-			<button class="filter-chip is-active" type="button" data-filter="all" aria-pressed="true"><i class="fa-solid fa-sliders" aria-hidden="true"></i> <?php esc_html_e( 'Všetko', 'cammino' ); ?></button>
-			<?php foreach ( $categories as $slug => $name ) : ?>
-				<button class="filter-chip" type="button" data-filter="<?php echo esc_attr( $slug ); ?>" aria-pressed="false"><i class="fa-solid fa-tag" aria-hidden="true"></i> <?php echo esc_html( $name ); ?></button>
-			<?php endforeach; ?>
-		</div>
-	</div>
-
-	<?php if ( empty( $posts ) ) : ?>
-		<div class="news-live-empty"><strong><?php esc_html_e( 'Zatiaľ nie sú publikované žiadne príspevky.', 'cammino' ); ?></strong></div>
-	<?php else : ?>
-		<div class="posts-grid" data-posts-grid>
-			<?php
-			$card_styles = array( 'post-card--sage', 'post-card--apricot', 'post-card--cream', 'post-card--coral' );
-			foreach ( $posts as $index => $post ) :
-				$category = cammino_get_post_category( $post->ID );
-				$minutes  = cammino_get_reading_minutes( $post->ID );
-				$permalink = get_permalink( $post );
-				?>
-				<article class="post-card <?php echo esc_attr( $card_styles[ $index % count( $card_styles ) ] ); ?>" data-category="<?php echo esc_attr( $category['slug'] ); ?>" data-news-reveal="up" data-delay="<?php echo esc_attr( (string) ( 80 * ( $index % 3 ) ) ); ?>">
-					<a class="post-card__image" href="<?php echo esc_url( $permalink ); ?>">
-						<img src="<?php echo esc_url( cammino_get_post_image_url( $post->ID, 'large' ) ); ?>" alt="<?php echo esc_attr( get_the_title( $post ) ); ?>" width="1200" height="800" loading="lazy">
-						<span class="post-category"><?php echo esc_html( $category['name'] ); ?></span>
-						<span class="post-card__arrow"><i class="fa-solid fa-arrow-right-long icon-diagonal" aria-hidden="true"></i></span>
-					</a>
-					<div class="post-card__content">
-						<div class="post-meta"><time datetime="<?php echo esc_attr( get_the_date( DATE_W3C, $post ) ); ?>"><?php echo esc_html( get_the_date( '', $post ) ); ?></time><span></span><span><?php echo esc_html( sprintf( _n( '%d min', '%d min', $minutes, 'cammino' ), $minutes ) ); ?></span></div>
-						<h3><a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( get_the_title( $post ) ); ?></a></h3>
-						<p><?php echo esc_html( wp_trim_words( get_the_excerpt( $post ), 22 ) ); ?></p>
-						<a class="post-read-link" href="<?php echo esc_url( $permalink ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Čítať: %s', 'cammino' ), get_the_title( $post ) ) ); ?>"><?php esc_html_e( 'Čítať ďalej', 'cammino' ); ?> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-					</div>
-				</article>
-			<?php endforeach; ?>
-		</div>
-	<?php endif; ?>
-
-	<div class="empty-results" hidden data-empty-results>
-		<i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-		<h3><?php esc_html_e( 'Nenašli sme žiadny článok', 'cammino' ); ?></h3>
-		<p><?php esc_html_e( 'Skúste iné slovo alebo kategóriu.', 'cammino' ); ?></p>
-		<button type="button" class="button button--coral" data-clear-filters><?php esc_html_e( 'Vymazať filtre', 'cammino' ); ?></button>
-	</div>
 	<?php
 
 	return (string) ob_get_clean();

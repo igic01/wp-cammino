@@ -43,24 +43,6 @@ $nstarter_html = str_replace(
 	$nstarter_html
 );
 
-// Remove the retired Events introduction from older saved News snapshots.
-if ( 'news' === $nstarter_source_slug ) {
-	$nstarter_html = (string) preg_replace(
-		'#<p>\s*Stretnutia,\s*workshopy\s*a\s*príležitosti,\s*ku\s*ktorým\s*sa\s*môžete\s*pridať\.\s*</p>#iu',
-		'',
-		$nstarter_html
-	);
-}
-
-// Remove captions retained by older Success Stories snapshots.
-if ( 'ss' === $nstarter_source_slug ) {
-	$nstarter_html = (string) preg_replace(
-		'#<figcaption\b[^>]*>.*?</figcaption>#is',
-		'',
-		$nstarter_html
-	);
-}
-
 // Saved snapshots can contain older copies of the site shell. Always replace
 // them with the current shared header and footer so every page stays visually
 // consistent. These remain normal theme markup, not live-section markers.

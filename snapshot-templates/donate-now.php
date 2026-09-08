@@ -7,6 +7,7 @@
 
 $cammino_asset_url   = NSTARTER_URL . '/assets';
 $cammino_placeholder = $cammino_asset_url . '/images/placeholder.webp';
+$cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
 ?>
   <a class="skip-link" href="#main-content">Preskočiť na obsah</a>
 
@@ -23,9 +24,7 @@ $cammino_placeholder = $cammino_asset_url . '/images/placeholder.webp';
       <nav class="site-nav" id="site-nav" aria-label="Hlavná navigácia" data-nav>
         <a href="index.html">Domov</a>
         <a href="aboutus.html">O nás</a>
-        <a href="ss.html">Príbehy</a>
-        <a href="news.html#events">Podujatia</a>
-        <a href="news.html">Novinky</a>
+        <a href="<?php echo esc_url( $cammino_events_url ); ?>">Podujatia</a>
         <a class="is-active" href="contact.html" aria-current="page">Kontakt</a>
         <a class="language-link" href="#" lang="en" aria-label="Switch to English">EN</a>
         <a class="button button--small button--coral nav-donate" href="donate.html">Prispieť <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
@@ -98,9 +97,7 @@ $cammino_placeholder = $cammino_asset_url . '/images/placeholder.webp';
       <div class="footer-links">
         <h2>Cammino</h2>
         <a href="aboutus.html">O nás</a>
-        <a href="ss.html">Príbehy úspechov</a>
-        <a href="index.html#events">Podujatia</a>
-        <a href="news.html">Novinky</a>
+        <a href="<?php echo esc_url( $cammino_events_url ); ?>">Podujatia</a>
       </div>
       <div class="footer-contact">
         <h2>Prihláste sa na newsletter</h2>

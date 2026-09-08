@@ -15,7 +15,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 $cammino_post_id    = get_queried_object_id();
 $cammino_post       = get_post( $cammino_post_id );
 $cammino_placement  = cammino_get_post_placement( $cammino_post_id );
-$cammino_news_url   = cammino_get_news_page_url();
+$cammino_listing_url = match ( $cammino_placement ) {
+	'event'        => nstarter_get_source_page_url( 'events', '/podujatia/' ),
+	'project'      => nstarter_get_source_page_url( 'projects', '/projekty/' ),
+	'impact-story' => nstarter_get_source_page_url( 'home', '/' ) . '#stories',
+	default        => home_url( '/' ),
+};
+$cammino_back_label = match ( $cammino_placement ) {
+	'event'        => __( 'Späť na podujatia', 'cammino' ),
+	'project'      => __( 'Späť na projekty', 'cammino' ),
+	'impact-story' => __( 'Späť na príbehy', 'cammino' ),
+	default        => __( 'Späť na domov', 'cammino' ),
+};
 $cammino_category   = cammino_get_post_category( $cammino_post_id );
 $cammino_editable_category = cammino_get_editable_post_category( $cammino_post_id );
 $cammino_image      = cammino_get_post_image_url( $cammino_post_id, 'full' );
@@ -68,11 +79,11 @@ foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 	<main id="main-content">
 		<article>
 			<header class="article-hero container">
-				<a class="article-back" href="<?php echo esc_url( $cammino_news_url ); ?>" data-article-reveal="up">
-					<i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i> Späť na novinky
+				<a class="article-back" href="<?php echo esc_url( $cammino_listing_url ); ?>" data-article-reveal="up">
+					<i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i> <?php echo esc_html( $cammino_back_label ); ?>
 				</a>
 				<div class="article-tags" data-article-reveal="up" data-delay="60">
-					<a href="<?php echo esc_url( $cammino_news_url . ( 'event' === $cammino_placement ? '#events' : '#articles' ) ); ?>" class="article-tag article-tag--primary"><?php echo esc_html( $cammino_type_label ); ?></a>
+					<a href="<?php echo esc_url( $cammino_listing_url ); ?>" class="article-tag article-tag--primary"><?php echo esc_html( $cammino_type_label ); ?></a>
 					<?php if ( in_array( $cammino_placement, array( 'event', 'project' ), true ) ) : ?>
 						<span class="article-tag" data-cammino-post-category<?php echo '' === $cammino_editable_category['name'] ? ' hidden' : ''; ?>><?php echo esc_html( $cammino_editable_category['name'] ); ?></span>
 					<?php else : ?>
