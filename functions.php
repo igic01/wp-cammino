@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.19' );
+define( 'NSTARTER_VERSION', '1.9.21' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
@@ -334,11 +334,6 @@ function cammino_enqueue_visual_page_assets(): void {
 			'style'  => '/assets/css/pages/activities.css',
 			'script' => '/assets/js/pages/activities.js',
 		),
-		'darujme-usmev' => array(
-			'handle' => 'cammino-darujme-usmev',
-			'style'  => '/assets/css/pages/darujme-usmev.css',
-			'script' => '/assets/js/pages/darujme-usmev.js',
-		),
 		'contact'  => array(
 			'handle' => 'cammino-contact',
 			'style'  => '/assets/css/pages/contact.css',
@@ -353,6 +348,11 @@ function cammino_enqueue_visual_page_assets(): void {
 			'handle' => 'cammino-projects',
 			'style'  => '/assets/css/pages/projects.css',
 			'script' => '/assets/js/pages/projects.js',
+		),
+		'main-project' => array(
+			'handle' => 'cammino-main-project',
+			'style'  => '/assets/css/pages/main-project.css',
+			'script' => '/assets/js/pages/main-project.js',
 		),
 		'donate'   => array(
 			'handle' => 'cammino-donate',
@@ -535,10 +535,10 @@ function cammino_visual_page_body_classes( array $classes ): array {
 			'home'          => array( 'home-page' ),
 			'about-us'      => array( 'about-page' ),
 			'activities'    => array( 'activities-page' ),
-			'darujme-usmev' => array( 'smile-page' ),
 			'contact'       => array( 'contact-page' ),
 			'events'        => array( 'events-page' ),
 			'projects'      => array( 'projects-page' ),
+			'main-project'  => array( 'main-project-page' ),
 			'donate'        => array( 'donation-page' ),
 			'donate-us'     => array( 'donate-us-page' ),
 			'donate-now'    => array( 'contact-page', 'donate-now-page' ),

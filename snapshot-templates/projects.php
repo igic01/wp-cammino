@@ -6,7 +6,7 @@
  */
 
 $cammino_projects_hero_image = NSTARTER_URL . '/assets/images/placeholder.webp';
-$cammino_featured_project_url = nstarter_get_source_page_url( 'darujme-usmev', '/darujme-usmev/' );
+$cammino_featured_project_url = nstarter_get_source_page_url( 'main-project', '/darujme-usmev/' );
 ?>
 <main id="main-content" class="projects-directory-main">
 	<section class="projects-feature" aria-labelledby="featured-project-title">

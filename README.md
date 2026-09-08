@@ -4,7 +4,7 @@ This repository contains a minimal child theme for [Astra](https://wpastra.com/)
 It deliberately relies on Astra's normal template hierarchy, so existing Astra
 and Elementor pages continue to work unchanged while new Cammino features are
 built incrementally. The opt-in custom pages currently include the editable
-**Domov**, **O nás**, **Naše aktivity**, **Darujme úsmev**, **Kontakt**, **Všetky podujatia**, **Projekty**, and donation designs, plus a
+**Domov**, **O nás**, **Naše aktivity**, **Kontakt**, **Všetky podujatia**, **Projekty**, **Hlavný projekt**, and donation designs, plus a
 shared single-post design for events, projects, and impact stories.
 
 ## Requirements
@@ -29,13 +29,13 @@ shared single-post design for events, projects, and impact stories.
 - `snapshot-templates/activities.php` provides the Naše aktivity page with four
   activity areas, scroll reveals, and an animated illustration using the shared
   design tokens. Choose **Cammino — Naše aktivity** for `/nase-aktivity/`.
-- `snapshot-templates/darujme-usmev.php` provides the Darujme úsmev campaign
-  page. Choose **Cammino — Darujme úsmev** for `/darujme-usmev/`.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
 - `snapshot-templates/events.php` is the compact directory of upcoming events,
   with the shared Cammino header and client-side event-type filtering.
 - `snapshot-templates/projects.php` opens with a permanent featured-project hero,
   then lists post categories and replaces them with linked project cards after a selection.
+- `snapshot-templates/main-project.php` is the editable Darujme úsmev project page.
+  It includes a repeatable story collection and reuses the homepage donation call to action.
 - `snapshot-templates/donate.php` provides the editable donation-options page.
 - `snapshot-templates/donate-us.php` provides the unrestricted-donation page.
 - `snapshot-templates/donate-detail.php` provides the reusable cause-detail page.
@@ -85,27 +85,10 @@ The Naše aktivity template uses the usual Text, Media, and Link editing modes.
 Its two image placeholders can be replaced in Media mode; add appropriate alt
 text when adding real photos. Motion is disabled in the editor and respects
 reduced-motion preferences. Project, story, and contact links resolve to
-their assigned templates; Darujme úsmev uses the same project URL as the homepage.
+their assigned destinations; Darujme úsmev resolves to the page assigned the
+**Cammino — Hlavný projekt** design.
 The impact section uses qualitative outcomes until verified figures and reporting
 periods are available.
-
-The Darujme úsmev template includes the project introduction, qualitative impact,
-three-step process, story introduction, three ways to help, gallery and partner
-acknowledgement, and a closing invitation. Its gift illustration and scroll
-animations respect reduced motion and remain still in the editor. Text, links,
-photos and captions use the normal visual editing modes.
-
-Three repeat controls manage verified result cards (0–4, initially 0), gallery
-photos (0–9, initially 3 placeholders), and confirmed partner logos (0–12,
-initially 0). After adding a result card, replace its dash, description and period
-with verified information. After adding a partner, replace the placeholder logo
-and name. Use consented photos and supply appropriate alt text in Media mode.
-The source document's draft totals, project age, overseas recipients and example
-family story require confirmation; they are not presented as facts in the initial
-snapshot. The story section uses general introductory copy until a verified story
-is available. Support links lead to the existing Kontakt template to arrange
-volunteering, partnership or a project donation; set a verified project payment URL
-in Link mode when available.
 
 ## Publish an event or project
 
@@ -154,7 +137,8 @@ classifications remain unchanged until explicitly reclassified.
 
 ## Post workflow checks
 
-Run `php tests/post-workflow.php` and `php tests/events-page-workflow.php` for
+Run `php tests/post-workflow.php`, `php tests/events-page-workflow.php`,
+`php tests/projects-page-workflow.php`, and `php tests/main-project-page-workflow.php` for
 standalone regression checks using WordPress test doubles. They cover migration,
 event-category assignment, visual event details, photo visibility, compact event
 cards and type filtering, type changes, saved-content preservation, the

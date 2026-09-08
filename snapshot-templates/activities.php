@@ -11,6 +11,7 @@ $cammino_contact_url = nstarter_get_source_page_url( 'contact', '/kontakt/' );
 $cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
 $cammino_projects_url = nstarter_get_source_page_url( 'projects', '/projekty/' );
 $cammino_stories_url = nstarter_get_source_page_url( 'home', '/' ) . '#stories';
+$cammino_main_project_url = nstarter_get_source_page_url( 'main-project', '/darujme-usmev/' );
 ?>
 <main id="main-content" class="activities-main">
   <section class="activities-hero" aria-labelledby="activities-title">
@@ -150,7 +151,7 @@ $cammino_stories_url = nstarter_get_source_page_url( 'home', '/' ) . '#stories';
         <h2 id="community-title">Spolu dokážeme<br><em>darovať úsmev.</em></h2>
         <p class="activities-lead">Spájame dobrovoľníkov, partnerov a komunity, aby pomoc našla cestu k deťom a rodinám, ktoré ju potrebujú.</p>
         <p>Našu komunitnú prácu stelesňuje iniciatíva <strong>Darujme úsmev</strong>. Vďaka ľuďom z celého Slovenska prináša konkrétnu pomoc aj pocit, že na náročnú životnú situáciu nikto nemusí zostať sám.</p>
-        <a class="button button--cream" href="https://www.exallievi.sk/darujmeusmev/">Spoznajte Darujme úsmev <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
+        <a class="button button--cream" href="<?php echo esc_url( $cammino_main_project_url ); ?>">Spoznajte Darujme úsmev <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
       </div>
     </div>
   </section>
