@@ -298,13 +298,14 @@
   display: none;
 }
 
-/* Full-spectrum pass: one continuous peach -> violet -> blue language. */
+/* Full-spectrum pass: warm ivory -> blush -> violet -> blue. */
 body.home-v2-page {
-  --v2-spectrum-peach: #f4d9d0;
+  --v2-spectrum-light: #fff5ed;
+  --v2-spectrum-peach: #efc7ca;
   --v2-spectrum-violet: #a28ebf;
   --v2-spectrum-blue: #5898cc;
-  --v2-spectrum: linear-gradient(110deg, var(--v2-spectrum-peach) 0%, var(--v2-spectrum-violet) 50%, var(--v2-spectrum-blue) 100%);
-  --v2-spectrum-dark: linear-gradient(110deg, #713f55 0%, #5f5488 50%, #276d98 100%);
+  --v2-spectrum: linear-gradient(110deg, var(--v2-spectrum-light) 0%, var(--v2-spectrum-peach) 30%, var(--v2-spectrum-violet) 62%, var(--v2-spectrum-blue) 100%);
+  --v2-spectrum-dark: linear-gradient(110deg, #553746 0%, #70475f 30%, #5f5488 62%, #276d98 100%);
   background-color: var(--v2-spectrum-violet);
   background-image: var(--v2-spectrum);
   background-attachment: fixed;
@@ -318,14 +319,14 @@ body.home-v2-page .home-v2 {
 body.home-v2-page .site-header {
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   background-color: rgba(194, 164, 188, 0.88);
-  background-image: linear-gradient(90deg, rgba(244, 217, 208, 0.94) 0%, rgba(162, 142, 191, 0.9) 50%, rgba(88, 152, 204, 0.9) 100%);
+  background-image: linear-gradient(90deg, rgba(255, 245, 237, 0.96) 0%, rgba(239, 199, 202, 0.93) 30%, rgba(162, 142, 191, 0.9) 62%, rgba(88, 152, 204, 0.9) 100%);
   box-shadow: 0 10px 34px rgba(39, 42, 96, 0.08);
   backdrop-filter: blur(18px) saturate(1.18);
 }
 
 body.home-v2-page .site-header.is-scrolled {
   background-color: rgba(194, 164, 188, 0.96);
-  background-image: linear-gradient(90deg, rgba(244, 217, 208, 0.97) 0%, rgba(162, 142, 191, 0.96) 50%, rgba(88, 152, 204, 0.96) 100%);
+  background-image: linear-gradient(90deg, rgba(255, 245, 237, 0.98) 0%, rgba(239, 199, 202, 0.97) 30%, rgba(162, 142, 191, 0.96) 62%, rgba(88, 152, 204, 0.96) 100%);
   box-shadow: 0 12px 38px rgba(39, 42, 96, 0.18);
 }
 
@@ -334,7 +335,7 @@ body.home-v2-page .site-nav {
 }
 
 body.home-v2-page .site-nav > a:not(.button, .language-link)::after {
-  background: linear-gradient(90deg, #ef3f48 0%, #f2a20a 50%, #049db5 100%);
+  background: #15163f;
 }
 
 body.home-v2-page .site-nav > a:last-child {
@@ -358,21 +359,21 @@ body.home-v2-page .site-nav > a:last-child:focus-visible {
 
 .home-v2 .about {
   background-color: #d7b9d3;
-  background-image: linear-gradient(110deg, #fae9e1 0%, #d7b9d3 50%, #a4cee4 100%);
+  background-image: linear-gradient(110deg, #fff8f2 0%, #efcdd0 30%, #c4acd3 62%, #93c4df 100%);
   background-size: 180% 180%;
   animation: home-v2-spectrum-shift 22s ease-in-out infinite alternate;
 }
 
 .home-v2 .home-projects {
   background-color: #b89fcb;
-  background-image: linear-gradient(110deg, #f5d8cf 0%, #b89fcb 50%, #78acd5 100%);
+  background-image: linear-gradient(110deg, #fff5ed 0%, #edc6ca 30%, #b89fcb 62%, #78acd5 100%);
   background-size: 180% 180%;
   animation: home-v2-spectrum-shift 24s ease-in-out infinite alternate-reverse;
 }
 
 .home-v2 .events {
   background-color: #c8aed5;
-  background-image: linear-gradient(110deg, #fae5dc 0%, #c8aed5 50%, #8bc0de 100%);
+  background-image: linear-gradient(110deg, #fff8f2 0%, #f0cdd0 30%, #c8aed5 62%, #8bc0de 100%);
   background-size: 180% 180%;
   animation: home-v2-spectrum-shift 23s ease-in-out infinite alternate;
 }
@@ -384,34 +385,34 @@ body.home-v2-page .site-nav > a:last-child:focus-visible {
 
 .home-v2 .community-cta {
   background-color: #655991;
-  background-image: linear-gradient(110deg, #7b455d 0%, #655991 50%, #2780a8 100%);
+  background-image: linear-gradient(110deg, #5b3949 0%, #7b455d 30%, #655991 62%, #2780a8 100%);
 }
 
 .home-v2 .home-involvement {
   background-color: #c3a9d2;
-  background-image: linear-gradient(110deg, #f8e1d8 0%, #c3a9d2 50%, #83b9da 100%);
+  background-image: linear-gradient(110deg, #fff7f0 0%, #efcbcd 30%, #c3a9d2 62%, #83b9da 100%);
   background-size: 180% 180%;
   animation: home-v2-spectrum-shift 25s ease-in-out infinite alternate-reverse;
 }
 
 .home-v2 .home-involvement__card {
   background-color: rgba(255, 255, 255, 0.7);
-  background-image: linear-gradient(110deg, rgba(255, 241, 235, 0.9) 0%, rgba(223, 207, 235, 0.88) 50%, rgba(198, 231, 244, 0.9) 100%);
+  background-image: linear-gradient(110deg, rgba(255, 250, 246, 0.94) 0%, rgba(246, 218, 218, 0.9) 30%, rgba(223, 207, 235, 0.88) 62%, rgba(198, 231, 244, 0.9) 100%);
 }
 
 .home-v2 .donate {
   background-color: #b59aca;
-  background-image: linear-gradient(110deg, #f4d8d0 0%, #b59aca 50%, #6fa8d2 100%);
+  background-image: linear-gradient(110deg, #fff5ed 0%, #efc7ca 30%, #b59aca 62%, #6fa8d2 100%);
 }
 
 .home-v2 .donate-card {
   background-color: #76537f;
-  background-image: linear-gradient(110deg, #ef4d58 0%, #76537f 50%, #168ba9 100%);
+  background-image: linear-gradient(110deg, #f88575 0%, #ef4d58 30%, #76537f 62%, #168ba9 100%);
 }
 
 .home-v2 .home-partners {
   background-color: #c6add4;
-  background-image: linear-gradient(110deg, #f8e3db 0%, #c6add4 50%, #8bbddd 100%);
+  background-image: linear-gradient(110deg, #fff8f2 0%, #efced1 30%, #c6add4 62%, #8bbddd 100%);
 }
 
 .home-v2 .home-partners__box {
@@ -422,7 +423,7 @@ body.home-v2-page .site-nav > a:last-child:focus-visible {
 
 .home-v2 .home-subscribe {
   background-color: #af96c7;
-  background-image: linear-gradient(110deg, #f4d9d0 0%, #af96c7 50%, #6ba5d1 100%);
+  background-image: linear-gradient(110deg, #fff5ed 0%, #efc7ca 30%, #af96c7 62%, #6ba5d1 100%);
 }
 
 .home-v2 .subscribe-card {
