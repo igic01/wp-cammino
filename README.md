@@ -31,7 +31,7 @@ shared single-post design for events, projects, and impact stories.
   design tokens. Choose **Cammino — Naše aktivity** for `/nase-aktivity/`.
 - `snapshot-templates/contact.php` is the clean PHP source for the Kontakt page.
 - `snapshot-templates/contact2.php` provides the two-column **Zapojte sa** page
-  backed by Contact Form 7 form `5554de4`.
+  backed by Contact Form 7 form `b4ce2b6`.
 - `snapshot-templates/events.php` is the compact directory of upcoming events,
   with the shared Cammino header and client-side event-type filtering.
 - `snapshot-templates/projects.php` opens with a permanent featured-project hero,
@@ -80,7 +80,7 @@ fallback. **Regenerate page** resets the editable snapshot from
 the selected file in `snapshot-templates/`.
 
 The Kontakt and Zapojte sa templates render Contact Form 7 forms `d43ca6f` and
-`5554de4` at request time. Their surrounding copy remains editable, while each
+`b4ce2b6` at request time. Their surrounding copy remains editable, while each
 live form is locked in the visual editor so a snapshot save cannot replace or
 stale its shortcode.
 

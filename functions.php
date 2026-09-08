@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.25' );
+define( 'NSTARTER_VERSION', '1.9.26' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
@@ -290,7 +290,7 @@ function cammino_register_live_sections(): void {
 				return '<p class="cammino-live-section-error">' . esc_html__( 'Contact Form 7 is required to display this form.', 'cammino' ) . '</p>';
 			}
 
-			return (string) do_shortcode( '[contact-form-7 id="5554de4" title="Zapojte sa"]' );
+			return (string) do_shortcode( '[contact-form-7 id="b4ce2b6" title="Zapojte sa"]' );
 		}
 	);
 
