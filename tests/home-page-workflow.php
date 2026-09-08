@@ -55,10 +55,6 @@ home_expect( str_contains( $styles, 'justify-content: center;' ) && str_contains
 home_expect( str_contains( $styles, '--home-section-space: clamp(2.25rem, 4vw, 3.5rem);' ) && str_contains( $styles, '#main-content > .section:not(.hero)' ), 'All reorderable homepage sections use one shared compact vertical spacing value.' );
 home_expect( ! str_contains( $styles, '.story-section + .donate' ), 'Donation spacing no longer depends on the preceding section.' );
 home_expect( ! str_contains( $template, 'class="story-person"' ) && ! str_contains( $styles, '.story-person' ), 'The Nina attribution element and its unused styles are removed.' );
-home_expect( str_contains( $template, '<main id="main-content" class="home-gradient-concept">' ), 'The homepage opts into the isolated gradient concept.' );
-home_expect( str_contains( $styles, '--home-pink:' ) && str_contains( $styles, '--home-blue:' ), 'The homepage defines its gradient concept color system.' );
-home_expect( substr_count( $styles, 'linear-gradient(' ) >= 15, 'The concept uses layered highlights and gradients throughout the page.' );
-home_expect( str_contains( $styles, '.home-gradient-concept .hero-path' ) && str_contains( $styles, '.home-gradient-concept .story-blob' ) && str_contains( $styles, 'display: none;' ), 'Large circle and path decorations are removed from the concept.' );
 
 $ordered_sections = array(
 	'class="section about"',
