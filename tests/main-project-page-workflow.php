@@ -36,5 +36,6 @@ main_project_expect( str_contains( $template, '>Chcem pomôcť <' ), 'The reused
 main_project_expect( str_contains( $theme, "'main-project' => array(" ) && str_contains( $theme, '/assets/css/pages/main-project.css' ) && str_contains( $theme, '/assets/js/pages/main-project.js' ), 'The theme loads the dedicated main-project assets.' );
 main_project_expect( str_contains( $script, 'IntersectionObserver' ), 'The page animation is progressive and viewport-aware.' );
 main_project_expect( str_contains( $script, 'animateCounter' ) && str_contains( $script, 'editorPreview' ), 'Impact counters animate publicly without mutating editable preview text.' );
+main_project_expect( str_contains( $styles, '@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine)' ) && str_contains( $styles, '.main-project-main .button:active' ), 'The page provides accessible hover and press feedback without relying on JavaScript.' );
 
 echo "Passed $checks main project page checks.\n";
