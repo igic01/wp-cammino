@@ -20,7 +20,8 @@ main_project_expect( str_contains( $template, 'Snapshot Name: Hlavný projekt' )
 main_project_expect( str_contains( $template, '<h1 id="main-project-title">Darujme <em>úsmev</em></h1>' ), 'The page introduces the supplied project.' );
 main_project_expect( ! str_contains( strtolower( $template ), 'eyebrow' ), 'The page does not render eyebrow elements.' );
 main_project_expect( 1 === substr_count( $template, '1500+' ) && 1 === substr_count( $template, '300+' ), 'Supplied impact totals are not repeated.' );
-main_project_expect( 3 === substr_count( $template, 'data-main-project-counter' ), 'Every numeric impact value is marked for count-up animation.' );
+main_project_expect( 2 === substr_count( $template, 'data-main-project-counter' ), 'Only the two standalone impact totals are marked for count-up animation.' );
+main_project_expect( str_contains( $template, '<strong>6 domovov</strong>' ), 'The Ukraine home count remains static.' );
 main_project_expect( str_contains( $template, 'Identifikácia rodín a detí' ), 'The first project step is present.' );
 main_project_expect( str_contains( $template, 'Zapojenie dobrovoľníkov a partnerov' ), 'The second project step is present.' );
 main_project_expect( str_contains( $template, 'Distribúcia pomoci' ), 'The third project step is present.' );

@@ -57,7 +57,7 @@ $cammino_donate_url         = CAMMINO_DONATE_URL;
 					<p>dobrovoľníci a pomoc v regiónoch po celej krajine</p>
 				</article>
 				<article class="main-project-impact__card main-project-impact__card--cream" data-main-project-reveal="up" data-delay="180">
-					<strong data-main-project-counter>6 domovov</strong>
+					<strong>6 domovov</strong>
 					<p>pre deti na Ukrajine získalo našu podporu</p>
 				</article>
 				<article class="main-project-impact__card main-project-impact__card--plum" data-main-project-reveal="up" data-delay="240">
