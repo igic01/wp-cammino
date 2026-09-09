@@ -14,6 +14,7 @@ $cammino_projects_url = nstarter_get_source_page_url( 'projects', '/projekty/' )
 $cammino_main_project_url = nstarter_get_source_page_url( 'main-project', '/darujme-usmev/' );
 $cammino_join_url     = nstarter_get_source_page_url( 'contact2', '/zapojte-sa/' );
 $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
+$cammino_community_image = NSTARTER_URL . '/assets/images/logopng-1.webp';
 $cammino_logo        = NSTARTER_URL . '/assets/logos/new_logo.svg';
 $cammino_home_project_ids = array_map(
   static fn( WP_Post $project ): int => (int) $project->ID,
@@ -272,10 +273,10 @@ $cammino_partners    = array(
       <div class="container">
         <div class="community-cta-card">
           <div class="community-cta-media" data-reveal="left">
-            <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Ľudia spojení komunitnými aktivitami OZ Cammino" width="1200" height="800" loading="lazy">
+            <img src="<?php echo esc_url( $cammino_community_image ); ?>" alt="Ľudia spojení komunitnými aktivitami OZ Cammino" width="1200" height="800" loading="lazy">
           </div>
           <div class="community-cta-copy" data-reveal="right" data-delay="120">
-            <h2 id="community-cta-title"><span>Spoznajte nášho partnera</span><em>Darujme úsmev</em></h2>
+            <h2 id="community-cta-title"><span>S Darujeme úsmev</span><em>už podprili</em></h2>
             <?php if ( 'home' === $cammino_home_variant ) : ?>
             <p>Darujme úsmev je komunitná iniciatíva, ktorá spája ľudí z celého Slovenska, aby prinášali radosť a konkrétnu pomoc deťom a rodinám v náročných životných situáciách.</p>
             <?php endif; ?>
