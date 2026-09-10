@@ -52,7 +52,7 @@ $cammino_partners    = array(
             <div class="image-tint" aria-hidden="true"></div>
           </div>
           <div class="hero-note hero-note--top" aria-hidden="true">
-            <span class="note-icon"><i class="fa-solid fa-seedling" aria-hidden="true"></i></span>
+            <img src="<?php echo esc_url( $cammino_logo ); ?>" alt="" width="526" height="526">
             <span><strong>Rozvíjame potenciál</strong>ľudí aj komunít</span>
           </div>
           <div class="hero-note hero-note--bottom">

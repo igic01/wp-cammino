@@ -7,6 +7,7 @@
 
 $cammino_main_project_image = NSTARTER_URL . '/assets/images/placeholder.webp';
 $cammino_donate_url         = CAMMINO_DONATE_URL;
+$cammino_logo               = NSTARTER_URL . '/assets/logos/new_logo.svg';
 ?>
 <main id="main-content" class="main-project-main">
 	<section class="main-project-hero" aria-labelledby="main-project-title">
@@ -14,12 +15,12 @@ $cammino_donate_url         = CAMMINO_DONATE_URL;
 			<div class="main-project-hero__copy" data-main-project-reveal="left">
 				<h1 id="main-project-title">Darujme <em>úsmev</em></h1>
 				<p>Spájame dobrovoľníkov, partnerov a darcov z celého Slovenska, aby sa konkrétna pomoc dostala k deťom a rodinám, ktoré ju najviac potrebujú.</p>
-				<a class="button button--coral" href="#o-projekte">Spoznajte projekt <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-down"></i></span></a>
+				<a class="button button--coral" href="https://www.exallievi.sk/darujmeusmev/">Spoznajte projekt <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-down"></i></span></a>
 			</div>
 
 			<figure class="main-project-hero__media" data-main-project-reveal="right" data-delay="120">
 				<img src="<?php echo esc_url( $cammino_main_project_image ); ?>" alt="Dobrovoľníci projektu Darujme úsmev pomáhajú rodinám s deťmi" width="1200" height="900" decoding="async" fetchpriority="high">
-				<div class="main-project-hero__note"><i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i><span>Pomoc, ktorá má ľudskú tvár</span></div>
+				<div class="main-project-hero__note"><img src="<?php echo esc_url( $cammino_logo ); ?>" alt="" width="627" height="523"><span>Pomoc, ktorá má ľudskú tvár</span></div>
 			</figure>
 		</div>
 	</section>

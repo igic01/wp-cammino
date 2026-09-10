@@ -24,11 +24,11 @@ $cammino_asset_url = NSTARTER_URL . '/assets';
             <img src="<?php echo esc_url( $cammino_asset_url . '/images/placeholder.webp' ); ?>" alt="Mladí ľudia spolupracujúci v komunite" width="1200" height="900">
           </div>
           <div class="floating-path floating-path--top">
-            <span class="floating-path__icon"><i class="fa-solid fa-route" aria-hidden="true"></i></span>
+            <span class="floating-path__icon"><img src="<?php echo esc_url( $cammino_asset_url . '/logos/new_logo.svg' ); ?>" alt="" width="627" height="523"></span>
             <span><strong>Cammino</strong> znamená cesta</span>
           </div>
           <div class="floating-path floating-path--bottom">
-            <i class="fa-solid fa-people-group" aria-hidden="true"></i>
+            <img src="<?php echo esc_url( $cammino_asset_url . '/logos/new_logo.svg' ); ?>" alt="" width="627" height="523">
             <span>Rastieme spolu</span>
           </div>
           <svg class="hero-path-line" viewBox="0 0 180 90" aria-hidden="true">

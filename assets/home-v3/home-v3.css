@@ -142,16 +142,6 @@ body.home-v3-page .nav-toggle {
   box-shadow: 0 24px 48px rgba(21, 54, 61, 0.22);
 }
 
-.home-v3 .note-icon {
-  color: var(--v3-ink);
-  background-color: var(--v3-orange);
-}
-
-.home-v3 .hero-note:hover .note-icon {
-  color: var(--v3-white);
-  background-color: var(--v3-red-deep);
-}
-
 .home-v3 .hero-path {
   stroke: var(--v3-red);
 }

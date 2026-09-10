@@ -91,10 +91,10 @@ $cammino_asset_url = NSTARTER_URL . '/assets';
             </div>
 
             <div class="qr-wrap" aria-label="QR kód pre podporu OZ Cammino">
-              <div class="qr-placeholder" role="button" tabindex="0" aria-pressed="false" aria-label="Zväčšiť QR kód" data-qr-toggle>
+              <a class="qr-placeholder" href="https://cammino.darujme.sk/darujmeusmev/" aria-label="Podporiť OZ Cammino">
                 <img src="<?php echo esc_url( $cammino_asset_url . '/images/placeholder.webp' ); ?>" alt="Miesto pre QR kód na podporu OZ Cammino" width="800" height="800" loading="lazy">
-              </div>
-              <small class="qr-hint"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> Kliknutím zväčšíte QR</small>
+              </a>
+              <small class="qr-hint"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> Kliknutím prispejete</small>
             </div>
           </article>
         </div>

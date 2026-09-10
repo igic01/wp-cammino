@@ -33,61 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  const qrControls = document.querySelectorAll("[data-qr-toggle]");
-  const mobileQrMedia = window.matchMedia("(max-width: 760px)");
-
-  const closeExpandedQrControls = (exceptControl = null) => {
-    qrControls.forEach((control) => {
-      if (control === exceptControl || !control.classList.contains("is-expanded")) return;
-
-      const controlHint = control.parentElement?.querySelector(".qr-hint");
-      control.classList.remove("is-expanded");
-      control.setAttribute("aria-pressed", "false");
-      control.setAttribute("aria-label", "Zväčšiť QR kód");
-
-      if (controlHint) {
-        controlHint.innerHTML = '<i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> Kliknutím zväčšíte QR';
-      }
-    });
-  };
-
-  qrControls.forEach((qrControl) => {
-    const hint = qrControl.parentElement?.querySelector(".qr-hint");
-    qrControl.setAttribute("data-nstarter-transient-class", "is-expanded");
-    qrControl.setAttribute("data-nstarter-transient-attributes", "aria-pressed aria-label");
-
-    const toggleQr = () => {
-      if (mobileQrMedia.matches) {
-        closeExpandedQrControls();
-        window.CamminoMediaPopup?.open(qrControl.querySelector("img"), "Zavrieť QR kód");
-        return;
-      }
-
-      const isExpanded = qrControl.classList.toggle("is-expanded");
-      if (isExpanded) closeExpandedQrControls(qrControl);
-      qrControl.setAttribute("aria-pressed", String(isExpanded));
-      qrControl.setAttribute("aria-label", isExpanded ? "Zmenšiť QR kód" : "Zväčšiť QR kód");
-
-      if (hint) {
-        hint.innerHTML = `<i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> ${isExpanded ? "Kliknutím zmenšíte QR" : "Kliknutím zväčšíte QR"}`;
-      }
-    };
-
-    qrControl.addEventListener("click", (event) => {
-      event.stopPropagation();
-      toggleQr();
-    });
-
-    qrControl.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      event.preventDefault();
-      event.stopPropagation();
-      toggleQr();
-    });
-  });
-
-  document.addEventListener("click", () => closeExpandedQrControls());
-
   const messageField = document.querySelector(".contact-form-runtime .wpcf7 textarea");
 
   messageField?.addEventListener("input", () => {
