@@ -132,6 +132,8 @@ function nstarter_maybe_render_editor(): void {
 					: __( 'Regenerate this page from its PHP template? All saved visual edits will be replaced.', 'nstarter' ),
 				'chooseMedia'       => __( 'Choose an image or video', 'nstarter' ),
 				'useMedia'          => __( 'Use this media', 'nstarter' ),
+				'invalidMediaUrl'   => __( 'Enter a valid HTTP or HTTPS media URL.', 'nstarter' ),
+				'invalidIframe'     => __( 'Enter iframe attributes or one complete iframe with a valid HTTPS src.', 'nstarter' ),
 				'invalidLink'       => __( 'Enter a valid web, email, phone, page, or anchor link.', 'nstarter' ),
 				'editVideoSettings'   => __( 'Edit video settings', 'nstarter' ),
 				'editSectionVariable' => __( 'Edit section variable', 'nstarter' ),
@@ -224,6 +226,51 @@ function nstarter_maybe_render_editor(): void {
 					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
 				</div>
 			</aside>
+
+			<dialog class="nstarter-media-source-dialog" data-nstarter-media-source-dialog>
+				<form data-nstarter-media-source-form>
+					<h2><?php esc_html_e( 'Edit media', 'nstarter' ); ?></h2>
+					<p><?php esc_html_e( 'Choose how you want to replace this image or video.', 'nstarter' ); ?></p>
+					<div class="nstarter-media-source-dialog__choices">
+						<button type="button" data-nstarter-media-source="url"><strong><?php esc_html_e( 'Direct URL', 'nstarter' ); ?></strong><span><?php esc_html_e( 'Use an image or video URL.', 'nstarter' ); ?></span></button>
+						<button type="button" data-nstarter-media-source="iframe"><strong><?php esc_html_e( 'Iframe embed', 'nstarter' ); ?></strong><span><?php esc_html_e( 'Embed YouTube or another HTTPS player.', 'nstarter' ); ?></span></button>
+						<button type="button" data-nstarter-media-source="wordpress"><strong><?php esc_html_e( 'WordPress Media', 'nstarter' ); ?></strong><span><?php esc_html_e( 'Open the existing Media Library.', 'nstarter' ); ?></span></button>
+					</div>
+					<div class="nstarter-media-dialog__actions">
+						<button type="button" data-nstarter-media-source-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>
+					</div>
+				</form>
+			</dialog>
+
+			<dialog class="nstarter-media-url-dialog" data-nstarter-media-url-dialog>
+				<form data-nstarter-media-url-form>
+					<h2><?php esc_html_e( 'Use a direct media URL', 'nstarter' ); ?></h2>
+					<label>
+						<span><?php esc_html_e( 'Image or video URL', 'nstarter' ); ?></span>
+						<input type="text" inputmode="url" autocomplete="url" data-nstarter-media-url-input required>
+					</label>
+					<p><?php esc_html_e( 'For media elements this updates the src attribute. Existing styling is preserved.', 'nstarter' ); ?></p>
+					<div class="nstarter-media-dialog__actions">
+						<button type="button" data-nstarter-media-url-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>
+						<button type="submit"><?php esc_html_e( 'Apply URL', 'nstarter' ); ?></button>
+					</div>
+				</form>
+			</dialog>
+
+			<dialog class="nstarter-iframe-dialog" data-nstarter-iframe-dialog>
+				<form data-nstarter-iframe-form>
+					<h2><?php esc_html_e( 'Use an iframe embed', 'nstarter' ); ?></h2>
+					<label>
+						<span><?php esc_html_e( 'Iframe or iframe attributes', 'nstarter' ); ?></span>
+						<textarea rows="7" spellcheck="false" data-nstarter-iframe-input required placeholder="src=&quot;https://www.youtube.com/embed/VIDEO_ID?autoplay=1&amp;mute=1&amp;playsinline=1&quot;&#10;title=&quot;YouTube video&quot;&#10;allow=&quot;autoplay; encrypted-media; picture-in-picture&quot;&#10;allowfullscreen"></textarea>
+					</label>
+					<p><?php esc_html_e( 'Only a secure HTTPS source and safe iframe attributes are kept.', 'nstarter' ); ?></p>
+					<div class="nstarter-media-dialog__actions">
+						<button type="button" data-nstarter-iframe-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>
+						<button type="submit"><?php esc_html_e( 'Apply iframe', 'nstarter' ); ?></button>
+					</div>
+				</form>
+			</dialog>
 
 			<dialog class="nstarter-video-dialog" data-nstarter-video-dialog>
 				<form data-nstarter-video-form>

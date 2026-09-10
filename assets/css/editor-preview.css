@@ -50,7 +50,8 @@
 }
 
 .nstarter-editor-preview.nstarter-mode-media img,
-.nstarter-editor-preview.nstarter-mode-media video {
+.nstarter-editor-preview.nstarter-mode-media video,
+.nstarter-editor-preview.nstarter-mode-media iframe[data-nstarter-embed] {
     cursor: pointer;
     outline: 3px solid transparent;
     outline-offset: 3px;
@@ -58,8 +59,15 @@
 }
 
 .nstarter-editor-preview.nstarter-mode-media img:hover,
-.nstarter-editor-preview.nstarter-mode-media video:hover {
+.nstarter-editor-preview.nstarter-mode-media video:hover,
+.nstarter-editor-preview.nstarter-mode-media iframe[data-nstarter-embed] {
     outline-color: #6d5dfc;
+}
+
+/* Cross-origin iframe clicks do not bubble to the editor document. Let its
+   containing media frame receive clicks while Media editing mode is active. */
+.nstarter-editor-preview.nstarter-mode-media iframe[data-nstarter-embed] {
+    pointer-events: none;
 }
 
 .nstarter-editor-preview .nstarter-video-tools {

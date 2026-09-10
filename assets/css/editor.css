@@ -211,6 +211,162 @@ body.nstarter-editor-shell {
     display: none;
 }
 
+.nstarter-media-source-dialog,
+.nstarter-media-url-dialog,
+.nstarter-iframe-dialog {
+    width: min(470px, calc(100vw - 32px));
+    padding: 16px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    color: #222;
+    background: #fff;
+    font-family: inherit;
+}
+
+.nstarter-media-source-dialog::backdrop,
+.nstarter-media-url-dialog::backdrop,
+.nstarter-iframe-dialog::backdrop {
+    background: rgb(0 0 0 / 38%);
+}
+
+.nstarter-media-source-dialog form,
+.nstarter-media-url-dialog form,
+.nstarter-iframe-dialog form,
+.nstarter-media-url-dialog label,
+.nstarter-iframe-dialog label {
+    display: grid;
+    gap: 12px;
+}
+
+.nstarter-media-source-dialog h2,
+.nstarter-media-source-dialog p,
+.nstarter-media-url-dialog h2,
+.nstarter-media-url-dialog p,
+.nstarter-iframe-dialog h2,
+.nstarter-iframe-dialog p {
+    margin: 0;
+}
+
+.nstarter-media-source-dialog h2,
+.nstarter-media-url-dialog h2,
+.nstarter-iframe-dialog h2 {
+    font-size: 16px;
+}
+
+.nstarter-media-source-dialog p,
+.nstarter-media-url-dialog p,
+.nstarter-iframe-dialog p {
+    color: #666;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.nstarter-media-source-dialog__choices {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.nstarter-media-source-dialog button,
+.nstarter-media-url-dialog button,
+.nstarter-iframe-dialog button {
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+    font: 400 12px/1 inherit;
+}
+
+.nstarter-media-source-dialog__choices button {
+    display: grid;
+    min-height: 92px;
+    align-content: center;
+    gap: 5px;
+    padding: 12px;
+    border-color: #c3c4c7;
+    text-align: left;
+}
+
+.nstarter-media-source-dialog__choices button:hover,
+.nstarter-media-source-dialog__choices button:focus-visible {
+    border-color: #6d5dfc;
+    box-shadow: 0 0 0 1px #6d5dfc;
+    outline: none;
+}
+
+.nstarter-media-source-dialog__choices strong {
+    font-size: 13px;
+}
+
+.nstarter-media-source-dialog__choices span {
+    color: #666;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.nstarter-media-url-dialog,
+.nstarter-iframe-dialog {
+    width: min(520px, calc(100vw - 32px));
+}
+
+.nstarter-media-url-dialog label,
+.nstarter-iframe-dialog label {
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.nstarter-media-url-dialog input,
+.nstarter-iframe-dialog textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    font: 400 13px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.nstarter-media-url-dialog input {
+    height: 38px;
+}
+
+.nstarter-iframe-dialog textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.nstarter-media-url-dialog input:focus,
+.nstarter-iframe-dialog textarea:focus {
+    border-color: #6d5dfc;
+    box-shadow: 0 0 0 1px #6d5dfc;
+    outline: none;
+}
+
+.nstarter-media-dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.nstarter-media-url-dialog button[type="submit"],
+.nstarter-iframe-dialog button[type="submit"] {
+    border-color: #222;
+    color: #fff;
+    background: #222;
+}
+
+@media (max-width: 560px) {
+    .nstarter-media-source-dialog__choices {
+        grid-template-columns: 1fr;
+    }
+
+    .nstarter-media-source-dialog__choices button {
+        min-height: 64px;
+    }
+}
+
 .nstarter-video-dialog {
     width: min(320px, calc(100vw - 32px));
     padding: 16px;

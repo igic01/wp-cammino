@@ -11,6 +11,17 @@
     const modeSelect = document.querySelector('[data-nstarter-mode]');
     const editorPanel = document.querySelector('.nstarter-editor-panel');
     const panelToggle = document.querySelector('[data-nstarter-panel-toggle]');
+    const mediaSourceDialog = document.querySelector('[data-nstarter-media-source-dialog]');
+    const mediaSourceForm = document.querySelector('[data-nstarter-media-source-form]');
+    const mediaSourceCancel = document.querySelector('[data-nstarter-media-source-cancel]');
+    const mediaUrlDialog = document.querySelector('[data-nstarter-media-url-dialog]');
+    const mediaUrlForm = document.querySelector('[data-nstarter-media-url-form]');
+    const mediaUrlInput = document.querySelector('[data-nstarter-media-url-input]');
+    const mediaUrlCancel = document.querySelector('[data-nstarter-media-url-cancel]');
+    const iframeDialog = document.querySelector('[data-nstarter-iframe-dialog]');
+    const iframeForm = document.querySelector('[data-nstarter-iframe-form]');
+    const iframeInput = document.querySelector('[data-nstarter-iframe-input]');
+    const iframeCancel = document.querySelector('[data-nstarter-iframe-cancel]');
     const videoDialog = document.querySelector('[data-nstarter-video-dialog]');
     const videoForm = document.querySelector('[data-nstarter-video-form]');
     const videoAutoplay = document.querySelector('[data-nstarter-video-autoplay]');
@@ -46,6 +57,7 @@
     let dirty = false;
     let mediaFrame = null;
     let mediaTarget = null;
+    let mediaPickerImageOnly = false;
     let linkTarget = null;
     let pendingLinkRange = null;
     let pendingLinkItem = null;
@@ -265,7 +277,7 @@
         if (!item || !item.isConnected) return true;
         if (action === 'edit-image') {
             const image = item.querySelector('img');
-            if (image) openMediaPicker(image, true);
+            if (image) openMediaSourceChooser(image, true);
             return true;
         }
         if (action === 'edit-link') {
@@ -1211,11 +1223,175 @@
         }
     }
 
+    function mediaElementFromEventTarget(eventTarget) {
+        if (!eventTarget || !eventTarget.closest) {
+            return null;
+        }
+
+        const directTarget = eventTarget.closest('img, video, iframe[data-nstarter-embed]');
+        if (directTarget) {
+            return directTarget;
+        }
+
+        return eventTarget.children
+            ? Array.from(eventTarget.children).find(function (child) {
+                return child.matches('iframe[data-nstarter-embed]');
+            }) || null
+            : null;
+    }
+
+    function closeMediaDialogs(clearTarget) {
+        [mediaSourceDialog, mediaUrlDialog, iframeDialog].forEach(function (dialog) {
+            if (dialog && dialog.open) {
+                dialog.close();
+            }
+        });
+        if (clearTarget !== false) {
+            mediaTarget = null;
+            mediaPickerImageOnly = false;
+        }
+    }
+
+    function openMediaSourceChooser(target, imageOnly) {
+        if (!target || !mediaSourceDialog) {
+            return;
+        }
+        mediaTarget = target;
+        mediaPickerImageOnly = Boolean(imageOnly);
+        mediaSourceDialog.showModal();
+    }
+
+    function isSafeMediaUrl(value, requireHttps) {
+        try {
+            const parsed = new URL(value, frame.contentWindow.location.href);
+            return requireHttps ? parsed.protocol === 'https:' : /^https?:$/.test(parsed.protocol);
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function chooseMediaSource(event) {
+        const button = event.target.closest('[data-nstarter-media-source]');
+        if (!button || !mediaTarget) {
+            return;
+        }
+
+        const source = button.dataset.nstarterMediaSource;
+        mediaSourceDialog.close();
+
+        if (source === 'wordpress') {
+            const target = mediaTarget;
+            const imageOnly = mediaPickerImageOnly;
+            openMediaPicker(target, imageOnly);
+            return;
+        }
+
+        if (source === 'url' && mediaUrlDialog && mediaUrlInput) {
+            mediaUrlInput.value = mediaTarget.getAttribute('src') || '';
+            mediaUrlInput.setCustomValidity('');
+            mediaUrlDialog.showModal();
+            mediaUrlInput.focus();
+            mediaUrlInput.select();
+            return;
+        }
+
+        if (source === 'iframe' && iframeDialog && iframeInput) {
+            iframeInput.value = mediaTarget.tagName.toLowerCase() === 'iframe'
+                ? mediaTarget.outerHTML
+                : '';
+            iframeInput.setCustomValidity('');
+            iframeDialog.showModal();
+            iframeInput.focus();
+        }
+    }
+
+    function applyDirectMediaUrl(event) {
+        event.preventDefault();
+        if (!mediaTarget || !mediaUrlInput) {
+            closeMediaDialogs();
+            return;
+        }
+
+        const url = mediaUrlInput.value.trim();
+        if (!url || !isSafeMediaUrl(url, false)) {
+            mediaUrlInput.setCustomValidity(config.strings.invalidMediaUrl);
+            mediaUrlInput.reportValidity();
+            return;
+        }
+
+        mediaUrlInput.setCustomValidity('');
+        mediaTarget.setAttribute('src', url);
+        mediaTarget.removeAttribute('srcset');
+        mediaTarget.removeAttribute('sizes');
+        mediaTarget.removeAttribute('data-attachment-id');
+        closeMediaDialogs(false);
+        finishMediaChange();
+    }
+
+    function parsedIframeAttributes(value) {
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return null;
+        }
+
+        const markup = /^<iframe\b/i.test(trimmed)
+            ? trimmed
+            : '<iframe ' + trimmed + '></iframe>';
+        const parsedDocument = new DOMParser().parseFromString(markup, 'text/html');
+        const children = Array.from(parsedDocument.body.children);
+        const parsedIframe = children.length === 1 && children[0].tagName.toLowerCase() === 'iframe'
+            ? children[0]
+            : null;
+        const src = parsedIframe && (parsedIframe.getAttribute('src') || '').trim();
+
+        if (!parsedIframe || !src || !isSafeMediaUrl(src, true)) {
+            return null;
+        }
+
+        return {
+            src: src,
+            title: (parsedIframe.getAttribute('title') || 'Embedded video').trim(),
+            allow: (parsedIframe.getAttribute('allow') || 'autoplay; encrypted-media; picture-in-picture').trim(),
+            allowFullscreen: parsedIframe.hasAttribute('allowfullscreen')
+        };
+    }
+
+    function applyIframeEmbed(event) {
+        event.preventDefault();
+        if (!mediaTarget || !iframeInput) {
+            closeMediaDialogs();
+            return;
+        }
+
+        const attributes = parsedIframeAttributes(iframeInput.value);
+        if (!attributes) {
+            iframeInput.setCustomValidity(config.strings.invalidIframe);
+            iframeInput.reportValidity();
+            return;
+        }
+
+        iframeInput.setCustomValidity('');
+        const embed = mediaTarget.ownerDocument.createElement('iframe');
+        copyPresentationAttributes(mediaTarget, embed);
+        embed.classList.add('nstarter-media-embed');
+        embed.setAttribute('data-nstarter-embed', '');
+        embed.setAttribute('src', attributes.src);
+        embed.setAttribute('title', attributes.title || 'Embedded video');
+        embed.setAttribute('allow', attributes.allow);
+        embed.setAttribute('loading', 'lazy');
+        embed.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        embed.toggleAttribute('allowfullscreen', attributes.allowFullscreen);
+
+        closeMediaDialogs(false);
+        replaceMediaElement(embed);
+    }
+
     function copyPresentationAttributes(source, destination) {
         const mediaAttributes = new Set([
             'src', 'srcset', 'sizes', 'alt', 'poster', 'autoplay', 'muted',
             'controls', 'playsinline', 'preload', 'loop', 'loading', 'decoding',
-            'data-attachment-id'
+            'allow', 'allowfullscreen', 'frameborder', 'referrerpolicy', 'title',
+            'data-attachment-id', 'data-nstarter-embed'
         ]);
 
         Array.from(source.attributes).forEach(function (attribute) {
@@ -1238,6 +1414,7 @@
 
     function finishMediaChange() {
         mediaTarget = null;
+        mediaPickerImageOnly = false;
         pendingVideoAttachment = null;
         markDirty();
         renderInlinePostEditor();
@@ -1270,6 +1447,7 @@
         const image = target.ownerDocument.createElement('img');
 
         copyPresentationAttributes(target, image);
+        image.classList.remove('nstarter-media-embed');
         image.setAttribute('src', url);
         image.setAttribute('data-attachment-id', attachment.id);
         image.setAttribute(
@@ -1332,6 +1510,7 @@
         const video = mediaTarget.ownerDocument.createElement('video');
 
         copyPresentationAttributes(mediaTarget, video);
+        video.classList.remove('nstarter-media-embed');
         video.setAttribute('src', pendingVideoAttachment.url);
         video.setAttribute('data-attachment-id', pendingVideoAttachment.id);
         video.setAttribute('playsinline', '');
@@ -1388,6 +1567,7 @@
             window.setTimeout(function () {
                 if (!attachmentSelected && mediaFrame === picker) {
                     mediaTarget = null;
+                    mediaPickerImageOnly = false;
                     mediaFrame = null;
                 }
             }, 100);
@@ -1517,10 +1697,27 @@
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 event.stopPropagation();
-                openMediaPicker(inlineImage, true);
+                openMediaSourceChooser(inlineImage, true);
                 return;
             }
 
+        }
+
+        if (mode === 'media') {
+            const mediaElement = mediaElementFromEventTarget(event.target);
+            const root = snapshotRoot();
+            const isPostCover = mediaElement && mediaElement.matches('.article-cover__frame img');
+            if (
+                mediaElement
+                && !isInLiveSection(mediaElement)
+                && (isPostCover || !contentBuilder() || root.contains(mediaElement))
+            ) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                event.stopPropagation();
+                openMediaSourceChooser(mediaElement, false);
+                return;
+            }
         }
 
         const link = event.target.closest && event.target.closest('a[href]');
@@ -1578,16 +1775,7 @@
             return;
         }
 
-        const target = event.target.closest && event.target.closest('img, video');
-        const root = snapshotRoot();
-        const isPostCover = target && target.matches('.article-cover__frame img');
-        if (!target || isInLiveSection(target) || (contentBuilder() && !root.contains(target) && !isPostCover)) {
-            event.preventDefault();
-            return;
-        }
-
         event.preventDefault();
-        openMediaPicker(target);
     }
 
     function preventPreviewFormNavigation(event) {
@@ -1869,6 +2057,42 @@
     saveButton.addEventListener('click', save);
     regenerateButton.addEventListener('click', regenerate);
     panelToggle.addEventListener('click', togglePanel);
+    if (mediaSourceDialog && mediaSourceForm && mediaSourceCancel) {
+        mediaSourceForm.addEventListener('click', chooseMediaSource);
+        mediaSourceCancel.addEventListener('click', function () {
+            closeMediaDialogs();
+        });
+        mediaSourceDialog.addEventListener('cancel', function (event) {
+            event.preventDefault();
+            closeMediaDialogs();
+        });
+    }
+    if (mediaUrlDialog && mediaUrlForm && mediaUrlInput && mediaUrlCancel) {
+        mediaUrlForm.addEventListener('submit', applyDirectMediaUrl);
+        mediaUrlCancel.addEventListener('click', function () {
+            closeMediaDialogs();
+        });
+        mediaUrlInput.addEventListener('input', function () {
+            mediaUrlInput.setCustomValidity('');
+        });
+        mediaUrlDialog.addEventListener('cancel', function (event) {
+            event.preventDefault();
+            closeMediaDialogs();
+        });
+    }
+    if (iframeDialog && iframeForm && iframeInput && iframeCancel) {
+        iframeForm.addEventListener('submit', applyIframeEmbed);
+        iframeCancel.addEventListener('click', function () {
+            closeMediaDialogs();
+        });
+        iframeInput.addEventListener('input', function () {
+            iframeInput.setCustomValidity('');
+        });
+        iframeDialog.addEventListener('cancel', function (event) {
+            event.preventDefault();
+            closeMediaDialogs();
+        });
+    }
     if (postDetailsDialog && postDetailsForm && postDetailsCancel) {
         postDetailsForm.addEventListener('submit', applyPostDetails);
         postDetailsCancel.addEventListener('click', closePostDetails);
@@ -1877,6 +2101,7 @@
             closePostDetails();
         });
     }
+
     if (sectionOrderButton && sectionOrderDialog && sectionOrderForm && sectionOrderCancel) {
         sectionOrderButton.addEventListener('click', openSectionOrder);
         sectionOrderForm.addEventListener('submit', applySectionOrder);
