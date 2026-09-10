@@ -43,6 +43,36 @@ $nstarter_html = str_replace(
 	$nstarter_html
 );
 
+// Replace legacy About-page floating icons while preserving saved page copy.
+$cammino_mark_logo_url = esc_url( NSTARTER_URL . '/assets/logos/new_logo.svg' );
+$nstarter_html = (string) preg_replace(
+	'#(<span\b[^>]*class=["\'][^"\']*\bfloating-path__icon\b[^>]*>)\s*<i\b[^>]*>.*?</i>\s*(</span>)#is',
+	'$1<img src="' . $cammino_mark_logo_url . '" alt="" width="627" height="523">$2',
+	$nstarter_html
+);
+$nstarter_html = (string) preg_replace(
+	'#(<div\b[^>]*class=["\'][^"\']*\bfloating-path--bottom\b[^>]*>)\s*<i\b[^>]*>.*?</i>#is',
+	'$1<img src="' . $cammino_mark_logo_url . '" alt="" width="627" height="523">',
+	$nstarter_html
+);
+
+// Convert legacy expandable QR controls in saved snapshots into donation links.
+$nstarter_html = (string) preg_replace(
+	'#<div\b(?=[^>]*class=["\'][^"\']*\bqr-placeholder\b)[^>]*>(.*?)</div>#is',
+	'<a class="qr-placeholder" href="https://cammino.darujme.sk/darujmeusmev/" target="_blank" rel="noopener noreferrer" aria-label="Podporiť OZ Cammino (otvorí sa na novej karte)">$1</a>',
+	$nstarter_html
+);
+$nstarter_html = (string) preg_replace(
+	'#<a\b(?=[^>]*class=["\'][^"\']*\bqr-placeholder\b)[^>]*>#i',
+	'<a class="qr-placeholder" href="https://cammino.darujme.sk/darujmeusmev/" target="_blank" rel="noopener noreferrer" aria-label="Podporiť OZ Cammino (otvorí sa na novej karte)">',
+	$nstarter_html
+);
+$nstarter_html = (string) preg_replace(
+	'#<small\b[^>]*class=["\'][^"\']*\bqr-hint\b[^>]*>.*?</small>#is',
+	'',
+	$nstarter_html
+);
+
 // Saved snapshots can contain older copies of the site shell. Always replace
 // them with the current shared header and footer so every page stays visually
 // consistent. These remain normal theme markup, not live-section markers.

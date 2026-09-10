@@ -71,10 +71,9 @@ $cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
             </div>
 
             <div class="qr-wrap" aria-label="QR kód pre podporu OZ Cammino">
-              <a class="qr-placeholder" href="https://cammino.darujme.sk/darujmeusmev/" aria-label="Podporiť OZ Cammino">
+              <a class="qr-placeholder" href="https://cammino.darujme.sk/darujmeusmev/" target="_blank" rel="noopener noreferrer" aria-label="Podporiť OZ Cammino (otvorí sa na novej karte)">
                 <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Miesto pre QR kód na podporu OZ Cammino" width="800" height="800" loading="lazy">
               </a>
-              <small class="qr-hint"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> Kliknutím prispejete</small>
             </div>
           </article>
       </div>
