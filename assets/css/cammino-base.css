@@ -77,6 +77,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -94,10 +95,31 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Mobile Safari can expose off-canvas decorations through the root viewport
+   during pinch zoom even when body overflow is hidden. */
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
+
 /* Keep Elementor/global theme typography from replacing Cammino's local fonts. */
 body.cammino-visual-page,
 body.cammino-visual-page #nstarter-snapshot {
   font-family: var(--font-body) !important;
+}
+
+body.cammino-visual-page #nstarter-snapshot {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@supports (overflow: clip) {
+  body.cammino-visual-page #nstarter-snapshot {
+    overflow-x: clip;
+  }
 }
 
 body.cammino-visual-page #nstarter-snapshot > .skip-link {
