@@ -1373,6 +1373,7 @@
         iframeInput.setCustomValidity('');
         const embed = mediaTarget.ownerDocument.createElement('iframe');
         copyPresentationAttributes(mediaTarget, embed);
+        copyMediaShape(mediaTarget, embed);
         embed.classList.add('nstarter-media-embed');
         embed.setAttribute('data-nstarter-embed', '');
         embed.setAttribute('src', attributes.src);
@@ -1399,6 +1400,24 @@
                 destination.setAttribute(attribute.name, attribute.value);
             }
         });
+    }
+
+    function copyMediaShape(source, destination) {
+        const sourceWindow = source.ownerDocument && source.ownerDocument.defaultView;
+        if (!sourceWindow) {
+            return;
+        }
+
+        const styles = sourceWindow.getComputedStyle(source);
+        if (styles.borderRadius && styles.borderRadius !== '0px') {
+            destination.style.borderRadius = styles.borderRadius;
+        }
+        if (styles.clipPath && styles.clipPath !== 'none') {
+            destination.style.clipPath = styles.clipPath;
+        }
+        if (styles.webkitClipPath && styles.webkitClipPath !== 'none') {
+            destination.style.webkitClipPath = styles.webkitClipPath;
+        }
     }
 
     function replaceMediaElement(replacement) {
