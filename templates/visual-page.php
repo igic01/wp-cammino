@@ -43,7 +43,7 @@ $nstarter_html = str_replace(
 	$nstarter_html
 );
 
-// Replace legacy About-page floating icons while preserving saved page copy.
+// Replace legacy floating/note icons while preserving saved page copy.
 $cammino_mark_logo_url = esc_url( NSTARTER_URL . '/assets/logos/new_logo.svg' );
 $nstarter_html = (string) preg_replace(
 	'#(<span\b[^>]*class=["\'][^"\']*\bfloating-path__icon\b[^>]*>)\s*<i\b[^>]*>.*?</i>\s*(</span>)#is',
@@ -53,6 +53,18 @@ $nstarter_html = (string) preg_replace(
 $nstarter_html = (string) preg_replace(
 	'#(<div\b[^>]*class=["\'][^"\']*\bfloating-path--bottom\b[^>]*>)\s*<i\b[^>]*>.*?</i>#is',
 	'$1<img src="' . $cammino_mark_logo_url . '" alt="" width="627" height="523">',
+	$nstarter_html
+);
+$nstarter_html = (string) preg_replace(
+	'#<span\b[^>]*class=["\'][^"\']*\bnote-icon\b[^>]*>\s*<i\b[^>]*>.*?</i>\s*</span>#is',
+	'<img src="' . $cammino_mark_logo_url . '" alt="" width="627" height="523">',
+	$nstarter_html
+);
+
+// Keep the Main Project hero CTA current in older saved snapshots.
+$nstarter_html = (string) preg_replace(
+	'#<a\b(?=[^>]*class=["\'][^"\']*\bbutton--coral\b)(?=[^>]*href=["\'](?:\#o-projekte|https://www\.exallievi\.sk/darujmeusmev/?)["\'])[^>]*>(?=\s*Spoznajte\s+projekt\b)#iu',
+	'<a class="button button--coral" href="https://www.exallievi.sk/darujmeusmev/" target="_blank" rel="noopener noreferrer">',
 	$nstarter_html
 );
 

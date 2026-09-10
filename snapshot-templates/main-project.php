@@ -15,7 +15,7 @@ $cammino_logo               = NSTARTER_URL . '/assets/logos/new_logo.svg';
 			<div class="main-project-hero__copy" data-main-project-reveal="left">
 				<h1 id="main-project-title">Darujme <em>úsmev</em></h1>
 				<p>Spájame dobrovoľníkov, partnerov a darcov z celého Slovenska, aby sa konkrétna pomoc dostala k deťom a rodinám, ktoré ju najviac potrebujú.</p>
-				<a class="button button--coral" href="https://www.exallievi.sk/darujmeusmev/">Spoznajte projekt <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-down"></i></span></a>
+				<a class="button button--coral" href="https://www.exallievi.sk/darujmeusmev/" target="_blank" rel="noopener noreferrer">Spoznajte projekt <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-down"></i></span></a>
 			</div>
 
 			<figure class="main-project-hero__media" data-main-project-reveal="right" data-delay="120">
