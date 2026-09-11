@@ -35,9 +35,9 @@
 
 .main-project-hero__grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.88fr) minmax(28rem, 1.12fr);
+  grid-template-columns: minmax(0, 0.78fr) minmax(30rem, 1.22fr);
   align-items: center;
-  gap: clamp(3rem, 8vw, 7rem);
+  gap: clamp(2.5rem, 5vw, 5rem);
 }
 
 .main-project-hero__copy {
@@ -100,32 +100,6 @@
   object-fit: cover;
   box-shadow: 0 28px 70px rgba(59, 64, 95, 0.13);
   transition: transform 650ms cubic-bezier(.2, .8, .2, 1), box-shadow 450ms ease;
-}
-
-.main-project-hero__note {
-  position: absolute;
-  z-index: 2;
-  bottom: 0;
-  left: -2.5rem;
-  display: flex;
-  max-width: 16rem;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 1rem 1.2rem;
-  border-radius: 1.3rem;
-  color: var(--color-plum);
-  background: var(--color-white);
-  box-shadow: var(--shadow-soft);
-  font-weight: 600;
-  line-height: 1.35;
-  transition: transform 360ms cubic-bezier(.2, .8, .2, 1), box-shadow 360ms ease;
-}
-
-.main-project-hero__note img {
-  width: 2.75rem;
-  height: auto;
-  flex: 0 0 auto;
-  transition: transform 420ms cubic-bezier(.2, .8, .2, 1);
 }
 
 .main-project-about {
@@ -633,15 +607,6 @@ body:not(.nstarter-editor-preview) .main-project-stories[data-nstarter-variable-
     transform: rotate(14deg) scale(1.12);
   }
 
-  body:not(.nstarter-editor-preview) .main-project-hero__media:hover .main-project-hero__note {
-    box-shadow: 0 24px 58px rgba(59, 64, 95, 0.16);
-    transform: translate(-5px, -8px);
-  }
-
-  body:not(.nstarter-editor-preview) .main-project-hero__media:hover .main-project-hero__note img {
-    transform: rotate(-9deg) scale(1.1);
-  }
-
   body:not(.nstarter-editor-preview) .main-project-about__copy p:hover {
     color: var(--color-white);
     transform: translateX(7px);
@@ -778,10 +743,6 @@ body:not(.nstarter-editor-preview) .main-project-stories[data-nstarter-variable-
     font-size: clamp(3.6rem, 18vw, 5.7rem);
   }
 
-  .main-project-hero__note {
-    left: 0;
-  }
-
   .main-project-about__copy {
     padding-top: 2rem;
     padding-left: 0;
@@ -832,7 +793,6 @@ body:not(.nstarter-editor-preview) .main-project-stories[data-nstarter-variable-
   .main-project-join__card,
   .main-project-hero__media,
   .main-project-hero__media > img,
-  .main-project-hero__note,
   .main-project-join__card > i {
     transition: none;
   }
