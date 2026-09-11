@@ -116,6 +116,9 @@ function nstarter_maybe_render_editor(): void {
 			'projectOptions' => $is_home_page && function_exists( 'cammino_get_project_picker_options' )
 				? cammino_get_project_picker_options()
 				: array(),
+			'eventOptions' => $is_home_page && function_exists( 'cammino_get_event_picker_options' )
+				? cammino_get_event_picker_options()
+				: array(),
 			'postDetails' => $is_post ? array(
 				'title'         => get_the_title( $post ),
 				'category'      => $editable_category['name'],
@@ -142,6 +145,13 @@ function nstarter_maybe_render_editor(): void {
 				'selectUpToProjects'   => __( 'Select no more than %d projects.', 'cammino' ),
 				'noProjectsAvailable'  => __( 'No published projects are available.', 'cammino' ),
 				'noProjectsSelected'   => __( 'Choose up to three projects using this section control.', 'cammino' ),
+				'selectUpToEvents'     => __( 'Select no more than %d events.', 'cammino' ),
+				'selectAtLeastOneEvent'=> __( 'Select at least one event.', 'cammino' ),
+				'noEventsAvailable'    => __( 'No published events are available.', 'cammino' ),
+				'noEventsSelected'     => __( 'Choose one to four events using this section control.', 'cammino' ),
+				'moveEventUp'          => __( 'Move event earlier', 'cammino' ),
+				'moveEventDown'        => __( 'Move event later', 'cammino' ),
+				'eventPickerHint'       => __( 'Position 1 is the large card on the left. Positions 2–4 appear on the right.', 'cammino' ),
 				'unsupportedMedia'    => __( 'Please choose an image or video.', 'nstarter' ),
 				'sectionOrderUp'      => __( 'Move section up', 'nstarter' ),
 				'sectionOrderDown'    => __( 'Move section down', 'nstarter' ),
@@ -309,6 +319,7 @@ function nstarter_maybe_render_editor(): void {
 						<input type="number" data-nstarter-variable-input>
 						<div class="nstarter-variable-project-picker" data-nstarter-variable-project-picker hidden></div>
 					</div>
+					<p data-nstarter-variable-picker-hint hidden></p>
 					<p><?php esc_html_e( 'This changes the editable snapshot immediately. Use the main Save button afterward to persist it.', 'nstarter' ); ?></p>
 					<div class="nstarter-variable-dialog__actions">
 						<button type="button" data-nstarter-variable-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>

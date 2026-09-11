@@ -21,6 +21,12 @@ if ( '' === trim( $nstarter_html ) ) {
 	$nstarter_html = nstarter_render_source_template( $nstarter_post_id );
 }
 
+// Existing home snapshots used separate placeholder/count controls. Upgrade
+// only inside the editor preview; saving then persists the ordered event IDs.
+if ( nstarter_is_preview_request() && function_exists( 'cammino_upgrade_legacy_home_event_picker_html' ) ) {
+	$nstarter_html = cammino_upgrade_legacy_home_event_picker_html( $nstarter_html );
+}
+
 // Remove legacy header/footer live markers from previously saved snapshots.
 $nstarter_html = (string) preg_replace(
 	'#<div[^>]*data-nstarter-live-section=["\']cammino_site_(?:header|footer)["\'][^>]*>\s*</div>#i',

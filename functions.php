@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.71' );
+define( 'NSTARTER_VERSION', '1.9.72' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
@@ -296,6 +296,7 @@ function cammino_register_live_sections(): void {
 
 	nstarter_register_live_section( 'cammino_all_events', 'cammino_render_all_events' );
 	nstarter_register_live_section( 'cammino_all_projects', 'cammino_render_all_projects' );
+	nstarter_register_live_section( 'cammino_home_events', 'cammino_render_home_events' );
 	nstarter_register_live_section( 'cammino_home_projects', 'cammino_render_home_projects' );
 }
 

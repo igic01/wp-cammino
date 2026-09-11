@@ -615,6 +615,242 @@ function cammino_render_home_projects( array $args = array(), int $page_id = 0 )
 }
 
 /**
+ * Get public event posts available to the homepage event picker.
+ *
+ * @return WP_Post[]
+ */
+function cammino_get_event_picker_posts(): array {
+	return array_values(
+		array_filter(
+			cammino_get_placed_posts( 'event', 100 ),
+			static fn( WP_Post $event ): bool => '' === (string) $event->post_password
+		)
+	);
+}
+
+/**
+ * Build the homepage date and location strings for an event.
+ *
+ * @return array{day:string,month:string,meta:string}
+ */
+function cammino_get_home_event_display_data( int $event_id ): array {
+	$timestamp = cammino_get_event_timestamp( $event_id );
+	$location  = trim( (string) get_post_meta( $event_id, CAMMINO_EVENT_LOCATION_META, true ) );
+	$time      = wp_date( 'H:i', $timestamp );
+	$meta      = implode( ' · ', array_filter( array( $location, $time ) ) );
+	$month     = wp_date( 'M', $timestamp );
+
+	return array(
+		'day'   => wp_date( 'd', $timestamp ),
+		'month' => function_exists( 'mb_strtoupper' ) ? mb_strtoupper( $month, 'UTF-8' ) : strtoupper( $month ),
+		'meta'  => $meta,
+	);
+}
+
+/** Render one selected event as the large left-hand homepage card. */
+function cammino_render_home_featured_event( WP_Post $event ): string {
+	$event_id   = (int) $event->ID;
+	$url        = get_permalink( $event );
+	$title      = get_the_title( $event );
+	$image_url  = cammino_get_post_image_url( $event_id, 'large' );
+	$description = trim( (string) get_the_excerpt( $event ) );
+	$date       = cammino_get_home_event_display_data( $event_id );
+	$type       = cammino_get_event_display_type( $event_id );
+	$type_name  = '' !== $type['name'] ? $type['name'] : __( 'Podujatie', 'cammino' );
+
+	if ( '' === $description ) {
+		$description = wp_trim_words( wp_strip_all_tags( strip_shortcodes( (string) get_post_field( 'post_content', $event_id ) ) ), 28 );
+	}
+
+	ob_start();
+	?>
+	<div class="featured-news-slot">
+		<div class="featured-news-items">
+			<article class="event-card event-card--featured">
+				<a class="event-image" href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Detail podujatia %s', 'cammino' ), $title ) ); ?>">
+					<img src="<?php echo esc_url( $image_url ); ?>" alt="" loading="lazy" decoding="async">
+					<span class="event-type"><?php echo esc_html( $type_name ); ?></span>
+				</a>
+				<div class="event-content">
+					<div class="event-date"><strong><?php echo esc_html( $date['day'] ); ?></strong><span><?php echo esc_html( $date['month'] ); ?></span></div>
+					<div>
+						<?php if ( '' !== $date['meta'] ) : ?><p class="event-meta"><?php echo esc_html( $date['meta'] ); ?></p><?php endif; ?>
+						<h3><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $title ); ?></a></h3>
+						<?php if ( '' !== $description ) : ?><p><?php echo esc_html( $description ); ?></p><?php endif; ?>
+					</div>
+				</div>
+			</article>
+		</div>
+	</div>
+	<?php
+
+	return (string) ob_get_clean();
+}
+
+/** Render one selected event as a compact right-hand homepage row. */
+function cammino_render_home_event_row( WP_Post $event ): string {
+	$event_id  = (int) $event->ID;
+	$url       = get_permalink( $event );
+	$title     = get_the_title( $event );
+	$date      = cammino_get_home_event_display_data( $event_id );
+	$type      = cammino_get_event_display_type( $event_id );
+	$type_name = '' !== $type['name'] ? $type['name'] : __( 'Podujatie', 'cammino' );
+
+	ob_start();
+	?>
+	<article class="event-row">
+		<div class="event-date"><strong><?php echo esc_html( $date['day'] ); ?></strong><span><?php echo esc_html( $date['month'] ); ?></span></div>
+		<div>
+			<?php if ( '' !== $date['meta'] ) : ?><p class="event-meta"><?php echo esc_html( $date['meta'] ); ?></p><?php endif; ?>
+			<h3><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $title ); ?></a></h3>
+			<span class="event-type event-type--inline"><?php echo esc_html( $type_name ); ?></span>
+		</div>
+		<a class="circle-link" href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Detail podujatia %s', 'cammino' ), $title ) ); ?>"><i class="fa-solid fa-arrow-right-long icon-diagonal" aria-hidden="true"></i></a>
+	</article>
+	<?php
+
+	return (string) ob_get_clean();
+}
+
+/**
+ * Provide ordered event choices and both homepage presentation variants.
+ *
+ * @return array<int,array{id:int,title:string,featuredHtml:string,rowHtml:string}>
+ */
+function cammino_get_event_picker_options(): array {
+	return array_map(
+		static fn( WP_Post $event ): array => array(
+			'id'           => (int) $event->ID,
+			'title'        => (string) get_the_title( $event ),
+			'featuredHtml' => cammino_render_home_featured_event( $event ),
+			'rowHtml'      => cammino_render_home_event_row( $event ),
+		),
+		cammino_get_event_picker_posts()
+	);
+}
+
+/** Render one to four selected homepage events in their selected order. */
+function cammino_render_home_events( array $args = array(), int $page_id = 0 ): string {
+	$ids = isset( $args['ids'] ) && is_array( $args['ids'] )
+		? array_slice( array_values( array_unique( array_filter( array_map( 'absint', $args['ids'] ) ) ) ), 0, 4 )
+		: array();
+
+	if ( empty( $ids ) ) {
+		return '';
+	}
+
+	$events = get_posts(
+		array(
+			'post_type'           => 'post',
+			'post_status'         => 'publish',
+			'posts_per_page'      => 4,
+			'post__in'            => $ids,
+			'has_password'        => false,
+			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+			'meta_query'          => cammino_get_placement_meta_query( 'event' ),
+			'orderby'             => 'post__in',
+		)
+	);
+
+	if ( empty( $events ) ) {
+		return '';
+	}
+
+	$html = cammino_render_home_featured_event( array_shift( $events ) );
+	if ( ! empty( $events ) ) {
+		$html .= '<div class="event-list"><div class="event-list-items">';
+		$html .= implode( '', array_map( 'cammino_render_home_event_row', $events ) );
+		$html .= '</div></div>';
+	}
+
+	return $html;
+}
+
+/** Build the editable live marker used by the homepage event picker. */
+function cammino_get_home_event_picker_markup( array $ids ): string {
+	$ids = array_slice( array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) ), 0, 4 );
+
+	ob_start();
+	nstarter_variable_section_attributes(
+		'home_selected_events',
+		array(
+			'label'   => __( 'Vybrané podujatia', 'cammino' ),
+			'type'    => 'events',
+			'control' => 'event-picker',
+			'value'   => implode( ',', $ids ),
+			'min'     => 1,
+			'max'     => 4,
+		)
+	);
+	$attributes = (string) ob_get_clean();
+
+	return '<div class="event-grid"' . $attributes . '>'
+		. nstarter_get_live_section_marker( 'cammino_home_events', array( 'ids' => $ids ) )
+		. '</div>';
+}
+
+/**
+ * Upgrade the old two-control homepage event grid inside the editor preview.
+ * Saving the page then persists the new ordered event-picker marker.
+ */
+function cammino_upgrade_legacy_home_event_picker_html( string $html ): string {
+	if ( str_contains( $html, 'data-nstarter-variable-section="home_selected_events"' )
+		|| ! str_contains( $html, 'data-nstarter-variable-section="home_featured_news"' ) ) {
+		return $html;
+	}
+
+	if ( ! preg_match( '#<div\b[^>]*class=["\'][^"\']*\bevent-grid\b[^"\']*["\'][^>]*>#i', $html, $opening, PREG_OFFSET_CAPTURE ) ) {
+		return $html;
+	}
+
+	$start  = (int) $opening[0][1];
+	$length = strlen( (string) $opening[0][0] );
+	$tail   = substr( $html, $start + $length );
+	if ( false === $tail || ! preg_match_all( '#</?div\b[^>]*>#i', $tail, $tags, PREG_OFFSET_CAPTURE ) ) {
+		return $html;
+	}
+
+	$depth = 1;
+	$end   = null;
+	foreach ( $tags[0] as $tag ) {
+		$depth += str_starts_with( strtolower( (string) $tag[0] ), '</div' ) ? -1 : 1;
+		if ( 0 === $depth ) {
+			$end = $start + $length + (int) $tag[1] + strlen( (string) $tag[0] );
+			break;
+		}
+	}
+
+	if ( null === $end ) {
+		return $html;
+	}
+
+	$legacy_grid = substr( $html, $start, $end - $start );
+	if ( false === $legacy_grid || ! str_contains( $legacy_grid, 'data-nstarter-variable-section="home_event_count"' ) ) {
+		return $html;
+	}
+
+	$featured_count = 1;
+	$row_count      = 3;
+	if ( preg_match( '#data-nstarter-variable-section="home_featured_news"[^>]*data-nstarter-variable-value="([01])"#i', $legacy_grid, $featured_match ) ) {
+		$featured_count = (int) $featured_match[1];
+	}
+	if ( preg_match( '#data-nstarter-variable-section="home_event_count"[^>]*data-nstarter-variable-value="([0-3])"#i', $legacy_grid, $row_match ) ) {
+		$row_count = (int) $row_match[1];
+	}
+	$selected_count = max( 1, min( 4, $featured_count + $row_count ) );
+
+	$ids = array_map(
+		static fn( WP_Post $event ): int => (int) $event->ID,
+		array_slice( cammino_get_event_picker_posts(), 0, $selected_count )
+	);
+
+	return substr( $html, 0, $start )
+		. cammino_get_home_event_picker_markup( $ids )
+		. substr( $html, $end );
+}
+
+/**
  * Return a post image, with the local design placeholder as fallback.
  */
 function cammino_get_post_image_url( int $post_id, string $size = 'large' ): string {

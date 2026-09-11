@@ -629,6 +629,64 @@ body.nstarter-editor-shell {
     text-align: center;
 }
 
+.nstarter-variable-event-picker__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 7px;
+}
+
+.nstarter-variable-event-picker__row > label {
+    grid-template-columns: 22px 24px minmax(0, 1fr);
+    margin: 0;
+}
+
+.nstarter-variable-event-picker__order {
+    display: grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    border-radius: 50%;
+    color: #646970;
+    background: #f0f0f1;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.nstarter-variable-event-picker__row.is-selected .nstarter-variable-event-picker__order {
+    color: #fff;
+    background: #6d5dfc;
+}
+
+.nstarter-variable-event-picker__actions {
+    display: flex;
+    gap: 3px;
+}
+
+.nstarter-variable-event-picker__actions button {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    min-height: 30px;
+    padding: 0;
+    place-items: center;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.nstarter-variable-event-picker__actions button:hover:not(:disabled),
+.nstarter-variable-event-picker__actions button:focus-visible:not(:disabled) {
+    border-color: #6d5dfc;
+    color: #5142df;
+}
+
+.nstarter-variable-event-picker__actions button:disabled {
+    cursor: default;
+    opacity: 0.32;
+}
+
 .nstarter-variable-dialog button {
     min-height: 34px;
     padding: 0 12px;

@@ -38,6 +38,7 @@
     const variableLabel = document.querySelector('[data-nstarter-variable-label]');
     const variableInput = document.querySelector('[data-nstarter-variable-input]');
     const variableProjectPicker = document.querySelector('[data-nstarter-variable-project-picker]');
+    const variablePickerHint = document.querySelector('[data-nstarter-variable-picker-hint]');
     const variableCancel = document.querySelector('[data-nstarter-variable-cancel]');
     const sectionOrderButton = document.querySelector('[data-nstarter-section-order]');
     const sectionOrderDialog = document.querySelector('[data-nstarter-section-order-dialog]');
@@ -976,6 +977,184 @@
         return true;
     }
 
+    function selectedEventIds(section) {
+        return (section.dataset.nstarterVariableValue || '')
+            .split(',')
+            .map(function (id) { return String(Number(id.trim())); })
+            .filter(function (id) { return id !== '0' && id !== 'NaN'; });
+    }
+
+    function eventPickerRows() {
+        return variableProjectPicker
+            ? Array.from(variableProjectPicker.querySelectorAll('[data-nstarter-event-picker-row]'))
+            : [];
+    }
+
+    function refreshEventPicker(section) {
+        const maximum = Math.max(1, Number(section.dataset.nstarterVariableMax || 4));
+        const rows = eventPickerRows();
+        const selectedRows = rows.filter(function (row) {
+            return row.querySelector('input[type="checkbox"]').checked;
+        });
+
+        rows.forEach(function (row) {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            const order = row.querySelector('[data-nstarter-event-order]');
+            const up = row.querySelector('[data-nstarter-event-up]');
+            const down = row.querySelector('[data-nstarter-event-down]');
+            const selectedIndex = selectedRows.indexOf(row);
+
+            checkbox.disabled = !checkbox.checked && selectedRows.length >= maximum;
+            row.classList.toggle('is-selected', checkbox.checked);
+            if (order) order.textContent = checkbox.checked ? String(selectedIndex + 1) : '–';
+            if (up) up.disabled = !checkbox.checked || selectedIndex <= 0;
+            if (down) down.disabled = !checkbox.checked || selectedIndex === selectedRows.length - 1;
+        });
+    }
+
+    function moveEventPickerRow(row, direction, section) {
+        const selectedRows = eventPickerRows().filter(function (candidate) {
+            return candidate.querySelector('input[type="checkbox"]').checked;
+        });
+        const index = selectedRows.indexOf(row);
+        const sibling = selectedRows[index + direction];
+        if (!sibling || !row.parentNode) {
+            return;
+        }
+
+        if (direction < 0) {
+            row.parentNode.insertBefore(row, sibling);
+        } else {
+            row.parentNode.insertBefore(sibling, row);
+        }
+        refreshEventPicker(section);
+    }
+
+    function populateEventPicker(section) {
+        if (!variableProjectPicker) {
+            return;
+        }
+
+        variableProjectPicker.replaceChildren();
+        const selectedIds = selectedEventIds(section);
+        const selected = new Set(selectedIds);
+        const events = Array.isArray(config.eventOptions) ? config.eventOptions : [];
+        const eventsById = new Map(events.map(function (event) {
+            return [String(event.id), event];
+        }));
+        const orderedEvents = selectedIds
+            .map(function (id) { return eventsById.get(id); })
+            .filter(Boolean)
+            .concat(events.filter(function (event) { return !selected.has(String(event.id)); }));
+
+        if (!orderedEvents.length) {
+            const empty = document.createElement('p');
+            empty.className = 'nstarter-variable-project-picker__empty';
+            empty.textContent = config.strings.noEventsAvailable;
+            variableProjectPicker.appendChild(empty);
+            return;
+        }
+
+        orderedEvents.forEach(function (eventOption) {
+            const row = document.createElement('div');
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            const position = document.createElement('span');
+            const title = document.createElement('span');
+            const actions = document.createElement('span');
+            const up = document.createElement('button');
+            const down = document.createElement('button');
+
+            row.className = 'nstarter-variable-event-picker__row';
+            row.setAttribute('data-nstarter-event-picker-row', '');
+            checkbox.type = 'checkbox';
+            checkbox.value = String(eventOption.id);
+            checkbox.checked = selected.has(String(eventOption.id));
+            position.className = 'nstarter-variable-event-picker__order';
+            position.setAttribute('data-nstarter-event-order', '');
+            title.textContent = eventOption.title;
+            actions.className = 'nstarter-variable-event-picker__actions';
+            up.type = 'button';
+            up.textContent = '↑';
+            up.setAttribute('data-nstarter-event-up', '');
+            up.setAttribute('aria-label', config.strings.moveEventUp + ': ' + eventOption.title);
+            down.type = 'button';
+            down.textContent = '↓';
+            down.setAttribute('data-nstarter-event-down', '');
+            down.setAttribute('aria-label', config.strings.moveEventDown + ': ' + eventOption.title);
+
+            label.append(checkbox, position, title);
+            actions.append(up, down);
+            row.append(label, actions);
+            variableProjectPicker.appendChild(row);
+
+            checkbox.addEventListener('change', function () {
+                if (checkbox.checked) {
+                    const selectedRows = eventPickerRows().filter(function (candidate) {
+                        return candidate !== row && candidate.querySelector('input[type="checkbox"]').checked;
+                    });
+                    const lastSelected = selectedRows[selectedRows.length - 1];
+                    if (lastSelected) {
+                        lastSelected.after(row);
+                    } else {
+                        variableProjectPicker.prepend(row);
+                    }
+                } else {
+                    variableProjectPicker.appendChild(row);
+                }
+                refreshEventPicker(section);
+            });
+            up.addEventListener('click', function () { moveEventPickerRow(row, -1, section); });
+            down.addEventListener('click', function () { moveEventPickerRow(row, 1, section); });
+        });
+
+        refreshEventPicker(section);
+    }
+
+    function updateEventPickerSection(section, eventIds) {
+        const liveSection = section.querySelector('[data-nstarter-live-section="cammino_home_events"]');
+        if (!liveSection) {
+            return false;
+        }
+
+        liveSection.dataset.nstarterLiveArgs = window.btoa(JSON.stringify({
+            ids: eventIds.map(function (id) { return Number(id); })
+        }));
+        liveSection.replaceChildren();
+
+        const eventsById = new Map(
+            (Array.isArray(config.eventOptions) ? config.eventOptions : []).map(function (eventOption) {
+                return [String(eventOption.id), eventOption];
+            })
+        );
+        const selectedEvents = eventIds.map(function (id) {
+            return eventsById.get(String(id));
+        }).filter(Boolean);
+
+        if (selectedEvents.length) {
+            liveSection.insertAdjacentHTML('beforeend', selectedEvents[0].featuredHtml || '');
+        }
+        if (selectedEvents.length > 1) {
+            const rows = selectedEvents.slice(1).map(function (eventOption) {
+                return eventOption.rowHtml || '';
+            }).join('');
+            liveSection.insertAdjacentHTML(
+                'beforeend',
+                '<div class="event-list"><div class="event-list-items">' + rows + '</div></div>'
+            );
+        }
+
+        if (!selectedEvents.length) {
+            const empty = liveSection.ownerDocument.createElement('p');
+            empty.className = 'home-events__editor-empty';
+            empty.textContent = config.strings.noEventsSelected;
+            liveSection.appendChild(empty);
+        }
+
+        liveSection.setAttribute('contenteditable', 'false');
+        return true;
+    }
+
     function openVariableEditor(section) {
         if (section && section.dataset.nstarterVariableControl === 'post-details') {
             openPostDetails();
@@ -991,14 +1170,20 @@
         const variableType = section.dataset.nstarterVariableType || 'number';
         const control = section.dataset.nstarterVariableControl || 'repeat';
         const isProjectPicker = variableType === 'projects' && control === 'project-picker';
-        const inputType = variableType === 'text' || isProjectPicker ? 'text' : (variableType === 'boolean' ? 'checkbox' : 'number');
+        const isEventPicker = variableType === 'events' && control === 'event-picker';
+        const isPostPicker = isProjectPicker || isEventPicker;
+        const inputType = variableType === 'text' || isPostPicker ? 'text' : (variableType === 'boolean' ? 'checkbox' : 'number');
 
         variableTitle.textContent = config.strings.editSectionVariable;
         variableLabel.textContent = variableType === 'boolean' ? label + ' (áno / nie)' : label;
-        variableInput.hidden = isProjectPicker;
-        variableInput.disabled = isProjectPicker;
+        variableInput.hidden = isPostPicker;
+        variableInput.disabled = isPostPicker;
         if (variableProjectPicker) {
-            variableProjectPicker.hidden = !isProjectPicker;
+            variableProjectPicker.hidden = !isPostPicker;
+        }
+        if (variablePickerHint) {
+            variablePickerHint.hidden = !isEventPicker;
+            variablePickerHint.textContent = isEventPicker ? config.strings.eventPickerHint : '';
         }
         variableInput.type = inputType;
         if (inputType === 'checkbox') {
@@ -1016,10 +1201,12 @@
 
         if (isProjectPicker) {
             populateProjectPicker(section);
+        } else if (isEventPicker) {
+            populateEventPicker(section);
         }
 
         variableDialog.showModal();
-        if (isProjectPicker) {
+        if (isPostPicker) {
             const firstProject = variableProjectPicker && variableProjectPicker.querySelector('input:not(:disabled)');
             (firstProject || variableCancel).focus();
         } else {
@@ -1101,7 +1288,8 @@
 
         const type = section.dataset.nstarterVariableType || 'number';
         const configuredControl = section.dataset.nstarterVariableControl || 'repeat';
-        const control = configuredControl === 'text' || configuredControl === 'project-picker' ? configuredControl : 'repeat';
+        const supportedControls = ['text', 'project-picker', 'event-picker'];
+        const control = supportedControls.includes(configuredControl) ? configuredControl : 'repeat';
         let value = type === 'boolean' ? (variableInput.checked ? 1 : 0) : variableInput.value;
 
         if (type === 'projects') {
@@ -1124,6 +1312,33 @@
             value = projectIds.join(',');
         }
 
+        if (type === 'events') {
+            if (control !== 'event-picker' || !variableProjectPicker) {
+                setStatus(config.strings.unsupportedVariable, 'error');
+                return;
+            }
+
+            const eventIds = eventPickerRows()
+                .map(function (row) { return row.querySelector('input[type="checkbox"]'); })
+                .filter(function (checkbox) { return checkbox.checked; })
+                .map(function (checkbox) { return checkbox.value; });
+            const minimum = Math.max(1, Number(section.dataset.nstarterVariableMin || 1));
+            const maximum = Math.max(minimum, Number(section.dataset.nstarterVariableMax || 4));
+            if (eventIds.length < minimum) {
+                setStatus(config.strings.selectAtLeastOneEvent, 'error');
+                return;
+            }
+            if (eventIds.length > maximum) {
+                setStatus(config.strings.selectUpToEvents.replace('%d', String(maximum)), 'error');
+                return;
+            }
+            if (!updateEventPickerSection(section, eventIds)) {
+                setStatus(config.strings.unsupportedVariable, 'error');
+                return;
+            }
+            value = eventIds.join(',');
+        }
+
         if (type === 'number') {
             value = Number(value);
             if (!Number.isFinite(value)) {
@@ -1139,8 +1354,8 @@
             }
         }
 
-        if (type === 'projects') {
-            // The project picker already updated its live section above.
+        if (type === 'projects' || type === 'events') {
+            // The post pickers already updated their live sections above.
         } else if (control === 'repeat') {
             const resized = type === 'number' || type === 'boolean' ? resizeRepeatSection(section, value) : false;
             if (resized === null) {
