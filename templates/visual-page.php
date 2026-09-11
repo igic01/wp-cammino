@@ -67,6 +67,15 @@ $nstarter_html = (string) preg_replace(
 	$nstarter_html
 );
 
+// Remove the retired floating note from older Main Project snapshots.
+if ( 'main-project' === $nstarter_source_slug ) {
+	$nstarter_html = (string) preg_replace(
+		'#<div\b[^>]*class=["\'][^"\']*\bmain-project-hero__note\b[^>]*>.*?</div>#is',
+		'',
+		$nstarter_html
+	);
+}
+
 // Keep the Main Project hero CTA current in older saved snapshots.
 $nstarter_html = (string) preg_replace(
 	'#<a\b(?=[^>]*class=["\'][^"\']*\bbutton--coral\b)(?=[^>]*href=["\'](?:\#o-projekte|https://www\.exallievi\.sk/darujmeusmev/?)["\'])[^>]*>(?=\s*Spoznajte\s+projekt\b)#iu',
