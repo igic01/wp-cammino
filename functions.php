@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.75' );
+define( 'NSTARTER_VERSION', '1.9.76' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
@@ -55,23 +55,6 @@ function cammino_normalize_donate_url( string $url ): string {
 }
 
 /**
- * Check whether a WordPress menu item points to a donation destination.
- */
-function cammino_is_donation_menu_url( string $url ): bool {
-	$path = wp_parse_url( $url, PHP_URL_PATH );
-
-	if ( ! is_string( $path ) ) {
-		return false;
-	}
-
-	return in_array(
-		trailingslashit( '/' . ltrim( $path, '/' ) ),
-		array( '/podporte-nas/', '/darovat-v2/', '/darujmeusmev/' ),
-		true
-	);
-}
-
-/**
  * Render WordPress menu links without list wrappers to match the static design.
  */
 class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
@@ -103,10 +86,7 @@ class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
 	 * @param int      $id     Current item ID.
 	 */
 	public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
-		if (
-			0 !== $depth
-			|| ( ! empty( $args->exclude_donation_link ) && cammino_is_donation_menu_url( (string) $item->url ) )
-		) {
+		if ( 0 !== $depth ) {
 			return;
 		}
 
@@ -158,18 +138,15 @@ class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
 
 /**
  * Render the shared Cammino menu.
- *
- * @param bool $exclude_donation_link Whether to omit donation destinations.
  */
-function cammino_render_shared_menu( bool $exclude_donation_link = false ): void {
+function cammino_render_shared_menu(): void {
 	$args = array(
-		'container'             => false,
-		'depth'                 => 1,
-		'echo'                  => false,
-		'exclude_donation_link' => $exclude_donation_link,
-		'fallback_cb'           => false,
-		'items_wrap'            => '%3$s',
-		'walker'                => new Cammino_Bare_Nav_Walker(),
+		'container'    => false,
+		'depth'        => 1,
+		'echo'         => false,
+		'fallback_cb'  => false,
+		'items_wrap'   => '%3$s',
+		'walker'       => new Cammino_Bare_Nav_Walker(),
 	);
 
 	if ( has_nav_menu( 'new-menu' ) ) {
@@ -219,7 +196,7 @@ function cammino_render_site_header(): void {
 			</button>
 
 			<nav class="site-nav" id="site-nav" aria-label="<?php esc_attr_e( 'Hlavná navigácia', 'cammino' ); ?>" data-nav>
-				<?php cammino_render_shared_menu( true ); ?>
+				<?php cammino_render_shared_menu(); ?>
 				<a class="nav-donate" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>"><?php esc_html_e( 'Darovať', 'cammino' ); ?> <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
 			</nav>
 		</div>
