@@ -493,7 +493,7 @@ h2 em {
   transform-origin: left;
 }
 
-.site-nav > a:last-child {
+.site-nav > .nav-donate {
   display: inline-flex;
   min-height: 2.85rem;
   align-items: center;
@@ -509,17 +509,17 @@ h2 em {
   transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
 }
 
-.site-nav > a:last-child i {
+.site-nav > .nav-donate i {
   font-size: 0.88em;
   line-height: 1;
 }
 
-.site-nav > a:last-child::after {
+.site-nav > .nav-donate::after {
   display: none;
 }
 
-.site-nav > a:last-child:hover,
-.site-nav > a:last-child:focus-visible {
+.site-nav > .nav-donate:hover,
+.site-nav > .nav-donate:focus-visible {
   color: var(--color-white);
   background: var(--color-coral-dark);
   box-shadow: 0 14px 30px rgba(217, 111, 93, 0.3);
@@ -809,13 +809,12 @@ h2 em {
     border: 0;
   }
 
-  .nav-donate,
-  .site-nav > a:last-child {
+  .site-nav > .nav-donate {
     align-self: flex-start;
     margin-top: 1rem;
   }
 
-  .site-nav > a:last-child {
+  .site-nav > .nav-donate {
     padding: 0.75rem 1.25rem;
   }
 

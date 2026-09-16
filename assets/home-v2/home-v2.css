@@ -73,15 +73,15 @@ body.home-v2-page .site-nav > a:not(.button, .language-link)::after {
   background-color: var(--v2-red);
 }
 
-body.home-v2-page .site-nav > a:last-child {
+body.home-v2-page .site-nav > .nav-donate {
   color: var(--v2-white);
   background-color: var(--v2-red-dark);
   background-image: none;
   box-shadow: 0 10px 24px rgba(232, 59, 57, 0.24);
 }
 
-body.home-v2-page .site-nav > a:last-child:hover,
-body.home-v2-page .site-nav > a:last-child:focus-visible {
+body.home-v2-page .site-nav > .nav-donate:hover,
+body.home-v2-page .site-nav > .nav-donate:focus-visible {
   color: var(--v2-white);
   background-color: var(--v2-blue-dark);
   box-shadow: 0 14px 30px rgba(2, 153, 181, 0.26);

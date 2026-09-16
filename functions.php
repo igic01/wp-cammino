@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'NSTARTER_VERSION', '1.9.75' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
-define( 'CAMMINO_DONATE_URL', 'https://ozcammino.sk/darovat-v2/' );
+define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
 
 require_once NSTARTER_PATH . '/inc/snapshots.php';
 require_once NSTARTER_PATH . '/inc/live-sections.php';
@@ -55,6 +55,23 @@ function cammino_normalize_donate_url( string $url ): string {
 }
 
 /**
+ * Check whether a WordPress menu item points to a donation destination.
+ */
+function cammino_is_donation_menu_url( string $url ): bool {
+	$path = wp_parse_url( $url, PHP_URL_PATH );
+
+	if ( ! is_string( $path ) ) {
+		return false;
+	}
+
+	return in_array(
+		trailingslashit( '/' . ltrim( $path, '/' ) ),
+		array( '/podporte-nas/', '/darovat-v2/', '/darujmeusmev/' ),
+		true
+	);
+}
+
+/**
  * Render WordPress menu links without list wrappers to match the static design.
  */
 class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
@@ -86,7 +103,10 @@ class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
 	 * @param int      $id     Current item ID.
 	 */
 	public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
-		if ( 0 !== $depth ) {
+		if (
+			0 !== $depth
+			|| ( ! empty( $args->exclude_donation_link ) && cammino_is_donation_menu_url( (string) $item->url ) )
+		) {
 			return;
 		}
 
@@ -139,16 +159,17 @@ class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
 /**
  * Render the shared Cammino menu.
  *
- * @param bool $with_cta_icon Whether to add a heart to the final menu link.
+ * @param bool $exclude_donation_link Whether to omit donation destinations.
  */
-function cammino_render_shared_menu( bool $with_cta_icon = false ): void {
+function cammino_render_shared_menu( bool $exclude_donation_link = false ): void {
 	$args = array(
-		'container'    => false,
-		'depth'        => 1,
-		'echo'         => false,
-		'fallback_cb'  => false,
-		'items_wrap'   => '%3$s',
-		'walker'       => new Cammino_Bare_Nav_Walker(),
+		'container'             => false,
+		'depth'                 => 1,
+		'echo'                  => false,
+		'exclude_donation_link' => $exclude_donation_link,
+		'fallback_cb'           => false,
+		'items_wrap'            => '%3$s',
+		'walker'                => new Cammino_Bare_Nav_Walker(),
 	);
 
 	if ( has_nav_menu( 'new-menu' ) ) {
@@ -160,19 +181,6 @@ function cammino_render_shared_menu( bool $with_cta_icon = false ): void {
 	$menu = wp_nav_menu( $args );
 
 	if ( is_string( $menu ) && '' !== trim( $menu ) ) {
-		if ( $with_cta_icon ) {
-			$closing_tag_position = strrpos( $menu, '</a>' );
-
-			if ( false !== $closing_tag_position ) {
-				$menu = substr_replace(
-					$menu,
-					'<i class="fa-solid fa-heart" aria-hidden="true"></i></a>',
-					$closing_tag_position,
-					4
-				);
-			}
-		}
-
 		echo $menu; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		return;
 	}
@@ -185,18 +193,11 @@ function cammino_render_shared_menu( bool $with_cta_icon = false ): void {
 		array( nstarter_get_source_page_url( 'contact', '/kontakt/' ), __( 'Kontakt', 'cammino' ) ),
 	);
 
-	$last_fallback_index = array_key_last( $fallback_links );
-
-	foreach ( $fallback_links as $index => $link ) {
-		$icon = $with_cta_icon && $index === $last_fallback_index
-			? '<i class="fa-solid fa-heart" aria-hidden="true"></i>'
-			: '';
-
+	foreach ( $fallback_links as $link ) {
 		printf(
-			'<a href="%s">%s%s</a>',
+			'<a href="%s">%s</a>',
 			esc_url( $link[0] ),
-			esc_html( $link[1] ),
-			$icon // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			esc_html( $link[1] )
 		);
 	}
 }
@@ -219,6 +220,7 @@ function cammino_render_site_header(): void {
 
 			<nav class="site-nav" id="site-nav" aria-label="<?php esc_attr_e( 'Hlavná navigácia', 'cammino' ); ?>" data-nav>
 				<?php cammino_render_shared_menu( true ); ?>
+				<a class="nav-donate" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>"><?php esc_html_e( 'Darovať', 'cammino' ); ?> <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
 			</nav>
 		</div>
 	</header>

@@ -70,15 +70,15 @@ body.home-v3-page .site-nav > a:not(.button, .language-link)::after {
   background-color: var(--v3-orange);
 }
 
-body.home-v3-page .site-nav > a:last-child {
+body.home-v3-page .site-nav > .nav-donate {
   color: var(--v3-white);
   background-color: var(--v3-red-deep);
   background-image: none;
   box-shadow: 0 10px 24px rgba(165, 31, 30, 0.24);
 }
 
-body.home-v3-page .site-nav > a:last-child:hover,
-body.home-v3-page .site-nav > a:last-child:focus-visible {
+body.home-v3-page .site-nav > .nav-donate:hover,
+body.home-v3-page .site-nav > .nav-donate:focus-visible {
   color: var(--v3-white);
   background-color: var(--v3-blue-deep);
 }

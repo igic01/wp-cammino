@@ -5,7 +5,8 @@
  * @package Cammino
  */
 
-$cammino_asset_url = NSTARTER_URL . '/assets';
+$cammino_asset_url  = NSTARTER_URL . '/assets';
+$cammino_donation_qr = 'https://ozcammino.sk/wp-content/uploads/2026/06/qrkoddarujmesk.jpeg';
 ?>
   <a class="skip-link" href="#main-content">Preskočiť na obsah</a>
 
@@ -167,6 +168,28 @@ $cammino_asset_url = NSTARTER_URL . '/assets';
             </article>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="section about-support" aria-label="Podporte OZ Cammino">
+      <div class="container">
+        <article class="about-support__card" data-about-reveal="up">
+          <div class="about-support__copy">
+            <div class="about-support__heart" aria-hidden="true">
+              <span><i class="fa-solid fa-heart"></i></span>
+            </div>
+            <span>Podporte nás</span>
+            <h2>Pomôžte dobrým veciam napredovať</h2>
+            <p>Každá podpora nám umožňuje vytvárať ďalšie príležitosti pre mladých ľudí a komunity.</p>
+            <a class="button button--cream" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>">Chcem pomôcť <span class="button-arrow"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
+          </div>
+
+          <div class="about-support__qr" aria-label="QR kód pre podporu OZ Cammino">
+            <a href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>" target="_blank" rel="noopener noreferrer" aria-label="Podporiť OZ Cammino (otvorí sa na novej karte)">
+              <img src="<?php echo esc_url( $cammino_donation_qr ); ?>" alt="QR kód na podporu OZ Cammino" width="800" height="800" loading="lazy">
+            </a>
+          </div>
+        </article>
       </div>
     </section>
   </main>

@@ -167,7 +167,7 @@ $cammino_partners    = array(
       </div>
     </section>
 
-    <section class="section community-cta" aria-labelledby="community-cta-title">
+    <section class="section community-cta community-cta--main-project" aria-labelledby="community-cta-title">
       <div class="container">
         <div class="community-cta-card">
           <div class="community-cta-media" data-reveal="left">

@@ -843,6 +843,140 @@
 .contact-person a:hover { color: var(--color-white); }
 .contact-person a:hover i { transform: translateX(5px); }
 
+.about-support {
+  padding-top: 0;
+}
+
+.about-support__card {
+  position: relative;
+  display: grid;
+  width: min(100%, 1120px);
+  min-height: 390px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.65fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  color: var(--color-plum);
+  background: var(--color-apricot);
+  box-shadow: 0 24px 58px rgba(80, 45, 54, 0.14);
+  transition: box-shadow 400ms ease, transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-support__card::after {
+  position: absolute;
+  right: -7rem;
+  bottom: -8rem;
+  width: 20rem;
+  height: 20rem;
+  border: 4rem solid rgba(100, 54, 75, 0.08);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.about-support__card:hover {
+  box-shadow: 0 32px 68px rgba(80, 45, 54, 0.2);
+  transform: translateY(-6px);
+}
+
+.about-support__copy,
+.about-support__qr {
+  position: relative;
+  z-index: 1;
+}
+
+.about-support__heart {
+  display: grid;
+  width: 4.4rem;
+  height: 4.4rem;
+  margin-bottom: 1.75rem;
+  place-items: center;
+  animation: about-support-heart-float 4s ease-in-out infinite;
+}
+
+.about-support__heart > span {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--color-white);
+  background: var(--color-coral);
+  box-shadow: 0 16px 34px rgba(100, 54, 75, 0.2);
+  font-size: 1.3rem;
+  transition: color 300ms ease, background-color 300ms ease, transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-support__card:hover .about-support__heart > span {
+  color: var(--color-plum);
+  background: var(--color-white);
+  transform: rotate(-8deg) scale(1.06);
+}
+
+@keyframes about-support-heart-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.about-support__copy > span {
+  color: var(--color-plum);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.about-support__copy h2 {
+  max-width: 15ch;
+  margin: 0.55rem 0 1rem;
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  line-height: 1.08;
+}
+
+.about-support__copy p {
+  max-width: 34rem;
+  margin-bottom: 1.5rem;
+  color: rgba(78, 40, 58, 0.78);
+}
+
+.about-support__qr {
+  display: flex;
+  justify-content: center;
+}
+
+.about-support__qr a {
+  position: relative;
+  display: grid;
+  width: min(100%, 250px);
+  aspect-ratio: 1;
+  padding: 0.7rem;
+  place-items: center;
+  overflow: hidden;
+  border: 8px solid var(--color-white);
+  border-radius: 24px;
+  background: var(--color-white);
+  box-shadow: 0 22px 45px rgba(100, 54, 75, 0.19);
+  transition: box-shadow 300ms ease, transform 300ms ease;
+}
+
+.about-support__qr a:hover,
+.about-support__qr a:focus-visible {
+  box-shadow: 0 30px 58px rgba(100, 54, 75, 0.27);
+  transform: translateY(-4px);
+}
+
+.about-support__qr img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
 @media (max-width: 1050px) {
   .about-hero__grid,
   .europe-grid {
@@ -884,7 +1018,8 @@
   .hero-path-line { right: -1rem; width: 9rem; }
 
   .identity-grid,
-  .info-card {
+  .info-card,
+  .about-support__card {
     grid-template-columns: 1fr;
   }
 
@@ -903,6 +1038,13 @@
   .europe-badge { right: 0; width: 5rem; height: 5rem; }
   .europe-note { right: 0; }
   .info-card { border-radius: var(--radius-md); }
+  .about-support__card {
+    width: min(100%, 760px);
+    min-height: 0;
+    gap: 2.5rem;
+    border-radius: var(--radius-md);
+  }
+  .about-support__qr { justify-content: flex-start; }
 }
 
 @media (max-width: 560px) {
@@ -930,6 +1072,9 @@
   .contact-person { grid-template-columns: 1fr; }
   .contact-person:hover { transform: translateY(-5px); }
   .mission-inner h2 { font-size: clamp(2rem, 9vw, 2.8rem); }
+  .about-support__card { padding: 1.6rem; }
+  .about-support__copy .button { width: 100%; }
+  .about-support__qr { justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -950,6 +1095,16 @@
   .europe-note.is-popped,
   .mission-steps:hover span {
     animation: none;
+  }
+
+  .about-support__heart {
+    animation: none;
+  }
+
+  .about-support__card:hover,
+  .about-support__qr a:hover,
+  .about-support__qr a:focus-visible {
+    transform: none;
   }
 
   .about-hero__visual.is-visible .hero-path-line path {

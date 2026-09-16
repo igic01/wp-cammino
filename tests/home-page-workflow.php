@@ -17,7 +17,7 @@ function home_expect( $condition, $message ) {
 	}
 }
 
-$community_start = strpos( $template, '<section class="section community-cta"' );
+$community_start = strpos( $template, '<section class="section community-cta community-cta--main-project"' );
 $community_end   = false !== $community_start ? strpos( $template, '</section>', $community_start ) : false;
 $community       = false !== $community_start && false !== $community_end
 	? substr( $template, $community_start, $community_end - $community_start )
@@ -42,7 +42,7 @@ home_expect( str_contains( $editor, 'populateProjectPicker' ) && str_contains( $
 home_expect( str_contains( $variables, "'projects'" ) && str_contains( $variables, "'project-picker'" ), 'The variable schema accepts project-picker controls.' );
 home_expect( str_contains( $styles, '.home-projects__grid > .nstarter-live-section' ) && str_contains( $styles, '.home-project-card' ), 'The selected-project section and cards are styled.' );
 home_expect( str_contains( $styles, '.home-page .home-project-card' ), 'The standard homepage gives all project cards the same surface color.' );
-home_expect( str_contains( $styles, '.home-page #main-content:not([class]) .community-cta' ) && str_contains( $styles, 'background: #c9d8c0;' ) && str_contains( $styles, '.community-cta-copy > p' ), 'The standard homepage community CTA has the requested sage background and styled project copy.' );
+home_expect( str_contains( $styles, '.home-page #main-content:not([class]) .community-cta--main-project' ) && str_contains( $styles, 'background: #3b405f;' ) && str_contains( $styles, '.community-cta-copy > p' ), 'The standard homepage community CTA uses the main-project slate-plum palette and styled project copy.' );
 home_expect( str_contains( $template, "'/assets/images/logopng-1.webp'" ), 'The community CTA uses the supplied project image by default.' );
 home_expect( str_contains( $community, '<span>S Darujeme úsmev</span><em>už podprili</em>' ), 'The community CTA uses the requested two-line title.' );
 home_expect( str_contains( $template, "nstarter_get_source_page_url( 'contact2', '/zapojte-sa/' )" ), 'The involvement CTA resolves the page using the contact2 template.' );
@@ -66,7 +66,7 @@ $ordered_sections = array(
 	'class="section home-projects"',
 	'class="section events"',
 	'class="section story-section"',
-	'class="section community-cta"',
+	'class="section community-cta community-cta--main-project"',
 	'class="section home-involvement"',
 	'class="section donate"',
 	'class="section home-partners"',
