@@ -32,7 +32,7 @@ $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 
 	<section class="donation-checkout-section section" aria-labelledby="checkout-title">
 		<div class="container">
-			<a class="article-back checkout-back" href="<?php echo esc_url( $cammino_donate_url ); ?>" data-detail-reveal="up"><i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i> Späť na možnosti podpory</a>
+			<a class="article-back checkout-back" href="<?php echo esc_url( $cammino_donate_url ); ?>" target="_blank" rel="noopener noreferrer" data-detail-reveal="up"><i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i> Späť na možnosti podpory</a>
 
 			<div class="checkout-grid">
 				<div class="checkout-cause" data-detail-reveal="up">
@@ -67,7 +67,7 @@ $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 
 	<section class="related-section section" aria-labelledby="other-donations-title">
 		<div class="container">
-			<div class="related-heading" data-detail-reveal="up"><div><span>Podporte ďalší krok</span><h2 id="other-donations-title">Ďalšie možnosti pomoci</h2></div><a href="<?php echo esc_url( $cammino_donate_url ); ?>">Všetky možnosti <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a></div>
+			<div class="related-heading" data-detail-reveal="up"><div><span>Podporte ďalší krok</span><h2 id="other-donations-title">Ďalšie možnosti pomoci</h2></div><a href="<?php echo esc_url( $cammino_donate_url ); ?>" target="_blank" rel="noopener noreferrer">Všetky možnosti <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a></div>
 			<div class="related-grid">
 				<a class="related-card related-card--sage" href="<?php echo esc_url( add_query_arg( 'cause', 'education', $cammino_detail_url ) ); ?>" data-donation-option="education" data-detail-reveal="up"><div class="related-card__image"><img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Vzdelávanie a mentoring" width="700" height="480" loading="lazy"><span>Vzdelávanie</span></div><div class="related-card__body"><small>Kurzy a osobné vedenie</small><h3>Vzdelávanie a mentoring</h3><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></div></a>
 				<a class="related-card related-card--apricot" href="<?php echo esc_url( add_query_arg( 'cause', 'workshops', $cammino_detail_url ) ); ?>" data-donation-option="workshops" data-detail-reveal="up" data-delay="100"><div class="related-card__image"><img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Praktické dielne" width="700" height="480" loading="lazy"><span>Dielne</span></div><div class="related-card__body"><small>Materiály a nové zručnosti</small><h3>Praktické dielne</h3><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></div></a>

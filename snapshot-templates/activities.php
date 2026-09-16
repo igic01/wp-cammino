@@ -183,7 +183,7 @@ $cammino_main_project_url = nstarter_get_source_page_url( 'main-project', '/daru
           <p>Darujte svoj čas, podeľte sa o skúsenosti alebo podporte naše aktivity. Každý z nás môže prispieť.</p>
           <div class="activities-invitation__actions">
             <a class="button button--cream" href="<?php echo esc_url( $cammino_contact_url ); ?>">Chcem sa zapojiť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
-            <a class="text-link" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>">Podporiť aktivity <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
+            <a class="text-link" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>" target="_blank" rel="noopener noreferrer">Podporiť aktivity <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
           </div>
         </div>
       </div>

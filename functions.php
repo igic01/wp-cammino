@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.76' );
+define( 'NSTARTER_VERSION', '1.9.77' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
@@ -105,7 +105,10 @@ class Cammino_Bare_Nav_Walker extends Walker_Nav_Menu {
 			$attributes['class'] = $class_attribute;
 		}
 
-		if ( '_blank' === $item->target ) {
+		if ( CAMMINO_DONATE_URL === $attributes['href'] ) {
+			$attributes['target'] = '_blank';
+			$attributes['rel']    = 'noopener noreferrer';
+		} elseif ( '_blank' === $item->target ) {
 			$attributes['target'] = '_blank';
 			$attributes['rel']    = trim( (string) $item->xfn . ' noopener noreferrer' );
 		} elseif ( ! empty( $item->xfn ) ) {
@@ -197,7 +200,7 @@ function cammino_render_site_header(): void {
 
 			<nav class="site-nav" id="site-nav" aria-label="<?php esc_attr_e( 'Hlavná navigácia', 'cammino' ); ?>" data-nav>
 				<?php cammino_render_shared_menu(); ?>
-				<a class="nav-donate" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>"><?php esc_html_e( 'Darovať', 'cammino' ); ?> <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
+				<a class="nav-donate" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Darovať', 'cammino' ); ?> <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
 			</nav>
 		</div>
 	</header>

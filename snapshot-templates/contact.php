@@ -87,7 +87,7 @@ $cammino_asset_url = NSTARTER_URL . '/assets';
               <span>Podporte nás</span>
               <h3>Pomôžte dobrým veciam napredovať</h3>
               <p>Každá podpora nám umožňuje vytvárať ďalšie príležitosti pre mladých ľudí a komunity.</p>
-              <a class="button button--cream" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>">Chcem pomôcť <span class="button-arrow"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
+              <a class="button button--cream" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>" target="_blank" rel="noopener noreferrer">Chcem pomôcť <span class="button-arrow"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
             </div>
 
             <div class="qr-wrap" aria-label="QR kód pre podporu OZ Cammino">

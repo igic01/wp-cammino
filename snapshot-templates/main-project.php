@@ -159,7 +159,7 @@ $cammino_donate_url         = CAMMINO_DONATE_URL;
 					<p>Každý dar a každé zapojenie pomáha vytvárať príbeh solidarity, ktorý prináša radosť a nádej deťom a rodinám.</p>
 				</div>
 				<div class="donate-action">
-					<a class="button button--cream" href="<?php echo esc_url( $cammino_donate_url ); ?>">Chcem pomôcť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-heart"></i></span></a>
+					<a class="button button--cream" href="<?php echo esc_url( $cammino_donate_url ); ?>" target="_blank" rel="noopener noreferrer">Chcem pomôcť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-heart"></i></span></a>
 					<small>Pomoc deťom a rodinám tam, kde je potrebná</small>
 				</div>
 			</div>

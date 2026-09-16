@@ -45,7 +45,7 @@ $cammino_partners    = array(
           <h1 id="hero-title">Priestor, kde sa ľudia spájajú pre <em>pozitívnu zmenu</em></h1>
           <p class="hero-lead">OZ Cammino prepája vzdelávanie, osobný rozvoj a komunitnú spoluprácu. Vytvárame príležitosti, vďaka ktorým môžu mladí ľudia rozvíjať svoj potenciál a aktívne meniť svoje okolie.</p>
           <div class="hero-actions">
-            <a class="button button--coral" href="<?php echo esc_url( $cammino_donate_url ); ?>">Podporte naše aktivity <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
+            <a class="button button--coral" href="<?php echo esc_url( $cammino_donate_url ); ?>" target="_blank" rel="noopener noreferrer">Podporte naše aktivity <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>
             <a class="text-link" href="#about">Spoznajte Cammino <span aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span></a>
           </div>
         </div>
@@ -258,7 +258,7 @@ $cammino_partners    = array(
             <p>Váš príspevok podporí vzdelávanie, praktické dielne, komunitné aktivity a priamu pomoc tam, kde je práve najviac potrebná.</p>
           </div>
           <div class="donate-action">
-            <a class="button button--cream" href="<?php echo esc_url( $cammino_donate_url ); ?>">Chcem pomôcť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-heart"></i></span></a>
+            <a class="button button--cream" href="<?php echo esc_url( $cammino_donate_url ); ?>" target="_blank" rel="noopener noreferrer">Chcem pomôcť <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-heart"></i></span></a>
             <small>Podpora vzdelávania, komunít a solidarity</small>
           </div>
         </div>

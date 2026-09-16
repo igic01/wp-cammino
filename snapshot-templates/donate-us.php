@@ -14,7 +14,7 @@ $cammino_placeholder = NSTARTER_URL . '/assets/images/placeholder.webp';
 		<img class="support-hero__photo" src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="" aria-hidden="true">
 		<div class="container support-shell">
 			<div class="support-opening">
-				<a class="support-back" href="<?php echo esc_url( $cammino_donate_url ); ?>" data-us-reveal="up"><i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i> Späť na možnosti podpory</a>
+				<a class="support-back" href="<?php echo esc_url( $cammino_donate_url ); ?>" target="_blank" rel="noopener noreferrer" data-us-reveal="up"><i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i> Späť na možnosti podpory</a>
 
 				<div class="support-intro" data-us-reveal="up">
 					<span class="support-intro__icon" aria-hidden="true"><i class="fa-solid fa-hand-holding-heart"></i></span>

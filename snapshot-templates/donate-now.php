@@ -67,7 +67,7 @@ $cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
               <span>Podporte nás</span>
               <h3>Pomôžte dobrým veciam napredovať</h3>
               <p>Každá podpora nám umožňuje vytvárať ďalšie príležitosti pre mladých ľudí a komunity.</p>
-              <a class="button button--cream" href="https://cammino.darujme.sk/darujmeusmev/">Chcem pomôcť <span class="button-arrow"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
+              <a class="button button--cream" href="https://cammino.darujme.sk/darujmeusmev/" target="_blank" rel="noopener noreferrer">Chcem pomôcť <span class="button-arrow"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
             </div>
 
             <div class="qr-wrap" aria-label="QR kód pre podporu OZ Cammino">

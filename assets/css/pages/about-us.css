@@ -850,7 +850,7 @@
 .about-support__card {
   position: relative;
   display: grid;
-  width: min(100%, 1120px);
+  width: 100%;
   min-height: 390px;
   grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.65fr);
   align-items: center;
@@ -1039,7 +1039,7 @@
   .europe-note { right: 0; }
   .info-card { border-radius: var(--radius-md); }
   .about-support__card {
-    width: min(100%, 760px);
+    width: 100%;
     min-height: 0;
     gap: 2.5rem;
     border-radius: var(--radius-md);

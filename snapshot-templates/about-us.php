@@ -181,7 +181,7 @@ $cammino_donation_qr = 'https://ozcammino.sk/wp-content/uploads/2026/06/qrkoddar
             <span>Podporte nás</span>
             <h2>Pomôžte dobrým veciam napredovať</h2>
             <p>Každá podpora nám umožňuje vytvárať ďalšie príležitosti pre mladých ľudí a komunity.</p>
-            <a class="button button--cream" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>">Chcem pomôcť <span class="button-arrow"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
+            <a class="button button--cream" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>" target="_blank" rel="noopener noreferrer">Chcem pomôcť <span class="button-arrow"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
           </div>
 
           <div class="about-support__qr" aria-label="QR kód pre podporu OZ Cammino">
