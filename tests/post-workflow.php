@@ -137,4 +137,15 @@ expect( $GLOBALS['test_post_terms'][1] === array( $selected_categories[1], $even
 wp_set_post_terms( 2, $selected_categories, 'category', false );
 cammino_enforce_single_post_category( 2, array(), array(), 'post_tag' );
 expect( $GLOBALS['test_post_terms'][2] === $selected_categories, 'Other taxonomies are unaffected' );
+expect( cammino_get_post_social_links( 2 ) === array( 'facebook', 'instagram', 'copy' ), 'Existing posts show all three social controls by default' );
+cammino_save_post_social_links( 2, 'instagram,copy,invalid,instagram' );
+expect( cammino_get_post_social_links( 2 ) === array( 'instagram', 'copy' ), 'Per-post social settings retain only valid unique selections' );
+expect( cammino_get_post_social_links( 1 ) === array( 'facebook', 'instagram', 'copy' ), 'Social visibility is independent for each post' );
+ob_start();
+cammino_render_post_social_links( 2 );
+$social_html = ob_get_clean();
+expect( str_contains( $social_html, 'https://www.facebook.com/darujmeusmev' ) && str_contains( $social_html, 'https://www.instagram.com/oz.cammino/' ) && ! str_contains( $social_html, 'linkedin' ), 'Post controls use the supplied profile URLs instead of LinkedIn' );
+expect( str_contains( $social_html, 'aria-label="Facebook" hidden' ) && ! str_contains( $social_html, 'aria-label="Instagram" hidden' ) && str_contains( $social_html, 'data-share="copy"' ), 'Rendering honors visibility and retains copy-link behavior' );
+cammino_save_post_social_links( 2, '' );
+expect( cammino_get_post_social_links( 2 ) === array(), 'Hide all persists instead of reverting to defaults' );
 echo "Passed $checks post workflow checks.\n";

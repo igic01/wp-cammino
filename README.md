@@ -219,6 +219,12 @@ Run `node tests/editor-history-workflow.mjs` for the Chrome UI check. Set
 The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.
 
+All post layouts use Facebook `https://www.facebook.com/darujmeusmev` and
+Instagram `https://www.instagram.com/oz.cammino/`. The link icon still copies
+the current post URL. In the visual editor, use the **Social links** section
+variable to select a combination of Facebook, Instagram and Copy link, or
+**Hide all**. Press **Save** to store that post's visibility choice.
+
 The original donation forms are interactive design previews only. They do not
 collect, transmit, or process payments.
 

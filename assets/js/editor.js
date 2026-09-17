@@ -859,11 +859,10 @@
         variableToolsLayer.setAttribute('contenteditable', 'false');
 
         const sections = Array.from(root.querySelectorAll('[data-nstarter-variable-section]'));
-        const postDetailsSection = config.isPost
-            ? doc.querySelector('[data-cammino-post-details-element][data-nstarter-variable-section]')
-            : null;
-        if (postDetailsSection && !sections.includes(postDetailsSection)) {
-            sections.unshift(postDetailsSection);
+        if (config.isPost) {
+            doc.querySelectorAll('[data-cammino-post-details-element][data-nstarter-variable-section], [data-cammino-post-social][data-nstarter-variable-section]').forEach(function (section) {
+                if (!sections.includes(section)) sections.unshift(section);
+            });
         }
 
         sections.forEach(function (section) {
@@ -1178,7 +1177,8 @@
         const control = section.dataset.nstarterVariableControl || 'repeat';
         const isProjectPicker = variableType === 'projects' && control === 'project-picker';
         const isEventPicker = variableType === 'events' && control === 'event-picker';
-        const isPostPicker = isProjectPicker || isEventPicker;
+        const isSocialPicker = control === 'social-picker';
+        const isPostPicker = isProjectPicker || isEventPicker || isSocialPicker;
         const inputType = variableType === 'text' || isPostPicker ? 'text' : (variableType === 'boolean' ? 'checkbox' : 'number');
 
         variableTitle.textContent = config.strings.editSectionVariable;
@@ -1206,7 +1206,19 @@
             }
         });
 
-        if (isProjectPicker) {
+        if (isSocialPicker) {
+            variableProjectPicker.replaceChildren();
+            const select = document.createElement('select');
+            select.setAttribute('data-nstarter-social-select', '');
+            select.setAttribute('aria-label', label);
+            const choices = [['facebook', 'Facebook'], ['instagram', 'Instagram'], ['copy', config.strings.copyLink]];
+            for (let mask = 0; mask < 8; mask++) {
+                const included = choices.filter((choice, index) => mask & (1 << index));
+                select.add(new Option(included.map(choice => choice[1]).join(' + ') || config.strings.hideSocialLinks, included.map(choice => choice[0]).join(',')));
+            }
+            select.value = section.dataset.nstarterVariableValue || '';
+            variableProjectPicker.appendChild(select);
+        } else if (isProjectPicker) {
             populateProjectPicker(section);
         } else if (isEventPicker) {
             populateEventPicker(section);
@@ -1214,7 +1226,7 @@
 
         variableDialog.showModal();
         if (isPostPicker) {
-            const firstProject = variableProjectPicker && variableProjectPicker.querySelector('input:not(:disabled)');
+            const firstProject = variableProjectPicker && variableProjectPicker.querySelector('input:not(:disabled), select');
             (firstProject || variableCancel).focus();
         } else {
             variableInput.focus();
@@ -1295,7 +1307,7 @@
 
         const type = section.dataset.nstarterVariableType || 'number';
         const configuredControl = section.dataset.nstarterVariableControl || 'repeat';
-        const supportedControls = ['text', 'project-picker', 'event-picker'];
+        const supportedControls = ['text', 'project-picker', 'event-picker', 'social-picker'];
         const control = supportedControls.includes(configuredControl) ? configuredControl : 'repeat';
         let value = type === 'boolean' ? (variableInput.checked ? 1 : 0) : variableInput.value;
 
@@ -1361,7 +1373,16 @@
             }
         }
 
-        if (type === 'projects' || type === 'events') {
+        if (control === 'social-picker') {
+            const select = variableProjectPicker.querySelector('[data-nstarter-social-select]');
+            if (!select) return;
+            value = select.value;
+            const selected = value.split(',');
+            section.querySelectorAll('[data-cammino-social]').forEach(function (item) {
+                item.hidden = !selected.includes(item.dataset.camminoSocial);
+            });
+            section.classList.toggle('article-share--empty', !value);
+        } else if (type === 'projects' || type === 'events') {
             // The post pickers already updated their live sections above.
         } else if (control === 'repeat') {
             const resized = type === 'number' || type === 'boolean' ? resizeRepeatSection(section, value) : false;
@@ -2183,7 +2204,7 @@
         }
 
         Object.keys(extraData || {}).forEach(function (key) {
-            body.append(key, extraData[key]);
+            if (extraData[key] !== undefined) body.append(key, extraData[key]);
         });
 
         const response = await fetch(config.ajaxUrl, {
@@ -2242,6 +2263,9 @@
                 event_location: postDetails.eventLocation,
                 event_type: postDetails.eventType,
                 category: postDetails.category,
+                social_links: config.isPost && frameDocument().querySelector('[data-cammino-post-social]')
+                    ? frameDocument().querySelector('[data-cammino-post-social]').dataset.nstarterVariableValue
+                    : undefined,
                 hide_image: postDetails.hideImage ? '1' : '0'
             });
             dirty = false;

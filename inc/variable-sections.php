@@ -29,7 +29,7 @@ function nstarter_variable_section_attributes( string $id, array $config = array
 	$type    = isset( $config['type'] ) && in_array( $config['type'], array( 'text', 'boolean', 'projects', 'events' ), true )
 		? $config['type']
 		: 'number';
-	$control = isset( $config['control'] ) && in_array( $config['control'], array( 'text', 'project-picker', 'event-picker' ), true )
+	$control = isset( $config['control'] ) && in_array( $config['control'], array( 'text', 'project-picker', 'event-picker', 'social-picker' ), true )
 		? $config['control']
 		: 'repeat';
 	$value   = isset( $config['value'] ) && is_scalar( $config['value'] ) ? (string) $config['value'] : '';

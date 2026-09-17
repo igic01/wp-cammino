@@ -546,7 +546,8 @@ body.nstarter-editor-shell {
     font-weight: 600;
 }
 
-.nstarter-variable-dialog input {
+.nstarter-variable-dialog input,
+.nstarter-variable-dialog select {
     width: 100%;
     height: 38px;
     padding: 0 10px;

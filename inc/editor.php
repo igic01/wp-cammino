@@ -140,6 +140,8 @@ function nstarter_maybe_render_editor(): void {
 				'mergeWarning' => __( 'Some saved content could not be matched to the updated layout. Previous HTML remains stored in History.', 'cammino' ),
 				'noHistory' => __( 'No saved versions yet.', 'cammino' ),
 				'currentVersion' => __( 'Current save', 'cammino' ),
+				'copyLink' => __( 'Copy link', 'cammino' ),
+				'hideSocialLinks' => __( 'Hide all', 'cammino' ),
 				'loadingHistory' => __( 'Loading saved content…', 'cammino' ),
 				'chooseMedia'       => __( 'Choose an image or video', 'nstarter' ),
 				'useMedia'          => __( 'Use this media', 'nstarter' ),
@@ -478,6 +480,9 @@ function nstarter_ajax_regenerate_snapshot(): void {
 
 	if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
 		wp_send_json_error( array( 'message' => __( 'You cannot edit this page.', 'nstarter' ) ), 403 );
+	}
+	if ( 'post' === get_post_type( $post_id ) && isset( $_POST['social_links'] ) ) {
+		cammino_save_post_social_links( $post_id, (string) wp_unslash( $_POST['social_links'] ) );
 	}
 	if ( 'page' === get_post_type( $post_id ) ) {
 		nstarter_require_snapshot_context( $post_id );

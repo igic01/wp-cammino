@@ -126,6 +126,32 @@ function cammino_get_editable_post_category( int $post_id ): array {
 	return array( 'id' => 0, 'slug' => '', 'name' => '' );
 }
 
+/** Each post chooses which profile links and copy-link button are visible. */
+function cammino_get_post_social_links( int $post_id ): array {
+	$stored = json_decode( (string) get_post_meta( $post_id, '_cammino_post_social_links', true ), true );
+	return is_array( $stored ) ? array_values( array_intersect( array( 'facebook', 'instagram', 'copy' ), $stored ) ) : array( 'facebook', 'instagram', 'copy' );
+}
+
+function cammino_save_post_social_links( int $post_id, string $value ): void {
+	$selected = array_values( array_intersect( array( 'facebook', 'instagram', 'copy' ), explode( ',', $value ) ) );
+	update_post_meta( $post_id, '_cammino_post_social_links', wp_slash( wp_json_encode( $selected ) ) );
+}
+
+function cammino_render_post_social_links( int $post_id ): void {
+	$selected = cammino_get_post_social_links( $post_id );
+	?>
+	<aside class="article-share<?php echo ! $selected ? ' article-share--empty' : ''; ?>" aria-label="Sociálne odkazy" data-article-reveal="left" data-cammino-post-social <?php
+	nstarter_variable_section_attributes( 'cammino_post_social', array( 'label' => __( 'Social links', 'cammino' ), 'type' => 'text', 'control' => 'social-picker', 'value' => implode( ',', $selected ) ) );
+	?>>
+		<span>Sociálne odkazy</span>
+		<a href="https://www.facebook.com/darujmeusmev" target="_blank" rel="noopener noreferrer" data-cammino-social="facebook" aria-label="Facebook"<?php echo ! in_array( 'facebook', $selected, true ) ? ' hidden' : ''; ?>><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+		<a href="https://www.instagram.com/oz.cammino/" target="_blank" rel="noopener noreferrer" data-cammino-social="instagram" aria-label="Instagram"<?php echo ! in_array( 'instagram', $selected, true ) ? ' hidden' : ''; ?>><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+		<button type="button" data-share="copy" data-cammino-social="copy" aria-label="Kopírovať odkaz"<?php echo ! in_array( 'copy', $selected, true ) ? ' hidden' : ''; ?>><i class="fa-solid fa-link" aria-hidden="true"></i></button>
+		<span class="copy-feedback" role="status" aria-live="polite" data-copy-feedback></span>
+	</aside>
+	<?php
+}
+
 /** Find or create one category and make it the post's editable category. */
 function cammino_set_post_category( int $post_id, string $category_name ): bool {
 	$category_name = sanitize_text_field( $category_name );

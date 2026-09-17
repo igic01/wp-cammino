@@ -120,13 +120,7 @@ foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 				</dl>
 			<?php endif; ?>
 			<div class="container article-layout">
-				<aside class="article-share" aria-label="Zdieľať" data-article-reveal="left">
-					<span>Zdieľať</span>
-					<button type="button" data-share="facebook" aria-label="Zdieľať na Facebooku"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></button>
-					<button type="button" data-share="linkedin" aria-label="Zdieľať na LinkedIn"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></button>
-					<button type="button" data-share="copy" aria-label="Kopírovať odkaz"><i class="fa-solid fa-link" aria-hidden="true"></i></button>
-					<span class="copy-feedback" role="status" aria-live="polite" data-copy-feedback></span>
-				</aside>
+				<?php cammino_render_post_social_links( $cammino_post_id ); ?>
 
 				<div class="article-content" data-nstarter-snapshot-root data-nstarter-content-builder="article" data-nstarter-content-label="Obsah príspevku">
 					<?php echo $cammino_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

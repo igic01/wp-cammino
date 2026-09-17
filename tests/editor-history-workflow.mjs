@@ -19,7 +19,7 @@ const state = {
     token: 'token-1',
     current: '<h1 id="title">Current client heading</h1><p id="removed">Recover this copy</p>',
     previous: '<h1 id="title">Older client heading</h1><script>top.previewScriptRan=true</script>',
-    saves: [], restores: 0, conflicts: ['p#removed: saved content could not be matched']
+    saves: [], restores: 0, social: 'facebook,instagram,copy', conflicts: ['p#removed: saved content could not be matched']
 };
 const previewMarkup = (html) => '<main id="main-content"><section id="hero"><h2 id="title" class="new-layout">'
     + (html.match(/<h[12][^>]*>(.*?)<\/h[12]>/s)?.[1] || 'Default heading') + '</h2></section></main>';
@@ -29,12 +29,12 @@ const fixture = `<!doctype html><html><head><link rel="stylesheet" href="/editor
 <select data-nstarter-mode><option value="text">Text</option><option value="media">Media</option></select>
 <button data-nstarter-save>Save</button><a data-nstarter-view>View</a><button data-nstarter-history>History</button></aside>
 <dialog data-nstarter-video-dialog><form data-nstarter-video-form></form><button data-nstarter-video-cancel></button></dialog>
-<dialog data-nstarter-variable-dialog><form data-nstarter-variable-form></form><button data-nstarter-variable-cancel></button></dialog>
+<dialog data-nstarter-variable-dialog><form data-nstarter-variable-form><h2 data-nstarter-variable-title></h2><span data-nstarter-variable-label></span><input data-nstarter-variable-input><div data-nstarter-variable-project-picker hidden></div><p data-nstarter-variable-picker-hint hidden></p><button type="submit">Apply</button></form><button data-nstarter-variable-cancel></button></dialog>
 <dialog data-nstarter-history-dialog class="nstarter-history-dialog"><select data-nstarter-history-version></select>
 <p data-nstarter-history-status></p><button data-nstarter-regenerate>Reset to defaults</button><button data-nstarter-history-close>Close</button><button data-nstarter-history-restore disabled>Restore</button></dialog>
 <script>window.nstarterEditor={ajaxUrl:'/ajax',nonce:'test',postId:1,source:'home',previewUrl:'/preview',isPost:false,strings:{
 confirmSaveConflicts:'Review unmatched content. Save anyway?',mergeWarning:'Review saved content in History.',confirmRestore:'Restore content?',confirmRegenerate:'Reset content?',
-noHistory:'No saved versions.',currentVersion:'Current save',loadingHistory:'Loading',saved:'Saved',unsaved:'Unsaved',error:'Failed',regenerated:'Reset'}};</script>
+noHistory:'No saved versions.',currentVersion:'Current save',loadingHistory:'Loading',saved:'Saved',unsaved:'Unsaved',error:'Failed',regenerated:'Reset',copyLink:'Copy link',hideSocialLinks:'Hide all',editSectionVariable:'Edit section variable'}};</script>
 <script src="/editor.js"></script></body></html>`.replaceAll('<button ', '<button type="button" ');
 const requests = [];
 
@@ -47,6 +47,11 @@ const server = createServer(async (req, res) => {
     } else if (pathname === '/font.woff2') {
         res.setHeader('Content-Type', 'font/woff2');
         res.end(readFileSync(join(root, 'assets/fonts/fredoka.woff2')));
+    } else if (pathname === '/social-preview') {
+        res.setHeader('Content-Type', 'text/html');
+        const selected = state.social.split(',');
+        const items = ['facebook', 'instagram', 'copy'].map(item => `<button data-cammino-social="${item}" ${selected.includes(item) ? '' : 'hidden'}>${item}</button>`).join('');
+        res.end(`<!doctype html><html><body class="nstarter-editor-preview"><aside data-cammino-post-social data-nstarter-variable-section="cammino_post_social" data-nstarter-variable-label="Social links" data-nstarter-variable-type="text" data-nstarter-variable-control="social-picker" data-nstarter-variable-value="${state.social}">${items}</aside><div data-nstarter-snapshot-root><p>Post content</p></div></body></html>`);
     } else if (pathname === '/preview') {
         res.setHeader('Content-Type', 'text/html');
         const url = new URL(req.url, 'http://localhost');
@@ -61,7 +66,7 @@ const server = createServer(async (req, res) => {
         const form = await new Request('http://localhost/ajax', { method: 'POST', headers: req.headers, body: Buffer.concat(chunks) }).formData();
         requests.push(String(form.get('action')));
         res.setHeader('Content-Type', 'application/json');
-        if (form.get('source') !== 'home' || form.get('snapshot_token') !== state.token) {
+        if (form.has('source') && (form.get('source') !== 'home' || form.get('snapshot_token') !== state.token)) {
             res.statusCode = 409;
             res.end(JSON.stringify({ success: false, data: { message: 'Reload the stale editor.' } }));
             return;
@@ -76,6 +81,7 @@ const server = createServer(async (req, res) => {
             data = { versionId: 'previous', snapshotToken: state.token };
             break;
         case 'nstarter_save_snapshot':
+            if (form.has('social_links')) state.social = form.get('social_links');
             state.saves.push(form.get('html'));
             state.current = form.get('html');
             state.token += '-saved';
@@ -93,7 +99,7 @@ const server = createServer(async (req, res) => {
         res.end(JSON.stringify({ success: true, data }));
     } else {
         res.setHeader('Content-Type', 'text/html');
-        res.end(fixture);
+        res.end(pathname === '/social-editor' ? fixture.replaceAll('/preview', '/social-preview').replace('isPost:false', 'isPost:true') : fixture);
     }
 });
 server.listen(0, '127.0.0.1');
@@ -182,6 +188,23 @@ try {
     await check(`document.querySelector('[data-nstarter-history-dialog]').open && !document.querySelector('[data-nstarter-regenerate]').disabled`, 'History offers Reset to defaults');
     await evaluate(`document.querySelector('[data-nstarter-regenerate]').click()`);
     await check(`!document.querySelector('[data-nstarter-history-dialog]').open && document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('#title')?.textContent==='Default heading'`, 'Reset from History closes the dialog and reloads defaults');
+    await call('Page.navigate', { url: address + '/social-editor' });
+    await check(`!!document.querySelector('[data-nstarter-frame]')?.contentDocument?.querySelector('[data-nstarter-variable-edit]')`, 'The post social section outside the saved body has a variable control');
+    await evaluate(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('[data-nstarter-variable-edit]').click()`);
+    await check(`document.querySelector('[data-nstarter-social-select]')?.options.length===8`, 'Social dropdown offers all combinations and Hide all');
+    await evaluate(`document.querySelector('[data-nstarter-social-select]').value='instagram,copy';document.querySelector('[data-nstarter-variable-form]').requestSubmit()`);
+    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('[data-cammino-social="facebook"]').hidden && !document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('[data-cammino-social="instagram"]').hidden`, 'Applying a social choice immediately updates visibility');
+    if (state.social !== 'facebook,instagram,copy') throw new Error('Social draft persisted before Save');
+    await evaluate(`document.querySelector('[data-nstarter-save]').click()`);
+    await check(`document.querySelector('[data-nstarter-status]').classList.contains('is-success')`, 'Saving a post persists social selection');
+    if (state.social !== 'instagram,copy') throw new Error('Social selection was omitted from the save request');
+    await call('Page.navigate', { url: address + '/social-editor' });
+    await check(`document.querySelector('[data-nstarter-frame]')?.contentDocument?.querySelector('[data-cammino-social="facebook"]')?.hidden===true`, 'Saved visibility survives reloading');
+    await evaluate(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('[data-nstarter-variable-edit]').click()`);
+    await check(`document.querySelector('[data-nstarter-social-select]')?.value==='instagram,copy'`, 'The dropdown loads the saved selection');
+    await evaluate(`document.querySelector('[data-nstarter-social-select]').value='';document.querySelector('[data-nstarter-variable-form]').requestSubmit();document.querySelector('[data-nstarter-save]').click()`);
+    await check(`document.querySelector('[data-nstarter-status]').classList.contains('is-success')`, 'Hide all can be saved');
+    if (state.social !== '') throw new Error('Hide all was not persisted');
     if (errors.length) throw new Error(JSON.stringify(errors));
     console.log(`Passed ${checks} editor history browser checks.`);
 } finally {

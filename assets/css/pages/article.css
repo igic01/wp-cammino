@@ -194,7 +194,8 @@
   letter-spacing: 0.08em;
 }
 
-.article-share button {
+.article-share button,
+.article-share > a {
   display: grid;
   width: 44px;
   aspect-ratio: 1;
@@ -205,10 +206,14 @@
   color: var(--color-plum);
   background: rgba(255, 253, 249, 0.82);
   cursor: pointer;
+  text-decoration: none;
   transition: transform 360ms cubic-bezier(.2,.8,.2,1), color 300ms ease, background-color 300ms ease;
 }
 
-.article-share button:hover { color: var(--color-white); background: var(--color-coral); transform: translateY(-5px) rotate(-8deg) scale(1.08); }
+.article-share button:hover, .article-share > a:hover { color: var(--color-white); background: var(--color-coral); transform: translateY(-5px) rotate(-8deg) scale(1.08); }
+.article-share [hidden] { display: none; }
+.article-share.article-share--empty { display: none; }
+.nstarter-editor-preview .article-share.article-share--empty { display: grid; min-height: 48px; }
 .copy-feedback { position: absolute; top: 100%; width: 100px; color: var(--color-coral); font-size: 0.7rem; text-align: center; }
 
 .article-content { grid-column: 2; color: #4d4745; font-size: clamp(1.03rem, 1.4vw, 1.13rem); line-height: 1.9; }
@@ -382,7 +387,7 @@
   .article-cover__frame { aspect-ratio: 4 / 5; border-width: 6px; border-radius: 2.5rem 2.5rem 1.5rem 1.5rem; }
   .image-caption { margin-inline: 0.3rem; }
   .article-layout { padding-block: 3.5rem 4.5rem; }
-  .article-share button { width: 40px; }
+  .article-share button, .article-share > a { width: 40px; }
   .article-content blockquote { margin-inline: -0.35rem; padding: 1.7rem; border-radius: 1.6rem 1.6rem 3.5rem 1.6rem; }
   .article-inline-image img { border-radius: 1.5rem 3.5rem 1.5rem 1.5rem; }
   .article-impact-story { grid-template-columns: 1fr; align-items: start; border-radius: 1.5rem 1.5rem 3rem 1.5rem; }
