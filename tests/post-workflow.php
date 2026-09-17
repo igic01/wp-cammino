@@ -70,6 +70,11 @@ expect( ! str_contains( $fresh_body, 'article-impact-story__eyebrow' ), 'Impact-
 expect( ! str_contains( $fresh_body, 'data-nstarter-content-template="important-link"' ), 'The separate important-link block has been removed' );
 expect( ! str_contains( $fresh_body, 'content-template="posts"' ), 'Fresh post body has no Related Posts element' );
 
+$selected_category = wp_insert_term( 'Vzdelávanie', 'category', array( 'slug' => 'vzdelavanie' ) );
+$second_category = wp_insert_term( 'Druhá kategória', 'category', array( 'slug' => 'druha' ) );
+$selected_categories = array( $selected_category['term_id'], $second_category['term_id'] );
+wp_set_post_terms( 4, $selected_categories, 'category', false );
+update_post_meta( 4, CAMMINO_PROJECT_HIDE_IMAGE_META, '1' );
 $_POST = array(
 	'cammino_post_settings_nonce' => 'test-nonce',
 	'cammino_post_placement'      => 'project',
@@ -77,18 +82,18 @@ $_POST = array(
 );
 cammino_save_post_settings( 4 );
 expect( get_post_meta( 4, CAMMINO_POST_SNAPSHOT_META, true ) === $cleaned, 'Type changes preserve the cleaned visual snapshot' );
-expect( cammino_get_post_placement( 4 ) === 'project' && $GLOBALS['test_post_terms'][4] === array( 2 ), 'Project category saves from the simplified settings' );
-expect( get_post_meta( 4, CAMMINO_PROJECT_HIDE_IMAGE_META, true ) === '1', 'An unchecked project image option hides the project image' );
+expect( cammino_get_post_placement( 4 ) === 'project' && $GLOBALS['test_post_terms'][4] === $selected_categories, 'Project settings preserve categories selected in WordPress, even if a stale duplicate field is submitted' );
+expect( get_post_meta( 4, CAMMINO_PROJECT_HIDE_IMAGE_META, true ) === '1', 'Settings preserve image visibility after its checkbox is removed' );
 
-$_POST['cammino_project_show_image'] = '1';
+delete_post_meta( 4, CAMMINO_PROJECT_HIDE_IMAGE_META );
 cammino_save_post_settings( 4 );
-expect( '' === get_post_meta( 4, CAMMINO_PROJECT_HIDE_IMAGE_META, true ), 'The project image can be enabled again' );
+expect( '' === get_post_meta( 4, CAMMINO_PROJECT_HIDE_IMAGE_META, true ), 'Saving settings does not hide a project image by default' );
 
 $GLOBALS['test_categories'][2] = array( (object) array( 'term_id' => 2, 'slug' => 'vzdelavanie', 'name' => 'Vzdelávanie' ) );
 ob_start();
 cammino_render_post_settings_meta_box( $GLOBALS['test_posts'][2] );
 $project_settings = (string) ob_get_clean();
-expect( str_contains( $project_settings, 'cammino_project_category' ) && str_contains( $project_settings, 'cammino_project_show_image' ), 'Project settings contain only category and image controls' );
+expect( ! str_contains( $project_settings, 'data-cammino-fields="project"' ) && ! str_contains( $project_settings, 'cammino_project_category' ) && ! str_contains( $project_settings, 'cammino_project_show_image' ), 'The duplicate project settings block is removed' );
 expect( ! str_contains( $project_settings, 'cammino_project_period' ) && ! str_contains( $project_settings, 'cammino_project_location' ) && ! str_contains( $project_settings, 'cammino_project_status' ), 'Removed project controls are absent from the editor' );
 expect( ! str_contains( $project_settings, '<option value="impact-story"' ), 'Príbeh pomoci is removed from the post type selector' );
 
@@ -97,9 +102,13 @@ cammino_render_post_settings_meta_box( $GLOBALS['test_posts'][1] );
 $event_settings = (string) ob_get_clean();
 expect( str_contains( $event_settings, 'cammino_event_category' ), 'Event settings also expose an editable category' );
 
+wp_set_post_terms( 2, $selected_categories, 'category', false );
+$GLOBALS['test_categories'][2][] = (object) array( 'term_id' => $second_category['term_id'], 'slug' => 'druha', 'name' => 'Druhá kategória' );
+expect( cammino_update_visual_post_details( 2, 'Projekt Beta', '', '', false, '', 'Vzdelávanie' ) && $GLOBALS['test_post_terms'][2] === $selected_categories, 'An unchanged visual-editor category preserves multiple native selections' );
 expect( cammino_update_visual_post_details( 2, 'Nový projekt', '', '', true, '', 'Komunita' ), 'Visual editor saves project title, category, and image visibility' );
 expect( get_the_title( 2 ) === 'Nový projekt' && get_post_meta( 2, CAMMINO_PROJECT_HIDE_IMAGE_META, true ) === '1', 'Visual project details update the title and image setting' );
-expect( isset( $GLOBALS['test_terms'][3] ) && 'Komunita' === $GLOBALS['test_terms'][3]['name'] && $GLOBALS['test_post_terms'][2] === array( 3 ), 'Visual editor creates and assigns a project category' );
+$community_category = term_exists( 'Komunita', 'category' );
+expect( $community_category && $GLOBALS['test_post_terms'][2] === array( $community_category['term_id'] ), 'Visual editor creates and assigns an intentionally changed project category' );
 
 $editor_php = file_get_contents( NSTARTER_PATH . '/inc/editor.php' );
 $editor_js = file_get_contents( NSTARTER_PATH . '/assets/js/editor.js' );
