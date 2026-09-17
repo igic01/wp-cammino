@@ -2267,6 +2267,9 @@
 
         try {
             const data = await request('nstarter_regenerate_snapshot');
+            if (historyDialog && historyDialog.open) {
+                historyDialog.close();
+            }
             dirty = false;
             if (viewLink && data.viewUrl) {
                 viewLink.href = data.viewUrl;
@@ -2275,6 +2278,9 @@
             loading.classList.remove('is-hidden');
             frame.src = config.previewUrl + (config.previewUrl.includes('?') ? '&' : '?') + 'nstarter_refresh=' + Date.now();
         } catch (error) {
+            if (historyDialog && historyDialog.open) {
+                historyStatus.textContent = error.message || config.strings.error;
+            }
             setStatus(error.message || config.strings.error, 'error');
         } finally {
             setBusy(false);

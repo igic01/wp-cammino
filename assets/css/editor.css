@@ -53,6 +53,7 @@ body.nstarter-editor-shell {
 }
 
 .nstarter-mode-field,
+.nstarter-control--history,
 .nstarter-control--order,
 .nstarter-control--quiet {
     grid-column: 1 / -1;
@@ -863,7 +864,8 @@ body.nstarter-editor-shell {
 .nstarter-history-dialog h2 { margin: 0; }
 .nstarter-history-dialog label { display: block; margin: 10px 0; }
 .nstarter-history-dialog select { max-width: 100%; padding: 6px; }
-.nstarter-history-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; }
+.nstarter-history-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 12px; }
+.nstarter-history-actions [data-nstarter-regenerate] { margin-right: auto; }
 .nstarter-history-actions button { padding: 8px 16px; cursor: pointer; }
 
 @media (max-width: 480px) {

@@ -27,11 +27,11 @@ const fixture = `<!doctype html><html><head><link rel="stylesheet" href="/editor
 <div data-nstarter-loading></div><iframe data-nstarter-frame src="/preview"></iframe>
 <aside class="nstarter-editor-panel"><div data-nstarter-status><strong>Ready</strong></div><button data-nstarter-panel-toggle><span>−</span></button>
 <select data-nstarter-mode><option value="text">Text</option><option value="media">Media</option></select>
-<button data-nstarter-save>Save</button><a data-nstarter-view>View</a><button data-nstarter-regenerate>Reset</button><button data-nstarter-history>History</button></aside>
+<button data-nstarter-save>Save</button><a data-nstarter-view>View</a><button data-nstarter-history>History</button></aside>
 <dialog data-nstarter-video-dialog><form data-nstarter-video-form></form><button data-nstarter-video-cancel></button></dialog>
 <dialog data-nstarter-variable-dialog><form data-nstarter-variable-form></form><button data-nstarter-variable-cancel></button></dialog>
 <dialog data-nstarter-history-dialog class="nstarter-history-dialog"><select data-nstarter-history-version></select>
-<p data-nstarter-history-status></p><button data-nstarter-history-close>Close</button><button data-nstarter-history-restore disabled>Restore</button></dialog>
+<p data-nstarter-history-status></p><button data-nstarter-regenerate>Reset to defaults</button><button data-nstarter-history-close>Close</button><button data-nstarter-history-restore disabled>Restore</button></dialog>
 <script>window.nstarterEditor={ajaxUrl:'/ajax',nonce:'test',postId:1,source:'home',previewUrl:'/preview',isPost:false,strings:{
 confirmSaveConflicts:'Review unmatched content. Save anyway?',mergeWarning:'Review saved content in History.',confirmRestore:'Restore content?',confirmRegenerate:'Reset content?',
 noHistory:'No saved versions.',currentVersion:'Current save',loadingHistory:'Loading',saved:'Saved',unsaved:'Unsaved',error:'Failed',regenerated:'Reset'}};</script>
@@ -178,8 +178,10 @@ try {
     if (state.saves.length !== 2) throw new Error('Stale save reached storage');
     await call('Page.navigate', { url: address });
     await check(`document.querySelector('[data-nstarter-frame]')?.contentDocument?.querySelector('#title')?.textContent==='New client edit'`, 'Reload retrieves current content');
+    await evaluate(`document.querySelector('[data-nstarter-history]').click()`);
+    await check(`document.querySelector('[data-nstarter-history-dialog]').open && !document.querySelector('[data-nstarter-regenerate]').disabled`, 'History offers Reset to defaults');
     await evaluate(`document.querySelector('[data-nstarter-regenerate]').click()`);
-    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('#title')?.textContent==='Default heading'`, 'Reset reloads defaults');
+    await check(`!document.querySelector('[data-nstarter-history-dialog]').open && document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('#title')?.textContent==='Default heading'`, 'Reset from History closes the dialog and reloads defaults');
     if (errors.length) throw new Error(JSON.stringify(errors));
     console.log(`Passed ${checks} editor history browser checks.`);
 } finally {

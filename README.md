@@ -93,7 +93,7 @@ Restoring loads an unsaved draft into the editor using the latest layout. The
 published page and history stay unchanged until you press **Save**. Saving the
 draft keeps the replaced content in history; reloading the editor discards an
 unsaved restore. Unchanged saves do not consume a history slot. Switching away
-from a design and back retrieves its content and history. **Reset to defaults**
+from a design and back retrieves its content and history. **Reset to defaults** inside **History**
 replaces content with fresh template output and keeps the previous save in history.
 
 The merger identifies elements by stable `id` attributes and existing variable,

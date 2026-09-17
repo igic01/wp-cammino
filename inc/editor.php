@@ -242,9 +242,10 @@ function nstarter_maybe_render_editor(): void {
 					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
 					<button type="button" class="nstarter-control nstarter-control--order" data-nstarter-section-order><?php esc_html_e( 'Section order', 'nstarter' ); ?></button>
 					<?php if ( ! $is_post ) : ?>
-						<button type="button" class="nstarter-control" data-nstarter-history><?php esc_html_e( 'History', 'cammino' ); ?></button>
+						<button type="button" class="nstarter-control nstarter-control--history" data-nstarter-history><?php esc_html_e( 'History', 'cammino' ); ?></button>
+					<?php else : ?>
+						<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Reset content', 'cammino' ); ?></button>
 					<?php endif; ?>
-					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php echo esc_html( $is_post ? __( 'Reset content', 'cammino' ) : __( 'Reset to defaults', 'cammino' ) ); ?></button>
 				</div>
 			</aside>
 			<?php if ( ! $is_post ) : ?>
@@ -254,6 +255,7 @@ function nstarter_maybe_render_editor(): void {
 					<label><?php esc_html_e( 'Version', 'cammino' ); ?> <select data-nstarter-history-version></select></label>
 					<p data-nstarter-history-status role="status"></p>
 					<div class="nstarter-history-actions">
+						<button type="button" data-nstarter-regenerate><?php esc_html_e( 'Reset to defaults', 'cammino' ); ?></button>
 						<button type="button" data-nstarter-history-close><?php esc_html_e( 'Close', 'cammino' ); ?></button>
 						<button type="button" data-nstarter-history-restore disabled><?php esc_html_e( 'Restore', 'cammino' ); ?></button>
 					</div>
