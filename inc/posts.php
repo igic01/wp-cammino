@@ -269,7 +269,44 @@ add_action( 'add_meta_boxes_post', 'cammino_add_post_settings_meta_box' );
 add_action( 'admin_enqueue_scripts', static function ( string $hook ): void {
 	if ( in_array( $hook, array( 'post.php', 'post-new.php' ), true ) && 'post' === get_current_screen()->post_type ) {
 		wp_enqueue_script( 'cammino-post-settings', NSTARTER_URL . '/assets/js/post-settings.js', array(), NSTARTER_VERSION, true );
+		if ( get_current_screen()->is_block_editor() ) {
+			wp_enqueue_script( 'cammino-post-categories', NSTARTER_URL . '/assets/js/post-categories.js', array( 'wp-hooks', 'wp-element', 'wp-data', 'wp-core-data', 'wp-editor', 'wp-components', 'wp-i18n', 'wp-html-entities' ), NSTARTER_VERSION, true );
+			wp_localize_script( 'cammino-post-categories', 'camminoPostCategories', array( 'eventCategoryId' => cammino_get_event_category_id( false ) ) );
+		}
 	}
+} );
+
+add_action( 'set_object_terms', 'cammino_enforce_single_post_category', 20, 4 );
+/** Keep one selected category, plus the automatic category for events. */
+function cammino_enforce_single_post_category( int $post_id, $terms, $tt_ids, string $taxonomy ): void {
+	static $updating = false;
+	if ( $updating || 'category' !== $taxonomy || 'post' !== get_post_type( $post_id ) ) {
+		return;
+	}
+	$categories = wp_get_post_categories( $post_id );
+	if ( is_wp_error( $categories ) ) {
+		return;
+	}
+	$automatic = cammino_get_event_category_id( false );
+	$editable = array_values( array_diff( $categories, array( $automatic ) ) );
+	$selected = array_slice( $editable, 0, 1 );
+	if ( 'event' === cammino_get_post_placement( $post_id ) && $automatic ) {
+		$selected[] = $automatic;
+	}
+	if ( count( array_diff( $categories, $selected ) ) || count( array_diff( $selected, $categories ) ) ) {
+		$updating = true;
+		try {
+			wp_set_post_terms( $post_id, $selected, 'category', false );
+		} finally {
+			$updating = false;
+		}
+	}
+}
+
+// REST writes taxonomy terms after save_post; synchronize the event marker last.
+add_action( 'rest_after_insert_post', static function ( WP_Post $post ): void {
+	cammino_sync_event_category( $post->ID );
+	cammino_enforce_single_post_category( $post->ID, array(), array(), 'category' );
 } );
 
 add_filter( 'manage_post_posts_columns', static function ( array $columns ): array {

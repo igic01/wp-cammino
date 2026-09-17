@@ -124,4 +124,17 @@ $_POST['cammino_post_placement'] = 'event';
 cammino_save_post_settings( 4 );
 expect( cammino_get_post_placement( 4 ) === 'project', 'Unauthorized metadata update refused' );
 
+// Category writes enforce one user-selected category while retaining event routing.
+wp_set_post_terms( 2, $selected_categories, 'category', false );
+cammino_enforce_single_post_category( 2, $selected_categories, array(), 'category' );
+expect( $GLOBALS['test_post_terms'][2] === array( $selected_categories[0] ), 'Category writes reduce multiple project selections to one' );
+wp_set_post_terms( 1, array_merge( $selected_categories, array( $event_term_id ) ), 'category', false );
+cammino_enforce_single_post_category( 1, array(), array(), 'category' );
+expect( $GLOBALS['test_post_terms'][1] === array( $selected_categories[0], $event_term_id ), 'Events retain one selected category plus the automatic routing category' );
+wp_set_post_terms( 1, array( $selected_categories[1] ), 'category', false );
+cammino_enforce_single_post_category( 1, array(), array(), 'category' );
+expect( $GLOBALS['test_post_terms'][1] === array( $selected_categories[1], $event_term_id ), 'Changing an event category restores its automatic category' );
+wp_set_post_terms( 2, $selected_categories, 'category', false );
+cammino_enforce_single_post_category( 2, array(), array(), 'post_tag' );
+expect( $GLOBALS['test_post_terms'][2] === $selected_categories, 'Other taxonomies are unaffected' );
 echo "Passed $checks post workflow checks.\n";

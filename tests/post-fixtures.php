@@ -85,6 +85,7 @@ function wp_set_post_terms( $post_id, $terms, $taxonomy, $append = false ) {
 	$GLOBALS['test_post_terms'][ $post_id ] = array_values( array_unique( array_merge( $current, array_map( 'intval', $terms ) ) ) );
 	return $GLOBALS['test_post_terms'][ $post_id ];
 }
+function wp_get_post_categories( $post_id ) { return $GLOBALS['test_post_terms'][ $post_id ] ?? array(); }
 function wp_remove_object_terms( $post_id, $terms, $taxonomy ) {
 	$remove = array_map( 'intval', (array) $terms );
 	$GLOBALS['test_post_terms'][ $post_id ] = array_values( array_diff( $GLOBALS['test_post_terms'][ $post_id ] ?? array(), $remove ) );
