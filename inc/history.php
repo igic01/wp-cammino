@@ -164,10 +164,6 @@ function nstarter_ajax_restore_snapshot_version(): void {
 	if ( ! $version ) {
 		wp_send_json_error( array( 'message' => __( 'This saved version is no longer available.', 'cammino' ) ), 404 );
 	}
-	// Store the original HTML, so unmatched content is preserved even when it cannot be matched.
-	if ( ! nstarter_update_snapshot_html( $post_id, $version['html'], (string) wp_unslash( $_POST['snapshot_token'] ) ) ) {
-		wp_send_json_error( array( 'message' => __( 'The version could not be restored. Reload the editor and try again.', 'cammino' ) ), 409 );
-	}
-	nstarter_invalidate_snapshot_cache( $post_id );
-	wp_send_json_success( array( 'message' => __( 'Content restored', 'cammino' ), 'snapshotToken' => nstarter_snapshot_content_token( (string) wp_unslash( $_POST['source'] ), $version['html'] ) ) );
+	// Loading a version is read-only; the regular Save endpoint commits the draft.
+	wp_send_json_success( array( 'versionId' => $version['id'], 'snapshotToken' => nstarter_snapshot_token( $post_id ) ) );
 }

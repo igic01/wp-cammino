@@ -89,8 +89,10 @@ design. The current HTML is also mirrored to the legacy snapshot meta and ACF
 field when ACF is active; the design-specific history is authoritative.
 
 Use **History** to select a save by date and author and restore it.
-Restoring creates a new save and keeps the replaced
-content in history. Unchanged saves do not consume a history slot. Switching away
+Restoring loads an unsaved draft into the editor using the latest layout. The
+published page and history stay unchanged until you press **Save**. Saving the
+draft keeps the replaced content in history; reloading the editor discards an
+unsaved restore. Unchanged saves do not consume a history slot. Switching away
 from a design and back retrieves its content and history. **Reset to defaults**
 replaces content with fresh template output and keeps the previous save in history.
 
@@ -118,8 +120,8 @@ are protected by version tokens; reload a stale editor before saving.
 To try the features, create a draft page and select **Cammino — Feature test —
 HTML merge and history** as its template. Edit its heading, paragraphs, link
 destination and image, adjust the number of test cards, and save several times.
-Open **History**, select an earlier save and choose **Restore**. The replaced
-save remains available. Twelve distinct saves also let you verify the limit of
+Open **History**, select an earlier save and choose **Restore**, then press
+**Save** to commit it. The replaced save remains available. Twelve distinct saves also let you verify the limit of
 ten previous saves alongside the current one.
 
 The test template now defaults to layout two. If you saved content with layout

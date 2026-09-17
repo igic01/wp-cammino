@@ -49,8 +49,12 @@ const server = createServer(async (req, res) => {
         res.end(readFileSync(join(root, 'assets/fonts/fredoka.woff2')));
     } else if (pathname === '/preview') {
         res.setHeader('Content-Type', 'text/html');
+        const url = new URL(req.url, 'http://localhost');
+        const restored = url.searchParams.get('nstarter_restore_version') === 'previous'
+            && url.searchParams.get('nstarter_restore_token') === state.token
+            && url.searchParams.get('nstarter_restore_source') === 'home';
         const conflicts = JSON.stringify(state.conflicts).replaceAll('"', '&quot;');
-        res.end(`<!doctype html><html><head><style>@font-face{font-family:PreviewFont;src:url('/font.woff2')}.new-layout{color:blue;font-family:PreviewFont}</style></head><body><div data-nstarter-snapshot-root data-nstarter-snapshot-source="home" data-nstarter-snapshot-token="${state.token}" data-nstarter-merge-conflicts="${conflicts}"><header class="site-header">Header</header>${previewMarkup(state.current)}<footer class="site-footer">Footer</footer></div></body></html>`);
+        res.end(`<!doctype html><html><head><style>@font-face{font-family:PreviewFont;src:url('/font.woff2')}.new-layout{color:blue;font-family:PreviewFont}</style></head><body><div data-nstarter-snapshot-root data-nstarter-snapshot-source="home" data-nstarter-snapshot-token="${state.token}" data-nstarter-restored-version="${restored ? 'previous' : ''}" data-nstarter-merge-conflicts="${conflicts}"><header class="site-header">Header</header>${previewMarkup(restored ? state.previous : state.current)}<footer class="site-footer">Footer</footer></div></body></html>`);
     } else if (pathname === '/ajax') {
         const chunks = [];
         for await (const chunk of req) chunks.push(chunk);
@@ -68,10 +72,8 @@ const server = createServer(async (req, res) => {
             data = { versions: [{ id: 'current', saved_at: 'Today', author_name: 'Editor' }, { id: 'previous', saved_at: 'Yesterday', author_name: 'Editor' }] };
             break;
         case 'nstarter_restore_snapshot_version':
-            state.current = state.previous;
             state.restores++;
-            state.token += '-restored';
-            data = { message: 'Content restored', snapshotToken: state.token };
+            data = { versionId: 'previous', snapshotToken: state.token };
             break;
         case 'nstarter_save_snapshot':
             state.saves.push(form.get('html'));
@@ -157,6 +159,9 @@ try {
     await evaluate(`document.querySelector('[data-nstarter-history-restore]').click()`);
     await check(`!document.querySelector('[data-nstarter-history-dialog]').open && document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('#title')?.textContent==='Older client heading'`, 'Restore reloads the latest layout with old content');
     if (state.restores !== 1) throw new Error('Restore endpoint was not called');
+    if (!state.current.includes('Current client heading') || state.token !== 'token-1' || state.saves.length) throw new Error('Restore changed persisted content before Save');
+    checks++;
+    await check(`!document.querySelector('[data-nstarter-save]').disabled`, 'Restore finishes loading before Save is enabled');
     await evaluate(`window.acceptConfirm=false;document.querySelector('[data-nstarter-save]').click()`);
     await pause(150);
     if (state.saves.length !== 0) throw new Error('Cancelled conflict save wrote content');

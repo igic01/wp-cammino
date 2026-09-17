@@ -14,6 +14,7 @@
     const historyStatus = document.querySelector('[data-nstarter-history-status]');
     const historyRestore = document.querySelector('[data-nstarter-history-restore]');
     let historyRequestId = 0;
+    let pendingRestoreId = '';
     const modeSelect = document.querySelector('[data-nstarter-mode]');
     const editorPanel = document.querySelector('.nstarter-editor-panel');
     const panelToggle = document.querySelector('[data-nstarter-panel-toggle]');
@@ -2296,9 +2297,16 @@
         }
     }
 
-    function reloadPreview() {
+    function reloadPreview(versionId, token) {
         loading.classList.remove('is-hidden');
-        frame.src = config.previewUrl + (config.previewUrl.includes('?') ? '&' : '?') + 'nstarter_refresh=' + Date.now();
+        const url = new URL(config.previewUrl, window.location.href);
+        url.searchParams.set('nstarter_refresh', Date.now());
+        if (versionId) {
+            url.searchParams.set('nstarter_restore_version', versionId);
+            url.searchParams.set('nstarter_restore_token', token);
+            url.searchParams.set('nstarter_restore_source', config.source);
+        }
+        frame.src = url.href;
     }
 
     function updateHistoryRestoreState() {
@@ -2346,14 +2354,16 @@
         try {
             const data = await request('nstarter_restore_snapshot_version', { version_id: historyVersion.value });
             historyDialog.close();
-            dirty = false;
-            setStatus(data.message, 'success');
-            reloadPreview();
+            pendingRestoreId = data.versionId;
+            dirty = true;
+            reloadPreview(data.versionId, data.snapshotToken);
         } catch (error) {
             historyStatus.textContent = error.message;
             historyRestore.disabled = false;
         } finally {
-            setBusy(false);
+            if (!pendingRestoreId) {
+                setBusy(false);
+            }
         }
     }
 
@@ -2379,6 +2389,17 @@
         }
         if (sectionOrderButton && contentBuilder()) {
             sectionOrderButton.hidden = true;
+        }
+        if (pendingRestoreId) {
+            const root = snapshotRoot();
+            const restored = root && root.dataset.nstarterRestoredVersion === pendingRestoreId;
+            pendingRestoreId = '';
+            dirty = restored;
+            setBusy(false);
+            setStatus(restored ? config.strings.unsaved : config.strings.restoreFailed, restored ? 'dirty' : 'error');
+            if (!restored) {
+                return;
+            }
         }
         if (!config.isPost && mergeConflicts().length) {
             setStatus(config.strings.mergeWarning, 'error');

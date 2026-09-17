@@ -134,7 +134,8 @@ function nstarter_maybe_render_editor(): void {
 				'confirmRegenerate' => 'post' === $post->post_type
 					? __( 'Reset this post body? All saved body edits will be replaced.', 'cammino' )
 					: __( 'Reset this page to its template defaults? The current saved content will be kept in History.', 'cammino' ),
-				'confirmRestore' => __( 'Restore this saved content? Unsaved edits will be discarded. The current save will be kept in History.', 'cammino' ),
+				'confirmRestore' => __( 'Load this saved content into the editor? Unsaved edits will be discarded. Press Save to commit the restored content.', 'cammino' ),
+				'restoreFailed' => __( 'This version could not be loaded because the page or history changed. Reload the editor and try again.', 'cammino' ),
 				'confirmSaveConflicts' => __( 'Some saved content could not be matched to the updated layout. Save anyway? The previous HTML will be kept in History.', 'cammino' ),
 				'mergeWarning' => __( 'Some saved content could not be matched to the updated layout. Previous HTML remains stored in History.', 'cammino' ),
 				'noHistory' => __( 'No saved versions yet.', 'cammino' ),
@@ -249,7 +250,7 @@ function nstarter_maybe_render_editor(): void {
 			<?php if ( ! $is_post ) : ?>
 				<dialog class="nstarter-history-dialog" data-nstarter-history-dialog>
 					<h2><?php esc_html_e( 'Saved content', 'cammino' ); ?></h2>
-					<p><?php esc_html_e( 'The current save and up to ten previous saves for this page design. Restoring content uses the latest layout.', 'cammino' ); ?></p>
+					<p><?php esc_html_e( 'The current save and up to ten previous saves for this page design. Restore loads content into the latest layout. Press Save to commit it.', 'cammino' ); ?></p>
 					<label><?php esc_html_e( 'Version', 'cammino' ); ?> <select data-nstarter-history-version></select></label>
 					<p data-nstarter-history-status role="status"></p>
 					<div class="nstarter-history-actions">
