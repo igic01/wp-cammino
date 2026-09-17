@@ -9,12 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.9.77' );
+define( 'NSTARTER_VERSION', '1.10.0' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
 
 require_once NSTARTER_PATH . '/inc/snapshots.php';
+require_once NSTARTER_PATH . '/inc/html-merge.php';
+require_once NSTARTER_PATH . '/inc/history.php';
 require_once NSTARTER_PATH . '/inc/live-sections.php';
 require_once NSTARTER_PATH . '/inc/variable-sections.php';
 require_once NSTARTER_PATH . '/inc/posts.php';

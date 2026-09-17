@@ -11,6 +11,7 @@ shared single-post design for events, projects, and impact stories.
 
 - WordPress 6.4 or newer
 - PHP 8.0 or newer
+- PHP DOM extension (used to merge saved HTML into updated page layouts)
 - Astra installed as the parent theme in `wp-content/themes/astra`
 - Elementor installed when existing Elementor pages require it
 - Contact Form 7 installed and active for the Kontakt and Zapojte sa pages
@@ -80,9 +81,39 @@ On the homepage, use the **Vybrané projekty** variable control to choose zero t
 three published Project posts. The live cards keep their titles, descriptions,
 links, categories, and optional images synchronized with the source posts.
 
-The saved HTML is stored in ACF when ACF is active, with private post meta as a
-fallback. **Regenerate page** resets the editable snapshot from
-the selected file in `snapshot-templates/`.
+Page layouts always render from the latest file in `snapshot-templates/`.
+Saved HTML supplies the text, links, media, section order and section-variable
+values. No title/paragraph field model is required. Private post meta stores the
+current HTML and up to ten previous saves independently for each page and selected
+design. The current HTML is also mirrored to the legacy snapshot meta and ACF
+field when ACF is active; the design-specific history is authoritative.
+
+Use **History** to preview a save with the current layout, inspect its original
+saved HTML, or restore it. Restoring creates a new save and keeps the replaced
+content in history. Unchanged saves do not consume a history slot. Switching away
+from a design and back retrieves its content and history. **Reset to defaults**
+replaces content with fresh template output and keeps the previous save in history.
+
+The merger identifies elements by stable `id` attributes and existing variable,
+live-section and `aria-labelledby` markers. Unique classes can help match nodes
+inside a matched section. Anonymous siblings use their positions only when their
+type counts agree; ambiguous or removed content produces an editor warning.
+Inspect the original HTML in History before saving a page with a warning.
+The previous raw HTML remains available within the ten-save retention limit.
+
+For reliable updates, retain IDs when moving or redesigning editable elements.
+Anonymous siblings that exchange positions without any other identifying change
+cannot be distinguished automatically. Saved content always wins, including old
+defaults the client never edited. New elements retain the new template defaults.
+Tags, classes, wrappers, decorations, scripts and other presentation attributes
+come from the latest template. Supported inline text formatting and client media
+type replacements are preserved. Repeatable collections retain their items and
+order using the current item markup. Forms and listings still render live.
+Purge full-page caches after deploying template updates so the fresh layout is served.
+
+The history feature applies to Cammino page designs. Normal posts retain their
+existing separate article-body storage and reset workflow. Concurrent page edits
+are protected by version tokens; reload a stale editor before saving.
 
 The Kontakt and Zapojte sa templates render Contact Form 7 forms `d43ca6f` and
 `b4ce2b6` at request time. Their surrounding copy remains editable, while each
@@ -153,6 +184,15 @@ event-category assignment, visual event details, photo visibility, compact event
 cards and type filtering, type changes, saved-content preservation, the
 inline builder, and removal of legacy Related Posts markup. These checks do not
 require or modify a WordPress database.
+
+Run `php tests/html-merge-workflow.php`,
+`php tests/template-merge-workflow.php` and
+`php tests/snapshot-history-workflow.php` for HTML merge and save-history checks.
+These cover layout changes, anonymous matching conflicts, media, repeatable
+items, all existing page designs, legacy saves, retention, restore, reset,
+permissions and concurrent saves without modifying a WordPress database.
+Run `node tests/editor-history-workflow.mjs` for the Chrome UI check. Set
+`BROWSER_BIN` if Chrome/Chromium is not installed at one of the detected paths.
 
 The newsletter card is currently a visual placeholder and intentionally reports
 that no mailing-list integration is connected yet.

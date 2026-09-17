@@ -8,6 +8,15 @@
     const saveButton = document.querySelector('[data-nstarter-save]');
     const viewLink = document.querySelector('[data-nstarter-view]');
     const regenerateButton = document.querySelector('[data-nstarter-regenerate]');
+    const historyButton = document.querySelector('[data-nstarter-history]');
+    const historyDialog = document.querySelector('[data-nstarter-history-dialog]');
+    const historyVersion = document.querySelector('[data-nstarter-history-version]');
+    const historyOriginal = document.querySelector('[data-nstarter-history-original]');
+    const historyPreview = document.querySelector('[data-nstarter-history-preview]');
+    const historyStatus = document.querySelector('[data-nstarter-history-status]');
+    const historyRestore = document.querySelector('[data-nstarter-history-restore]');
+    let historyContent = null;
+    let historyRequestId = 0;
     const modeSelect = document.querySelector('[data-nstarter-mode]');
     const editorPanel = document.querySelector('.nstarter-editor-panel');
     const panelToggle = document.querySelector('[data-nstarter-panel-toggle]');
@@ -2145,6 +2154,11 @@
         copy.querySelectorAll('[data-nstarter-editor-runtime]').forEach(function (element) {
             element.remove();
         });
+        if (!config.isPost) {
+            copy.querySelectorAll('.site-header, .site-footer, .skip-link').forEach(function (element) {
+                element.remove();
+            });
+        }
 
         // Runtime live HTML never enters ACF; retain only the original marker.
         copy.querySelectorAll('[data-nstarter-live-section]').forEach(function (section) {
@@ -2161,6 +2175,11 @@
         body.append('action', action);
         body.append('nonce', config.nonce);
         body.append('post_id', config.postId);
+        if (!config.isPost) {
+            const root = snapshotRoot();
+            body.append('source', config.source || '');
+            body.append('snapshot_token', root ? root.dataset.nstarterSnapshotToken || '' : '');
+        }
 
         Object.keys(extraData || {}).forEach(function (key) {
             body.append(key, extraData[key]);
@@ -2185,6 +2204,10 @@
         saveButton.disabled = nextBusy;
         regenerateButton.disabled = nextBusy;
         modeSelect.disabled = nextBusy;
+        if (historyButton) {
+            historyButton.disabled = nextBusy;
+            historyVersion.disabled = nextBusy;
+        }
         if (sectionOrderButton) {
             sectionOrderButton.disabled = nextBusy;
         }
@@ -2198,6 +2221,9 @@
 
     async function save() {
         if (busy) {
+            return;
+        }
+        if (!config.isPost && mergeConflicts().length && !window.confirm(config.strings.confirmSaveConflicts)) {
             return;
         }
 
@@ -2217,6 +2243,10 @@
                 hide_image: postDetails.hideImage ? '1' : '0'
             });
             dirty = false;
+            if (data.snapshotToken && snapshotRoot()) {
+                snapshotRoot().dataset.nstarterSnapshotToken = data.snapshotToken;
+                snapshotRoot().dataset.nstarterMergeConflicts = '[]';
+            }
             if (viewLink && data.viewUrl) {
                 viewLink.href = data.viewUrl;
             }
@@ -2259,6 +2289,118 @@
         }
     }
 
+    function mergeConflicts() {
+        const root = snapshotRoot();
+        try {
+            return root ? JSON.parse(root.dataset.nstarterMergeConflicts || '[]') : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function reloadPreview() {
+        loading.classList.remove('is-hidden');
+        frame.src = config.previewUrl + (config.previewUrl.includes('?') ? '&' : '?') + 'nstarter_refresh=' + Date.now();
+    }
+
+    function renderHistoryPreview() {
+        if (!historyContent) {
+            return;
+        }
+        const doc = document.implementation.createHTMLDocument('Saved content');
+        // Reuse current styles; scripts and saved forms cannot run in this sandbox.
+        frameDocument().head.querySelectorAll('link[rel="stylesheet"], style').forEach(function (style) {
+            doc.head.appendChild(style.cloneNode(true));
+        });
+        doc.body.className = frameDocument().body.className.replace('nstarter-editor-preview', '');
+        doc.body.innerHTML = historyOriginal.checked ? historyContent.savedHtml : historyContent.html;
+        doc.querySelectorAll('[contenteditable]').forEach(function (node) {
+            node.removeAttribute('contenteditable');
+        });
+        historyPreview.srcdoc = '<!doctype html>' + doc.documentElement.outerHTML;
+        historyStatus.textContent = !historyOriginal.checked && historyContent.conflicts.length
+            ? config.strings.mergeWarning + ' ' + historyContent.conflicts.join('; ')
+            : '';
+    }
+
+    async function previewHistoryVersion() {
+        const requestId = ++historyRequestId;
+        historyContent = null;
+        historyRestore.disabled = true;
+        historyPreview.removeAttribute('srcdoc');
+        if (!historyVersion.value) {
+            return;
+        }
+        historyStatus.textContent = config.strings.loadingHistory;
+        try {
+            const data = await request('nstarter_preview_snapshot_version', { version_id: historyVersion.value });
+            if (requestId !== historyRequestId || !historyDialog.open) {
+                return;
+            }
+            historyContent = data;
+            renderHistoryPreview();
+            historyRestore.disabled = historyVersion.selectedIndex === 0;
+        } catch (error) {
+            if (requestId === historyRequestId) {
+                historyStatus.textContent = error.message;
+            }
+        }
+    }
+
+    async function openHistory() {
+        if (busy) {
+            return;
+        }
+        historyDialog.showModal();
+        historyVersion.replaceChildren();
+        historyContent = null;
+        historyRestore.disabled = true;
+        historyPreview.removeAttribute('srcdoc');
+        historyOriginal.checked = false;
+        historyStatus.textContent = config.strings.loadingHistory;
+        setBusy(true);
+        try {
+            const data = await request('nstarter_snapshot_history');
+            if (!historyDialog.open) {
+                return;
+            }
+            data.versions.forEach(function (version, index) {
+                const label = (index === 0 ? config.strings.currentVersion + ' — ' : '')
+                    + version.saved_at + (version.author_name ? ' — ' + version.author_name : '');
+                historyVersion.add(new Option(label, version.id));
+            });
+            if (!data.versions.length) {
+                historyStatus.textContent = config.strings.noHistory;
+            } else {
+                await previewHistoryVersion();
+            }
+        } catch (error) {
+            historyStatus.textContent = error.message;
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    async function restoreHistoryVersion() {
+        if (busy || !historyContent || !window.confirm(config.strings.confirmRestore)) {
+            return;
+        }
+        setBusy(true);
+        historyRestore.disabled = true;
+        try {
+            const data = await request('nstarter_restore_snapshot_version', { version_id: historyVersion.value });
+            historyDialog.close();
+            dirty = false;
+            setStatus(data.message, 'success');
+            reloadPreview();
+        } catch (error) {
+            historyStatus.textContent = error.message;
+            historyRestore.disabled = false;
+        } finally {
+            setBusy(false);
+        }
+    }
+
     function initialisePreview() {
         const doc = frameDocument();
 
@@ -2282,6 +2424,9 @@
         if (sectionOrderButton && contentBuilder()) {
             sectionOrderButton.hidden = true;
         }
+        if (!config.isPost && mergeConflicts().length) {
+            setStatus(config.strings.mergeWarning, 'error');
+        }
     }
 
     modeSelect.addEventListener('change', function () {
@@ -2290,6 +2435,18 @@
 
     saveButton.addEventListener('click', save);
     regenerateButton.addEventListener('click', regenerate);
+    if (historyButton) {
+        historyButton.addEventListener('click', openHistory);
+        historyVersion.addEventListener('change', previewHistoryVersion);
+        historyOriginal.addEventListener('change', renderHistoryPreview);
+        historyRestore.addEventListener('click', restoreHistoryVersion);
+        document.querySelector('[data-nstarter-history-close]').addEventListener('click', function () {
+            historyDialog.close();
+        });
+        historyDialog.addEventListener('close', function () {
+            ++historyRequestId;
+        });
+    }
     panelToggle.addEventListener('click', togglePanel);
     if (mediaSourceDialog && mediaSourceForm && mediaSourceCancel) {
         mediaSourceForm.addEventListener('click', chooseMediaSource);

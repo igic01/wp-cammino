@@ -93,7 +93,7 @@ function nstarter_maybe_render_editor(): void {
 	$placement  = $is_post ? cammino_get_post_placement( $post_id ) : '';
 	$is_event   = 'event' === $placement;
 	$is_project = 'project' === $placement;
-	$is_home_page = ! $is_post && 'home' === nstarter_get_native_source_template_slug( $post_id );
+	$is_home_page = ! $is_post && in_array( nstarter_get_native_source_template_slug( $post_id ), array( 'home', 'home-v2', 'home-v3' ), true );
 	$editable_category = $is_post ? cammino_get_editable_post_category( $post_id ) : array( 'name' => '' );
 
 	show_admin_bar( false );
@@ -111,6 +111,7 @@ function nstarter_maybe_render_editor(): void {
 			'previewUrl' => nstarter_get_preview_url( $post_id ),
 			'viewUrl'    => get_permalink( $post_id ),
 			'isPost'     => $is_post,
+			'source'     => $is_post ? '' : nstarter_get_source_template_slug( $post_id ),
 			'isEvent'    => $is_event,
 			'isProject'  => $is_project,
 			'projectOptions' => $is_home_page && function_exists( 'cammino_get_project_picker_options' )
@@ -132,7 +133,13 @@ function nstarter_maybe_render_editor(): void {
 			'strings'    => array(
 				'confirmRegenerate' => 'post' === $post->post_type
 					? __( 'Reset this post body? All saved body edits will be replaced.', 'cammino' )
-					: __( 'Regenerate this page from its PHP template? All saved visual edits will be replaced.', 'nstarter' ),
+					: __( 'Reset this page to its template defaults? The current saved content will be kept in History.', 'cammino' ),
+				'confirmRestore' => __( 'Restore this saved content? Unsaved edits will be discarded. The current save will be kept in History.', 'cammino' ),
+				'confirmSaveConflicts' => __( 'Some saved content could not be matched to the updated layout. Review it in History before saving. Save anyway? The previous HTML will be kept in History.', 'cammino' ),
+				'mergeWarning' => __( 'Some saved content needs review. Open History to inspect the saved HTML.', 'cammino' ),
+				'noHistory' => __( 'No saved versions yet.', 'cammino' ),
+				'currentVersion' => __( 'Current save', 'cammino' ),
+				'loadingHistory' => __( 'Loading saved content…', 'cammino' ),
 				'chooseMedia'       => __( 'Choose an image or video', 'nstarter' ),
 				'useMedia'          => __( 'Use this media', 'nstarter' ),
 				'invalidMediaUrl'   => __( 'Enter a valid HTTP or HTTPS media URL.', 'nstarter' ),
@@ -233,9 +240,26 @@ function nstarter_maybe_render_editor(): void {
 					<button type="button" class="nstarter-control nstarter-control--primary" data-nstarter-save><?php esc_html_e( 'Save', 'nstarter' ); ?></button>
 					<a class="nstarter-control" data-nstarter-view href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View', 'nstarter' ); ?></a>
 					<button type="button" class="nstarter-control nstarter-control--order" data-nstarter-section-order><?php esc_html_e( 'Section order', 'nstarter' ); ?></button>
-					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php esc_html_e( 'Regenerate page', 'nstarter' ); ?></button>
+					<?php if ( ! $is_post ) : ?>
+						<button type="button" class="nstarter-control" data-nstarter-history><?php esc_html_e( 'History', 'cammino' ); ?></button>
+					<?php endif; ?>
+					<button type="button" class="nstarter-control nstarter-control--quiet" data-nstarter-regenerate><?php echo esc_html( $is_post ? __( 'Reset content', 'cammino' ) : __( 'Reset to defaults', 'cammino' ) ); ?></button>
 				</div>
 			</aside>
+			<?php if ( ! $is_post ) : ?>
+				<dialog class="nstarter-history-dialog" data-nstarter-history-dialog>
+					<h2><?php esc_html_e( 'Saved content', 'cammino' ); ?></h2>
+					<p><?php esc_html_e( 'The current save and up to ten previous saves for this page design. Restoring content uses the latest layout.', 'cammino' ); ?></p>
+					<label><?php esc_html_e( 'Version', 'cammino' ); ?> <select data-nstarter-history-version></select></label>
+					<label><input type="checkbox" data-nstarter-history-original> <?php esc_html_e( 'Show original saved HTML', 'cammino' ); ?></label>
+					<p data-nstarter-history-status role="status"></p>
+					<iframe data-nstarter-history-preview sandbox="allow-same-origin" title="<?php esc_attr_e( 'Saved content preview', 'cammino' ); ?>"></iframe>
+					<div class="nstarter-history-actions">
+						<button type="button" data-nstarter-history-close><?php esc_html_e( 'Close', 'cammino' ); ?></button>
+						<button type="button" data-nstarter-history-restore disabled><?php esc_html_e( 'Restore', 'cammino' ); ?></button>
+					</div>
+				</dialog>
+			<?php endif; ?>
 
 			<dialog class="nstarter-media-source-dialog" data-nstarter-media-source-dialog>
 				<form data-nstarter-media-source-form>
@@ -385,6 +409,9 @@ function nstarter_ajax_save_snapshot(): void {
 	if ( ! isset( $_POST['html'] ) ) {
 		wp_send_json_error( array( 'message' => __( 'No snapshot HTML was received.', 'nstarter' ) ), 400 );
 	}
+	if ( 'page' === get_post_type( $post_id ) ) {
+		nstarter_require_snapshot_context( $post_id );
+	}
 
 	if ( 'post' === get_post_type( $post_id ) ) {
 		$title = isset( $_POST['post_title'] ) ? (string) wp_unslash( $_POST['post_title'] ) : get_the_title( $post_id );
@@ -413,7 +440,10 @@ function nstarter_ajax_save_snapshot(): void {
 
 	// This intentionally stores the editor's complete HTML. Access is capability + nonce protected.
 	$html = (string) wp_unslash( $_POST['html'] );
-	if ( ! nstarter_is_visual_document( $post_id ) || ! nstarter_update_visual_document_html( $post_id, $html ) ) {
+	$updated = nstarter_is_visual_document( $post_id ) && ( 'page' === get_post_type( $post_id )
+		? nstarter_update_snapshot_html( $post_id, $html, (string) wp_unslash( $_POST['snapshot_token'] ) )
+		: nstarter_update_visual_document_html( $post_id, $html ) );
+	if ( ! $updated ) {
 		wp_send_json_error( array( 'message' => __( 'The saved page could not be verified. Please try again.', 'cammino' ) ), 500 );
 	}
 
@@ -429,6 +459,7 @@ function nstarter_ajax_save_snapshot(): void {
 	wp_send_json_success(
 		array(
 			'message' => __( 'Saved', 'cammino' ),
+			'snapshotToken' => 'page' === get_post_type( $post_id ) ? nstarter_snapshot_content_token( (string) wp_unslash( $_POST['source'] ), $html ) : '',
 			'viewUrl' => add_query_arg( 'cammino_snapshot', wp_generate_uuid4(), get_permalink( $post_id ) ),
 		)
 	);
@@ -447,9 +478,15 @@ function nstarter_ajax_regenerate_snapshot(): void {
 	if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
 		wp_send_json_error( array( 'message' => __( 'You cannot edit this page.', 'nstarter' ) ), 403 );
 	}
+	if ( 'page' === get_post_type( $post_id ) ) {
+		nstarter_require_snapshot_context( $post_id );
+	}
 
 	$html = nstarter_render_visual_document( $post_id );
-	if ( ! nstarter_is_visual_document( $post_id ) || ! nstarter_update_visual_document_html( $post_id, $html ) ) {
+	$updated = nstarter_is_visual_document( $post_id ) && ( 'page' === get_post_type( $post_id )
+		? nstarter_update_snapshot_html( $post_id, $html, (string) wp_unslash( $_POST['snapshot_token'] ) )
+		: nstarter_update_visual_document_html( $post_id, $html ) );
+	if ( ! $updated ) {
 		wp_send_json_error( array( 'message' => __( 'The regenerated page could not be verified. Please try again.', 'cammino' ) ), 500 );
 	}
 

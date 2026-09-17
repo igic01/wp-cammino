@@ -1,0 +1,76 @@
+<?php
+/** Run with `php tests/html-merge-workflow.php`. No WordPress/database changes. */
+define( 'ABSPATH', __DIR__ );
+require dirname( __DIR__ ) . '/inc/html-merge.php';
+$checks = 0;
+function merge_expect( bool $condition, string $message ): void {
+	global $checks;
+	++$checks;
+	if ( ! $condition ) {
+		throw new RuntimeException( $message );
+	}
+}
+function merged( string $fresh, string $old ): array {
+	return nstarter_merge_page_html( $fresh, $old );
+}
+
+$result = merged(
+	'<main id="main-content"><section id="hero" class="new"><div class="wrapper"><h2 id="title" class="large">Default</h2><p>Description</p><a id="cta" class="button new" href="/default" target="_blank">Default label<span class="arrow" aria-hidden="true">NEW ICON</span></a></div></section></main>',
+	'<main id="main-content"><section id="hero" class="old"><h1 id="title">Život &amp; úsmev</h1><p>Client description</p><a id="cta" class="button" href="/support">Client label<span class="arrow" aria-hidden="true">OLD ICON</span></a></section></main>'
+);
+merge_expect( str_contains( $result['html'], '<h2 id="title" class="large">Život &amp; úsmev</h2>' ), 'Stable IDs retain Unicode text when a heading type and its wrappers change.' );
+merge_expect( str_contains( $result['html'], '<p>Client description</p>' ), 'Anonymous content matches inside a new wrapper.' );
+merge_expect( str_contains( $result['html'], 'href="/support" target="_blank"' ) && str_contains( $result['html'], 'Client label' ), 'Saved link values retain new presentation and behavior attributes.' );
+merge_expect( str_contains( $result['html'], 'NEW ICON' ) && ! str_contains( $result['html'], 'OLD ICON' ), 'Decorative markup comes from the new template.' );
+merge_expect( ! $result['conflicts'], 'A supported layout update merges without conflicts.' );
+
+$result = merged( '<section id="copy"><p>New first</p><p>New second</p></section>', '<section id="copy"><p>Client paragraph</p></section>' );
+merge_expect( str_contains( $result['html'], 'New first' ) && ! str_contains( $result['html'], 'Client paragraph' ) && count( $result['conflicts'] ) === 1, 'An inserted anonymous paragraph is flagged rather than receiving the wrong saved content.' );
+$result = merged( '<section id="copy"><div><p>New intro</p></div><div><p>New body</p></div></section>', '<section id="copy"><p>Client body</p></section>' );
+merge_expect( ! str_contains( $result['html'], 'Client body' ) && ! empty( $result['conflicts'] ), 'Inserted wrappers cannot disguise ambiguous anonymous paragraphs.' );
+$result = merged( '<section id="copy"><p>Default</p></section>', '<section id="copy"><div><p>Client body</p></div></section>' );
+merge_expect( str_contains( $result['html'], '<p>Client body</p>' ) && ! $result['conflicts'], 'Removing an anonymous wrapper retains its uniquely matched content.' );
+$result = merged( '<section id="copy"><p>One</p><p>Two</p></section>', '<section id="copy"><p>Saved one</p><p>Saved two</p></section>' );
+merge_expect( str_contains( $result['html'], '<p>Saved one</p><p>Saved two</p>' ) && ! $result['conflicts'], 'Unchanged anonymous sibling counts preserve positional content.' );
+$result = merged( '<h2 id="title">New default</h2><p id="new">New content</p>', '<h1 id="title"></h1><p id="removed">Removed client content</p>' );
+merge_expect( str_contains( $result['html'], '<h2 id="title"></h2>' ), 'An intentionally empty field stays empty.' );
+merge_expect( str_contains( $result['html'], 'New content' ) && count( $result['conflicts'] ) === 1, 'New content survives and removed saved content is reported.' );
+$result = merged( '<h2 id="title"><span class="new">Default</span></h2>', '<h1 id="title">Client title</h1>' );
+merge_expect( str_contains( $result['html'], '<span class="new">Client title</span>' ) && ! $result['conflicts'], 'A new inline wrapper retains the outer element’s saved text.' );
+$result = merged( '<a id="cta" href="/new">Default<span aria-hidden="true">NEW ICON</span></a>', '<a id="cta" href="/client"><span aria-hidden="true">OLD ICON</span></a>' );
+merge_expect( str_contains( $result['html'], 'href="/client"><span aria-hidden="true">NEW ICON</span>' ) && ! $result['conflicts'], 'Empty button labels stay empty while their decorative icons update.' );
+$result = merged( '<p id="copy" class="new">Default</p>', '<p id="copy">Client <strong>bold</strong> <a href="/story" onclick="bad()">story</a></p>' );
+merge_expect( str_contains( $result['html'], '<strong>bold</strong>' ) && str_contains( $result['html'], 'href="/story"' ) && ! str_contains( $result['html'], 'onclick' ), 'Client inline formatting is preserved without layout or event attributes.' );
+$result = merged( '<a id="cta" href="/safe">Default</a>', '<a id="cta" href="javascript:bad()">Saved</a>' );
+merge_expect( str_contains( $result['html'], 'href="/safe"' ), 'Unsafe saved link protocols cannot replace template destinations.' );
+$result = merged( '<h2 id="duplicate">New</h2>', '<h1 id="duplicate">Old one</h1><h1 id="duplicate">Old two</h1>' );
+merge_expect( str_contains( $result['html'], '>New</h2>' ) && ! empty( $result['conflicts'] ), 'Duplicate IDs are not silently matched.' );
+
+$result = merged( '<img id="cover" class="new" width="800" src="/default.jpg" srcset="/default-large.jpg 2x" alt="Default">', '<img id="cover" class="old" src="/client.jpg" alt="" data-attachment-id="123">' );
+merge_expect( str_contains( $result['html'], 'src="/client.jpg"' ) && str_contains( $result['html'], 'alt=""' ) && ! str_contains( $result['html'], 'srcset' ) && str_contains( $result['html'], 'width="800"' ), 'Saved media removes stale responsive sources but keeps current dimensions.' );
+$result = merged( '<img id="cover" class="new" width="800" src="/default.jpg">', '<video id="cover" class="old" controls><source src="/client.mp4" type="video/mp4"></video>' );
+merge_expect( str_contains( $result['html'], '<video id="cover" class="new" width="800" controls' ) && str_contains( $result['html'], 'src="/client.mp4"' ) && ! $result['conflicts'], 'Image-to-video replacements retain the new template presentation.' );
+$result = merged( '<video id="cover" autoplay muted controls src="/new.mp4"></video>', '<video id="cover" controls src="/saved.mp4"></video>' );
+merge_expect( ! str_contains( $result['html'], 'autoplay' ) && ! str_contains( $result['html'], 'muted' ), 'Turning off video options persists across template updates.' );
+$result = merged( '<picture id="cover"><source srcset="/new.webp"><img class="new" src="/new.jpg" width="800"></picture>', '<img id="cover" src="/client.jpg" alt="Client">' );
+merge_expect( str_contains( $result['html'], '<picture id="cover">' ) && str_contains( $result['html'], 'src="/client.jpg"' ) && ! str_contains( $result['html'], 'srcset' ) && ! $result['conflicts'], 'A new picture wrapper uses saved image content without a default source overriding it.' );
+
+$result = merged(
+	'<section data-nstarter-variable-section="projects" data-nstarter-variable-value="1" data-nstarter-variable-max="3"><div data-nstarter-live-section="cards" data-nstarter-live-args="new"></div></section>',
+	'<section data-nstarter-variable-section="projects" data-nstarter-variable-value="2,3" data-nstarter-variable-max="99"><div data-nstarter-live-section="cards" data-nstarter-live-args="saved"><p>Stale card</p></div></section>'
+);
+merge_expect( str_contains( $result['html'], 'data-nstarter-variable-value="2,3"' ) && str_contains( $result['html'], 'data-nstarter-variable-max="3"' ) && str_contains( $result['html'], 'data-nstarter-live-args="saved"' ) && ! str_contains( $result['html'], 'Stale card' ), 'Picker selections survive while live HTML and variable definitions stay current.' );
+$result = merged(
+	'<section data-nstarter-variable-section="stories" data-nstarter-variable-value="0"><div data-nstarter-variable-items></div><template data-nstarter-variable-template><article class="new-card" data-nstarter-variable-item><h3>Default</h3><p>Default description</p><span aria-hidden="true">New decoration</span></article></template></section>',
+	'<section data-nstarter-variable-section="stories" data-nstarter-variable-value="2"><div data-nstarter-variable-items><article class="old-card" data-nstarter-variable-item><h3>Story B</h3><p>Client B</p></article><article class="old-card" data-nstarter-variable-item><h3>Story A</h3><p>Client A</p></article></div><template data-nstarter-variable-template><article>Old prototype</article></template></section>'
+);
+merge_expect( substr_count( $result['html'], 'class="new-card"' ) === 3 && str_contains( $result['html'], '<h3>Story B</h3>' ) && str_contains( $result['html'], '<p>Client A</p>' ) && ! str_contains( $result['html'], 'old-card' ), 'Repeated items use new markup and keep their count, content and order.' );
+merge_expect( ! $result['conflicts'], 'Repeated items do not create false unmatched-content warnings.' );
+$result = merged(
+	'<main id="main-content"><section id="a"><p>New A</p></section><section id="new"><p>Brand new</p></section><section id="b"><p>New B</p></section></main>',
+	'<main id="main-content"><section id="b"><p>Saved B</p></section><section id="a"><p>Saved A</p></section></main>'
+);
+merge_expect( strpos( $result['html'], 'id="b"' ) < strpos( $result['html'], 'id="new"' ) && strpos( $result['html'], 'id="new"' ) < strpos( $result['html'], 'id="a"' ), 'Saved section ordering leaves new sections in their template slots.' );
+merge_expect( str_contains( $result['html'], 'Saved A' ) && str_contains( $result['html'], 'Saved B' ) && str_contains( $result['html'], 'Brand new' ), 'Reordered sections receive their own saved content.' );
+
+echo "Passed $checks HTML merge checks.\n";

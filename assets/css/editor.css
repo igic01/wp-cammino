@@ -844,6 +844,34 @@ body.nstarter-editor-shell {
     background: #6d5dfc;
 }
 
+.nstarter-history-dialog {
+    width: min(1000px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    box-sizing: border-box;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    color: #222;
+    background: #fff;
+    font: 400 14px/1.5 sans-serif;
+}
+
+.nstarter-history-dialog::backdrop {
+    background: rgb(0 0 0 / 45%);
+}
+
+.nstarter-history-dialog h2 { margin: 0; }
+.nstarter-history-dialog label { display: block; margin: 10px 0; }
+.nstarter-history-dialog select { max-width: 100%; padding: 6px; }
+.nstarter-history-dialog iframe {
+    width: 100%;
+    height: min(55vh, 600px);
+    border: 1px solid #ddd;
+    background: #fff;
+}
+.nstarter-history-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; }
+.nstarter-history-actions button { padding: 8px 16px; cursor: pointer; }
+
 @media (max-width: 480px) {
     .nstarter-editor-panel {
         top: 10px;

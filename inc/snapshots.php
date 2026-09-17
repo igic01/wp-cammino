@@ -176,6 +176,10 @@ function nstarter_get_source_template_slug( int $post_id ): string {
  * Read the raw saved HTML snapshot for the currently selected source.
  */
 function nstarter_get_snapshot_html( int $post_id ): string {
+	$history = nstarter_get_snapshot_history( $post_id );
+	if ( $history ) {
+		return $history['current']['html'];
+	}
 	$has_canonical_snapshot = metadata_exists( 'post', $post_id, NSTARTER_SNAPSHOT_META_KEY );
 	$html                   = $has_canonical_snapshot
 		? (string) get_post_meta( $post_id, NSTARTER_SNAPSHOT_META_KEY, true )
@@ -211,9 +215,16 @@ function nstarter_get_snapshot_html( int $post_id ): string {
 }
 
 /**
- * Save a snapshot to ACF. Post meta is a fallback when ACF is unavailable.
+ * Save design-specific history and mirror current HTML to legacy meta and ACF.
  */
-function nstarter_update_snapshot_html( int $post_id, string $html ): bool {
+function nstarter_update_snapshot_html( int $post_id, string $html, string $expected_token = '' ): bool {
+	if ( ! nstarter_preserve_legacy_design( $post_id ) ) {
+		return false;
+	}
+	$previous = nstarter_get_snapshot_html( $post_id );
+	if ( ! nstarter_commit_snapshot_history( $post_id, $html, $previous, $expected_token ) ) {
+		return false;
+	}
 	update_post_meta( $post_id, '_nstarter_snapshot_source', nstarter_get_source_template_slug( $post_id ) );
 	update_post_meta( $post_id, NSTARTER_SNAPSHOT_META_KEY, wp_slash( $html ) );
 
