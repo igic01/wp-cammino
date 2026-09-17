@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.10.0' );
+define( 'NSTARTER_VERSION', '1.10.1' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
@@ -316,6 +316,11 @@ function cammino_enqueue_visual_page_assets(): void {
 
 	$slug  = nstarter_get_native_source_template_slug( get_queried_object_id() );
 	$pages = array(
+		'feature-test' => array(
+			'handle' => 'cammino-feature-test',
+			'style' => '/assets/css/pages/feature-test.css',
+			'script' => '',
+		),
 		'home'     => array(
 			'handle' => 'cammino-home',
 			'style'  => '/assets/css/pages/home.css',
@@ -474,6 +479,10 @@ function cammino_enqueue_design_assets( string $handle, string $style, string $s
 		NSTARTER_VERSION,
 		true
 	);
+
+	if ( '' === $script ) {
+		return;
+	}
 
 	wp_enqueue_script(
 		$handle,

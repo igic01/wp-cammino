@@ -30,8 +30,8 @@ const fixture = `<!doctype html><html><head><link rel="stylesheet" href="/editor
 <button data-nstarter-save>Save</button><a data-nstarter-view>View</a><button data-nstarter-regenerate>Reset</button><button data-nstarter-history>History</button></aside>
 <dialog data-nstarter-video-dialog><form data-nstarter-video-form></form><button data-nstarter-video-cancel></button></dialog>
 <dialog data-nstarter-variable-dialog><form data-nstarter-variable-form></form><button data-nstarter-variable-cancel></button></dialog>
-<dialog data-nstarter-history-dialog class="nstarter-history-dialog"><select data-nstarter-history-version></select><input type="checkbox" data-nstarter-history-original>
-<p data-nstarter-history-status></p><iframe data-nstarter-history-preview sandbox="allow-same-origin"></iframe><button data-nstarter-history-close>Close</button><button data-nstarter-history-restore disabled>Restore</button></dialog>
+<dialog data-nstarter-history-dialog class="nstarter-history-dialog"><select data-nstarter-history-version></select>
+<p data-nstarter-history-status></p><button data-nstarter-history-close>Close</button><button data-nstarter-history-restore disabled>Restore</button></dialog>
 <script>window.nstarterEditor={ajaxUrl:'/ajax',nonce:'test',postId:1,source:'home',previewUrl:'/preview',isPost:false,strings:{
 confirmSaveConflicts:'Review unmatched content. Save anyway?',mergeWarning:'Review saved content in History.',confirmRestore:'Restore content?',confirmRegenerate:'Reset content?',
 noHistory:'No saved versions.',currentVersion:'Current save',loadingHistory:'Loading',saved:'Saved',unsaved:'Unsaved',error:'Failed',regenerated:'Reset'}};</script>
@@ -67,11 +67,6 @@ const server = createServer(async (req, res) => {
         case 'nstarter_snapshot_history':
             data = { versions: [{ id: 'current', saved_at: 'Today', author_name: 'Editor' }, { id: 'previous', saved_at: 'Yesterday', author_name: 'Editor' }] };
             break;
-        case 'nstarter_preview_snapshot_version': {
-            const html = form.get('version_id') === 'current' ? state.current : state.previous;
-            data = { html: previewMarkup(html), savedHtml: html, conflicts: state.conflicts };
-            break;
-        }
         case 'nstarter_restore_snapshot_version':
             state.current = state.previous;
             state.restores++;
@@ -155,14 +150,10 @@ try {
     await check(`document.querySelector('[data-nstarter-status]').classList.contains('is-error')`, 'Merge warning appears on load');
     await check(`window.confirm.toString().includes('confirmations')`, 'Confirmation stub is active');
     await evaluate(`document.querySelector('[data-nstarter-history]').click()`);
-    await check(`document.querySelector('[data-nstarter-history-version]').options.length===2 && !!document.querySelector('[data-nstarter-history-preview]').srcdoc`, 'History opens and previews current content');
+    await check(`document.querySelector('[data-nstarter-history-version]').options.length===2 && document.querySelector('[data-nstarter-history-dialog]').open`, 'History opens with version metadata');
     await check(`document.querySelector('[data-nstarter-history-restore]').disabled`, 'Current save cannot be restored over itself');
-    await check(`Array.from(document.querySelector('[data-nstarter-history-preview]').contentDocument.fonts).some(font=>font.status==='loaded')`, 'History previews can load the theme’s fonts');
-    await evaluate(`document.querySelector('[data-nstarter-history-original]').click()`);
-    await check(`document.querySelector('[data-nstarter-history-preview]').srcdoc.includes('Recover this copy')`, 'Original HTML exposes unmatched content');
     await evaluate(`const versions=document.querySelector('[data-nstarter-history-version]');versions.selectedIndex=1;versions.dispatchEvent(new Event('change'))`);
-    await check(`!document.querySelector('[data-nstarter-history-restore]').disabled && document.querySelector('[data-nstarter-history-preview]').srcdoc.includes('Older client heading')`, 'Previous version preview enables restore');
-    await check(`!document.querySelector('[data-nstarter-history-preview]').sandbox.contains('allow-scripts') && !window.previewScriptRan`, 'History previews cannot execute saved scripts');
+    await check(`!document.querySelector('[data-nstarter-history-restore]').disabled`, 'Selecting a previous version enables restore');
     await evaluate(`document.querySelector('[data-nstarter-history-restore]').click()`);
     await check(`!document.querySelector('[data-nstarter-history-dialog]').open && document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('#title')?.textContent==='Older client heading'`, 'Restore reloads the latest layout with old content');
     if (state.restores !== 1) throw new Error('Restore endpoint was not called');

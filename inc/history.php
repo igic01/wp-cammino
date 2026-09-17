@@ -108,7 +108,7 @@ function nstarter_get_snapshot_version( int $post_id, string $id ): ?array {
 			return $record;
 		}
 	}
-	// The existing snapshot is previewable before the first history-enabled save.
+	// The existing snapshot is available before the first history-enabled save.
 	if ( 'current' === $id ) {
 		$html = nstarter_get_snapshot_html( $post_id );
 		return '' !== $html ? array( 'id' => 'current', 'html' => $html, 'saved_at' => __( 'Existing saved content', 'cammino' ), 'author' => 0 ) : null;
@@ -155,19 +155,6 @@ function nstarter_ajax_snapshot_history(): void {
 	wp_send_json_success( array( 'versions' => nstarter_snapshot_history_list( $post_id ) ) );
 }
 
-add_action( 'wp_ajax_nstarter_preview_snapshot_version', 'nstarter_ajax_preview_snapshot_version' );
-function nstarter_ajax_preview_snapshot_version(): void {
-	$post_id = nstarter_history_request_post();
-	nstarter_require_snapshot_context( $post_id );
-	$id = isset( $_POST['version_id'] ) ? sanitize_text_field( wp_unslash( $_POST['version_id'] ) ) : '';
-	$version = nstarter_get_snapshot_version( $post_id, $id );
-	if ( ! $version ) {
-		wp_send_json_error( array( 'message' => __( 'This saved version is no longer available.', 'cammino' ) ), 404 );
-	}
-	$merged = nstarter_render_merged_page_html( $post_id, $version['html'] );
-	wp_send_json_success( array( 'html' => nstarter_expand_live_sections( $merged['html'], $post_id ), 'savedHtml' => $version['html'], 'conflicts' => $merged['conflicts'] ) );
-}
-
 add_action( 'wp_ajax_nstarter_restore_snapshot_version', 'nstarter_ajax_restore_snapshot_version' );
 function nstarter_ajax_restore_snapshot_version(): void {
 	$post_id = nstarter_history_request_post();
@@ -177,7 +164,7 @@ function nstarter_ajax_restore_snapshot_version(): void {
 	if ( ! $version ) {
 		wp_send_json_error( array( 'message' => __( 'This saved version is no longer available.', 'cammino' ) ), 404 );
 	}
-	// Store the original HTML, so unmatched content remains available for review.
+	// Store the original HTML, so unmatched content is preserved even when it cannot be matched.
 	if ( ! nstarter_update_snapshot_html( $post_id, $version['html'], (string) wp_unslash( $_POST['snapshot_token'] ) ) ) {
 		wp_send_json_error( array( 'message' => __( 'The version could not be restored. Reload the editor and try again.', 'cammino' ) ), 409 );
 	}

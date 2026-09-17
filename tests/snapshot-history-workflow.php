@@ -81,7 +81,7 @@ $legacy = '<p>Client’s \"quoted\" content \\ path</p>';
 update_post_meta( 1, NSTARTER_SNAPSHOT_META_KEY, wp_slash( $legacy ) );
 update_post_meta( 1, '_nstarter_snapshot_source', 'home' );
 history_expect( nstarter_get_snapshot_html( 1 ) === $legacy, 'Legacy raw snapshots remain available.' );
-history_expect( count( nstarter_snapshot_history_list( 1 ) ) === 1, 'Legacy HTML is previewable before the first new save.' );
+history_expect( count( nstarter_snapshot_history_list( 1 ) ) === 1, 'Legacy HTML is listed before the first new save.' );
 history_expect( nstarter_update_snapshot_html( 1, '<p>First save</p>' ), 'First save succeeds.' );
 $state = nstarter_get_snapshot_history( 1 );
 history_expect( $state['previous'][0]['html'] === $legacy, 'The first save preserves the original HTML exactly.' );
@@ -137,7 +137,7 @@ $race = static function ( int $id, string $key ): void {
 };
 history_expect( ! nstarter_update_snapshot_html( 1, '<p>Losing save</p>' ) && nstarter_get_snapshot_html( 1 ) === '<p>Racing save</p>', 'Compare-and-swap preserves the winning concurrent save.' );
 
-// Exercise the actual editor save, reset and version-preview endpoints.
+// Exercise the actual editor save, reset and restore endpoints.
 $source[1] = 'contact2';
 $html = '<h1 id="contact2-title">Client heading</h1><p id="removed">Recover this text</p>';
 $response = history_call( 'nstarter_ajax_save_snapshot', array( 'html' => wp_slash( $html ) ) );
@@ -147,9 +147,10 @@ $response = history_call( 'nstarter_ajax_regenerate_snapshot' );
 history_expect( $response->status === 200 && str_contains( nstarter_get_snapshot_html( 1 ), 'contact2-main' ), 'Reset renders fresh source HTML.' );
 $old_version = nstarter_get_snapshot_history( 1 )['previous'][0];
 history_expect( $old_version['html'] === $html, 'Reset preserves the previous client content in History.' );
-$response = history_call( 'nstarter_ajax_preview_snapshot_version', array( 'version_id' => $old_version['id'] ) );
-history_expect( $response->status === 200 && str_contains( $response->data['html'], 'contact2-main' ) && str_contains( $response->data['html'], '>Client heading</h1>' ), 'History preview merges old content into the latest real template.' );
-history_expect( $response->data['savedHtml'] === $html && ! empty( $response->data['conflicts'] ), 'Preview also exposes the original HTML and reports unmatched saved content.' );
+$response = history_call( 'nstarter_ajax_restore_snapshot_version', array( 'version_id' => $old_version['id'] ) );
+$merged = nstarter_render_merged_page_html( 1 );
+history_expect( $response->status === 200 && str_contains( $merged['html'], 'contact2-main' ) && str_contains( $merged['html'], '>Client heading</h1>' ), 'Restored content renders within the latest real template.' );
+history_expect( nstarter_get_snapshot_html( 1 ) === $html && ! empty( $merged['conflicts'] ), 'Restore preserves original HTML and reports unmatched content in the editor.' );
 $before = nstarter_get_snapshot_html( 1 );
 $response = history_call( 'nstarter_ajax_save_snapshot', array( 'html' => 'Wrong', 'snapshot_token' => 'stale' ) );
 history_expect( $response->status === 409 && nstarter_get_snapshot_html( 1 ) === $before, 'A stale editor save cannot overwrite current content.' );

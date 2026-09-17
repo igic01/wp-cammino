@@ -1,0 +1,11 @@
+.feature-test { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+.feature-test__panel { margin-bottom: 24px; padding: 32px; background: #fffaf4; border: 1px solid #e2d9cc; border-radius: 16px; }
+.feature-test h1, .feature-test h2, .feature-test h3 { margin: 0 0 16px; }
+.feature-test p { margin: 0 0 20px; line-height: 1.7; }
+.feature-test img { display: block; width: 100%; max-width: 480px; height: auto; margin-top: 24px; border-radius: 12px; }
+.feature-test__cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px; }
+.feature-test__card { padding: 24px; background: #fff; border: 1px solid #e2d9cc; border-radius: 12px; }
+.feature-test--layout-2 .feature-test__panel { background: #edf6f4; border-left: 6px solid #216f62; }
+.feature-test--layout-2 #feature-test-hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 32px; align-items: center; }
+.feature-test--layout-2 #feature-test-hero img { margin-top: 0; }
+@media (max-width: 600px) { .feature-test { padding: 24px 16px; } .feature-test__panel { padding: 24px; } }

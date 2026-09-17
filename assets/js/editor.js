@@ -11,11 +11,8 @@
     const historyButton = document.querySelector('[data-nstarter-history]');
     const historyDialog = document.querySelector('[data-nstarter-history-dialog]');
     const historyVersion = document.querySelector('[data-nstarter-history-version]');
-    const historyOriginal = document.querySelector('[data-nstarter-history-original]');
-    const historyPreview = document.querySelector('[data-nstarter-history-preview]');
     const historyStatus = document.querySelector('[data-nstarter-history-status]');
     const historyRestore = document.querySelector('[data-nstarter-history-restore]');
-    let historyContent = null;
     let historyRequestId = 0;
     const modeSelect = document.querySelector('[data-nstarter-mode]');
     const editorPanel = document.querySelector('.nstarter-editor-panel');
@@ -2207,6 +2204,7 @@
         if (historyButton) {
             historyButton.disabled = nextBusy;
             historyVersion.disabled = nextBusy;
+            updateHistoryRestoreState();
         }
         if (sectionOrderButton) {
             sectionOrderButton.disabled = nextBusy;
@@ -2303,65 +2301,23 @@
         frame.src = config.previewUrl + (config.previewUrl.includes('?') ? '&' : '?') + 'nstarter_refresh=' + Date.now();
     }
 
-    function renderHistoryPreview() {
-        if (!historyContent) {
-            return;
-        }
-        const doc = document.implementation.createHTMLDocument('Saved content');
-        // Reuse current styles; scripts and saved forms cannot run in this sandbox.
-        frameDocument().head.querySelectorAll('link[rel="stylesheet"], style').forEach(function (style) {
-            doc.head.appendChild(style.cloneNode(true));
-        });
-        doc.body.className = frameDocument().body.className.replace('nstarter-editor-preview', '');
-        doc.body.innerHTML = historyOriginal.checked ? historyContent.savedHtml : historyContent.html;
-        doc.querySelectorAll('[contenteditable]').forEach(function (node) {
-            node.removeAttribute('contenteditable');
-        });
-        historyPreview.srcdoc = '<!doctype html>' + doc.documentElement.outerHTML;
-        historyStatus.textContent = !historyOriginal.checked && historyContent.conflicts.length
-            ? config.strings.mergeWarning + ' ' + historyContent.conflicts.join('; ')
-            : '';
-    }
-
-    async function previewHistoryVersion() {
-        const requestId = ++historyRequestId;
-        historyContent = null;
-        historyRestore.disabled = true;
-        historyPreview.removeAttribute('srcdoc');
-        if (!historyVersion.value) {
-            return;
-        }
-        historyStatus.textContent = config.strings.loadingHistory;
-        try {
-            const data = await request('nstarter_preview_snapshot_version', { version_id: historyVersion.value });
-            if (requestId !== historyRequestId || !historyDialog.open) {
-                return;
-            }
-            historyContent = data;
-            renderHistoryPreview();
-            historyRestore.disabled = historyVersion.selectedIndex === 0;
-        } catch (error) {
-            if (requestId === historyRequestId) {
-                historyStatus.textContent = error.message;
-            }
-        }
+    function updateHistoryRestoreState() {
+        historyRestore.disabled = busy || !historyVersion.value || historyVersion.selectedIndex <= 0;
     }
 
     async function openHistory() {
         if (busy) {
             return;
         }
+        const requestId = ++historyRequestId;
         historyDialog.showModal();
         historyVersion.replaceChildren();
-        historyContent = null;
         historyRestore.disabled = true;
-        historyPreview.removeAttribute('srcdoc');
-        historyOriginal.checked = false;
         historyStatus.textContent = config.strings.loadingHistory;
         setBusy(true);
         try {
             const data = await request('nstarter_snapshot_history');
-            if (!historyDialog.open) {
+            if (requestId !== historyRequestId || !historyDialog.open) {
                 return;
             }
             data.versions.forEach(function (version, index) {
@@ -2372,7 +2328,7 @@
             if (!data.versions.length) {
                 historyStatus.textContent = config.strings.noHistory;
             } else {
-                await previewHistoryVersion();
+                historyStatus.textContent = '';
             }
         } catch (error) {
             historyStatus.textContent = error.message;
@@ -2382,7 +2338,7 @@
     }
 
     async function restoreHistoryVersion() {
-        if (busy || !historyContent || !window.confirm(config.strings.confirmRestore)) {
+        if (busy || !historyVersion.value || historyVersion.selectedIndex <= 0 || !window.confirm(config.strings.confirmRestore)) {
             return;
         }
         setBusy(true);
@@ -2437,8 +2393,7 @@
     regenerateButton.addEventListener('click', regenerate);
     if (historyButton) {
         historyButton.addEventListener('click', openHistory);
-        historyVersion.addEventListener('change', previewHistoryVersion);
-        historyOriginal.addEventListener('change', renderHistoryPreview);
+        historyVersion.addEventListener('change', updateHistoryRestoreState);
         historyRestore.addEventListener('click', restoreHistoryVersion);
         document.querySelector('[data-nstarter-history-close]').addEventListener('click', function () {
             historyDialog.close();

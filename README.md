@@ -88,8 +88,8 @@ current HTML and up to ten previous saves independently for each page and select
 design. The current HTML is also mirrored to the legacy snapshot meta and ACF
 field when ACF is active; the design-specific history is authoritative.
 
-Use **History** to preview a save with the current layout, inspect its original
-saved HTML, or restore it. Restoring creates a new save and keeps the replaced
+Use **History** to select a save by date and author and restore it.
+Restoring creates a new save and keeps the replaced
 content in history. Unchanged saves do not consume a history slot. Switching away
 from a design and back retrieves its content and history. **Reset to defaults**
 replaces content with fresh template output and keeps the previous save in history.
@@ -98,7 +98,7 @@ The merger identifies elements by stable `id` attributes and existing variable,
 live-section and `aria-labelledby` markers. Unique classes can help match nodes
 inside a matched section. Anonymous siblings use their positions only when their
 type counts agree; ambiguous or removed content produces an editor warning.
-Inspect the original HTML in History before saving a page with a warning.
+Check the page carefully before saving when a merge warning appears.
 The previous raw HTML remains available within the ten-save retention limit.
 
 For reliable updates, retain IDs when moving or redesigning editable elements.
@@ -114,6 +114,21 @@ Purge full-page caches after deploying template updates so the fresh layout is s
 The history feature applies to Cammino page designs. Normal posts retain their
 existing separate article-body storage and reset workflow. Concurrent page edits
 are protected by version tokens; reload a stale editor before saving.
+
+To try the features, create a draft page and select **Cammino — Feature test —
+HTML merge and history** as its template. Edit its heading, paragraphs, link
+destination and image, adjust the number of test cards, and save several times.
+Open **History**, select an earlier save and choose **Restore**. The replaced
+save remains available. Twelve distinct saves also let you verify the limit of
+ten previous saves alongside the current one.
+
+To simulate deploying a new layout, change the default `: 1` to `: 2` on the
+`$cammino_test_layout` line in `snapshot-templates/feature-test.php`. Purge page
+caches and reload the editor. Layout two changes the heading tag, introduces
+wrappers, changes the visual layout and adds a section. Existing edited content,
+including both paragraphs without IDs or classes, should remain. Restore an
+earlier save again to verify it uses layout two. Use **Reset to defaults** only
+when testing a deliberate reset of the content.
 
 The Kontakt and Zapojte sa templates render Contact Form 7 forms `d43ca6f` and
 `b4ce2b6` at request time. Their surrounding copy remains editable, while each

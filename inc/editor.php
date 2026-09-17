@@ -135,8 +135,8 @@ function nstarter_maybe_render_editor(): void {
 					? __( 'Reset this post body? All saved body edits will be replaced.', 'cammino' )
 					: __( 'Reset this page to its template defaults? The current saved content will be kept in History.', 'cammino' ),
 				'confirmRestore' => __( 'Restore this saved content? Unsaved edits will be discarded. The current save will be kept in History.', 'cammino' ),
-				'confirmSaveConflicts' => __( 'Some saved content could not be matched to the updated layout. Review it in History before saving. Save anyway? The previous HTML will be kept in History.', 'cammino' ),
-				'mergeWarning' => __( 'Some saved content needs review. Open History to inspect the saved HTML.', 'cammino' ),
+				'confirmSaveConflicts' => __( 'Some saved content could not be matched to the updated layout. Save anyway? The previous HTML will be kept in History.', 'cammino' ),
+				'mergeWarning' => __( 'Some saved content could not be matched to the updated layout. Previous HTML remains stored in History.', 'cammino' ),
 				'noHistory' => __( 'No saved versions yet.', 'cammino' ),
 				'currentVersion' => __( 'Current save', 'cammino' ),
 				'loadingHistory' => __( 'Loading saved content…', 'cammino' ),
@@ -251,9 +251,7 @@ function nstarter_maybe_render_editor(): void {
 					<h2><?php esc_html_e( 'Saved content', 'cammino' ); ?></h2>
 					<p><?php esc_html_e( 'The current save and up to ten previous saves for this page design. Restoring content uses the latest layout.', 'cammino' ); ?></p>
 					<label><?php esc_html_e( 'Version', 'cammino' ); ?> <select data-nstarter-history-version></select></label>
-					<label><input type="checkbox" data-nstarter-history-original> <?php esc_html_e( 'Show original saved HTML', 'cammino' ); ?></label>
 					<p data-nstarter-history-status role="status"></p>
-					<iframe data-nstarter-history-preview sandbox="allow-same-origin" title="<?php esc_attr_e( 'Saved content preview', 'cammino' ); ?>"></iframe>
 					<div class="nstarter-history-actions">
 						<button type="button" data-nstarter-history-close><?php esc_html_e( 'Close', 'cammino' ); ?></button>
 						<button type="button" data-nstarter-history-restore disabled><?php esc_html_e( 'Restore', 'cammino' ); ?></button>

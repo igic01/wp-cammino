@@ -50,4 +50,22 @@ foreach ( nstarter_get_source_templates() as $slug => $name ) {
 	}
 	template_merge_expect( ! str_contains( $result['html'], 'class="site-header"' ) && ! str_contains( $result['html'], 'class="site-footer"' ), $slug . ': the wrapper owns the shared shell.' );
 }
+// Simulate a deployed redesign of the dedicated feature-test template.
+$GLOBALS['test_meta'][100]['_wp_page_template'] = nstarter_get_source_template_path( 'feature-test' );
+$saved = str_replace(
+    array( 'A page for testing saved content', 'First anonymous paragraph.', 'Second anonymous paragraph.', 'https://example.com/', 'Replace this test image', 'First test card' ),
+    array( 'CLIENT heading', 'CLIENT first paragraph.', 'CLIENT second paragraph.', 'https://client.example/destination', 'CLIENT image description', 'CLIENT first card' ),
+    nstarter_render_source_template( 100 )
+);
+$saved = str_replace( NSTARTER_URL . '/assets/images/placeholder.webp', 'https://client.example/photo.jpg', $saved );
+define( 'CAMMINO_FEATURE_TEST_LAYOUT', 2 );
+$result = nstarter_merge_page_html( nstarter_render_source_template( 100 ), $saved );
+template_merge_expect( ! $result['conflicts'], 'Test design updates without ambiguous matches.' );
+template_merge_expect( str_contains( $result['html'], 'feature-test--layout-2' ) && str_contains( $result['html'], 'feature-test__new-wrapper' ), 'The new layout and wrappers replace the old structure.' );
+template_merge_expect( str_contains( $result['html'], '<h2 id="feature-test-title">CLIENT heading</h2>' ), 'The heading content survives a tag change.' );
+template_merge_expect( str_contains( $result['html'], 'CLIENT first paragraph.' ) && str_contains( $result['html'], 'CLIENT second paragraph.' ), 'Anonymous paragraphs survive new wrappers in order.' );
+template_merge_expect( str_contains( $result['html'], 'href="https://client.example/destination"' ), 'The saved link destination survives.' );
+template_merge_expect( str_contains( $result['html'], 'src="https://client.example/photo.jpg"' ) && str_contains( $result['html'], 'alt="CLIENT image description"' ), 'The saved image and description survive.' );
+template_merge_expect( str_contains( $result['html'], 'CLIENT first card' ), 'Repeatable card edits survive.' );
+template_merge_expect( str_contains( $result['html'], 'New section from layout two' ), 'New sections retain template defaults.' );
 echo "Passed $checks template merge checks.\n";
