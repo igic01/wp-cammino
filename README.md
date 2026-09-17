@@ -188,7 +188,7 @@ the current WordPress content or an empty body.
 
 Managed posts use the same dedicated content-builder element below the
 cover image. Its four inline buttons add unlimited headings, paragraphs,
-placeholder images, and compact impact-story calls to action. Every paragraph
+placeholder images, and compact impact-story text blocks. Every paragraph
 has safe controls for turning selected words into a link, editing an existing
 selected link, or removing links without replacing the paragraph. Text is
 editable in the preview; clicking an image opens the WordPress media library.

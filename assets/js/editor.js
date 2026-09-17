@@ -125,7 +125,7 @@
         } else if (type === 'impact-story') {
             item = doc.createElement('div');
             item.className = 'article-impact-story';
-            item.innerHTML = '<div class="article-impact-story__copy"><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div><a class="button button--coral" href="#">Prečítať príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a>';
+            item.innerHTML = '<div class="article-impact-story__copy"><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div>';
         }
 
         if (item) {
@@ -2152,6 +2152,9 @@
         copy.querySelectorAll('[data-nstarter-editor-runtime]').forEach(function (element) {
             element.remove();
         });
+        copy.querySelectorAll('.article-impact-story > a.button').forEach(function (element) {
+            element.remove();
+        });
         if (!config.isPost) {
             copy.querySelectorAll('.site-header, .site-footer, .skip-link').forEach(function (element) {
                 element.remove();
@@ -2377,6 +2380,9 @@
         const doc = frameDocument();
 
         loading.classList.add('is-hidden');
+        doc.querySelectorAll('.article-impact-story > a.button').forEach(function (element) {
+            element.remove();
+        });
         rememberTransientState(doc);
         doc.addEventListener('pointerdown', stopPreviewInteraction, true);
         doc.addEventListener('mousedown', stopPreviewInteraction, true);

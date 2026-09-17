@@ -65,7 +65,7 @@ $fresh_visible_body = preg_replace( '#<template\b[^>]*>.*?</template>#is', '', $
 expect( ! str_contains( $fresh_visible_body, 'data-nstarter-content-item' ), 'New post body starts empty' );
 expect( substr_count( $fresh_body, 'data-nstarter-content-template=' ) === 4, 'Inline builder provides title, paragraph, image, and impact-story templates' );
 expect( str_contains( $fresh_body, '/assets/images/placeholder.webp' ), 'New image template uses the local placeholder' );
-expect( str_contains( $fresh_body, 'data-nstarter-content-template="impact-story"' ) && str_contains( $fresh_body, 'Prečítať príbeh' ), 'Impact-story template contains an editable title, description, and linked button' );
+expect( str_contains( $fresh_body, 'data-nstarter-content-template="impact-story"' ) && str_contains( $fresh_body, 'article-impact-story__copy' ) && ! str_contains( $fresh_body, 'Prečítať príbeh' ), 'Impact-story template contains editable copy without a button' );
 expect( ! str_contains( $fresh_body, 'article-impact-story__eyebrow' ), 'Impact-story template has no eyebrow label' );
 expect( ! str_contains( $fresh_body, 'data-nstarter-content-template="important-link"' ), 'The separate important-link block has been removed' );
 expect( ! str_contains( $fresh_body, 'content-template="posts"' ), 'Fresh post body has no Related Posts element' );

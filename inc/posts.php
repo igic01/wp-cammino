@@ -1362,7 +1362,7 @@ function cammino_render_post_visual_content( int $post_id ): string {
 	<template data-nstarter-content-template="title"><h2 class="article-content-block" data-nstarter-content-item data-nstarter-content-type="title">Nový nadpis</h2></template>
 	<template data-nstarter-content-template="paragraph"><p class="article-content-block" data-nstarter-content-item data-nstarter-content-type="paragraph">Nový odsek textu.</p></template>
 	<template data-nstarter-content-template="image"><figure class="article-inline-image article-content-block" data-nstarter-content-item data-nstarter-content-type="image"><img src="<?php echo esc_url( $placeholder ); ?>" alt="" width="1200" height="800" loading="lazy"></figure></template>
-	<template data-nstarter-content-template="impact-story"><div class="article-impact-story article-content-block" data-nstarter-content-item data-nstarter-content-type="impact-story"><div class="article-impact-story__copy"><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div><a class="button button--coral" href="#">Prečítať príbeh <span class="button-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right-long icon-diagonal"></i></span></a></div></template>
+	<template data-nstarter-content-template="impact-story"><div class="article-impact-story article-content-block" data-nstarter-content-item data-nstarter-content-type="impact-story"><div class="article-impact-story__copy"><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div></div></template>
 	<?php
 
 	return (string) ob_get_clean();
