@@ -5,9 +5,9 @@
  * @package Cammino
  */
 
-// Change the default from 1 to 2 to simulate deploying a redesigned template.
+// Layout two is the redesigned template. Set the default to 1 to retry the original.
 // The constant allows automated tests to exercise both layouts without file edits.
-$cammino_test_layout = defined( 'CAMMINO_FEATURE_TEST_LAYOUT' ) ? CAMMINO_FEATURE_TEST_LAYOUT : 1;
+$cammino_test_layout = defined( 'CAMMINO_FEATURE_TEST_LAYOUT' ) ? CAMMINO_FEATURE_TEST_LAYOUT : 2;
 $cammino_test_heading = 2 === $cammino_test_layout ? 'h2' : 'h1';
 ?>
 <main id="main-content" class="feature-test feature-test--layout-<?php echo (int) $cammino_test_layout; ?>">

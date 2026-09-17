@@ -52,10 +52,16 @@ foreach ( nstarter_get_source_templates() as $slug => $name ) {
 }
 // Simulate a deployed redesign of the dedicated feature-test template.
 $GLOBALS['test_meta'][100]['_wp_page_template'] = nstarter_get_source_template_path( 'feature-test' );
+// Render the original layout independently of the currently deployed default.
+$original_source = str_replace( 'CAMMINO_FEATURE_TEST_LAYOUT : 2;', 'CAMMINO_FEATURE_TEST_LAYOUT : 1;', file_get_contents( NSTARTER_PATH . '/snapshot-templates/feature-test.php' ) );
+ob_start();
+eval( '?>' . $original_source );
+$original_html = ob_get_clean();
+template_merge_expect( str_contains( $original_html, 'feature-test--layout-1' ) && ! str_contains( $original_html, 'feature-test-new-section' ), 'The migration fixture renders the original layout.' );
 $saved = str_replace(
     array( 'A page for testing saved content', 'First anonymous paragraph.', 'Second anonymous paragraph.', 'https://example.com/', 'Replace this test image', 'First test card' ),
     array( 'CLIENT heading', 'CLIENT first paragraph.', 'CLIENT second paragraph.', 'https://client.example/destination', 'CLIENT image description', 'CLIENT first card' ),
-    nstarter_render_source_template( 100 )
+    $original_html
 );
 $saved = str_replace( NSTARTER_URL . '/assets/images/placeholder.webp', 'https://client.example/photo.jpg', $saved );
 define( 'CAMMINO_FEATURE_TEST_LAYOUT', 2 );

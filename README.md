@@ -122,9 +122,11 @@ Open **History**, select an earlier save and choose **Restore**. The replaced
 save remains available. Twelve distinct saves also let you verify the limit of
 ten previous saves alongside the current one.
 
-To simulate deploying a new layout, change the default `: 1` to `: 2` on the
-`$cammino_test_layout` line in `snapshot-templates/feature-test.php`. Purge page
-caches and reload the editor. Layout two changes the heading tag, introduces
+The test template now defaults to layout two. If you saved content with layout
+one, purge page caches and reload the editor to see the update. To repeat the
+test, change the default `: 2` to `: 1` on the `$cammino_test_layout` line in
+`snapshot-templates/feature-test.php`, save your edits with layout one, then
+change it back to `: 2`. Layout two changes the heading tag, introduces
 wrappers, changes the visual layout and adds a section. Existing edited content,
 including both paragraphs without IDs or classes, should remain. Restore an
 earlier save again to verify it uses layout two. Use **Reset to defaults** only
