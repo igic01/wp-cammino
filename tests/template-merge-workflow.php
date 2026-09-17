@@ -50,6 +50,16 @@ foreach ( nstarter_get_source_templates() as $slug => $name ) {
 	}
 	template_merge_expect( ! str_contains( $result['html'], 'class="site-header"' ) && ! str_contains( $result['html'], 'class="site-footer"' ), $slug . ': the wrapper owns the shared shell.' );
 }
+// New partner link wrappers must also work with saved, previously unlinked logos.
+$GLOBALS['test_meta'][100]['_wp_page_template'] = nstarter_get_source_template_path( 'home' );
+$partner_template = nstarter_render_source_template( 100 );
+$legacy_partners = preg_replace( '#(<li class="home-partner"[^>]*>)\s*<a\b[^>]*>(.*?)</a>#s', '$1$2', $partner_template );
+$legacy_partners = str_replace( NSTARTER_URL . '/assets/partners/logo-02-fma.webp', 'https://client.example/edited-partner.webp', $legacy_partners );
+$partner_result = nstarter_merge_page_html( $partner_template, $legacy_partners );
+template_merge_expect( ! $partner_result['conflicts'], 'Adding partner links does not cause conflicts with legacy snapshots: ' . implode( '; ', $partner_result['conflicts'] ) );
+template_merge_expect( str_contains( $partner_result['html'], 'href="http://www.salezianky.sk"' ) && str_contains( $partner_result['html'], 'href="https://grapepr.sk/"' ), 'Fresh partner destinations appear in previously unlinked snapshots.' );
+template_merge_expect( str_contains( $partner_result['html'], 'src="https://client.example/edited-partner.webp"' ), 'Edited partner logos survive new link wrappers.' );
+
 // Simulate a deployed redesign of the dedicated feature-test template.
 $GLOBALS['test_meta'][100]['_wp_page_template'] = nstarter_get_source_template_path( 'feature-test' );
 // Render the original layout independently of the currently deployed default.

@@ -127,6 +127,18 @@ final class NStarter_HTML_Merge {
 		return false;
 	}
 
+	private function transparent_wrapper( DOMElement $node ): bool {
+		if ( '' !== $this->key( $node ) ) {
+			return false;
+		}
+		if ( in_array( $node->tagName, array( 'div', 'figure' ), true ) ) {
+			return true;
+		}
+		// A newly linked image keeps its saved media while using the new href.
+		$children = $this->children( $node );
+		return 'a' === $node->tagName && ! $this->texts( $node ) && 1 === count( $children ) && 'media' === $this->type( $children[0] );
+	}
+
 	private function descendants( DOMElement $scope ): array {
 		$nodes = array();
 		foreach ( $this->children( $scope ) as $child ) {
@@ -135,7 +147,7 @@ final class NStarter_HTML_Merge {
 			}
 			$nodes[] = $child;
 			// Search through wrappers, never into other identified sections.
-			if ( '' === $this->key( $child ) && in_array( $child->tagName, array( 'div', 'figure' ), true ) ) {
+			if ( $this->transparent_wrapper( $child ) ) {
 				$nodes = array_merge( $nodes, $this->descendants( $child ) );
 			}
 		}
@@ -446,7 +458,7 @@ final class NStarter_HTML_Merge {
 				$this->merge_node( $child, $old );
 			} elseif ( ! $child->hasAttribute( 'data-nstarter-live-section' ) ) {
 				// Unidentified wrappers may be new; identified unmatched sections are new content.
-				$wrapper = '' === $this->key( $child ) && in_array( $child->tagName, array( 'div', 'figure' ), true );
+				$wrapper = $this->transparent_wrapper( $child );
 				$this->walk( $child, $wrapper ? $scope : null, $wrapper ? $fresh_scope : null );
 			}
 		}

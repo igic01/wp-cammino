@@ -1889,6 +1889,19 @@ body:not(.nstarter-editor-preview) .home-partners[data-nstarter-variable-value="
   will-change: transform;
 }
 
+.home-partner > a {
+  display: grid;
+  width: 100%;
+  min-height: 5rem;
+  place-items: center;
+}
+
+.home-partner > a:focus-visible {
+  outline: 2px solid var(--color-coral);
+  outline-offset: 4px;
+  border-radius: 0.35rem;
+}
+
 .home-partner img {
   display: block;
   width: auto;

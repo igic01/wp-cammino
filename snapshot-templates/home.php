@@ -25,17 +25,17 @@ $cammino_home_event_ids = array_map(
   array_slice( cammino_get_event_picker_posts(), 0, 4 )
 );
 $cammino_partners    = array(
-  array( 'file' => 'logo-02-fma.webp', 'name' => 'FMA', 'width' => 47, 'height' => 47 ),
-  array( 'file' => 'logo-03-domka-00.webp', 'name' => 'DOMKA', 'width' => 140, 'height' => 47 ),
-  array( 'file' => 'logo-04-vdb.webp', 'name' => 'VDB', 'width' => 93, 'height' => 47 ),
-  array( 'file' => 'logo-05-slovo-plus-02.webp', 'name' => 'Slovo+', 'width' => 116, 'height' => 47 ),
-  array( 'file' => 'male_Logo_CB_transparent.webp', 'name' => 'Exallievi Don Bosca', 'width' => 740, 'height' => 220 ),
-  array( 'file' => 'zlate_zrnko_logo-1.webp', 'name' => 'Zlaté Zrnko', 'width' => 658, 'height' => 657 ),
-  array( 'file' => 'logo-06-dm.webp', 'name' => 'dm', 'width' => 73, 'height' => 47 ),
-  array( 'file' => 'PM-Profimarket-logo.webp', 'name' => 'ProfiMarket', 'width' => 820, 'height' => 384 ),
+  array( 'file' => 'logo-02-fma.webp', 'name' => 'FMA', 'url' => 'http://www.salezianky.sk', 'width' => 47, 'height' => 47 ),
+  array( 'file' => 'logo-03-domka-00.webp', 'name' => 'DOMKA', 'url' => 'https://www.domka.sk/', 'width' => 140, 'height' => 47 ),
+  array( 'file' => 'logo-04-vdb.webp', 'name' => 'VDB', 'url' => 'http://www.vdb.sk', 'width' => 93, 'height' => 47 ),
+  array( 'file' => 'logo-05-slovo-plus-02.webp', 'name' => 'Slovo+', 'url' => 'http://www.slovoplus.sk', 'width' => 116, 'height' => 47 ),
+  array( 'file' => 'male_Logo_CB_transparent.webp', 'name' => 'Exallievi Don Bosca', 'url' => 'https://www.exallievi.sk/', 'width' => 740, 'height' => 220 ),
+  array( 'file' => 'zlate_zrnko_logo-1.webp', 'name' => 'Zlaté Zrnko', 'url' => 'https://www.zlatezrnko.sk/', 'width' => 658, 'height' => 657 ),
+  array( 'file' => 'logo-06-dm.webp', 'name' => 'dm', 'url' => 'https://www.mojadm.sk/', 'width' => 73, 'height' => 47 ),
+  array( 'file' => 'PM-Profimarket-logo.webp', 'name' => 'ProfiMarket', 'url' => 'https://www.pmprofimarket.sk/', 'width' => 820, 'height' => 384 ),
   array( 'file' => 'logoeasydeal.webp', 'name' => 'Easy Deal', 'width' => 236, 'height' => 63 ),
-  array( 'file' => 'logo-07-final-cd.webp', 'name' => 'FINAL-CD', 'width' => 121, 'height' => 47 ),
-  array( 'file' => 'GrapePR_CMYK_logo-1536x418.webp', 'name' => 'Grape PR', 'width' => 1536, 'height' => 418 ),
+  array( 'file' => 'logo-07-final-cd.webp', 'name' => 'FINAL-CD', 'url' => 'http://www.finalcd.sk', 'width' => 121, 'height' => 47 ),
+  array( 'file' => 'GrapePR_CMYK_logo-1536x418.webp', 'name' => 'Grape PR', 'url' => 'https://grapepr.sk/', 'width' => 1536, 'height' => 418 ),
 );
 ?>
 <main id="main-content">
@@ -288,6 +288,9 @@ $cammino_partners    = array(
           <ul class="home-partners__grid" aria-label="Logá partnerov" data-nstarter-variable-items>
             <?php foreach ( $cammino_partners as $cammino_partner_index => $cammino_partner ) : ?>
               <li class="home-partner" data-nstarter-variable-item data-reveal="up" data-delay="<?php echo esc_attr( (string) ( 35 * ( $cammino_partner_index % 8 ) ) ); ?>">
+                <?php if ( ! empty( $cammino_partner['url'] ) ) : ?>
+                <a href="<?php echo esc_url( $cammino_partner['url'] ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( $cammino_partner['name'] ); ?>">
+                <?php endif; ?>
                 <img
                   src="<?php echo esc_url( NSTARTER_URL . '/assets/partners/' . $cammino_partner['file'] ); ?>"
                   alt="<?php echo esc_attr( sprintf( 'Logo partnera %s', $cammino_partner['name'] ) ); ?>"
@@ -296,12 +299,15 @@ $cammino_partners    = array(
                   loading="lazy"
                   decoding="async"
                 >
+                <?php if ( ! empty( $cammino_partner['url'] ) ) : ?></a><?php endif; ?>
               </li>
             <?php endforeach; ?>
           </ul>
           <template data-nstarter-variable-template>
             <li class="home-partner" data-nstarter-variable-item>
+              <a href="#" target="_blank" rel="noopener noreferrer">
               <img src="<?php echo esc_url( $cammino_placeholder ); ?>" alt="Logo partnera {{partner}}" width="600" height="300" loading="lazy" decoding="async">
+              </a>
             </li>
           </template>
         </div>
