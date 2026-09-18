@@ -191,6 +191,7 @@ function nstarter_maybe_render_editor(): void {
 				'regenerated'       => __( 'Regenerated from PHP', 'nstarter' ),
 				'unsaved'           => __( 'Unsaved changes', 'nstarter' ),
 				'error'             => __( 'Something went wrong. Please try again.', 'nstarter' ),
+				'invalidResponse'   => __( 'The server returned an unexpected response. Your changes are still in the editor. Please try again.', 'nstarter' ),
 				'collapseControls'  => __( 'Collapse controls', 'nstarter' ),
 				'expandControls'    => __( 'Expand controls', 'nstarter' ),
 			),

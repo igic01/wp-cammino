@@ -2212,10 +2212,15 @@
             credentials: 'same-origin',
             body: body
         });
-        const data = await response.json();
+        let data;
+        try {
+            data = await response.json();
+        } catch (error) {
+            throw new Error(config.strings.invalidResponse || config.strings.error);
+        }
 
-        if (!response.ok || !data.success) {
-            throw new Error(data.data && data.data.message ? data.data.message : config.strings.error);
+        if (!response.ok || !data || !data.success) {
+            throw new Error(data && data.data && data.data.message ? data.data.message : config.strings.error);
         }
 
         return data.data;

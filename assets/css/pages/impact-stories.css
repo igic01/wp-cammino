@@ -137,6 +137,12 @@ body:not(.nstarter-editor-preview) .impact-stories-list[data-nstarter-variable-v
   transform: rotate(1.5deg);
 }
 
+.nstarter-editor-preview [data-impact-stories-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
 .nstarter-editor-preview .impact-stories-grid:empty::before {
   display: block;
   grid-column: 1 / -1;
