@@ -59,6 +59,7 @@
                 ),
                 onChange: choose
             }),
+            selected && el(Button, { variant: 'secondary', disabled: adding, onClick: () => choose('') }, __('Remove category', 'cammino')),
             state.canCreate && el(Button, { variant: 'link', disabled: adding, 'aria-expanded': showForm, onClick: () => setShowForm(!showForm) }, __('Add category', 'cammino')),
             showForm && el('form', { onSubmit: addCategory },
                 el(TextControl, { label: __('New category name', 'cammino'), value: name, onChange: setName, required: true, disabled: adding }),
