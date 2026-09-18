@@ -31,4 +31,7 @@ impact_stories_expect( str_contains( $script, 'IntersectionObserver' ) && str_co
 impact_stories_expect( str_contains( $theme, "'impact-stories' => array(" ) && str_contains( $theme, '/assets/css/pages/impact-stories.css' ) && str_contains( $theme, '/assets/js/pages/impact-stories.js' ), 'The theme registers the new page assets.' );
 impact_stories_expect( str_contains( $theme, "'impact-stories' => array( 'impact-stories-page' )" ), 'The template receives its page body class.' );
 
+impact_stories_expect( preg_match( '/\.nstarter-editor-preview \[data-impact-stories-reveal\]\s*\{[^}]*opacity:\s*1\s*!important;[^}]*transform:\s*none\s*!important;[^}]*transition:\s*none\s*!important;/s', $styles ), 'Newly cloned stories are visible immediately in the editor, including when reveal styles compete.' );
+impact_stories_expect( str_contains( $theme, 'filemtime( NSTARTER_PATH . $style )' ), 'Page stylesheet updates change their cache version automatically.' );
+
 echo "Passed $checks impact stories page checks.\n";

@@ -470,7 +470,7 @@ function cammino_enqueue_design_assets( string $handle, string $style, string $s
 		$style_dependencies = array( $before_handle );
 	}
 
-	wp_enqueue_style( $handle, NSTARTER_URL . $style, $style_dependencies, NSTARTER_VERSION );
+	wp_enqueue_style( $handle, NSTARTER_URL . $style, $style_dependencies, (string) filemtime( NSTARTER_PATH . $style ) );
 
 	wp_enqueue_script(
 		'cammino-shell',

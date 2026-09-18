@@ -92,4 +92,18 @@ $story_template = '<section data-nstarter-variable-section="stories"><div data-n
 $result = merged( $story_template, str_replace( '<p>Default</p>', '<p><span style="font-family:Arial">' . $story_text . '</span><div><div>Ďalší riadok.</div></div></p>', $story_template ) );
 merge_expect( ! $result['conflicts'] && str_contains( $result['html'], $story_text ) && str_contains( $result['html'], 'Ďalší riadok.' ), 'The complete supplied story survives nested paragraph markup created by multiline pasting.' );
 
+foreach ( array( 'div', 'section', 'article' ) as $container ) {
+	$result = merged(
+		'<' . $container . ' id="copy"><h2 id="heading">Default</h2><p id="description" class="new-copy">Default</p><a id="cta" href="/default">Default</a></' . $container . '>',
+		'<' . $container . ' id="copy"><h2 id="heading">Saved heading</h2><p id="description">Blížili sa Vianoce.</p><div><span style="color:red">Práčka bola darom.</span></div><p>Prečítajte si tento príťažlivý príbeh.</p><a id="cta" href="/saved">Saved button</a></' . $container . '>'
+	);
+	merge_expect( ! $result['conflicts'] && str_contains( $result['html'], 'Práčka bola darom.' ) && str_contains( $result['html'], 'Prečítajte si tento príťažlivý príbeh.' ) && str_contains( $result['html'], 'Saved heading' ) && str_contains( $result['html'], 'href="/saved"' ), 'Multiline paragraphs merge in generic ' . $container . ' layouts while preserving surrounding content.' );
+	merge_expect( substr_count( $result['html'], 'id="description"' ) === 1 && substr_count( $result['html'], 'class="new-copy"' ) === 3 && ! str_contains( $result['html'], 'color:red' ), 'Expanded paragraphs retain template styling without duplicating IDs in ' . $container . ' layouts.' );
+}
+$result = merged(
+	'<section id="copy"><p>First default</p><p>Second default</p></section>',
+	'<section id="copy"><p>' . $story_text . '</p><p>Second saved paragraph</p></section>'
+);
+merge_expect( ! $result['conflicts'] && str_contains( $result['html'], $story_text ) && str_contains( $result['html'], 'Second saved paragraph' ), 'Long pasted prose stays correctly associated on layouts with multiple paragraphs.' );
+
 echo "Passed $checks HTML merge checks.\n";

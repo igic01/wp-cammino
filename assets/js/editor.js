@@ -1483,7 +1483,8 @@
         }
         if (!Array.from(event.clipboardData.types).includes('text/plain')) return;
         event.preventDefault();
-        const text = event.clipboardData.getData('text/plain').replace(/\r\n?/g, '\n');
+        // Wrapped prose stays inside its paragraph instead of creating layout siblings.
+        const text = event.clipboardData.getData('text/plain').replace(/\r\n?|\n/g, ' ');
         if (!doc.execCommand('insertText', false, text)) {
             range.deleteContents();
             const pasted = doc.createTextNode(text);

@@ -138,9 +138,9 @@ body:not(.nstarter-editor-preview) .impact-stories-list[data-nstarter-variable-v
 }
 
 .nstarter-editor-preview [data-impact-stories-reveal] {
-  opacity: 1;
-  transform: none;
-  transition: none;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
 }
 
 .nstarter-editor-preview .impact-stories-grid:empty::before {
