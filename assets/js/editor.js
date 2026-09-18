@@ -1466,6 +1466,31 @@
         }
     }
 
+    function insertTitleLineBreak(event) {
+        if (mode !== 'text' || event.defaultPrevented || event.inputType !== 'insertParagraph') return;
+        const doc = frameDocument();
+        const selection = doc.getSelection();
+        if (!selection || !selection.rangeCount) return;
+        const range = selection.getRangeAt(0);
+        const node = range.startContainer;
+        const element = node.nodeType === 1 ? node : node.parentElement;
+        const heading = element && element.closest('h1, h2, h3, h4, h5, h6');
+        const root = snapshotRoot();
+        if (!heading || !root || !root.contains(heading) || !heading.contains(range.endContainer)) return;
+        event.preventDefault();
+        if (isInLiveSection(node) || element.closest('[contenteditable="false"]')) return;
+        if (!doc.execCommand('insertLineBreak', false)) {
+            range.deleteContents();
+            const lineBreak = doc.createElement('br');
+            range.insertNode(lineBreak);
+            range.setStartAfter(lineBreak);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+        markDirty();
+    }
+
     function pastePlainText(event) {
         if (mode !== 'text' || !event.clipboardData) return;
         const doc = frameDocument();
@@ -2451,6 +2476,7 @@
         doc.addEventListener('click', handlePreviewClick, true);
         doc.addEventListener('submit', preventPreviewFormNavigation, true);
         doc.addEventListener('beforeinput', protectLiveSection, true);
+        doc.addEventListener('beforeinput', insertTitleLineBreak, true);
         doc.addEventListener('paste', pastePlainText, true);
         doc.addEventListener('input', markDirty, true);
         doc.addEventListener('keydown', handleShortcut, true);

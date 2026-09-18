@@ -106,4 +106,14 @@ $result = merged(
 );
 merge_expect( ! $result['conflicts'] && str_contains( $result['html'], $story_text ) && str_contains( $result['html'], 'Second saved paragraph' ), 'Long pasted prose stays correctly associated on layouts with multiple paragraphs.' );
 
+foreach ( array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ) as $tag ) {
+	$result = merged(
+		'<' . $tag . ' id="title" class="new-heading"><span class="title-copy">Default</span></' . $tag . '>',
+		'<' . $tag . ' id="title">Prvý riadok<div style="font-size:20px"><strong>Druhý riadok</strong></div></' . $tag . '>'
+	);
+	merge_expect( ! $result['conflicts'] && str_contains( $result['html'], 'Prvý riadok<br><strong>Druhý riadok</strong>' ) && str_contains( $result['html'], 'class="title-copy"' ) && str_contains( $result['html'], 'class="new-heading"' ) && ! str_contains( $result['html'], 'font-size:20px' ), 'Enter-created title blocks merge as line breaks while retaining template wrappers for ' . $tag . '.' );
+	$result = merged( '<' . $tag . ' id="title"><span class="title-copy">Default</span></' . $tag . '>', '<' . $tag . ' id="title">Prvý riadok<br>Druhý riadok</' . $tag . '>' );
+	merge_expect( ! $result['conflicts'] && str_contains( $result['html'], '<span class="title-copy">Prvý riadok<br>Druhý riadok</span>' ), 'Explicit title line breaks survive template merging for ' . $tag . '.' );
+}
+
 echo "Passed $checks HTML merge checks.\n";

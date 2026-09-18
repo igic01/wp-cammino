@@ -433,6 +433,19 @@ final class NStarter_HTML_Merge {
 			return $fresh;
 		}
 		// Text may move into new inline wrappers while its outer ID stays stable.
+		if ( 'heading' === $this->type( $fresh ) && $this->inline_only( $fresh, true ) && $this->paragraph_text_only( $old ) && ( $old->getElementsByTagName( 'br' )->length || $old->getElementsByTagName( 'div' )->length || $old->getElementsByTagName( 'p' )->length ) ) {
+			// Keep presentation wrappers while treating title line breaks as content.
+			$target = $fresh;
+			while ( 1 === count( $this->children( $target ) ) && ! $this->texts( $target ) && 'span' === $this->children( $target )[0]->tagName ) {
+				$target = $this->children( $target )[0];
+			}
+			while ( $target->firstChild ) {
+				$target->removeChild( $target->firstChild );
+			}
+			$this->copy_paragraph_text( $old, $target );
+			$this->cover( $old );
+			return $fresh;
+		}
 		$is_text = 'heading' === $this->type( $fresh ) || in_array( $fresh->tagName, array( 'p', 'a', 'span', 'em', 'strong', 'b', 'i', 'u', 's', 'li', 'blockquote', 'caption', 'th', 'td' ), true );
 		if ( $is_text && $this->inline_only( $fresh, true ) && $this->inline_only( $old, true ) ) {
 			$old_region = $this->region_texts( $old );
