@@ -192,7 +192,7 @@ function cammino_render_site_header(): void {
 	<a class="skip-link" href="#main-content"><?php esc_html_e( 'Preskočiť na obsah', 'cammino' ); ?></a>
 	<header class="site-header" data-header>
 		<div class="container header-inner">
-			<a class="brand" href="<?php echo esc_url( 'https://ozcammino.sk/domov-v2/' ); ?>" aria-label="<?php esc_attr_e( 'Cammino – domov', 'cammino' ); ?>">
+			<a class="brand" href="<?php echo esc_url( 'https://ozcammino.sk/' ); ?>" aria-label="<?php esc_attr_e( 'Cammino – domov', 'cammino' ); ?>">
 				<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/new_long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1668" height="370">
 			</a>
 

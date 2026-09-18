@@ -13,7 +13,7 @@ $cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
 
   <header class="site-header" data-header>
     <div class="container header-inner">
-      <a class="brand" href="index.html" aria-label="Cammino – domov">
+      <a class="brand" href="https://ozcammino.sk/" aria-label="Cammino – domov">
         <img src="<?php echo esc_url( $cammino_asset_url . '/logos/new_long_logo.svg' ); ?>" alt="Cammino" width="1668" height="370">
       </a>
 
