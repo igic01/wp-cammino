@@ -234,12 +234,12 @@ final class NStarter_HTML_Merge {
 		}
 	}
 
-	private function inline_only( DOMElement $node, bool $presentation = false ): bool {
+	private function inline_only( DOMElement $node, bool $presentation = false, bool $clipboard = false ): bool {
 		foreach ( $this->children( $node ) as $child ) {
 			if ( $presentation && $this->excluded( $child ) ) {
 				continue;
 			}
-			if ( ! in_array( $child->tagName, array( 'em', 'strong', 'b', 'i', 'u', 's', 'br', 'a', 'span' ), true ) || ( ! $presentation && ( $child->hasAttribute( 'class' ) || $child->hasAttribute( 'id' ) ) ) || ! $this->inline_only( $child, $presentation ) ) {
+			if ( ! in_array( $child->tagName, array( 'em', 'strong', 'b', 'i', 'u', 's', 'br', 'a', 'span' ), true ) || ( ! $presentation && ! $clipboard && ( $child->hasAttribute( 'class' ) || $child->hasAttribute( 'id' ) ) ) || ! $this->inline_only( $child, $presentation, $clipboard ) ) {
 				return false;
 			}
 		}
@@ -373,7 +373,8 @@ final class NStarter_HTML_Merge {
 		}
 		$old_texts = $this->texts( $old );
 		$new_texts = $this->texts( $fresh );
-		if ( $this->inline_only( $fresh ) && $this->inline_only( $old ) && ( count( $old_texts ) !== count( $new_texts ) || count( $this->children( $old ) ) !== count( $this->children( $fresh ) ) ) ) {
+		// Pasted inline wrappers are content; copy_inline strips their clipboard attributes.
+		if ( $is_text && $this->inline_only( $fresh ) && $this->inline_only( $old, false, true ) && ( count( $old_texts ) !== count( $new_texts ) || count( $this->children( $old ) ) !== count( $this->children( $fresh ) ) ) ) {
 			while ( $fresh->firstChild ) {
 				$fresh->removeChild( $fresh->firstChild );
 			}

@@ -100,7 +100,7 @@ function nstarter_maybe_render_editor(): void {
 	remove_action( 'wp_head', '_admin_bar_bump_cb' );
 	wp_enqueue_media( array( 'post' => $post_id ) );
 	wp_enqueue_style( 'nstarter-editor', NSTARTER_URL . '/assets/css/editor.css', array(), NSTARTER_VERSION );
-	wp_enqueue_script( 'nstarter-editor', NSTARTER_URL . '/assets/js/editor.js', array( 'media-editor' ), NSTARTER_VERSION, true );
+	wp_enqueue_script( 'nstarter-editor', NSTARTER_URL . '/assets/js/editor.js', array( 'media-editor' ), (string) filemtime( NSTARTER_PATH . '/assets/js/editor.js' ), true );
 	wp_localize_script(
 		'nstarter-editor',
 		'nstarterEditor',

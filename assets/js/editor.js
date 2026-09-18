@@ -1466,6 +1466,36 @@
         }
     }
 
+    function pastePlainText(event) {
+        if (mode !== 'text' || !event.clipboardData) return;
+        const doc = frameDocument();
+        const selection = doc.getSelection();
+        if (!selection || !selection.rangeCount) return;
+        const range = selection.getRangeAt(0);
+        const root = snapshotRoot();
+        const node = range.startContainer;
+        const element = node.nodeType === 1 ? node : node.parentElement;
+        if (!root || !element || !root.contains(node) || !root.contains(range.endContainer)) return;
+        if (!element.closest('p, h1, h2, h3, h4, h5, h6, li, blockquote')) return;
+        if (isInLiveSection(node) || element.closest('[contenteditable="false"]')) {
+            event.preventDefault();
+            return;
+        }
+        if (!Array.from(event.clipboardData.types).includes('text/plain')) return;
+        event.preventDefault();
+        const text = event.clipboardData.getData('text/plain').replace(/\r\n?/g, '\n');
+        if (!doc.execCommand('insertText', false, text)) {
+            range.deleteContents();
+            const pasted = doc.createTextNode(text);
+            range.insertNode(pasted);
+            range.setStartAfter(pasted);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+        markDirty();
+    }
+
     function mediaElementFromEventTarget(eventTarget) {
         if (!eventTarget || !eventTarget.closest) {
             return null;
@@ -2216,7 +2246,7 @@
         try {
             data = await response.json();
         } catch (error) {
-            throw new Error(config.strings.invalidResponse || config.strings.error);
+            throw new Error((config.strings.invalidResponse || config.strings.error) + ' (HTTP ' + response.status + ')');
         }
 
         if (!response.ok || !data || !data.success) {
@@ -2420,6 +2450,7 @@
         doc.addEventListener('click', handlePreviewClick, true);
         doc.addEventListener('submit', preventPreviewFormNavigation, true);
         doc.addEventListener('beforeinput', protectLiveSection, true);
+        doc.addEventListener('paste', pastePlainText, true);
         doc.addEventListener('input', markDirty, true);
         doc.addEventListener('keydown', handleShortcut, true);
         doc.addEventListener('scroll', positionEditorTools, true);

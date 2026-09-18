@@ -73,4 +73,12 @@ $result = merged(
 merge_expect( strpos( $result['html'], 'id="b"' ) < strpos( $result['html'], 'id="new"' ) && strpos( $result['html'], 'id="new"' ) < strpos( $result['html'], 'id="a"' ), 'Saved section ordering leaves new sections in their template slots.' );
 merge_expect( str_contains( $result['html'], 'Saved A' ) && str_contains( $result['html'], 'Saved B' ) && str_contains( $result['html'], 'Brand new' ), 'Reordered sections receive their own saved content.' );
 
+$story_text = 'Blížili sa Vianoce a v malom domčeku prala mamička posteľnú bielizeň ručne v umývadle – nová práčka bola pre nich v tom čase nedosiahnuteľným luxusom. Keď sme im ju nečakane priniesli, statný otec rodiny celú návštevu prečkal mlčaním. Vo dverách mi však zovrel ruku do svojej mozoľnatej dlane s takou nekontrolovateľnou silou, že v tom jedinom stisku bolo povedané všetko. Čo sa stalo o päť minút neskôr, nám ukázalo, že človek zvyčajne vycíti, komu v jeho okolí na ňom záleží. Prečítajte si tento príťažlivý príbeh.';
+$result = merged(
+	'<section id="stories"><h2>Title</h2><p>Default</p></section>',
+	'<section id="stories"><h2>Title</h2><p><span class="clipboard-format" style="font-size:20px" onclick="bad()">' . $story_text . '</span><br><span class="clipboard-format">Ďalší riadok.</span></p></section>'
+);
+merge_expect( str_contains( $result['html'], $story_text ) && str_contains( $result['html'], 'Ďalší riadok.' ) && ! $result['conflicts'], 'Pasted Unicode paragraphs with formatted spans and line breaks merge without losing text or creating conflicts.' );
+merge_expect( ! str_contains( $result['html'], 'clipboard-format' ) && ! str_contains( $result['html'], 'onclick' ) && ! str_contains( $result['html'], 'font-size:20px' ), 'Clipboard styling and event attributes are discarded during inline merging.' );
+
 echo "Passed $checks HTML merge checks.\n";
