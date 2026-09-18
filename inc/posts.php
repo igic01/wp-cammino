@@ -297,7 +297,11 @@ add_action( 'admin_enqueue_scripts', static function ( string $hook ): void {
 		wp_enqueue_script( 'cammino-post-settings', NSTARTER_URL . '/assets/js/post-settings.js', array(), NSTARTER_VERSION, true );
 		if ( get_current_screen()->is_block_editor() ) {
 			wp_enqueue_script( 'cammino-post-categories', NSTARTER_URL . '/assets/js/post-categories.js', array( 'wp-hooks', 'wp-element', 'wp-data', 'wp-core-data', 'wp-editor', 'wp-components', 'wp-i18n', 'wp-html-entities' ), (string) filemtime( NSTARTER_PATH . '/assets/js/post-categories.js' ), true );
-			wp_localize_script( 'cammino-post-categories', 'camminoPostCategories', array( 'eventCategoryId' => cammino_get_event_category_id( false ) ) );
+			wp_localize_script( 'cammino-post-categories', 'camminoPostCategories', array(
+				'eventCategoryId'     => cammino_get_event_category_id( false ),
+				'defaultCategoryId'   => (int) get_option( 'default_category' ),
+				'canDeleteCategories' => current_user_can( 'delete_terms', 'category' ),
+			) );
 		}
 	}
 } );

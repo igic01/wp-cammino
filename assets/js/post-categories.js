@@ -24,7 +24,7 @@
             };
         }, []);
         const { editPost } = useDispatch('core/editor');
-        const { saveEntityRecord } = useDispatch('core');
+        const { saveEntityRecord, deleteEntityRecord } = useDispatch('core');
         function choose(id) {
             const selected = Number(id) ? [Number(id)] : [];
             if (automaticId && state.selected.includes(automaticId)) selected.push(automaticId);
@@ -47,6 +47,21 @@
                 setAdding(false);
             }
         }
+        async function removeCategory() {
+            const category = state.categories.find(category => state.selected.includes(category.id) && category.id !== automaticId);
+            if (adding || !category || !window.camminoPostCategories.canDeleteCategories || category.id === Number(window.camminoPostCategories.defaultCategoryId)) return;
+            if (!window.confirm(wp.i18n.sprintf(__('Delete category "%s" permanently? It will be removed from the list and all posts using it. Posts will not be deleted.', 'cammino'), wp.htmlEntities.decodeEntities(category.name)))) return;
+            setAdding(true);
+            setError('');
+            try {
+                await deleteEntityRecord('taxonomy', 'category', category.id, { force: true }, { throwOnError: true });
+                choose('');
+            } catch (failure) {
+                setError(failure.message || __('Could not delete the category.', 'cammino'));
+            } finally {
+                setAdding(false);
+            }
+        }
         if (!state.canAssign) return null;
         if (!state.categories) return el(Spinner);
         const selected = state.selected.find(id => id !== automaticId) || '';
@@ -59,7 +74,7 @@
                 ),
                 onChange: choose
             }),
-            selected && el(Button, { variant: 'secondary', disabled: adding, onClick: () => choose('') }, __('Remove category', 'cammino')),
+            selected && window.camminoPostCategories.canDeleteCategories && Number(selected) !== Number(window.camminoPostCategories.defaultCategoryId) && el(Button, { variant: 'secondary', isDestructive: true, disabled: adding, onClick: removeCategory }, __('Delete category', 'cammino')),
             state.canCreate && el(Button, { variant: 'link', disabled: adding, 'aria-expanded': showForm, onClick: () => setShowForm(!showForm) }, __('Add category', 'cammino')),
             showForm && el('form', { onSubmit: addCategory },
                 el(TextControl, { label: __('New category name', 'cammino'), value: name, onChange: setName, required: true, disabled: adding }),
