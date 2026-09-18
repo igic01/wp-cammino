@@ -275,9 +275,69 @@ final class NStarter_HTML_Merge {
 		return $copy;
 	}
 
+	/** Story descriptions may gain paragraph blocks when pasted or edited. */
+	private function merge_story_text( DOMElement $fresh, DOMElement $old ): bool {
+		if ( 'article' !== $fresh->tagName || ! $fresh->hasAttribute( 'data-nstarter-variable-item' ) || ! in_array( 'impact-story', preg_split( '/\s+/', $fresh->getAttribute( 'class' ) ), true ) ) {
+			return false;
+		}
+		$new = $this->children( $fresh );
+		$saved = $this->children( $old );
+		if ( 2 !== count( $new ) || 'h2' !== $new[0]->tagName || 'p' !== $new[1]->tagName || ! $saved || 'h2' !== $saved[0]->tagName ) {
+			return false;
+		}
+		foreach ( array_slice( $saved, 1 ) as $paragraph ) {
+			if ( ! in_array( $paragraph->tagName, array( 'p', 'div' ), true ) || ! $this->story_text_only( $paragraph ) ) {
+				return false;
+			}
+		}
+		$this->merge_node( $new[0], $saved[0] );
+		foreach ( array_slice( $saved, 1 ) as $paragraph ) {
+			$copy = $new[1]->cloneNode( false );
+			$this->copy_story_text( $paragraph, $copy );
+			$fresh->appendChild( $copy );
+			$this->cover( $paragraph );
+		}
+		$fresh->removeChild( $new[1] );
+		$this->covered[ spl_object_id( $old ) ] = true;
+		return true;
+	}
+
+	private function story_text_only( DOMElement $node ): bool {
+		foreach ( $this->children( $node ) as $child ) {
+			if ( ! in_array( $child->tagName, array( 'p', 'div', 'em', 'strong', 'b', 'i', 'u', 's', 'br', 'a', 'span' ), true ) || ! $this->story_text_only( $child ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private function copy_story_text( DOMElement $old, DOMElement $copy ): void {
+		foreach ( $old->childNodes as $child ) {
+			if ( $child instanceof DOMElement && in_array( $child->tagName, array( 'p', 'div' ), true ) ) {
+				if ( $copy->hasChildNodes() ) {
+					$copy->appendChild( $copy->ownerDocument->createElement( 'br' ) );
+				}
+				$this->copy_story_text( $child, $copy );
+				$copy->appendChild( $copy->ownerDocument->createElement( 'br' ) );
+			} elseif ( $child instanceof DOMElement ) {
+				$inline = $copy->ownerDocument->createElement( $child->tagName );
+				if ( 'a' === $child->tagName ) {
+					$this->attributes( $inline, $child, array( 'href', 'title' ) );
+				}
+				$this->copy_story_text( $child, $inline );
+				$copy->appendChild( $inline );
+			} elseif ( $child instanceof DOMText ) {
+				$copy->appendChild( $copy->ownerDocument->createTextNode( $child->nodeValue ) );
+			}
+		}
+	}
+
 	private function merge_node( DOMElement $fresh, DOMElement $old ): DOMElement {
 		$this->used[ spl_object_id( $old ) ] = true;
 		$this->matched[ spl_object_id( $old ) ] = $fresh;
+		if ( $this->merge_story_text( $fresh, $old ) ) {
+			return $fresh;
+		}
 		if ( 'picture' === $old->tagName && 'picture' !== $fresh->tagName ) {
 			$image = $old->getElementsByTagName( 'img' )->item( 0 );
 			if ( $image ) {

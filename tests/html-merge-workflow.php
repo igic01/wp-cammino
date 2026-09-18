@@ -81,4 +81,15 @@ $result = merged(
 merge_expect( str_contains( $result['html'], $story_text ) && str_contains( $result['html'], 'Ďalší riadok.' ) && ! $result['conflicts'], 'Pasted Unicode paragraphs with formatted spans and line breaks merge without losing text or creating conflicts.' );
 merge_expect( ! str_contains( $result['html'], 'clipboard-format' ) && ! str_contains( $result['html'], 'onclick' ) && ! str_contains( $result['html'], 'font-size:20px' ), 'Clipboard styling and event attributes are discarded during inline merging.' );
 
+$result = merged(
+	'<section data-nstarter-variable-section="stories"><div data-nstarter-variable-items><article class="impact-story" data-nstarter-variable-item><h2>Default title</h2><p>Default text</p></article></div><template data-nstarter-variable-template><article class="impact-story" data-nstarter-variable-item><h2>Title</h2><p>Text</p></article></template></section>',
+	'<section data-nstarter-variable-section="stories"><div data-nstarter-variable-items><article class="impact-story" data-nstarter-variable-item><h2>Saved title</h2><p>Blížili sa Vianoce a v malom domčeku.</p><p>práčka bola pre nich nedosiahnuteľná.</p><div style="font-size:20px">Prečítajte si tento príťažlivý príbeh.</div></article></div></section>'
+);
+merge_expect( ! $result['conflicts'] && str_contains( $result['html'], 'Saved title' ) && str_contains( $result['html'], 'práčka bola pre nich nedosiahnuteľná.' ) && str_contains( $result['html'], 'Prečítajte si tento príťažlivý príbeh.' ), 'Impact story descriptions retain pasted paragraph blocks and browser-created divs without layout conflicts.' );
+merge_expect( ! str_contains( $result['html'], 'font-size:20px' ), 'Multi-paragraph story text uses template styling.' );
+
+$story_template = '<section data-nstarter-variable-section="stories"><div data-nstarter-variable-items><article class="impact-story" data-nstarter-variable-item><h2>Title</h2><p>Default</p></article></div><template data-nstarter-variable-template><article class="impact-story" data-nstarter-variable-item><h2>Title</h2><p>Default</p></article></template></section>';
+$result = merged( $story_template, str_replace( '<p>Default</p>', '<p><span style="font-family:Arial">' . $story_text . '</span><div><div>Ďalší riadok.</div></div></p>', $story_template ) );
+merge_expect( ! $result['conflicts'] && str_contains( $result['html'], $story_text ) && str_contains( $result['html'], 'Ďalší riadok.' ), 'The complete supplied story survives nested paragraph markup created by multiline pasting.' );
+
 echo "Passed $checks HTML merge checks.\n";
