@@ -444,7 +444,7 @@ h2 em {
   width: min(calc(100% - (var(--gutter) * 2)), 1440px);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 1.5rem;
   min-height: 4.5rem;
 }
@@ -751,6 +751,10 @@ h2 em {
 }
 
 @media (max-width: 1200px) {
+  .header-inner {
+    justify-content: space-between;
+  }
+
   body.nav-open .site-header,
   body.nav-open .site-header.is-scrolled {
     position: fixed;
