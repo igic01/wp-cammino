@@ -300,7 +300,7 @@ add_action( 'admin_enqueue_scripts', static function ( string $hook ): void {
 			wp_localize_script( 'cammino-post-categories', 'camminoPostCategories', array(
 				'eventCategoryId'     => cammino_get_event_category_id( false ),
 				'defaultCategoryId'   => (int) get_option( 'default_category' ),
-				'canDeleteCategories' => current_user_can( 'delete_terms', 'category' ),
+				'canDeleteCategories' => current_user_can( get_taxonomy( 'category' )->cap->delete_terms ),
 			) );
 		}
 	}
