@@ -455,7 +455,7 @@ function cammino_enqueue_design_assets( string $handle, string $style, string $s
 		'cammino-base',
 		NSTARTER_URL . '/assets/css/cammino-base.css',
 		array( 'cammino-font-awesome' ),
-		NSTARTER_VERSION
+		(string) filemtime( NSTARTER_PATH . '/assets/css/cammino-base.css' )
 	);
 
 	$style_dependencies = array( 'cammino-base' );
