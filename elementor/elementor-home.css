@@ -1,0 +1,55 @@
+/* Small compatibility layer between Elementor's wrappers and Cammino's Home CSS. */
+body.cammino-elementor-home-page {
+  color: var(--color-charcoal);
+  background: var(--color-cream);
+  font-family: var(--font-body) !important;
+}
+
+body.cammino-elementor-home-page #nstarter-snapshot,
+body.cammino-elementor-home-page #main-content {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  gap: 0;
+  overflow: visible;
+}
+
+body.cammino-elementor-home-page #main-content {
+  --home-section-space: clamp(2.25rem, 4vw, 3.5rem);
+}
+
+body.cammino-elementor-home-page #main-content > .elementor-element {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+body.cammino-elementor-home-page .elementor-widget[class*="elementor-widget-cammino-home-"] > .elementor-widget-container > .section:not(.hero) {
+  padding-block: var(--home-section-space);
+}
+
+body.cammino-elementor-home-page .elementor-widget[class*="elementor-widget-cammino-home-"] h1,
+body.cammino-elementor-home-page .elementor-widget[class*="elementor-widget-cammino-home-"] h2,
+body.cammino-elementor-home-page .elementor-widget[class*="elementor-widget-cammino-home-"] h3,
+body.cammino-elementor-home-page .elementor-widget[class*="elementor-widget-cammino-home-"] h1 *,
+body.cammino-elementor-home-page .elementor-widget[class*="elementor-widget-cammino-home-"] h2 *,
+body.cammino-elementor-home-page .elementor-widget[class*="elementor-widget-cammino-home-"] h3 * {
+  font-family: var(--font-display) !important;
+}
+
+/* Newly re-rendered widgets must stay visible while editing on the canvas. */
+body.elementor-editor-active [data-reveal],
+body.elementor-editor-preview [data-reveal] {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+body.elementor-editor-active .hero-image-wrap,
+body.elementor-editor-preview .hero-image-wrap,
+body.elementor-editor-active .hero-note,
+body.elementor-editor-preview .hero-note {
+  opacity: 1 !important;
+}
+

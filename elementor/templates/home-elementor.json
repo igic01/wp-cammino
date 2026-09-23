@@ -1,0 +1,49 @@
+{
+  "title": "Cammino - Home Elementor",
+  "type": "page",
+  "version": "0.4",
+  "page_settings": {
+    "hide_title": "yes",
+    "template": "elementor_full_width"
+  },
+  "content": [
+    {
+      "id": "c0a00001",
+      "elType": "container",
+      "isInner": false,
+      "settings": {
+        "content_width": "full",
+        "flex_direction": "column",
+        "gap": { "unit": "px", "size": 0, "sizes": [] },
+        "_element_id": "nstarter-snapshot"
+      },
+      "elements": [
+        {
+          "id": "c0a00002",
+          "elType": "container",
+          "isInner": true,
+          "settings": {
+            "content_width": "full",
+            "flex_direction": "column",
+            "gap": { "unit": "px", "size": 0, "sizes": [] },
+            "html_tag": "main",
+            "_element_id": "main-content"
+          },
+          "elements": [
+            { "id": "c0a01001", "elType": "widget", "widgetType": "cammino-home-hero", "isInner": false, "settings": [], "elements": [] },
+            { "id": "c0a01002", "elType": "widget", "widgetType": "cammino-home-about", "isInner": false, "settings": [], "elements": [] },
+            { "id": "c0a01003", "elType": "widget", "widgetType": "cammino-home-projects", "isInner": false, "settings": [], "elements": [] },
+            { "id": "c0a01004", "elType": "widget", "widgetType": "cammino-home-events", "isInner": false, "settings": [], "elements": [] },
+            { "id": "c0a01005", "elType": "widget", "widgetType": "cammino-home-story", "isInner": false, "settings": [], "elements": [] },
+            { "id": "c0a01006", "elType": "widget", "widgetType": "cammino-home-main-project", "isInner": false, "settings": [], "elements": [] },
+            { "id": "c0a01007", "elType": "widget", "widgetType": "cammino-home-involvement", "isInner": false, "settings": [], "elements": [] },
+            { "id": "c0a01008", "elType": "widget", "widgetType": "cammino-home-donate", "isInner": false, "settings": [], "elements": [] },
+            { "id": "c0a01009", "elType": "widget", "widgetType": "cammino-home-partners", "isInner": false, "settings": [], "elements": [] },
+            { "id": "c0a01010", "elType": "widget", "widgetType": "cammino-home-newsletter", "isInner": false, "settings": [], "elements": [] }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
