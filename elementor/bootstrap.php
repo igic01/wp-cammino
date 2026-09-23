@@ -70,7 +70,7 @@ function cammino_elementor_body_classes( array $classes ): array {
 	$post_id = get_queried_object_id();
 	if ( $post_id > 0 ) {
 		$data = (string) get_post_meta( $post_id, '_elementor_data', true );
-		if ( str_contains( $data, 'cammino-home-' ) ) {
+		if ( str_contains( $data, 'cammino-home-' ) || str_contains( $data, 'cammino-native-hero' ) ) {
 			$classes[] = 'cammino-visual-page';
 			$classes[] = 'cammino-elementor-home-page';
 			$classes[] = 'home-page';
@@ -101,7 +101,6 @@ function cammino_elementor_register_widgets( $widgets_manager ): void {
 	}
 
 	$classes = array(
-		'Cammino_Elementor_Hero',
 		'Cammino_Elementor_About',
 		'Cammino_Elementor_Projects',
 		'Cammino_Elementor_Events',
@@ -118,3 +117,17 @@ function cammino_elementor_register_widgets( $widgets_manager ): void {
 	}
 }
 add_action( 'elementor/widgets/register', 'cammino_elementor_register_widgets' );
+
+/** Load Home design assets when a page uses only the native Hero section. */
+function cammino_elementor_enqueue_native_assets(): void {
+	$post_id = get_queried_object_id();
+	if ( $post_id < 1 ) {
+		return;
+	}
+	$data = (string) get_post_meta( $post_id, '_elementor_data', true );
+	if ( str_contains( $data, 'cammino-native-hero' ) ) {
+		wp_enqueue_style( 'cammino-elementor-home-bridge' );
+		wp_enqueue_script( 'cammino-elementor-home' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'cammino_elementor_enqueue_native_assets', 20 );
