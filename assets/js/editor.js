@@ -995,7 +995,7 @@
             return;
         }
 
-        const maximum = Math.max(0, Number(section.dataset.nstarterVariableMax || 3));
+        const maximum = Math.max(0, Number(section.dataset.nstarterVariableMax || 6));
         const checkboxes = Array.from(variableProjectPicker.querySelectorAll('input[type="checkbox"]'));
         const checkedCount = checkboxes.filter(function (checkbox) { return checkbox.checked; }).length;
 
@@ -1410,7 +1410,7 @@
 
             const projectIds = Array.from(variableProjectPicker.querySelectorAll('input[type="checkbox"]:checked'))
                 .map(function (checkbox) { return checkbox.value; });
-            const maximum = Math.max(0, Number(section.dataset.nstarterVariableMax || 3));
+            const maximum = Math.max(0, Number(section.dataset.nstarterVariableMax || 6));
             if (projectIds.length > maximum) {
                 setStatus(config.strings.selectUpToProjects.replace('%d', String(maximum)), 'error');
                 return;

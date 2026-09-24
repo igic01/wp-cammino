@@ -49,9 +49,19 @@ projects_expect( str_contains( $picker_options[0]['html'], 'home-project-card--n
 
 $home_projects = cammino_render_home_projects( array( 'ids' => array( 2 ) ) );
 $home_query    = end( $GLOBALS['test_queries'] );
-projects_expect( 3 === $home_query['posts_per_page'] && array( 2 ) === $home_query['post__in'], 'The homepage renderer requests only the selected IDs with a three-project limit.' );
+projects_expect( 6 === $home_query['posts_per_page'] && array( 2 ) === $home_query['post__in'], 'The homepage renderer requests only the selected IDs with a six-project limit.' );
 projects_expect( str_contains( $home_projects, '<a class="home-project-card' ) && str_contains( $home_projects, 'Projekt Beta' ), 'A selected project renders as a fully linked homepage card.' );
 projects_expect( str_contains( $home_projects, 'Krátky popis projektu.' ), 'The homepage project card displays its description.' );
+
+foreach ( range( 9, 15 ) as $id ) {
+	$GLOBALS['test_posts'][ $id ] = new WP_Post( $id, 'Projekt Navi ' . $id );
+	$GLOBALS['test_meta'][ $id ][CAMMINO_POST_PLACEMENT_META] = 'project';
+}
+$six_projects = cammino_render_home_projects( array( 'ids' => array( 15, 14, 13, 12, 11, 10, 9 ) ) );
+$six_query = end( $GLOBALS['test_queries'] );
+projects_expect( array( 15, 14, 13, 12, 11, 10 ) === $six_query['post__in'], 'Only the first six selected project IDs are queried.' );
+projects_expect( 6 === substr_count( $six_projects, '<a class="home-project-card' ) && ! str_contains( $six_projects, 'Projekt Navi 9' ), 'The homepage renders six cards and excludes a seventh selection.' );
+projects_expect( strpos( $six_projects, 'Projekt Navi 15' ) < strpos( $six_projects, 'Projekt Navi 14' ), 'The selected project order is preserved.' );
 
 $template = file_get_contents( NSTARTER_PATH . '/snapshot-templates/projects.php' );
 $styles   = file_get_contents( NSTARTER_PATH . '/assets/css/pages/projects.css' );

@@ -24,7 +24,7 @@ shared single-post design for events, projects, and impact stories.
   and footer as locked live sections on visual pages and uses the same renderers
   outside the editable content of managed posts.
 - `snapshot-templates/home.php` is the editable Cammino homepage source.
-  Its project picker displays up to three published Project posts, and its final
+  Its project picker displays up to six published Project posts, and its final
   section displays every color logo from `assets/partners/` in a responsive
   partner grid.
 - `snapshot-templates/about-us.php` is the clean PHP source for the O nás page.

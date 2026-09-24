@@ -154,7 +154,7 @@ function nstarter_maybe_render_editor(): void {
 				'unsupportedVariable' => __( 'This section variable is not configured correctly.', 'nstarter' ),
 				'selectUpToProjects'   => __( 'Select no more than %d projects.', 'cammino' ),
 				'noProjectsAvailable'  => __( 'No published projects are available.', 'cammino' ),
-				'noProjectsSelected'   => __( 'Choose up to three projects using this section control.', 'cammino' ),
+				'noProjectsSelected'   => __( 'Choose up to six projects using this section control.', 'cammino' ),
 				'selectUpToEvents'     => __( 'Select no more than %d events.', 'cammino' ),
 				'selectAtLeastOneEvent'=> __( 'Select at least one event.', 'cammino' ),
 				'noEventsAvailable'    => __( 'No published events are available.', 'cammino' ),

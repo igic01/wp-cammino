@@ -36,11 +36,12 @@ home_expect( ! str_contains( $styles, '.story-section.smile-impact' ) && ! str_c
 home_expect( str_contains( $styles, '.community-cta .smile-impact-stat:hover' ), 'The relocated cards have CTA-specific interaction styling.' );
 home_expect( str_contains( $script, '[data-impact-counter]' ), 'The homepage counter script still discovers the relocated values.' );
 home_expect( str_contains( $template, "'home_selected_projects'" ) && str_contains( $template, "'control' => 'project-picker'" ), 'The homepage exposes a dedicated selected-projects variable.' );
-home_expect( str_contains( $template, "'max'     => 3" ), 'The homepage project picker is limited to three projects.' );
+home_expect( str_contains( $template, "'max'     => 6" ) && str_contains( $template, 'array_slice( cammino_get_project_picker_posts(), 0, 3 )' ), 'The homepage project picker allows six projects while retaining three defaults.' );
 home_expect( str_contains( $template, "nstarter_live_section( 'cammino_home_projects'" ), 'Selected project cards are rendered from a live section.' );
 home_expect( str_contains( $editor, 'populateProjectPicker' ) && str_contains( $editor, 'updateProjectPickerSection' ), 'The visual editor supports selecting and previewing existing projects.' );
 home_expect( str_contains( $variables, "'projects'" ) && str_contains( $variables, "'project-picker'" ), 'The variable schema accepts project-picker controls.' );
 home_expect( str_contains( $styles, '.home-projects__grid > .nstarter-live-section' ) && str_contains( $styles, '.home-project-card' ), 'The selected-project section and cards are styled.' );
+home_expect( str_contains( $styles, 'grid-template-columns: repeat(3, minmax(0, 1fr));' ), 'Six selected projects can flow into two rows of three cards.' );
 home_expect( str_contains( $styles, '.home-page .home-project-card' ), 'The standard homepage gives all project cards the same surface color.' );
 home_expect( str_contains( $styles, '.home-page #main-content:not([class]) .community-cta--main-project' ) && str_contains( $styles, 'background: #3b405f;' ) && str_contains( $styles, '.community-cta-copy > p' ), 'The standard homepage community CTA uses the main-project slate-plum palette and styled project copy.' );
 home_expect( str_contains( $template, "'/assets/images/logopng-1.webp'" ), 'The community CTA uses the supplied project image by default.' );

@@ -117,7 +117,7 @@ $cammino_partners    = array(
         'control' => 'project-picker',
         'value'   => implode( ',', $cammino_home_project_ids ),
         'min'     => 0,
-        'max'     => 3,
+        'max'     => 6,
       )
     );
     ?>>

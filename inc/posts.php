@@ -642,11 +642,11 @@ function cammino_get_project_picker_options(): array {
 }
 
 /**
- * Render up to three selected projects while preserving their selected order.
+ * Render up to six selected projects while preserving their selected order.
  */
 function cammino_render_home_projects( array $args = array(), int $page_id = 0 ): string {
 	$ids = isset( $args['ids'] ) && is_array( $args['ids'] )
-		? array_slice( array_values( array_unique( array_filter( array_map( 'absint', $args['ids'] ) ) ) ), 0, 3 )
+		? array_slice( array_values( array_unique( array_filter( array_map( 'absint', $args['ids'] ) ) ) ), 0, 6 )
 		: array();
 
 	if ( empty( $ids ) ) {
@@ -657,7 +657,7 @@ function cammino_render_home_projects( array $args = array(), int $page_id = 0 )
 		array(
 			'post_type'           => 'post',
 			'post_status'         => 'publish',
-			'posts_per_page'      => 3,
+			'posts_per_page'      => 6,
 			'post__in'            => $ids,
 			'has_password'        => false,
 			'ignore_sticky_posts' => true,

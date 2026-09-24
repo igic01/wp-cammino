@@ -2103,7 +2103,7 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
   border: 1px dashed rgba(100, 54, 75, 0.28);
   border-radius: var(--radius-md);
   color: rgba(39, 36, 35, 0.65);
-  content: "Vyberte najviac tri projekty cez ovládanie tejto sekcie.";
+  content: "Vyberte najviac šesť projektov cez ovládanie tejto sekcie.";
   text-align: center;
 }
 
