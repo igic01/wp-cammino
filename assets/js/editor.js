@@ -24,6 +24,7 @@
     const mediaUrlDialog = document.querySelector('[data-nstarter-media-url-dialog]');
     const mediaUrlForm = document.querySelector('[data-nstarter-media-url-form]');
     const mediaUrlInput = document.querySelector('[data-nstarter-media-url-input]');
+    const mediaUrlType = document.querySelector('[data-nstarter-media-url-type]');
     const mediaUrlCancel = document.querySelector('[data-nstarter-media-url-cancel]');
     const iframeDialog = document.querySelector('[data-nstarter-iframe-dialog]');
     const iframeForm = document.querySelector('[data-nstarter-iframe-form]');
@@ -122,6 +123,10 @@
             image.height = 800;
             image.loading = 'lazy';
             item.appendChild(image);
+        } else if (type === 'gallery') {
+            item = doc.createElement('div');
+            item.className = 'article-gallery';
+            item.appendChild(createGallerySlot(doc));
         } else if (type === 'button') {
             item = doc.createElement('div');
             item.className = 'article-button';
@@ -143,6 +148,23 @@
         }
 
         return item;
+    }
+
+    function createGallerySlot(doc) {
+        const slot = doc.createElement('div');
+        slot.className = 'article-gallery__item';
+        const image = doc.createElement('img');
+        image.src = config.placeholderUrl;
+        image.alt = '';
+        image.loading = 'lazy';
+        slot.appendChild(image);
+        return slot;
+    }
+
+    function gallerySlots(item) {
+        return Array.from(item.children).filter(function (child) {
+            return child.matches('.article-gallery__item');
+        });
     }
 
     function addContentItem(type, afterItem) {
@@ -216,6 +238,28 @@
                 tools.appendChild(edit);
             }
 
+            if (item.dataset.nstarterContentType === 'gallery') {
+                const slots = gallerySlots(item);
+                slots.forEach(function (slot) {
+                    const slotTools = doc.createElement('div');
+                    slotTools.className = 'nstarter-gallery-item-tools';
+                    slotTools.dataset.nstarterEditorRuntime = '';
+                    slotTools.setAttribute('contenteditable', 'false');
+                    const edit = createInlineButton(doc, 'edit-gallery-media', config.strings.editGalleryMedia, config.strings.editGalleryMedia);
+                    const remove = createInlineButton(doc, 'remove-gallery-media', config.strings.removeGalleryMedia, '×');
+                    edit.nstarterContentItem = remove.nstarterContentItem = item;
+                    edit.nstarterGallerySlot = remove.nstarterGallerySlot = slot;
+                    remove.disabled = slots.length <= 1;
+                    slotTools.append(edit, remove);
+                    slot.appendChild(slotTools);
+                });
+                if (slots.length < 4) {
+                    const add = createInlineButton(doc, 'add-gallery-media', config.strings.addGalleryMedia, '+ ' + config.strings.addGalleryMedia, 'nstarter-post-item-tools__edit');
+                    add.nstarterContentItem = item;
+                    tools.appendChild(add);
+                }
+            }
+
             if (item.dataset.nstarterContentType === 'paragraph') {
                 const linkActions = doc.createElement('div');
                 linkActions.className = 'nstarter-post-item-tools__link-actions';
@@ -252,6 +296,7 @@
             createInlineButton(doc, 'add-title', config.strings.addHeading, '+ ' + config.strings.addHeading),
             createInlineButton(doc, 'add-paragraph', config.strings.addParagraph, '+ ' + config.strings.addParagraph),
             createInlineButton(doc, 'add-image', config.strings.addImage, '+ ' + config.strings.addImage),
+            createInlineButton(doc, 'add-gallery', config.strings.addGallery, '+ ' + config.strings.addGallery),
             createInlineButton(doc, 'add-button', config.strings.addButton, '+ ' + config.strings.addButton),
             createInlineButton(doc, 'add-impact-story', config.strings.addImpactStory, '+ ' + config.strings.addImpactStory)
         );
@@ -263,7 +308,7 @@
     function focusContentItem(item) {
         if (!item) return;
         item.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        if (item.dataset.nstarterContentType === 'image') return;
+        if (item.dataset.nstarterContentType === 'image' || item.dataset.nstarterContentType === 'gallery') return;
         const doc = item.ownerDocument;
         const selection = doc.getSelection();
         const range = doc.createRange();
@@ -284,7 +329,7 @@
         event.stopPropagation();
         const action = button.dataset.nstarterInlineAction;
 
-        if (action.indexOf('add-') === 0) {
+        if (action.indexOf('add-') === 0 && action !== 'add-gallery-media') {
             const item = addContentItem(action.slice(4));
             focusContentItem(item);
             return true;
@@ -292,6 +337,26 @@
 
         const item = button.nstarterContentItem;
         if (!item || !item.isConnected) return true;
+        if (action === 'add-gallery-media' && gallerySlots(item).length < 4) {
+            const slot = createGallerySlot(item.ownerDocument);
+            item.appendChild(slot);
+            markDirty();
+            renderInlinePostEditor();
+            openMediaSourceChooser(slot.querySelector('img'), false);
+            return true;
+        }
+        if (action === 'edit-gallery-media') {
+            const slot = button.nstarterGallerySlot;
+            const media = slot && slot.querySelector('img, video, iframe[data-nstarter-embed]');
+            if (media) openMediaSourceChooser(media, false);
+            return true;
+        }
+        if (action === 'remove-gallery-media' && gallerySlots(item).length > 1) {
+            button.nstarterGallerySlot.remove();
+            markDirty();
+            renderInlinePostEditor();
+            return true;
+        }
         if (action === 'edit-image') {
             const image = item.querySelector('img');
             if (image) openMediaSourceChooser(image, true);
@@ -1596,6 +1661,7 @@
 
         if (source === 'url' && mediaUrlDialog && mediaUrlInput) {
             mediaUrlInput.value = mediaTarget.getAttribute('src') || '';
+            if (mediaUrlType) mediaUrlType.value = mediaTarget.tagName.toLowerCase() === 'video' ? 'video' : 'image';
             mediaUrlInput.setCustomValidity('');
             mediaUrlDialog.showModal();
             mediaUrlInput.focus();
@@ -1628,6 +1694,25 @@
         }
 
         mediaUrlInput.setCustomValidity('');
+        const type = mediaUrlType ? mediaUrlType.value : 'image';
+        const currentType = mediaTarget.tagName.toLowerCase();
+        if (currentType !== (type === 'video' ? 'video' : 'img')) {
+            const replacement = mediaTarget.ownerDocument.createElement(type === 'video' ? 'video' : 'img');
+            copyPresentationAttributes(mediaTarget, replacement);
+            replacement.classList.remove('nstarter-media-embed');
+            replacement.setAttribute('src', url);
+            if (type === 'video') {
+                replacement.setAttribute('controls', '');
+                replacement.setAttribute('playsinline', '');
+                replacement.setAttribute('preload', 'metadata');
+            } else {
+                replacement.setAttribute('alt', '');
+                replacement.setAttribute('loading', 'lazy');
+            }
+            closeMediaDialogs(false);
+            replaceMediaElement(replacement);
+            return;
+        }
         mediaTarget.setAttribute('src', url);
         mediaTarget.removeAttribute('srcset');
         mediaTarget.removeAttribute('sizes');
@@ -2019,12 +2104,12 @@
         }
 
         if (config.isPost && event.target.closest) {
-            const inlineImage = event.target.closest('[data-nstarter-content-type="image"] img, .article-cover__frame img');
+            const inlineImage = event.target.closest('[data-nstarter-content-type="image"] img, [data-nstarter-content-type="gallery"] img, .article-cover__frame img');
             if (inlineImage) {
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 event.stopPropagation();
-                openMediaSourceChooser(inlineImage, true);
+                openMediaSourceChooser(inlineImage, !inlineImage.closest('[data-nstarter-content-type="gallery"]'));
                 return;
             }
 

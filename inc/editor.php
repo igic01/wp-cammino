@@ -173,12 +173,16 @@ function nstarter_maybe_render_editor(): void {
 				'addHeading'          => __( 'Add heading', 'cammino' ),
 				'addParagraph'        => __( 'Add paragraph', 'cammino' ),
 				'addImage'            => __( 'Add image', 'cammino' ),
+				'addGallery'          => __( 'Add gallery', 'cammino' ),
 				'addButton'           => __( 'Add button', 'cammino' ),
 				'addImpactStory'      => __( 'Add impact story', 'cammino' ),
 				'newHeading'          => __( 'New heading', 'cammino' ),
 				'newParagraph'        => __( 'Write your paragraph here.', 'cammino' ),
 				'newButton'           => __( 'Button text', 'cammino' ),
 				'editImage'           => __( 'Choose or replace image', 'cammino' ),
+				'addGalleryMedia'     => __( 'Add media', 'cammino' ),
+				'editGalleryMedia'    => __( 'Replace media', 'cammino' ),
+				'removeGalleryMedia'  => __( 'Remove media', 'cammino' ),
 				'editLink'            => __( 'Edit link destination', 'cammino' ),
 				'linkSelectedText'    => __( 'Link selected text', 'cammino' ),
 				'removeTextLink'      => __( 'Remove link', 'cammino' ),
@@ -286,10 +290,17 @@ function nstarter_maybe_render_editor(): void {
 				<form data-nstarter-media-url-form>
 					<h2><?php esc_html_e( 'Use a direct media URL', 'nstarter' ); ?></h2>
 					<label>
+						<span><?php esc_html_e( 'Media type', 'cammino' ); ?></span>
+						<select data-nstarter-media-url-type>
+							<option value="image"><?php esc_html_e( 'Image', 'cammino' ); ?></option>
+							<option value="video"><?php esc_html_e( 'Video', 'cammino' ); ?></option>
+						</select>
+					</label>
+					<label>
 						<span><?php esc_html_e( 'Image or video URL', 'nstarter' ); ?></span>
 						<input type="text" inputmode="url" autocomplete="url" data-nstarter-media-url-input required>
 					</label>
-					<p><?php esc_html_e( 'For media elements this updates the src attribute. Existing styling is preserved.', 'nstarter' ); ?></p>
+					<p><?php esc_html_e( 'Choose whether the URL points to an image or a video file.', 'cammino' ); ?></p>
 					<div class="nstarter-media-dialog__actions">
 						<button type="button" data-nstarter-media-url-cancel><?php esc_html_e( 'Cancel', 'nstarter' ); ?></button>
 						<button type="submit"><?php esc_html_e( 'Apply URL', 'nstarter' ); ?></button>

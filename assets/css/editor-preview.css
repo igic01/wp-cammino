@@ -196,6 +196,29 @@
     margin-right: auto;
 }
 
+.nstarter-gallery-item-tools {
+    position: absolute;
+    z-index: 2;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    font-family: system-ui, sans-serif;
+}
+.nstarter-gallery-item-tools button {
+    min-height: 36px;
+    padding: 0 0.65rem;
+    border: 1px solid #c9c5df;
+    border-radius: 9px;
+    color: #41387f;
+    background: #fff;
+    cursor: pointer;
+    font: 650 0.78rem/1 system-ui, sans-serif;
+}
+.nstarter-gallery-item-tools button:hover { border-color: #6d5dfc; background: #f4f2ff; }
+.nstarter-gallery-item-tools button:disabled { opacity: 0.38; cursor: default; }
+
 .nstarter-post-builder-controls {
     display: grid;
     margin: 2.5rem 0;

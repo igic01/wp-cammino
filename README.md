@@ -169,13 +169,16 @@ periods are available.
 4. Open **Cammino visual editor**. Use the purple variable control attached to
    **Event details** or **Project details**. Both edit title, category, and image
    visibility; events additionally edit date/time, location, and event type.
-   Use the five buttons directly below the body to add a heading, paragraph,
-   placeholder image, button, or impact-story callout. Edit text in place; click an
+   Use the six buttons directly below the body to add a heading, paragraph,
+   placeholder image, gallery, button, or impact-story callout. Edit text in place; click an
    image to replace it, and use the small controls below a block to move or
    remove it. To add a link, select words in a paragraph and choose **Link
    selected text**. Select linked words and choose **Remove link** to undo it.
    For a button, edit its label in place and use **Edit link destination** below
-   the block to set its URL.
+   the block to set its URL. A gallery starts with one media slot. Use **Add media**
+   to reach four slots, and the controls on each slot to replace or remove media.
+   Gallery slots support images, video files, and iframe video embeds through
+   the existing media chooser.
 5. Publish the post. Events appear in the event listing and projects appear in
    the project directory. Impact stories keep their individual post pages.
 
@@ -189,8 +192,8 @@ the current WordPress content or an empty body.
 ## Article body builder
 
 Managed posts use the same dedicated content-builder element below the
-cover image. Its five inline buttons add unlimited headings, paragraphs,
-placeholder images, buttons, and compact impact-story text blocks. Every paragraph
+cover image. Its six inline buttons add unlimited headings, paragraphs,
+placeholder images, galleries, buttons, and compact impact-story text blocks. Every paragraph
 has safe controls for turning selected words into a link, editing an existing
 selected link, or removing links without replacing the paragraph. Text is
 editable in the preview; clicking an image opens the WordPress media library.

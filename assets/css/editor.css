@@ -320,6 +320,7 @@ body.nstarter-editor-shell {
 }
 
 .nstarter-media-url-dialog input,
+.nstarter-media-url-dialog select,
 .nstarter-iframe-dialog textarea {
     width: 100%;
     box-sizing: border-box;
@@ -329,7 +330,8 @@ body.nstarter-editor-shell {
     font: 400 13px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
-.nstarter-media-url-dialog input {
+.nstarter-media-url-dialog input,
+.nstarter-media-url-dialog select {
     height: 38px;
 }
 
@@ -339,6 +341,7 @@ body.nstarter-editor-shell {
 }
 
 .nstarter-media-url-dialog input:focus,
+.nstarter-media-url-dialog select:focus,
 .nstarter-iframe-dialog textarea:focus {
     border-color: #6d5dfc;
     box-shadow: 0 0 0 1px #6d5dfc;

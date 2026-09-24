@@ -1372,7 +1372,7 @@ function cammino_get_visual_items_from_blocks( array $blocks ): array {
  * Build the type-specific editable body when no visual snapshot exists.
  *
  * Existing WordPress content is split into movable content items. New posts
- * start with an empty builder and five templates used by the inline editor.
+ * start with an empty builder and six templates used by the inline editor.
  */
 function cammino_render_post_visual_content( int $post_id ): string {
 	$post_content = trim( (string) get_post_field( 'post_content', $post_id ) );
@@ -1393,6 +1393,7 @@ function cammino_render_post_visual_content( int $post_id ): string {
 	<template data-nstarter-content-template="title"><h2 class="article-content-block" data-nstarter-content-item data-nstarter-content-type="title">Nový nadpis</h2></template>
 	<template data-nstarter-content-template="paragraph"><p class="article-content-block" data-nstarter-content-item data-nstarter-content-type="paragraph">Nový odsek textu.</p></template>
 	<template data-nstarter-content-template="image"><figure class="article-inline-image article-content-block" data-nstarter-content-item data-nstarter-content-type="image"><img src="<?php echo esc_url( $placeholder ); ?>" alt="" width="1200" height="800" loading="lazy"></figure></template>
+	<template data-nstarter-content-template="gallery"><div class="article-gallery article-content-block" data-nstarter-content-item data-nstarter-content-type="gallery"><div class="article-gallery__item"><img src="<?php echo esc_url( $placeholder ); ?>" alt="" loading="lazy"></div></div></template>
 	<template data-nstarter-content-template="button"><div class="article-button article-content-block" data-nstarter-content-item data-nstarter-content-type="button"><a class="button button--coral" href="#">Text tlačidla</a></div></template>
 	<template data-nstarter-content-template="impact-story"><div class="article-impact-story article-content-block" data-nstarter-content-item data-nstarter-content-type="impact-story"><div class="article-impact-story__copy"><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div></div></template>
 	<?php

@@ -303,6 +303,28 @@
 .article-inline-image img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 2rem 5rem 2rem 2rem; box-shadow: var(--shadow-soft); }
 .article-inline-image figcaption { margin-top: 0.7rem; color: rgba(39, 36, 35, 0.55); font-size: 0.76rem; }
 
+.article-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.6rem, 2vw, 1rem);
+  margin: clamp(2.5rem, 6vw, 4rem) 0;
+}
+.article-gallery__item { position: relative; min-width: 0; aspect-ratio: 4 / 3; }
+.article-gallery__item:only-child { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
+.cammino-article-page .article-content .article-gallery__item > img,
+.article-gallery__item > video,
+.article-gallery__item > iframe {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 1.25rem;
+  object-fit: cover;
+  background: var(--color-sage);
+}
+
 .article-button { margin: 1.5rem 0 2rem; }
 .article-button .button { max-width: 100%; text-align: center; overflow-wrap: anywhere; text-decoration: none; }
 
