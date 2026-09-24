@@ -29,13 +29,13 @@ $GLOBALS['test_meta'][8][CAMMINO_POST_PLACEMENT_META] = 'project';
 cammino_migrate_post_placements_from_slugs();
 expect( 'project' === cammino_get_post_placement( 8 ), 'Migration is idempotent' );
 
-expect( cammino_update_visual_post_details( 1, 'Nový názov podujatia', '2026-10-15T16:00', 'Bratislava', true, 'Workshop', 'Vzdelávanie' ), 'Visual editor saves event title, date, location, type, category, and photo visibility' );
+expect( cammino_update_visual_post_details( 1, 'Nový názov podujatia', '2026-10-15T16:00', 'Bratislava', true, 'Workshop', array(), 'Vzdelávanie' ), 'Visual editor saves event title, date, location, type, category, and photo visibility' );
 expect( get_the_title( 1 ) === 'Nový názov podujatia', 'Visual editor updates the WordPress post title' );
 expect( get_post_meta( 1, CAMMINO_EVENT_DATE_META, true ) === '2026-10-15T16:00' && get_post_meta( 1, CAMMINO_EVENT_LOCATION_META, true ) === 'Bratislava', 'Visual editor updates event metadata' );
 expect( get_post_meta( 1, CAMMINO_EVENT_TYPE_META, true ) === 'Workshop', 'Visual editor updates the optional event type' );
 expect( get_post_meta( 1, CAMMINO_EVENT_HIDE_IMAGE_META, true ) === '1', 'Visual editor can hide the event photo' );
 expect( isset( $GLOBALS['test_terms'][2] ) && 'Vzdelávanie' === $GLOBALS['test_terms'][2]['name'] && in_array( 2, $GLOBALS['test_post_terms'][1], true ), 'Visual editor creates and assigns an event category' );
-expect( cammino_update_visual_post_details( 1, 'Nový názov podujatia', '2026-10-15T16:00', 'Bratislava', true, '' ) && '' === get_post_meta( 1, CAMMINO_EVENT_TYPE_META, true ), 'Event type can be left empty' );
+expect( cammino_update_visual_post_details( 1, 'Nový názov podujatia', '2026-10-15T16:00', 'Bratislava', true, '', array( 2 ) ) && '' === get_post_meta( 1, CAMMINO_EVENT_TYPE_META, true ), 'Event type can be left empty' );
 expect( ! cammino_update_visual_post_details( 1, '', 'not-a-date', 'Bratislava' ), 'Invalid visual event details are rejected' );
 
 $saved = '<p data-nstarter-content-item data-nstarter-content-type="paragraph">Zachovať moje úpravy.</p>';
@@ -104,23 +104,24 @@ expect( ! str_contains( $project_settings, '<option value="impact-story"' ), 'Pr
 ob_start();
 cammino_render_post_settings_meta_box( $GLOBALS['test_posts'][1] );
 $event_settings = (string) ob_get_clean();
-expect( str_contains( $event_settings, 'cammino_event_category' ), 'Event settings also expose an editable category' );
+expect( ! str_contains( $event_settings, 'cammino_event_category' ), 'Event settings use the shared WordPress category picker' );
 
 wp_set_post_terms( 2, $selected_categories, 'category', false );
 $GLOBALS['test_categories'][2][] = (object) array( 'term_id' => $second_category['term_id'], 'slug' => 'druha', 'name' => 'Druhá kategória' );
-expect( cammino_update_visual_post_details( 2, 'Projekt Beta', '', '', false, '', 'Vzdelávanie' ) && $GLOBALS['test_post_terms'][2] === $selected_categories, 'An unchanged visual-editor category preserves multiple native selections' );
-expect( cammino_update_visual_post_details( 2, 'Nový projekt', '', '', true, '', 'Komunita' ), 'Visual editor saves project title, category, and image visibility' );
+expect( count( cammino_get_editable_post_categories( 2 ) ) === 2, 'All selected project categories are available for display' );
+expect( cammino_update_visual_post_details( 2, 'Projekt Beta', '', '', false, '', $selected_categories ) && $GLOBALS['test_post_terms'][2] === $selected_categories, 'Visual editor preserves multiple category selections' );
+expect( cammino_update_visual_post_details( 2, 'Nový projekt', '', '', true, '', $selected_categories, 'Komunita' ), 'Visual editor saves project title, categories, and image visibility' );
 expect( get_the_title( 2 ) === 'Nový projekt' && get_post_meta( 2, CAMMINO_PROJECT_HIDE_IMAGE_META, true ) === '1', 'Visual project details update the title and image setting' );
 $community_category = term_exists( 'Komunita', 'category' );
-expect( $community_category && $GLOBALS['test_post_terms'][2] === array( $community_category['term_id'] ), 'Visual editor creates and assigns an intentionally changed project category' );
+expect( $community_category && $GLOBALS['test_post_terms'][2] === array_merge( $selected_categories, array( $community_category['term_id'] ) ), 'Visual editor adds a new category without removing existing selections' );
 
 $editor_php = file_get_contents( NSTARTER_PATH . '/inc/editor.php' );
 $editor_js = file_get_contents( NSTARTER_PATH . '/assets/js/editor.js' );
 $single_template = file_get_contents( NSTARTER_PATH . '/templates/single-post.php' );
 $theme_functions = file_get_contents( NSTARTER_PATH . '/functions.php' );
 expect( str_contains( $theme_functions, '(string) filemtime( NSTARTER_PATH . $script )' ), 'Published article script URL changes when the zoom code changes' );
-expect( str_contains( $editor_php, "'isProject'" ) && str_contains( $editor_php, 'name="category"' ), 'Visual editor exposes project mode and category editing' );
-expect( str_contains( $editor_js, 'category: postDetails.category' ) && str_contains( $editor_js, 'config.isEvent || config.isProject' ), 'Visual editor sends and previews category and image settings for both types' );
+expect( str_contains( $editor_php, "'categoryOptions'" ) && str_contains( $editor_php, 'name="new_category"' ), 'Visual editor exposes a multiple-category picker' );
+expect( str_contains( $editor_js, 'category_ids: postDetails.categoryIds' ) && str_contains( $editor_js, '[data-cammino-post-category]' ), 'Visual editor sends and previews every selected category' );
 expect( str_contains( $editor_js, "'add-impact-story'" ) && str_contains( $editor_js, "'link-selected-text'" ) && str_contains( $editor_js, "'remove-text-link'" ), 'Visual editor adds impact stories and safe paragraph link controls' );
 expect( str_contains( $editor_js, "'add-button'" ) && str_contains( $editor_js, "type === 'button'" ) && str_contains( $editor_js, "'edit-link'" ), 'Visual editor offers buttons on new and existing post bodies with destination editing' );
 expect( str_contains( $editor_js, "'add-gallery'" ) && str_contains( $editor_js, 'countInput.min = \'1\'' ) && str_contains( $editor_js, 'countInput.max = \'4\'' ) && str_contains( $editor_js, 'confirmReduceGallery' ) && str_contains( $editor_js, "'remove-gallery-media'" ), 'Gallery count control adjusts one to four media slots' );
@@ -134,18 +135,18 @@ $_POST['cammino_post_placement'] = 'event';
 cammino_save_post_settings( 4 );
 expect( cammino_get_post_placement( 4 ) === 'project', 'Unauthorized metadata update refused' );
 
-// Category writes enforce one user-selected category while retaining event routing.
+// Category writes preserve every selection while retaining event routing.
 wp_set_post_terms( 2, $selected_categories, 'category', false );
-cammino_enforce_single_post_category( 2, $selected_categories, array(), 'category' );
-expect( $GLOBALS['test_post_terms'][2] === array( $selected_categories[0] ), 'Category writes reduce multiple project selections to one' );
+cammino_sync_post_event_category( 2, $selected_categories, array(), 'category' );
+expect( $GLOBALS['test_post_terms'][2] === $selected_categories, 'Project posts retain multiple category selections' );
 wp_set_post_terms( 1, array_merge( $selected_categories, array( $event_term_id ) ), 'category', false );
-cammino_enforce_single_post_category( 1, array(), array(), 'category' );
-expect( $GLOBALS['test_post_terms'][1] === array( $selected_categories[0], $event_term_id ), 'Events retain one selected category plus the automatic routing category' );
+cammino_sync_post_event_category( 1, array(), array(), 'category' );
+expect( $GLOBALS['test_post_terms'][1] === array_merge( $selected_categories, array( $event_term_id ) ), 'Events retain every selected category plus the automatic routing category' );
 wp_set_post_terms( 1, array( $selected_categories[1] ), 'category', false );
-cammino_enforce_single_post_category( 1, array(), array(), 'category' );
+cammino_sync_post_event_category( 1, array(), array(), 'category' );
 expect( $GLOBALS['test_post_terms'][1] === array( $selected_categories[1], $event_term_id ), 'Changing an event category restores its automatic category' );
 wp_set_post_terms( 2, $selected_categories, 'category', false );
-cammino_enforce_single_post_category( 2, array(), array(), 'post_tag' );
+cammino_sync_post_event_category( 2, array(), array(), 'post_tag' );
 expect( $GLOBALS['test_post_terms'][2] === $selected_categories, 'Other taxonomies are unaffected' );
 expect( cammino_get_post_social_links( 2 ) === array( 'facebook', 'instagram', 'copy' ), 'Existing posts show all three social controls by default' );
 cammino_save_post_social_links( 2, 'instagram,copy,invalid,instagram' );

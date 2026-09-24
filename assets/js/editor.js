@@ -79,7 +79,7 @@
     let orderedSections = [];
     let sectionOrderParent = null;
     let transientState = new Map();
-    let postDetails = Object.assign({ title: '', category: '', eventDate: '', eventLocation: '', eventType: '', hideImage: false }, config.postDetails || {});
+    let postDetails = Object.assign({ title: '', categoryIds: [], newCategory: '', eventDate: '', eventLocation: '', eventType: '', hideImage: false }, config.postDetails || {});
 
     function frameDocument() {
         return frame.contentDocument || frame.contentWindow.document;
@@ -2031,10 +2031,18 @@
     function refreshPostDetailsPreview() {
         renderPostTitle(postDetails.title);
         const doc = frameDocument();
-        const category = doc.querySelector('[data-cammino-post-category]');
-        if (category && (config.isEvent || config.isProject)) {
-            category.hidden = !postDetails.category;
-            category.textContent = postDetails.category;
+        const tags = doc.querySelector('.article-tags');
+        if (tags && config.isPost) {
+            tags.querySelectorAll('[data-cammino-post-category]').forEach(category => category.remove());
+            const names = (config.categoryOptions || []).filter(category => postDetails.categoryIds.includes(category.id)).map(category => category.name);
+            if (postDetails.newCategory && !names.some(name => name.toLowerCase() === postDetails.newCategory.toLowerCase())) names.push(postDetails.newCategory);
+            names.forEach(name => {
+                const category = doc.createElement('span');
+                category.className = 'article-tag';
+                category.dataset.camminoPostCategory = '';
+                category.textContent = name;
+                tags.append(category);
+            });
         }
         const cover = doc.querySelector('[data-cammino-event-cover]');
         if (cover && (config.isEvent || config.isProject)) {
@@ -2066,9 +2074,22 @@
             postDetailsForm.elements.event_location.value = postDetails.eventLocation;
             postDetailsForm.elements.event_type.value = postDetails.eventType;
         }
-        if (config.isEvent || config.isProject) {
-            postDetailsForm.elements.category.value = postDetails.category;
-            postDetailsForm.elements.hide_image.checked = Boolean(postDetails.hideImage);
+        if (config.isPost) {
+            const options = postDetailsForm.querySelector('[data-cammino-category-options]');
+            options.replaceChildren();
+            (config.categoryOptions || []).forEach(category => {
+                const label = document.createElement('label');
+                label.className = 'nstarter-post-details-dialog__check';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'category_ids[]';
+                checkbox.value = String(category.id);
+                checkbox.checked = postDetails.categoryIds.includes(category.id);
+                label.append(checkbox, document.createTextNode(' ' + category.name));
+                options.append(label);
+            });
+            postDetailsForm.elements.new_category.value = postDetails.newCategory;
+            if (config.isEvent || config.isProject) postDetailsForm.elements.hide_image.checked = Boolean(postDetails.hideImage);
         }
         postDetailsDialog.showModal();
         postDetailsForm.elements.title.focus();
@@ -2088,9 +2109,10 @@
             postDetails.eventLocation = postDetailsForm.elements.event_location.value.trim();
             postDetails.eventType = postDetailsForm.elements.event_type.value.trim();
         }
-        if (config.isEvent || config.isProject) {
-            postDetails.category = postDetailsForm.elements.category.value.trim();
-            postDetails.hideImage = postDetailsForm.elements.hide_image.checked;
+        if (config.isPost) {
+            postDetails.categoryIds = Array.from(postDetailsForm.querySelectorAll('[name="category_ids[]"]:checked'), input => Number(input.value));
+            postDetails.newCategory = postDetailsForm.elements.new_category.value.trim();
+            if (config.isEvent || config.isProject) postDetails.hideImage = postDetailsForm.elements.hide_image.checked;
         }
         refreshPostDetailsPreview();
         closePostDetails();
@@ -2376,7 +2398,11 @@
         }
 
         Object.keys(extraData || {}).forEach(function (key) {
-            if (extraData[key] !== undefined) body.append(key, extraData[key]);
+            if (Array.isArray(extraData[key])) {
+                extraData[key].forEach(value => body.append(key + '[]', value));
+            } else if (extraData[key] !== undefined) {
+                body.append(key, extraData[key]);
+            }
         });
 
         const response = await fetch(config.ajaxUrl, {
@@ -2439,13 +2465,20 @@
                 event_date: postDetails.eventDate,
                 event_location: postDetails.eventLocation,
                 event_type: postDetails.eventType,
-                category: postDetails.category,
+                category_ids_present: '1',
+                category_ids: postDetails.categoryIds,
+                new_category: postDetails.newCategory,
                 social_links: config.isPost && frameDocument().querySelector('[data-cammino-post-social]')
                     ? frameDocument().querySelector('[data-cammino-post-social]').dataset.nstarterVariableValue
                     : undefined,
                 hide_image: postDetails.hideImage ? '1' : '0'
             });
             dirty = false;
+            if (data.categories && config.isPost) {
+                postDetails.categoryIds = data.categories.map(category => category.id);
+                config.categoryOptions = data.categoryOptions;
+                postDetails.newCategory = '';
+            }
             if (data.snapshotToken && snapshotRoot()) {
                 snapshotRoot().dataset.nstarterSnapshotToken = data.snapshotToken;
                 snapshotRoot().dataset.nstarterMergeConflicts = '[]';

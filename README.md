@@ -161,13 +161,12 @@ periods are available.
    the dedicated WordPress **Podujatia** category and removed from that category
    if their type changes.
 3. Fill the fields for that type: event date/time, location, optional event type,
-   category, and photo visibility. For projects, use WordPress **Categories** to
-   select one category; the duplicate project settings block is removed.
-   The category selector offers no parent field when adding a category. Events
-   also retain their automatically assigned **Podujatia** category.
+   and photo visibility. Use WordPress **Categories** to select as many categories
+   as needed for any post. Events also retain their automatically assigned
+   **Podujatia** category.
    Project image visibility remains editable through **Project details** below.
 4. Open **Cammino visual editor**. Use the purple variable control attached to
-   **Event details** or **Project details**. Both edit title, category, and image
+   **Event details** or **Project details**. Both edit title, categories, and image
    visibility; events additionally edit date/time, location, and event type.
    Use the six buttons directly below the body to add a heading, paragraph,
    placeholder image, gallery, button, or impact-story callout. Edit text in place; click an

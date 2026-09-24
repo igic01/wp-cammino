@@ -29,7 +29,7 @@ const wp = {
             editPost: value => { state.selected = Array.from(value.categories); writes.push(state.selected); }
         } : { saveEntityRecord: async (kind, taxonomy, value) => { creation = value; return { id: 4, name: value.name }; } }
     },
-    components: Object.fromEntries(['SelectControl', 'TextControl', 'Button', 'Notice', 'Spinner'].map(name => [name, name])),
+    components: Object.fromEntries(['CheckboxControl', 'TextControl', 'Button', 'Notice', 'Spinner'].map(name => [name, name])),
     i18n: { __: value => value }, htmlEntities: { decodeEntities: value => value }
 };
 vm.runInNewContext(readFileSync(new URL('../assets/js/post-categories.js', import.meta.url), 'utf8'), {
@@ -43,30 +43,36 @@ function render() {
     return component.type(component.props);
 }
 function find(node, type) {
+    if (Array.isArray(node)) return node.map(child => find(child, type)).find(Boolean);
     if (node?.type === type) return node;
     for (const child of node?.children || []) {
         const match = find(child, type);
         if (match) return match;
     }
 }
+function findAll(node, type) {
+    if (!node) return [];
+    if (Array.isArray(node)) return node.flatMap(child => findAll(child, type));
+    return (node.type === type ? [node] : []).concat((node.children || []).flatMap(child => findAll(child, type)));
+}
 let checks = 0;
 function check(callback) { callback(); checks++; }
 let tree = render();
-check(() => assert.equal(find(tree, 'SelectControl').props.value, '2'));
-find(tree, 'SelectControl').props.onChange('3');
+check(() => assert.deepEqual(findAll(tree, 'CheckboxControl').map(control => control.props.checked), [true, true]));
+findAll(tree, 'CheckboxControl')[0].props.onChange(false);
 check(() => assert.deepEqual(state.selected, [3]));
 state.selected = [1, 2];
 tree = render();
-find(tree, 'SelectControl').props.onChange('3');
-check(() => assert.deepEqual(state.selected, [3, 1]));
-check(() => assert.equal(find(tree, 'SelectControl').props.options.some(option => option.value === '1'), false));
+findAll(tree, 'CheckboxControl')[1].props.onChange(true);
+check(() => assert.deepEqual(state.selected, [1, 2, 3]));
+check(() => assert.equal(findAll(tree, 'CheckboxControl').length, 2));
 find(tree, 'Button').props.onClick();
 tree = render();
 find(tree, 'TextControl').props.onChange('New category');
 tree = render();
 await find(tree, 'form').props.onSubmit({ preventDefault() {} });
 check(() => assert.equal(creation.parent, 0));
-check(() => assert.deepEqual(state.selected, [4, 1]));
+check(() => assert.deepEqual(state.selected, [1, 2, 3, 4]));
 check(() => assert.equal(find(render(), 'form'), undefined));
 state.links = { 'wp:action-assign-categories': [{}] };
 check(() => assert.equal(find(render(), 'Button'), undefined));

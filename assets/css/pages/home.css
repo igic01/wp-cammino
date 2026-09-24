@@ -2031,9 +2031,15 @@ body:not(.nstarter-editor-preview) .home-projects[data-nstarter-variable-value="
   padding: clamp(1.2rem, 2.4vw, 1.6rem);
 }
 
+.home-project-card__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
 .home-project-card__category {
   align-self: flex-start;
-  margin-bottom: 0.9rem;
   padding: 0.4rem 0.7rem;
   border-radius: var(--radius-pill);
   color: var(--color-plum);

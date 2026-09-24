@@ -27,8 +27,7 @@ $cammino_back_label = match ( $cammino_placement ) {
 	'impact-story' => __( 'Späť na príbehy', 'cammino' ),
 	default        => __( 'Späť na domov', 'cammino' ),
 };
-$cammino_category   = cammino_get_post_category( $cammino_post_id );
-$cammino_editable_category = cammino_get_editable_post_category( $cammino_post_id );
+$cammino_categories = cammino_get_editable_post_categories( $cammino_post_id );
 $cammino_image      = cammino_get_post_image_url( $cammino_post_id, 'full' );
 $cammino_event_date = 'event' === $cammino_placement
 	? (string) get_post_meta( $cammino_post_id, CAMMINO_EVENT_DATE_META, true )
@@ -84,11 +83,9 @@ foreach ( cammino_get_post_detail_fields() as $key => $field ) {
 				</a>
 				<div class="article-tags" data-article-reveal="up" data-delay="60">
 					<a href="<?php echo esc_url( $cammino_listing_url ); ?>" class="article-tag article-tag--primary"><?php echo esc_html( $cammino_type_label ); ?></a>
-					<?php if ( in_array( $cammino_placement, array( 'event', 'project' ), true ) ) : ?>
-						<span class="article-tag" data-cammino-post-category<?php echo '' === $cammino_editable_category['name'] ? ' hidden' : ''; ?>><?php echo esc_html( $cammino_editable_category['name'] ); ?></span>
-					<?php else : ?>
-						<span class="article-tag"><?php echo esc_html( $cammino_category['name'] ); ?></span>
-					<?php endif; ?>
+					<?php foreach ( $cammino_categories as $category ) : ?>
+						<span class="article-tag" data-cammino-post-category><?php echo esc_html( $category['name'] ); ?></span>
+					<?php endforeach; ?>
 				</div>
 				<div class="cammino-post-details-variable" data-cammino-post-details-element data-nstarter-variable-section="cammino_post_details" data-nstarter-variable-label="<?php echo esc_attr( 'event' === $cammino_placement ? __( 'Event details', 'cammino' ) : ( 'project' === $cammino_placement ? __( 'Project details', 'cammino' ) : __( 'Post title', 'cammino' ) ) ); ?>" data-nstarter-variable-type="text" data-nstarter-variable-control="post-details">
 					<h1 data-cammino-post-title data-article-reveal="up" data-delay="120"><?php echo cammino_format_display_title( get_the_title( $cammino_post ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>

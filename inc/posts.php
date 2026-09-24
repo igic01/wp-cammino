@@ -111,19 +111,27 @@ function cammino_get_post_type_icon( string $type ): string {
 	return array( 'event' => 'fa-calendar-days', 'project' => 'fa-seedling', 'impact-story' => 'fa-hand-holding-heart' )[ $type ] ?? 'fa-book-open';
 }
 
-/** Return the editable category, excluding the automatic event category. */
-function cammino_get_editable_post_category( int $post_id ): array {
+/** Return every user-selected category, excluding the automatic event marker. */
+function cammino_get_editable_post_categories( int $post_id ): array {
+	$categories = array();
 	foreach ( get_the_category( $post_id ) as $category ) {
 		if ( CAMMINO_EVENT_CATEGORY_SLUG !== (string) $category->slug ) {
-			return array(
+			$categories[] = array(
 				'id'   => (int) $category->term_id,
 				'slug' => sanitize_title( (string) $category->slug ),
 				'name' => (string) $category->name,
 			);
 		}
 	}
+	return $categories;
+}
 
-	return array( 'id' => 0, 'slug' => '', 'name' => '' );
+/** Categories available in the visual editor, apart from the event routing marker. */
+function cammino_get_selectable_post_categories(): array {
+	return array_values( array_map(
+		static fn( $category ): array => array( 'id' => (int) $category->term_id, 'name' => (string) $category->name ),
+		array_filter( get_categories( array( 'hide_empty' => false ) ), static fn( $category ): bool => CAMMINO_EVENT_CATEGORY_SLUG !== $category->slug )
+	) );
 }
 
 /** Each post chooses which profile links and copy-link button are visible. */
@@ -150,27 +158,6 @@ function cammino_render_post_social_links( int $post_id ): void {
 		<span class="copy-feedback" role="status" aria-live="polite" data-copy-feedback></span>
 	</aside>
 	<?php
-}
-
-/** Find or create one category and make it the post's editable category. */
-function cammino_set_post_category( int $post_id, string $category_name ): bool {
-	$category_name = sanitize_text_field( $category_name );
-	if ( '' === $category_name || 'post' !== get_post_type( $post_id ) ) {
-		return false;
-	}
-
-	$term = term_exists( $category_name, 'category' );
-	if ( ! $term ) {
-		$term = wp_insert_term( $category_name, 'category', array( 'slug' => sanitize_title( $category_name ) ) );
-	}
-	if ( is_wp_error( $term ) || ! $term ) {
-		return false;
-	}
-
-	$term_id = (int) ( is_array( $term ) ? $term['term_id'] : $term );
-	$result  = wp_set_post_terms( $post_id, array( $term_id ), 'category', false );
-
-	return ! is_wp_error( $result );
 }
 
 /** Optional facts edited in WordPress, independent of the visual body. */
@@ -306,9 +293,9 @@ add_action( 'admin_enqueue_scripts', static function ( string $hook ): void {
 	}
 } );
 
-add_action( 'set_object_terms', 'cammino_enforce_single_post_category', 20, 4 );
-/** Keep one selected category, plus the automatic category for events. */
-function cammino_enforce_single_post_category( int $post_id, $terms, $tt_ids, string $taxonomy ): void {
+add_action( 'set_object_terms', 'cammino_sync_post_event_category', 20, 4 );
+/** Preserve every selected category while maintaining the automatic event marker. */
+function cammino_sync_post_event_category( int $post_id, $terms, $tt_ids, string $taxonomy ): void {
 	static $updating = false;
 	if ( $updating || 'category' !== $taxonomy || 'post' !== get_post_type( $post_id ) ) {
 		return;
@@ -318,8 +305,7 @@ function cammino_enforce_single_post_category( int $post_id, $terms, $tt_ids, st
 		return;
 	}
 	$automatic = cammino_get_event_category_id( false );
-	$editable = array_values( array_diff( $categories, array( $automatic ) ) );
-	$selected = array_slice( $editable, 0, 1 );
+	$selected = array_values( array_diff( $categories, array( $automatic ) ) );
 	if ( 'event' === cammino_get_post_placement( $post_id ) && $automatic ) {
 		$selected[] = $automatic;
 	}
@@ -336,7 +322,7 @@ function cammino_enforce_single_post_category( int $post_id, $terms, $tt_ids, st
 // REST writes taxonomy terms after save_post; synchronize the event marker last.
 add_action( 'rest_after_insert_post', static function ( WP_Post $post ): void {
 	cammino_sync_event_category( $post->ID );
-	cammino_enforce_single_post_category( $post->ID, array(), array(), 'category' );
+	cammino_sync_post_event_category( $post->ID, array(), array(), 'category' );
 } );
 
 add_filter( 'manage_post_posts_columns', static function ( array $columns ): array {
@@ -372,7 +358,6 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	$location   = (string) get_post_meta( $post->ID, CAMMINO_EVENT_LOCATION_META, true );
 	$event_type = (string) get_post_meta( $post->ID, CAMMINO_EVENT_TYPE_META, true );
 	$hide_image = '1' === (string) get_post_meta( $post->ID, CAMMINO_EVENT_HIDE_IMAGE_META, true );
-	$editable_category = cammino_get_editable_post_category( $post->ID );
 
 	wp_nonce_field( 'cammino_save_post_settings', 'cammino_post_settings_nonce' );
 	?>
@@ -408,10 +393,6 @@ function cammino_render_post_settings_meta_box( WP_Post $post ): void {
 	<p>
 		<label for="cammino-event-type"><?php esc_html_e( 'Typ podujatia (voliteľné)', 'cammino' ); ?></label>
 		<input id="cammino-event-type" name="cammino_event_type" type="text" value="<?php echo esc_attr( $event_type ); ?>" maxlength="100" placeholder="<?php esc_attr_e( 'Napr. workshop alebo webinár', 'cammino' ); ?>" style="width:100%">
-	</p>
-	<p>
-		<label for="cammino-event-category"><?php esc_html_e( 'Kategória', 'cammino' ); ?></label>
-		<input id="cammino-event-category" name="cammino_event_category" type="text" value="<?php echo esc_attr( $editable_category['name'] ); ?>" maxlength="100" placeholder="<?php esc_attr_e( 'Napíšte názov kategórie', 'cammino' ); ?>" style="width:100%">
 	</p>
 	<p><label><input name="cammino_event_hide_image" type="checkbox" value="1" <?php checked( $hide_image ); ?>> <?php esc_html_e( 'Skryť fotografiu na stránke podujatia', 'cammino' ); ?></label></p>
 	</div>
@@ -468,17 +449,13 @@ function cammino_save_post_settings( int $post_id ): void {
 		}
 	}
 
-	if ( 'event' === $placement && isset( $_POST['cammino_event_category'] ) ) {
-		cammino_set_post_category( $post_id, (string) wp_unslash( $_POST['cammino_event_category'] ) );
-	}
-
 	cammino_sync_event_category( $post_id, $fields[ CAMMINO_POST_PLACEMENT_META ] );
 }
 
 /**
  * Save the fields exposed by the visual post-details editor.
  */
-function cammino_update_visual_post_details( int $post_id, string $title, string $event_date = '', string $event_location = '', bool $hide_image = false, string $event_type = '', string $category_name = '' ): bool {
+function cammino_update_visual_post_details( int $post_id, string $title, string $event_date = '', string $event_location = '', bool $hide_image = false, string $event_type = '', array $category_ids = array(), string $new_category = '' ): bool {
 	if ( 'post' !== get_post_type( $post_id ) ) {
 		return false;
 	}
@@ -487,7 +464,7 @@ function cammino_update_visual_post_details( int $post_id, string $title, string
 	$event_date     = sanitize_text_field( $event_date );
 	$event_location = sanitize_text_field( $event_location );
 	$event_type     = sanitize_text_field( $event_type );
-	$category_name  = sanitize_text_field( $category_name );
+	$new_category   = sanitize_text_field( $new_category );
 	$placement      = cammino_get_post_placement( $post_id );
 
 	if ( '' === $title || ( '' !== $event_date && ! preg_match( '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $event_date ) ) ) {
@@ -522,9 +499,28 @@ function cammino_update_visual_post_details( int $post_id, string $title, string
 		}
 	}
 	$category_saved = true;
-	// An unchanged visual-editor label must not replace categories selected in WordPress.
-	if ( in_array( $placement, array( 'event', 'project' ), true ) && '' !== $category_name && $category_name !== cammino_get_editable_post_category( $post_id )['name'] ) {
-		$category_saved = cammino_set_post_category( $post_id, $category_name );
+	if ( 'post' === get_post_type( $post_id ) ) {
+		$category_ids = array_values( array_unique( array_filter( array_map( 'absint', $category_ids ) ) ) );
+		$automatic = cammino_get_event_category_id( false );
+		$category_ids = array_values( array_diff( $category_ids, array( $automatic ) ) );
+		$valid_ids = $category_ids ? get_terms( array( 'taxonomy' => 'category', 'hide_empty' => false, 'include' => $category_ids, 'fields' => 'ids' ) ) : array();
+		if ( is_wp_error( $valid_ids ) || count( $valid_ids ) !== count( $category_ids ) ) {
+			return false;
+		}
+		if ( '' !== $new_category ) {
+			$term = term_exists( $new_category, 'category' );
+			if ( ! $term ) {
+				$term = wp_insert_term( $new_category, 'category', array( 'slug' => sanitize_title( $new_category ) ) );
+			}
+			if ( is_wp_error( $term ) || ! $term ) {
+				return false;
+			}
+			$category_ids[] = (int) ( is_array( $term ) ? $term['term_id'] : $term );
+		}
+		if ( 'event' === $placement && $automatic ) {
+			$category_ids[] = $automatic;
+		}
+		$category_saved = ! is_wp_error( wp_set_post_terms( $post_id, array_values( array_unique( $category_ids ) ), 'category', false ) );
 	}
 
 	cammino_sync_event_category( $post_id, $placement );
@@ -599,7 +595,7 @@ function cammino_render_home_project_card( WP_Post $project ): string {
 	$hide_image  = '1' === (string) get_post_meta( $project_id, CAMMINO_PROJECT_HIDE_IMAGE_META, true );
 	$image_url   = $hide_image ? false : get_the_post_thumbnail_url( $project_id, 'medium_large' );
 	$description = trim( (string) get_the_excerpt( $project ) );
-	$categories  = get_the_category( $project_id );
+	$categories  = cammino_get_editable_post_categories( $project_id );
 
 	if ( '' === $description ) {
 		$description = wp_trim_words( wp_strip_all_tags( strip_shortcodes( (string) get_post_field( 'post_content', $project_id ) ) ), 24 );
@@ -614,7 +610,7 @@ function cammino_render_home_project_card( WP_Post $project ): string {
 			<div class="home-project-card__symbol" aria-hidden="true"><i class="fa-solid fa-seedling"></i></div>
 		<?php endif; ?>
 		<div class="home-project-card__body">
-			<?php if ( ! empty( $categories ) ) : ?><span class="home-project-card__category"><?php echo esc_html( (string) $categories[0]->name ); ?></span><?php endif; ?>
+			<?php if ( $categories ) : ?><span class="home-project-card__categories"><?php foreach ( $categories as $category ) : ?><span class="home-project-card__category"><?php echo esc_html( $category['name'] ); ?></span><?php endforeach; ?></span><?php endif; ?>
 			<h3><?php echo esc_html( get_the_title( $project ) ); ?></h3>
 			<?php if ( '' !== $description ) : ?><p><?php echo esc_html( $description ); ?></p><?php endif; ?>
 			<span class="home-project-card__action"><?php esc_html_e( 'Pozrieť projekt', 'cammino' ); ?> <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></span>
@@ -915,27 +911,6 @@ function cammino_get_post_image_url( int $post_id, string $size = 'large' ): str
 	return is_string( $image ) && '' !== $image
 		? $image
 		: NSTARTER_URL . '/assets/images/placeholder.webp';
-}
-
-/**
- * Return the first category used as a visual label/filter.
- *
- * @return array{slug:string,name:string}
- */
-function cammino_get_post_category( int $post_id ): array {
-	$categories = get_the_category( $post_id );
-
-	if ( ! empty( $categories ) ) {
-		return array(
-			'slug' => sanitize_title( $categories[0]->slug ),
-			'name' => $categories[0]->name,
-		);
-	}
-
-	return array(
-		'slug' => 'nezaradene',
-		'name' => __( 'Nezaradené', 'cammino' ),
-	);
 }
 
 /**
