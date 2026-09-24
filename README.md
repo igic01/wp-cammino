@@ -175,10 +175,12 @@ periods are available.
    remove it. To add a link, select words in a paragraph and choose **Link
    selected text**. Select linked words and choose **Remove link** to undo it.
    For a button, edit its label in place and use **Edit link destination** below
-   the block to set its URL. A gallery starts with one media slot. Use **Add media**
-   to reach four slots, and the controls on each slot to replace or remove media.
+   the block to set its URL. A gallery starts with one media slot. Set **Number
+   of media (1–4)** below it to choose its size, and use the controls on each
+   slot to replace or remove media. Reducing the number removes slots from the end.
    Gallery slots support images, video files, and iframe video embeds through
-   the existing media chooser.
+   the existing media chooser. On published posts, clicking an image opens it
+   in a popup.
 5. Publish the post. Events appear in the event listing and projects appear in
    the project directory. Impact stories keep their individual post pages.
 

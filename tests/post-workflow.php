@@ -121,7 +121,9 @@ expect( str_contains( $editor_php, "'isProject'" ) && str_contains( $editor_php,
 expect( str_contains( $editor_js, 'category: postDetails.category' ) && str_contains( $editor_js, 'config.isEvent || config.isProject' ), 'Visual editor sends and previews category and image settings for both types' );
 expect( str_contains( $editor_js, "'add-impact-story'" ) && str_contains( $editor_js, "'link-selected-text'" ) && str_contains( $editor_js, "'remove-text-link'" ), 'Visual editor adds impact stories and safe paragraph link controls' );
 expect( str_contains( $editor_js, "'add-button'" ) && str_contains( $editor_js, "type === 'button'" ) && str_contains( $editor_js, "'edit-link'" ), 'Visual editor offers buttons on new and existing post bodies with destination editing' );
-expect( str_contains( $editor_js, "'add-gallery'" ) && str_contains( $editor_js, "'add-gallery-media'" ) && str_contains( $editor_js, "'remove-gallery-media'" ) && str_contains( $editor_js, 'gallerySlots(item).length < 4' ) && str_contains( $editor_js, 'gallerySlots(item).length > 1' ), 'Gallery controls keep one to four media slots' );
+expect( str_contains( $editor_js, "'add-gallery'" ) && str_contains( $editor_js, 'countInput.min = \'1\'' ) && str_contains( $editor_js, 'countInput.max = \'4\'' ) && str_contains( $editor_js, 'confirmReduceGallery' ) && str_contains( $editor_js, "'remove-gallery-media'" ), 'Gallery count control adjusts one to four media slots' );
+$article_js = file_get_contents( NSTARTER_PATH . '/assets/js/pages/article.js' );
+expect( str_contains( $article_js, 'articleImages = ".article-content img, .article-cover__frame img"' ) && str_contains( $article_js, 'imageDialog.showModal()' ) && str_contains( $article_js, 'event.key !== "Enter"' ), 'Published article images open an accessible popup' );
 expect( ! str_contains( $editor_js, "'add-important-link'" ), 'Visual editor no longer exposes the separate important-link block' );
 expect( str_contains( $single_template, 'data-cammino-post-category' ) && str_contains( $single_template, "__( 'Project details'" ), 'Project pages expose the project details variable element and category label' );
 

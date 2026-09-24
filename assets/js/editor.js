@@ -239,6 +239,7 @@
             }
 
             if (item.dataset.nstarterContentType === 'gallery') {
+                tools.classList.add('nstarter-post-item-tools--gallery');
                 const slots = gallerySlots(item);
                 slots.forEach(function (slot) {
                     const slotTools = doc.createElement('div');
@@ -253,11 +254,35 @@
                     slotTools.append(edit, remove);
                     slot.appendChild(slotTools);
                 });
-                if (slots.length < 4) {
-                    const add = createInlineButton(doc, 'add-gallery-media', config.strings.addGalleryMedia, '+ ' + config.strings.addGalleryMedia, 'nstarter-post-item-tools__edit');
-                    add.nstarterContentItem = item;
-                    tools.appendChild(add);
-                }
+                const countLabel = doc.createElement('label');
+                countLabel.className = 'nstarter-gallery-count';
+                countLabel.textContent = config.strings.galleryMediaCount;
+                const countInput = doc.createElement('input');
+                countInput.type = 'number';
+                countInput.min = '1';
+                countInput.max = '4';
+                countInput.step = '1';
+                countInput.value = String(slots.length);
+                countInput.dataset.nstarterGalleryCount = '';
+                countInput.addEventListener('change', function () {
+                    const current = gallerySlots(item);
+                    const requested = Number(countInput.value);
+                    if (!Number.isInteger(requested) || requested < 1 || requested > 4) {
+                        countInput.value = String(current.length);
+                        return;
+                    }
+                    if (requested === current.length) return;
+                    if (requested < current.length && !window.confirm(config.strings.confirmReduceGallery)) {
+                        countInput.value = String(current.length);
+                        return;
+                    }
+                    while (gallerySlots(item).length < requested) item.appendChild(createGallerySlot(doc));
+                    current.slice(requested).forEach(function (slot) { slot.remove(); });
+                    markDirty();
+                    renderInlinePostEditor();
+                });
+                countLabel.appendChild(countInput);
+                tools.appendChild(countLabel);
             }
 
             if (item.dataset.nstarterContentType === 'paragraph') {
@@ -329,7 +354,7 @@
         event.stopPropagation();
         const action = button.dataset.nstarterInlineAction;
 
-        if (action.indexOf('add-') === 0 && action !== 'add-gallery-media') {
+        if (action.indexOf('add-') === 0) {
             const item = addContentItem(action.slice(4));
             focusContentItem(item);
             return true;
@@ -337,14 +362,6 @@
 
         const item = button.nstarterContentItem;
         if (!item || !item.isConnected) return true;
-        if (action === 'add-gallery-media' && gallerySlots(item).length < 4) {
-            const slot = createGallerySlot(item.ownerDocument);
-            item.appendChild(slot);
-            markDirty();
-            renderInlinePostEditor();
-            openMediaSourceChooser(slot.querySelector('img'), false);
-            return true;
-        }
         if (action === 'edit-gallery-media') {
             const slot = button.nstarterGallerySlot;
             const media = slot && slot.querySelector('img, video, iframe[data-nstarter-embed]');
@@ -2099,6 +2116,11 @@
     }
 
     function handlePreviewClick(event) {
+        if (event.target.matches && event.target.matches('[data-nstarter-gallery-count]')) {
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+            return;
+        }
         if (handleInlinePostAction(event)) {
             return;
         }
@@ -2572,7 +2594,9 @@
         doc.addEventListener('beforeinput', protectLiveSection, true);
         doc.addEventListener('beforeinput', insertTitleLineBreak, true);
         doc.addEventListener('paste', pastePlainText, true);
-        doc.addEventListener('input', markDirty, true);
+        doc.addEventListener('input', function (event) {
+            if (!event.target.matches || !event.target.matches('[data-nstarter-gallery-count]')) markDirty();
+        }, true);
         doc.addEventListener('keydown', handleShortcut, true);
         doc.addEventListener('scroll', positionEditorTools, true);
         frame.contentWindow.addEventListener('resize', positionEditorTools);

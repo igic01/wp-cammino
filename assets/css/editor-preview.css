@@ -144,6 +144,7 @@
     margin: -0.55rem 0 1.25rem;
     font-family: system-ui, sans-serif;
 }
+.nstarter-post-item-tools--gallery { flex-wrap: wrap; }
 
 .nstarter-post-item-tools button,
 .nstarter-post-builder-controls button {
@@ -218,6 +219,27 @@
 }
 .nstarter-gallery-item-tools button:hover { border-color: #6d5dfc; background: #f4f2ff; }
 .nstarter-gallery-item-tools button:disabled { opacity: 0.38; cursor: default; }
+
+.nstarter-gallery-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-right: auto;
+    color: #41387f;
+    font: 650 0.82rem/1.25 system-ui, sans-serif;
+}
+.nstarter-gallery-count input {
+    width: 4.25rem;
+    min-height: 36px;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid #c9c5df;
+    border-radius: 9px;
+    color: #41387f;
+    background: #fff;
+    font: 650 0.9rem/1 system-ui, sans-serif;
+    text-align: center;
+}
+.nstarter-gallery-count input:focus-visible { outline: 2px solid #6d5dfc; outline-offset: 2px; }
 
 .nstarter-post-builder-controls {
     display: grid;
