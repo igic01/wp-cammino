@@ -117,6 +117,8 @@ expect( $community_category && $GLOBALS['test_post_terms'][2] === array( $commun
 $editor_php = file_get_contents( NSTARTER_PATH . '/inc/editor.php' );
 $editor_js = file_get_contents( NSTARTER_PATH . '/assets/js/editor.js' );
 $single_template = file_get_contents( NSTARTER_PATH . '/templates/single-post.php' );
+$theme_functions = file_get_contents( NSTARTER_PATH . '/functions.php' );
+expect( str_contains( $theme_functions, '(string) filemtime( NSTARTER_PATH . $script )' ), 'Published article script URL changes when the zoom code changes' );
 expect( str_contains( $editor_php, "'isProject'" ) && str_contains( $editor_php, 'name="category"' ), 'Visual editor exposes project mode and category editing' );
 expect( str_contains( $editor_js, 'category: postDetails.category' ) && str_contains( $editor_js, 'config.isEvent || config.isProject' ), 'Visual editor sends and previews category and image settings for both types' );
 expect( str_contains( $editor_js, "'add-impact-story'" ) && str_contains( $editor_js, "'link-selected-text'" ) && str_contains( $editor_js, "'remove-text-link'" ), 'Visual editor adds impact stories and safe paragraph link controls' );

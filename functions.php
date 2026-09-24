@@ -488,7 +488,7 @@ function cammino_enqueue_design_assets( string $handle, string $style, string $s
 		$handle,
 		NSTARTER_URL . $script,
 		array( 'cammino-shell' ),
-		NSTARTER_VERSION,
+		(string) filemtime( NSTARTER_PATH . $script ),
 		true
 	);
 }
