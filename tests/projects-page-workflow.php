@@ -29,6 +29,7 @@ projects_expect( 'project' === $query['meta_query'][0]['value'], 'Only posts pla
 projects_expect( str_contains( $directory, 'data-project-filter="vzdelavanie"' ), 'A project category becomes a filter.' );
 projects_expect( str_contains( $directory, 'data-project-filter="komunita"' ), 'Every meaningful project category becomes a filter.' );
 projects_expect( str_contains( $directory, 'data-project-filter="uncategorized"' ), 'Every category used by a project is shown.' );
+projects_expect( str_contains( $directory, 'Nezaradené' ) && ! str_contains( $directory, '>Uncategorized<' ), 'The default category uses a Slovak public label while retaining its filter slug.' );
 projects_expect( ! str_contains( $directory, 'data-project-filter="all"' ), 'The redesigned selector starts with categories rather than an all-projects filter.' );
 projects_expect( str_contains( $directory, 'class="project-category-card"' ), 'Categories use the large selectable card design.' );
 projects_expect( str_contains( $directory, 'data-project-categories="vzdelavanie komunita uncategorized"' ), 'Cards expose all their categories to the client filter.' );

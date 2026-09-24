@@ -48,6 +48,9 @@
     const variableProjectPicker = document.querySelector('[data-nstarter-variable-project-picker]');
     const variablePickerHint = document.querySelector('[data-nstarter-variable-picker-hint]');
     const variableCancel = document.querySelector('[data-nstarter-variable-cancel]');
+    const personDialog = document.querySelector('[data-nstarter-person-dialog]');
+    const personForm = document.querySelector('[data-nstarter-person-form]');
+    let activePerson = null;
     const sectionOrderButton = document.querySelector('[data-nstarter-section-order]');
     const sectionOrderDialog = document.querySelector('[data-nstarter-section-order-dialog]');
     const sectionOrderForm = document.querySelector('[data-nstarter-section-order-form]');
@@ -930,6 +933,14 @@
             button.style.top = Math.max(4, rect.top + 10) + 'px';
             button.style.left = Math.max(4, Math.min(previewWindow.innerWidth - 42, rect.right - 42)) + 'px';
         });
+        variableToolsLayer.querySelectorAll('[data-nstarter-person-edit]').forEach(function (button) {
+            const person = button.nstarterPerson;
+            if (!person || !person.isConnected) { button.remove(); return; }
+            const rect = person.getBoundingClientRect();
+            button.hidden = rect.bottom <= 0 || rect.top >= previewWindow.innerHeight || rect.right <= 0 || rect.left >= previewWindow.innerWidth;
+            button.style.top = Math.max(4, rect.top + 8) + 'px';
+            button.style.left = Math.max(4, rect.left + 8) + 'px';
+        });
     }
 
     function refreshVariableTools() {
@@ -971,6 +982,19 @@
             button.setAttribute('title', config.strings.editSectionVariable + ': ' + label);
             button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.25V20h2.75L17.81 8.94l-2.75-2.75L4 17.25Zm15.71-10.42a1 1 0 0 0 0-1.42l-1.12-1.12a1 1 0 0 0-1.42 0l-.88.88 2.75 2.75.67-.67Z"/></svg>';
             button.nstarterVariableSection = section;
+            variableToolsLayer.appendChild(button);
+        });
+
+        if (personDialog) root.querySelectorAll('.contact-people [data-nstarter-variable-item].contact-person').forEach(function (person) {
+            const button = doc.createElement('button');
+            button.type = 'button';
+            button.className = 'nstarter-variable-edit-button';
+            button.setAttribute('data-nstarter-person-edit', '');
+            button.setAttribute('contenteditable', 'false');
+            button.setAttribute('aria-label', 'Upraviť člena tímu');
+            button.setAttribute('title', 'Upraviť člena tímu');
+            button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.25V20h2.75L17.81 8.94l-2.75-2.75L4 17.25Zm15.71-10.42a1 1 0 0 0 0-1.42l-.88.88 2.75 2.75.67-.67Z"/></svg>';
+            button.nstarterPerson = person;
             variableToolsLayer.appendChild(button);
         });
 
@@ -1250,6 +1274,91 @@
 
         liveSection.setAttribute('contenteditable', 'false');
         return true;
+    }
+
+    function updatePersonMediaFields() {
+        if (!personForm) return;
+        const image = personForm.elements.media_type.value === 'image';
+        personForm.querySelector('[data-nstarter-person-icon-preset]').hidden = image;
+        personForm.querySelector('[data-nstarter-person-icon-field]').hidden = image || personForm.elements.icon_preset.value !== 'custom';
+        personForm.querySelector('[data-nstarter-person-image-field]').hidden = !image;
+        personForm.elements.image_url.required = image;
+        personForm.elements.image_url.disabled = !image;
+        if (!image) personForm.elements.image_url.setCustomValidity('');
+    }
+
+    function openPersonEditor(person) {
+        if (!personDialog || !personForm || !person) return;
+        activePerson = person;
+        const content = person.querySelector(':scope > div:last-child');
+        const media = person.querySelector('.contact-person__icon');
+        const image = media && media.querySelector('img');
+        personForm.elements.name.value = content.querySelector('h3').textContent.trim();
+        personForm.elements.role.value = content.querySelector('span').textContent.trim();
+        personForm.elements.email.value = (content.querySelector('a').getAttribute('href') || '').replace(/^mailto:/i, '');
+        personForm.elements.media_type.value = image ? 'image' : 'icon';
+        personForm.elements.icon.value = media.querySelector('i')?.className || 'fa-solid fa-user';
+        personForm.elements.icon_preset.value = Array.from(personForm.elements.icon_preset.options).some(option => option.value === personForm.elements.icon.value)
+            ? personForm.elements.icon.value : 'custom';
+        personForm.elements.image_url.value = image?.getAttribute('src') || '';
+        personForm.elements.image_url.setCustomValidity('');
+        updatePersonMediaFields();
+        personDialog.showModal();
+        personForm.elements.name.focus();
+    }
+
+    function closePersonEditor() {
+        activePerson = null;
+        if (personDialog?.open) personDialog.close();
+    }
+
+    function applyPersonEditor(event) {
+        event.preventDefault();
+        if (!activePerson || !personForm.reportValidity()) return;
+        const fields = personForm.elements;
+        const useImage = fields.media_type.value === 'image';
+        let imageUrl = '';
+        if (useImage) {
+            try {
+                const parsed = new URL(fields.image_url.value.trim());
+                if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Invalid image URL');
+                imageUrl = parsed.href;
+            } catch (error) {
+                fields.image_url.setCustomValidity('Zadajte platnú adresu obrázka.');
+                fields.image_url.reportValidity();
+                return;
+            }
+        }
+        const content = activePerson.querySelector(':scope > div:last-child');
+        content.querySelector('span').textContent = fields.role.value.trim();
+        content.querySelector('h3').textContent = fields.name.value.trim();
+        const link = content.querySelector('a');
+        const email = fields.email.value.trim();
+        link.href = 'mailto:' + email;
+        link.replaceChildren(activePerson.ownerDocument.createTextNode(email + ' '));
+        const arrow = activePerson.ownerDocument.createElement('i');
+        arrow.className = 'fa-solid fa-arrow-right';
+        arrow.setAttribute('aria-hidden', 'true');
+        link.appendChild(arrow);
+        const media = activePerson.querySelector('.contact-person__icon');
+        media.replaceChildren();
+        if (useImage) {
+            const image = activePerson.ownerDocument.createElement('img');
+            image.src = imageUrl;
+            image.alt = '';
+            image.loading = 'lazy';
+            media.appendChild(image);
+        } else {
+            const icon = activePerson.ownerDocument.createElement('i');
+            const selectedIcon = fields.icon_preset.value === 'custom' ? fields.icon.value : fields.icon_preset.value;
+            const classes = selectedIcon.trim().split(/\s+/).filter(value => /^fa-[a-z0-9-]+$/.test(value));
+            if (!classes.some(value => ['fa-solid', 'fa-regular', 'fa-brands'].includes(value))) classes.unshift('fa-solid');
+            icon.className = classes.length > 1 ? classes.join(' ') : 'fa-solid fa-user';
+            media.appendChild(icon);
+        }
+        closePersonEditor();
+        markDirty();
+        positionVariableTools();
     }
 
     function openVariableEditor(section) {
@@ -2204,6 +2313,13 @@
 
         const variableButton = event.target.closest
             && event.target.closest('[data-nstarter-variable-edit]');
+        const personButton = event.target.closest
+            && event.target.closest('[data-nstarter-person-edit]');
+        if (personButton && personButton.nstarterPerson) {
+            event.preventDefault();
+            openPersonEditor(personButton.nstarterPerson);
+            return;
+        }
         if (variableButton && variableButton.nstarterVariableSection) {
             event.preventDefault();
             openVariableEditor(variableButton.nstarterVariableSection);
@@ -2746,6 +2862,24 @@
         });
     }
     variableForm.addEventListener('submit', applyVariableValue);
+    if (personDialog && personForm) {
+        personForm.addEventListener('submit', applyPersonEditor);
+        personForm.elements.media_type.addEventListener('change', updatePersonMediaFields);
+        personForm.elements.icon_preset.addEventListener('change', updatePersonMediaFields);
+        personForm.elements.image_url.addEventListener('input', function () { this.setCustomValidity(''); });
+        personForm.querySelector('[data-nstarter-person-cancel]').addEventListener('click', closePersonEditor);
+        personDialog.addEventListener('cancel', function (event) { event.preventDefault(); closePersonEditor(); });
+        personForm.querySelector('[data-nstarter-person-image-picker]').addEventListener('click', function () {
+            if (!window.wp?.media) return;
+            const picker = window.wp.media({ title: 'Vybrať fotografiu', button: { text: 'Použiť fotografiu' }, library: { type: 'image' }, multiple: false });
+            picker.on('select', function () {
+                const image = picker.state().get('selection').first().toJSON();
+                personForm.elements.image_url.value = image.url || '';
+                personForm.elements.image_url.setCustomValidity('');
+            });
+            picker.open();
+        });
+    }
     variableCancel.addEventListener('click', cancelVariableEditor);
     variableDialog.addEventListener('cancel', function (event) {
         event.preventDefault();

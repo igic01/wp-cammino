@@ -116,4 +116,12 @@ foreach ( array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ) as $tag ) {
 	merge_expect( ! $result['conflicts'] && str_contains( $result['html'], '<span class="title-copy">Prvý riadok<br>Druhý riadok</span>' ), 'Explicit title line breaks survive template merging for ' . $tag . '.' );
 }
 
+$people_template = '<div class="info-card" data-nstarter-variable-section="about_people_count"><div class="contact-people" data-nstarter-variable-items><article class="contact-person" data-nstarter-variable-item><div class="contact-person__icon"><i class="fa-solid fa-user"></i></div><div><span>Role</span><h3>Name</h3><a href="mailto:default@example.com">default@example.com</a></div></article></div><template data-nstarter-variable-template><article class="contact-person" data-nstarter-variable-item><div class="contact-person__icon"><i class="fa-solid fa-user"></i></div><div><span>Role</span><h3>Name</h3><a href="mailto:default@example.com">default@example.com</a></div></article></template></div>';
+$legacy_people = '<div class="info-card"><div class="contact-people"><article class="contact-person"><div class="contact-person__icon"><i class="fa-solid fa-folder-open"></i></div><div><span>Director</span><h3>Alex</h3><a href="mailto:alex@example.com">alex@example.com</a></div></article></div></div>';
+$result = merged( $people_template, $legacy_people );
+merge_expect( str_contains( $result['html'], 'Alex' ) && str_contains( $result['html'], 'fa-folder-open' ), 'Existing About Us people migrate into the repeatable section.' );
+$saved_people = str_replace( '<i class="fa-solid fa-user"></i>', '<img src="https://example.com/person.jpg" alt="">', $people_template );
+$result = merged( $people_template, $saved_people );
+merge_expect( str_contains( $result['html'], 'src="https://example.com/person.jpg"' ), 'A chosen team photo survives template merging.' );
+
 echo "Passed $checks HTML merge checks.\n";

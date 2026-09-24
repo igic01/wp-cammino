@@ -383,6 +383,20 @@ function nstarter_maybe_render_editor(): void {
 				</form>
 			</dialog>
 
+			<dialog class="nstarter-person-dialog" data-nstarter-person-dialog>
+				<form data-nstarter-person-form>
+					<h2><?php esc_html_e( 'Upraviť člena tímu', 'cammino' ); ?></h2>
+					<label><?php esc_html_e( 'Meno', 'cammino' ); ?><input name="name" type="text" required></label>
+					<label><?php esc_html_e( 'Pozícia', 'cammino' ); ?><input name="role" type="text" required></label>
+					<label><?php esc_html_e( 'E-mail', 'cammino' ); ?><input name="email" type="email" required></label>
+					<label><?php esc_html_e( 'Zobraziť', 'cammino' ); ?><select name="media_type"><option value="icon"><?php esc_html_e( 'Ikonu Font Awesome', 'cammino' ); ?></option><option value="image"><?php esc_html_e( 'Fotografiu', 'cammino' ); ?></option></select></label>
+					<label data-nstarter-person-icon-preset><?php esc_html_e( 'Ikona', 'cammino' ); ?><select name="icon_preset"><option value="fa-solid fa-user"><?php esc_html_e( 'Osoba', 'cammino' ); ?></option><option value="fa-solid fa-user-tie"><?php esc_html_e( 'Pracovník', 'cammino' ); ?></option><option value="fa-solid fa-folder-open"><?php esc_html_e( 'Projekty', 'cammino' ); ?></option><option value="fa-solid fa-briefcase"><?php esc_html_e( 'Práca', 'cammino' ); ?></option><option value="fa-solid fa-hand-holding-heart"><?php esc_html_e( 'Pomoc', 'cammino' ); ?></option><option value="fa-solid fa-graduation-cap"><?php esc_html_e( 'Vzdelávanie', 'cammino' ); ?></option><option value="custom"><?php esc_html_e( 'Vlastná ikona', 'cammino' ); ?></option></select></label>
+					<label data-nstarter-person-icon-field hidden><?php esc_html_e( 'Triedy ikony Font Awesome', 'cammino' ); ?><input name="icon" type="text" placeholder="fa-solid fa-user-tie"></label>
+					<div data-nstarter-person-image-field hidden><label><?php esc_html_e( 'URL fotografie', 'cammino' ); ?><input name="image_url" type="url"></label><button type="button" data-nstarter-person-image-picker><?php esc_html_e( 'Vybrať z knižnice médií', 'cammino' ); ?></button></div>
+					<div class="nstarter-person-dialog__actions"><button type="button" data-nstarter-person-cancel><?php esc_html_e( 'Zrušiť', 'cammino' ); ?></button><button type="submit"><?php esc_html_e( 'Použiť', 'cammino' ); ?></button></div>
+				</form>
+			</dialog>
+
 			<?php if ( $is_post ) : ?>
 				<dialog class="nstarter-post-details-dialog" data-cammino-post-details-dialog>
 					<form data-cammino-post-details-form>

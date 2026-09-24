@@ -822,7 +822,10 @@
   background: var(--color-sage);
   font-size: 1.2rem;
   transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
 }
+
+.contact-person__icon img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 .contact-person:hover .contact-person__icon { transform: rotate(-8deg) scale(1.1); }
 .contact-person > div:last-child { min-width: 0; }

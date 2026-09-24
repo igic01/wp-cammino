@@ -138,7 +138,7 @@ $cammino_donation_qr = 'https://ozcammino.sk/wp-content/uploads/2026/06/qrkoddar
 
     <section class="section info-section" id="info" aria-labelledby="info-title">
       <div class="container">
-        <div class="info-card" data-about-reveal="scale">
+        <div class="info-card" data-about-reveal="scale" <?php nstarter_variable_section_attributes( 'about_people_count', array( 'label' => 'Počet členov tímu', 'type' => 'number', 'control' => 'repeat', 'value' => 2, 'min' => 0, 'step' => 1, 'token' => 'person' ) ); ?>>
           <div class="info-intro">
             <span class="identity-number">04</span>
             <h2 id="info-title">Pridajte sa <em>k nám</em></h2>
@@ -149,8 +149,8 @@ $cammino_donation_qr = 'https://ozcammino.sk/wp-content/uploads/2026/06/qrkoddar
             </div>
           </div>
 
-          <div class="contact-people">
-            <article class="contact-person">
+          <div class="contact-people" data-nstarter-variable-items>
+            <article class="contact-person" data-nstarter-variable-item>
               <div class="contact-person__icon" aria-hidden="true"><i class="fa-solid fa-user-tie"></i></div>
               <div>
                 <span>Štatutár</span>
@@ -158,7 +158,7 @@ $cammino_donation_qr = 'https://ozcammino.sk/wp-content/uploads/2026/06/qrkoddar
                 <a href="mailto:management@ozcammino.sk">management@ozcammino.sk <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
               </div>
             </article>
-            <article class="contact-person">
+            <article class="contact-person" data-nstarter-variable-item>
               <div class="contact-person__icon" aria-hidden="true"><i class="fa-solid fa-folder-open"></i></div>
               <div>
                 <span>Projektový manažér</span>
@@ -167,6 +167,16 @@ $cammino_donation_qr = 'https://ozcammino.sk/wp-content/uploads/2026/06/qrkoddar
               </div>
             </article>
           </div>
+          <template data-nstarter-variable-template>
+            <article class="contact-person" data-nstarter-variable-item>
+              <div class="contact-person__icon" aria-hidden="true"><i class="fa-solid fa-user"></i></div>
+              <div>
+                <span>Pozícia</span>
+                <h3>Nový člen tímu {{person}}</h3>
+                <a href="mailto:kontakt@ozcammino.sk">kontakt@ozcammino.sk <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+              </div>
+            </article>
+          </template>
         </div>
       </div>
     </section>

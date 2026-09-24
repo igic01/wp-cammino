@@ -111,6 +111,14 @@ function cammino_get_post_type_icon( string $type ): string {
 	return array( 'event' => 'fa-calendar-days', 'project' => 'fa-seedling', 'impact-story' => 'fa-hand-holding-heart' )[ $type ] ?? 'fa-book-open';
 }
 
+/** Translate WordPress's English default category on public Cammino pages. */
+function cammino_get_category_display_name( $category ): string {
+	$name = (string) $category->name;
+	return 'uncategorized' === (string) $category->slug && in_array( strtolower( $name ), array( 'uncategorized', 'uncategorised' ), true )
+		? __( 'Nezaradené', 'cammino' )
+		: $name;
+}
+
 /** Return every user-selected category, excluding the automatic event marker. */
 function cammino_get_editable_post_categories( int $post_id ): array {
 	$categories = array();
@@ -119,7 +127,7 @@ function cammino_get_editable_post_categories( int $post_id ): array {
 			$categories[] = array(
 				'id'   => (int) $category->term_id,
 				'slug' => sanitize_title( (string) $category->slug ),
-				'name' => (string) $category->name,
+				'name' => cammino_get_category_display_name( $category ),
 			);
 		}
 	}
@@ -129,7 +137,7 @@ function cammino_get_editable_post_categories( int $post_id ): array {
 /** Categories available in the visual editor, apart from the event routing marker. */
 function cammino_get_selectable_post_categories(): array {
 	return array_values( array_map(
-		static fn( $category ): array => array( 'id' => (int) $category->term_id, 'name' => (string) $category->name ),
+		static fn( $category ): array => array( 'id' => (int) $category->term_id, 'name' => cammino_get_category_display_name( $category ) ),
 		array_filter( get_categories( array( 'hide_empty' => false ) ), static fn( $category ): bool => CAMMINO_EVENT_CATEGORY_SLUG !== $category->slug )
 	) );
 }
@@ -1201,9 +1209,9 @@ function cammino_render_all_projects( array $args = array(), int $page_id = 0 ):
 				continue;
 			}
 
-			$post_categories[ $slug ] = (string) $category->name;
+			$post_categories[ $slug ] = cammino_get_category_display_name( $category );
 			if ( ! isset( $categories[ $slug ] ) ) {
-				$categories[ $slug ] = array( 'name' => (string) $category->name, 'count' => 0 );
+				$categories[ $slug ] = array( 'name' => cammino_get_category_display_name( $category ), 'count' => 0 );
 			}
 			++$categories[ $slug ]['count'];
 		}

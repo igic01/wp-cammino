@@ -752,6 +752,27 @@ body.nstarter-editor-shell {
 }
 .nstarter-post-details-dialog button[type="submit"] { border-color: #5142df; color: #fff; background: #6d5dfc; }
 
+.nstarter-person-dialog {
+    width: min(460px, calc(100vw - 32px));
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    padding: 20px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    color: #222;
+    background: #fff;
+}
+.nstarter-person-dialog::backdrop { background: rgb(0 0 0 / 38%); }
+.nstarter-person-dialog form { display: grid; gap: 12px; }
+.nstarter-person-dialog h2 { margin: 0; font-size: 18px; }
+.nstarter-person-dialog label { display: grid; gap: 5px; font-size: 13px; font-weight: 600; }
+.nstarter-person-dialog input,
+.nstarter-person-dialog select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #8c8f94; border-radius: 3px; font: inherit; }
+.nstarter-person-dialog [hidden] { display: none; }
+.nstarter-person-dialog button { padding: 8px 12px; border: 1px solid #8c8f94; border-radius: 3px; background: #fff; cursor: pointer; }
+.nstarter-person-dialog__actions { display: flex; justify-content: flex-end; gap: 8px; }
+.nstarter-person-dialog__actions button[type="submit"] { color: #fff; border-color: #5142df; background: #6d5dfc; }
+
 .nstarter-section-order-dialog {
     width: min(520px, calc(100vw - 32px));
     max-height: min(720px, calc(100vh - 32px));

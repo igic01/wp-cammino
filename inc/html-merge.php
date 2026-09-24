@@ -159,6 +159,9 @@ final class NStarter_HTML_Merge {
 		if ( '' !== $key ) {
 			$old = $this->old_keys[ $key ] ?? array();
 			$new = $this->new_keys[ $key ] ?? array();
+			if ( ! $old && 'data-nstarter-variable-section:about_people_count' === $key && $scope ) {
+				$old = array_values( array_filter( $this->descendants( $scope ), static fn( DOMElement $node ): bool => str_contains( ' ' . $node->getAttribute( 'class' ) . ' ', ' info-card ' ) ) );
+			}
 			if ( $this->item_scope ) {
 				$old = array_values( array_filter( $old, fn( DOMElement $node ): bool => $this->within( $this->item_scope, $node ) ) );
 				$new = array( $fresh );
@@ -362,6 +365,23 @@ final class NStarter_HTML_Merge {
 	private function merge_node( DOMElement $fresh, DOMElement $old ): DOMElement {
 		$this->used[ spl_object_id( $old ) ] = true;
 		$this->matched[ spl_object_id( $old ) ] = $fresh;
+		if ( str_contains( ' ' . $fresh->getAttribute( 'class' ) . ' ', ' contact-person__icon ' ) && str_contains( ' ' . $old->getAttribute( 'class' ) . ' ', ' contact-person__icon ' ) ) {
+			$media = $this->children( $old )[0] ?? null;
+			if ( $media && in_array( $media->tagName, array( 'img', 'i' ), true ) ) {
+				while ( $fresh->firstChild ) { $fresh->removeChild( $fresh->firstChild ); }
+				$copy = $fresh->ownerDocument->createElement( $media->tagName );
+				if ( 'img' === $media->tagName ) {
+					$this->attributes( $copy, $media, array( 'src' ) );
+					$copy->setAttribute( 'alt', '' );
+				} else {
+					$classes = array_filter( preg_split( '/\s+/', $media->getAttribute( 'class' ) ), static fn( string $name ): bool => (bool) preg_match( '/^fa-[a-z0-9-]+$/', $name ) );
+					$copy->setAttribute( 'class', implode( ' ', $classes ) );
+				}
+				$fresh->appendChild( $copy );
+			}
+			$this->cover( $old );
+			return $fresh;
+		}
 		if ( $this->merge_paragraph_text( $fresh, $old ) ) {
 			return $fresh;
 		}
@@ -509,7 +529,7 @@ final class NStarter_HTML_Merge {
 			$prototype = $this->children( $template )[0] ?? null;
 			break;
 		}
-		$old_items = array_filter( $this->children( $old ), static fn( DOMElement $node ): bool => $node->hasAttribute( 'data-nstarter-variable-item' ) );
+		$old_items = array_filter( $this->children( $old ), static fn( DOMElement $node ): bool => $node->hasAttribute( 'data-nstarter-variable-item' ) || ( $fresh->getAttribute( 'class' ) === 'contact-people' && str_contains( ' ' . $node->getAttribute( 'class' ) . ' ', ' contact-person ' ) ) );
 		$new_items = array_values( array_filter( $this->children( $fresh ), static fn( DOMElement $node ): bool => $node->hasAttribute( 'data-nstarter-variable-item' ) ) );
 		if ( ! $prototype && $old_items ) {
 			$this->conflicts[] = $this->label( $old ) . ': repeatable item template is unavailable';
