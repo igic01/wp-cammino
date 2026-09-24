@@ -235,7 +235,7 @@ function cammino_render_site_footer(): void {
 
 			<div class="footer-contact">
 				<h2><?php esc_html_e( 'Prihláste sa na newsletter', 'cammino' ); ?></h2>
-				<a href="mailto:management@ozcammino.sk">management@ozcammino.sk</a>
+				<a href="mailto:marketing@ozcammino.sk">marketing@ozcammino.sk</a>
 				<p><?php esc_html_e( 'Miletičova 7, Bratislava', 'cammino' ); ?></p>
 				<form class="newsletter" action="#" method="post">
 					<label class="sr-only" for="cammino-footer-email"><?php esc_html_e( 'Váš e-mail', 'cammino' ); ?></label>

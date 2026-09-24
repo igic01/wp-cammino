@@ -100,7 +100,7 @@ $cammino_events_url  = nstarter_get_source_page_url( 'events', '/podujatia/' );
       </div>
       <div class="footer-contact">
         <h2>Prihláste sa na newsletter</h2>
-        <a href="mailto:management@ozcammino.sk">management@ozcammino.sk</a>
+        <a href="mailto:marketing@ozcammino.sk">marketing@ozcammino.sk</a>
         <p>Miletičova 7, Bratislava</p>
         <form class="newsletter" action="#" method="post">
           <label class="sr-only" for="contact-footer-email">Váš e-mail</label>
