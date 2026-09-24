@@ -122,6 +122,14 @@
             image.height = 800;
             image.loading = 'lazy';
             item.appendChild(image);
+        } else if (type === 'button') {
+            item = doc.createElement('div');
+            item.className = 'article-button';
+            const link = doc.createElement('a');
+            link.className = 'button button--coral';
+            link.setAttribute('href', '#');
+            link.textContent = config.strings.newButton;
+            item.appendChild(link);
         } else if (type === 'impact-story') {
             item = doc.createElement('div');
             item.className = 'article-impact-story';
@@ -244,6 +252,7 @@
             createInlineButton(doc, 'add-title', config.strings.addHeading, '+ ' + config.strings.addHeading),
             createInlineButton(doc, 'add-paragraph', config.strings.addParagraph, '+ ' + config.strings.addParagraph),
             createInlineButton(doc, 'add-image', config.strings.addImage, '+ ' + config.strings.addImage),
+            createInlineButton(doc, 'add-button', config.strings.addButton, '+ ' + config.strings.addButton),
             createInlineButton(doc, 'add-impact-story', config.strings.addImpactStory, '+ ' + config.strings.addImpactStory)
         );
 
@@ -258,7 +267,7 @@
         const doc = item.ownerDocument;
         const selection = doc.getSelection();
         const range = doc.createRange();
-        range.selectNodeContents(item);
+        range.selectNodeContents(item.dataset.nstarterContentType === 'button' ? item.querySelector('a') || item : item);
         range.collapse(false);
         selection.removeAllRanges();
         selection.addRange(range);

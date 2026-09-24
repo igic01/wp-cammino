@@ -63,7 +63,10 @@ expect( cammino_get_post_visual_content( 4 ) === $cleaned, 'Related Posts cleanu
 $fresh_body = cammino_render_post_visual_content( 1 );
 $fresh_visible_body = preg_replace( '#<template\b[^>]*>.*?</template>#is', '', $fresh_body );
 expect( ! str_contains( $fresh_visible_body, 'data-nstarter-content-item' ), 'New post body starts empty' );
-expect( substr_count( $fresh_body, 'data-nstarter-content-template=' ) === 4, 'Inline builder provides title, paragraph, image, and impact-story templates' );
+expect( substr_count( $fresh_body, 'data-nstarter-content-template=' ) === 5, 'Inline builder provides title, paragraph, image, button, and impact-story templates' );
+expect( str_contains( $fresh_body, 'data-nstarter-content-template="button"' ) && str_contains( $fresh_body, 'data-nstarter-content-type="button"' ) && str_contains( $fresh_body, 'class="button button--coral" href="#"' ), 'New button template contains an editable label and link' );
+$existing_buttons = cammino_get_visual_items_from_blocks( array( array( 'blockName' => 'core/buttons', 'innerBlocks' => array( array( 'blockName' => 'core/button', 'innerHTML' => '<div class="wp-block-button"><a class="wp-block-button__link" href="/contact/">Contact us</a></div>' ) ) ) ) );
+expect( count( $existing_buttons ) === 1 && $existing_buttons[0]['type'] === 'button' && str_contains( $existing_buttons[0]['html'], 'href="/contact/"' ), 'Existing WordPress button blocks remain editable as individual button items' );
 expect( str_contains( $fresh_body, '/assets/images/placeholder.webp' ), 'New image template uses the local placeholder' );
 expect( str_contains( $fresh_body, 'data-nstarter-content-template="impact-story"' ) && str_contains( $fresh_body, 'article-impact-story__copy' ) && ! str_contains( $fresh_body, 'Prečítať príbeh' ), 'Impact-story template contains editable copy without a button' );
 expect( ! str_contains( $fresh_body, 'article-impact-story__eyebrow' ), 'Impact-story template has no eyebrow label' );
@@ -116,6 +119,7 @@ $single_template = file_get_contents( NSTARTER_PATH . '/templates/single-post.ph
 expect( str_contains( $editor_php, "'isProject'" ) && str_contains( $editor_php, 'name="category"' ), 'Visual editor exposes project mode and category editing' );
 expect( str_contains( $editor_js, 'category: postDetails.category' ) && str_contains( $editor_js, 'config.isEvent || config.isProject' ), 'Visual editor sends and previews category and image settings for both types' );
 expect( str_contains( $editor_js, "'add-impact-story'" ) && str_contains( $editor_js, "'link-selected-text'" ) && str_contains( $editor_js, "'remove-text-link'" ), 'Visual editor adds impact stories and safe paragraph link controls' );
+expect( str_contains( $editor_js, "'add-button'" ) && str_contains( $editor_js, "type === 'button'" ) && str_contains( $editor_js, "'edit-link'" ), 'Visual editor offers buttons on new and existing post bodies with destination editing' );
 expect( ! str_contains( $editor_js, "'add-important-link'" ), 'Visual editor no longer exposes the separate important-link block' );
 expect( str_contains( $single_template, 'data-cammino-post-category' ) && str_contains( $single_template, "__( 'Project details'" ), 'Project pages expose the project details variable element and category label' );
 

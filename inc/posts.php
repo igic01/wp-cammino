@@ -1344,7 +1344,7 @@ function cammino_get_visual_items_from_blocks( array $blocks ): array {
 		$name  = isset( $block['blockName'] ) ? (string) $block['blockName'] : '';
 		$inner = isset( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ? $block['innerBlocks'] : array();
 
-		if ( in_array( $name, array( 'core/group', 'core/columns', 'core/column' ), true ) && ! empty( $inner ) ) {
+		if ( in_array( $name, array( 'core/group', 'core/columns', 'core/column', 'core/buttons' ), true ) && ! empty( $inner ) ) {
 			$items = array_merge( $items, cammino_get_visual_items_from_blocks( $inner ) );
 			continue;
 		}
@@ -1358,6 +1358,7 @@ function cammino_get_visual_items_from_blocks( array $blocks ): array {
 			'core/heading'   => 'title',
 			'core/paragraph' => 'paragraph',
 			'core/image'     => 'image',
+			'core/button'    => 'button',
 			default          => 'content',
 		};
 
@@ -1371,7 +1372,7 @@ function cammino_get_visual_items_from_blocks( array $blocks ): array {
  * Build the type-specific editable body when no visual snapshot exists.
  *
  * Existing WordPress content is split into movable content items. New posts
- * start with an empty builder and four templates used by the inline editor.
+ * start with an empty builder and five templates used by the inline editor.
  */
 function cammino_render_post_visual_content( int $post_id ): string {
 	$post_content = trim( (string) get_post_field( 'post_content', $post_id ) );
@@ -1392,6 +1393,7 @@ function cammino_render_post_visual_content( int $post_id ): string {
 	<template data-nstarter-content-template="title"><h2 class="article-content-block" data-nstarter-content-item data-nstarter-content-type="title">Nový nadpis</h2></template>
 	<template data-nstarter-content-template="paragraph"><p class="article-content-block" data-nstarter-content-item data-nstarter-content-type="paragraph">Nový odsek textu.</p></template>
 	<template data-nstarter-content-template="image"><figure class="article-inline-image article-content-block" data-nstarter-content-item data-nstarter-content-type="image"><img src="<?php echo esc_url( $placeholder ); ?>" alt="" width="1200" height="800" loading="lazy"></figure></template>
+	<template data-nstarter-content-template="button"><div class="article-button article-content-block" data-nstarter-content-item data-nstarter-content-type="button"><a class="button button--coral" href="#">Text tlačidla</a></div></template>
 	<template data-nstarter-content-template="impact-story"><div class="article-impact-story article-content-block" data-nstarter-content-item data-nstarter-content-type="impact-story"><div class="article-impact-story__copy"><h3>Malý nadpis príbehu</h3><p>Krátky opis príbehu a zmeny, ktorú priniesol.</p></div></div></template>
 	<?php
 
