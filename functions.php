@@ -22,11 +22,6 @@ require_once NSTARTER_PATH . '/inc/variable-sections.php';
 require_once NSTARTER_PATH . '/inc/posts.php';
 require_once NSTARTER_PATH . '/inc/editor.php';
 
-// Optional Elementor proof of concept. It remains dormant when Elementor is not active.
-if ( is_file( NSTARTER_PATH . '/elementor/bootstrap.php' ) ) {
-	require_once NSTARTER_PATH . '/elementor/bootstrap.php';
-}
-
 add_action( 'init', 'cammino_register_live_sections' );
 add_action( 'after_setup_theme', 'cammino_register_navigation' );
 
