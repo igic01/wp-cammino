@@ -497,7 +497,7 @@ h2 em {
   transform-origin: left;
 }
 
-.site-nav > .nav-donate {
+.site-nav > a.nav-donate {
   display: inline-flex;
   min-height: 2.85rem;
   align-items: center;
@@ -851,7 +851,7 @@ html.translated-ltr body {
 
   .language-switcher__link { color: var(--color-cream); }
 
-  .site-nav > .nav-donate {
+  .site-nav > a.nav-donate {
     align-self: flex-start;
     margin-top: 1rem;
     padding: 0.75rem 1.25rem;
@@ -877,7 +877,7 @@ html.translated-ltr body {
     --section-space: 4.5rem;
   }
 
-  .site-nav > .nav-donate {
+  .site-nav > a.nav-donate {
     padding-inline: 2rem;
   }
 
