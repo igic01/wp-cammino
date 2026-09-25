@@ -77,6 +77,56 @@ final class NStarter_HTML_Merge {
 		return array_values( array_filter( iterator_to_array( $node->childNodes ), static fn( DOMNode $child ): bool => $child instanceof DOMElement ) );
 	}
 
+	/** Move the Kontakt hero cards into the new repeatable team section once. */
+	private function migrate_contact_people( DOMElement $fresh, DOMElement $old ): void {
+		$xpath = new DOMXPath( $fresh->ownerDocument );
+		$team = $xpath->query( './/section[contains(concat(" ", normalize-space(@class), " "), " contact-team-section ")]', $fresh )->item( 0 );
+		if ( ! $team ) {
+			return;
+		}
+		$old_xpath = new DOMXPath( $old->ownerDocument );
+		if ( $old_xpath->query( './/*[@data-nstarter-variable-section="contact_people_count"]', $old )->length ) {
+			return;
+		}
+		$people = $old_xpath->query( './/section[contains(concat(" ", normalize-space(@class), " "), " contact-hero ")]//div[contains(concat(" ", normalize-space(@class), " "), " contact-intro ")]/div[contains(concat(" ", normalize-space(@class), " "), " contact-people ")]', $old )->item( 0 );
+		if ( ! $people ) {
+			return;
+		}
+		$hero = $people->parentNode->parentNode->parentNode;
+		$copy = $old->ownerDocument->importNode( $team, true );
+		$items = $old_xpath->query( './/*[@data-nstarter-variable-items]', $copy )->item( 0 );
+		$prototype = $old_xpath->query( './article', $items )->item( 0 );
+		if ( ! $hero || ! $items || ! $prototype ) {
+			return;
+		}
+		while ( $items->firstChild ) {
+			$items->removeChild( $items->firstChild );
+		}
+		foreach ( $old_xpath->query( './article[contains(concat(" ", normalize-space(@class), " "), " person-card ")]', $people ) as $person ) {
+			$card = $prototype->cloneNode( true );
+			$role = $old_xpath->query( './div[last()]/span', $person )->item( 0 );
+			$name = $old_xpath->query( './div[last()]/h2', $person )->item( 0 );
+			$email = $old_xpath->query( './div[last()]/a', $person )->item( 0 );
+			$icon = $old_xpath->query( './div[contains(concat(" ", normalize-space(@class), " "), " person-card__icon ")]/i', $person )->item( 0 );
+			$card_role = $old_xpath->query( './div[last()]/span', $card )->item( 0 );
+			$card_name = $old_xpath->query( './div[last()]/h3', $card )->item( 0 );
+			$card_email = $old_xpath->query( './div[last()]/a', $card )->item( 0 );
+			$card_icon = $old_xpath->query( './div[contains(concat(" ", normalize-space(@class), " "), " contact-person__icon ")]/i', $card )->item( 0 );
+			if ( $role && $card_role ) { $card_role->textContent = $role->textContent; }
+			if ( $name && $card_name ) { $card_name->textContent = $name->textContent; }
+			if ( $email && $card_email ) {
+				$card_email->setAttribute( 'href', $email->getAttribute( 'href' ) );
+				$card_email->firstChild->nodeValue = trim( $email->textContent ) . ' ';
+			}
+			if ( $icon && $card_icon ) { $card_icon->setAttribute( 'class', $icon->getAttribute( 'class' ) ); }
+			$items->appendChild( $card );
+		}
+		$info = $old_xpath->query( './/*[@data-nstarter-variable-section="contact_people_count"]', $copy )->item( 0 );
+		if ( $info ) { $info->setAttribute( 'data-nstarter-variable-value', (string) $items->childNodes->length ); }
+		$hero->parentNode->insertBefore( $copy, $hero->nextSibling );
+		$people->parentNode->removeChild( $people );
+	}
+
 	private function excluded( DOMElement $node ): bool {
 		// Team portraits and icons are decorative to readers but editable content.
 		return in_array( $node->tagName, array( 'script', 'style', 'svg', 'template', 'noscript' ), true )
@@ -632,6 +682,7 @@ final class NStarter_HTML_Merge {
 	public function merge( string $template, string $saved ): array {
 		$fresh = $this->parse( $template );
 		$old = $this->parse( $saved );
+		$this->migrate_contact_people( $fresh, $old );
 		$this->index( $old, $this->old_keys );
 		$this->index( $fresh, $this->new_keys );
 		$this->walk( $fresh, $old );

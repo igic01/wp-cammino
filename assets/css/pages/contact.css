@@ -63,7 +63,7 @@
 .contact-hero {
   position: relative;
   min-height: 0;
-  padding-bottom: clamp(3.5rem, 6vw, 5rem);
+  padding-bottom: clamp(2rem, 4vw, 3rem);
   overflow: hidden;
   background: transparent;
 }
@@ -88,6 +88,17 @@
 }
 
 .contact-people { display: grid; gap: 0.85rem; }
+
+.contact-team-section { padding-top: clamp(2rem, 4vw, 3rem); }
+.contact-team-section .contact-people {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.contact-team-section .info-card {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
 
 .person-card {
   display: grid;
@@ -702,6 +713,7 @@
 
 @media (max-width: 760px) {
   .contact-hero { min-height: 0; padding-bottom: 3rem; }
+  .contact-team-section .contact-people { grid-template-columns: 1fr; }
   .contact-intro h1 { font-size: clamp(3.2rem, 14vw, 4.5rem); }
   .contact-form-card .wpcf7-form { grid-template-columns: 1fr; }
   .contact-form-card .wpcf7-form > p:nth-of-type(n + 3),

@@ -17,25 +17,6 @@ $cammino_asset_url = NSTARTER_URL . '/assets';
           <h1 id="contact-title">Poďme urobiť <em>ďalší krok spolu</em></h1>
           <p class="contact-lead">Máte otázku, nápad na spoluprácu alebo chcete vedieť viac o našich aktivitách? Vyberte si správny kontakt alebo nám pošlite správu.</p>
 
-          <div class="contact-people">
-            <article class="person-card" data-contact-reveal="up" data-delay="80">
-              <div class="person-card__icon" aria-hidden="true" data-contact-pop><i class="fa-solid fa-user-tie"></i></div>
-              <div>
-                <span>Štatutár</span>
-                <h2>Róbert Mruk</h2>
-                <a href="mailto:management@ozcammino.sk">management@ozcammino.sk <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-              </div>
-            </article>
-
-            <article class="person-card" data-contact-reveal="up" data-delay="160">
-              <div class="person-card__icon" aria-hidden="true" data-contact-pop><i class="fa-solid fa-folder-open"></i></div>
-              <div>
-                <span>Projektový manažér</span>
-                <h2>Alexandra Mruk Papaianopol</h2>
-                <a href="mailto:projekty@ozcammino.sk">projekty@ozcammino.sk <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-              </div>
-            </article>
-          </div>
         </div>
 
         <div class="contact-form-card" data-contact-reveal="scale" data-delay="100">
@@ -50,6 +31,30 @@ $cammino_asset_url = NSTARTER_URL . '/assets';
           <div class="contact-form-runtime">
             <?php nstarter_live_section( 'cammino_contact_form' ); ?>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section info-section contact-team-section" aria-labelledby="contact-team-title">
+      <div class="container">
+        <div class="info-card" <?php nstarter_variable_section_attributes( 'contact_people_count', array( 'label' => 'Počet členov tímu', 'type' => 'number', 'control' => 'repeat', 'value' => 2, 'min' => 0, 'step' => 1, 'token' => 'person' ) ); ?>>
+          <div class="info-intro"><h2 id="contact-team-title">Náš tím</h2></div>
+          <div class="contact-people" data-nstarter-variable-items>
+            <article class="contact-person" data-nstarter-variable-item>
+              <div class="contact-person__icon" aria-hidden="true"><i class="fa-solid fa-user-tie"></i></div>
+              <div><span>Štatutár</span><h3>Róbert Mruk</h3><a href="mailto:management@ozcammino.sk">management@ozcammino.sk <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+            </article>
+            <article class="contact-person" data-nstarter-variable-item>
+              <div class="contact-person__icon" aria-hidden="true"><i class="fa-solid fa-folder-open"></i></div>
+              <div><span>Projektový manažér</span><h3>Alexandra Mruk Papaianopol</h3><a href="mailto:projekty@ozcammino.sk">projekty@ozcammino.sk <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+            </article>
+          </div>
+          <template data-nstarter-variable-template>
+            <article class="contact-person" data-nstarter-variable-item>
+              <div class="contact-person__icon" aria-hidden="true"><i class="fa-solid fa-user"></i></div>
+              <div><span>Pozícia</span><h3>Nový člen tímu {{person}}</h3><a href="mailto:kontakt@ozcammino.sk">kontakt@ozcammino.sk <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+            </article>
+          </template>
         </div>
       </div>
     </section>

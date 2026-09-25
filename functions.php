@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.10.10' );
+define( 'NSTARTER_VERSION', '1.10.11' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
@@ -356,6 +356,9 @@ function cammino_enqueue_visual_page_assets(): void {
 			'handle' => 'cammino-contact',
 			'style'  => '/assets/css/pages/contact.css',
 			'script' => '/assets/js/pages/contact.js',
+			'before_styles' => array(
+				'cammino-contact-team' => '/assets/css/pages/about-us.css',
+			),
 		),
 		'contact2' => array(
 			'handle' => 'cammino-contact2',
