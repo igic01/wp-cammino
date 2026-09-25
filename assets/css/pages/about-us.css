@@ -732,8 +732,8 @@
 
 .info-card {
   display: grid;
-  grid-template-columns: 0.75fr 1.25fr;
-  gap: clamp(2.5rem, 7vw, 7rem);
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 4vw, 3rem);
   padding: clamp(2rem, 5vw, 4.5rem);
   border-radius: var(--radius-lg);
   color: var(--color-white);
@@ -743,7 +743,12 @@
 
 .info-card h2 { color: var(--color-white); }
 .info-card .identity-number { color: var(--color-apricot); }
-.info-intro > p { color: rgba(255, 255, 255, 0.72); }
+.info-intro {
+  min-width: 0;
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+.info-intro > p { max-width: 66ch; color: rgba(255, 255, 255, 0.72); }
 
 .info-address {
   display: flex;
@@ -791,7 +796,12 @@
 .info-address > div { display: flex; flex-direction: column; }
 .info-address small { color: rgba(255, 255, 255, 0.55); }
 
-.contact-people { display: grid; gap: 1rem; }
+.contact-people {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 1rem;
+}
 
 .contact-person {
   display: grid;
@@ -1041,6 +1051,7 @@
   .europe-badge { right: 0; width: 5rem; height: 5rem; }
   .europe-note { right: 0; }
   .info-card { border-radius: var(--radius-md); }
+  .contact-people { grid-template-columns: 1fr; }
   .about-support__card {
     width: 100%;
     min-height: 0;
