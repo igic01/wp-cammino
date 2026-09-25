@@ -19,6 +19,11 @@ $contact_old = '<main id="main-content"><section class="contact-hero" aria-label
 $contact_result = merged( $contact_fresh, $contact_old );
 merge_expect( str_contains( $contact_result['html'], 'Saved role' ) && str_contains( $contact_result['html'], 'Saved name' ) && str_contains( $contact_result['html'], 'mailto:saved@example.com' ) && str_contains( $contact_result['html'], 'fa-solid fa-star' ), 'Legacy Kontakt cards migrate with saved content into the team section.' );
 merge_expect( ! str_contains( $contact_result['html'], 'person-card' ) && ! $contact_result['conflicts'], 'Migrating Kontakt cards leaves no duplicate cards or merge warnings.' );
+$number_result = merged(
+	'<main id="main-content"><section class="contact-team-section"><h2>Náš tím</h2></section><section class="contact-details" aria-labelledby="details-title"><h2 id="details-title">Kontakt</h2></section></main>',
+	'<main id="main-content"><section class="contact-team-section"><h2>Náš tím</h2></section><section class="contact-details" aria-labelledby="details-title"><span class="detail-number">01</span><h2 id="details-title">Kontakt</h2></section></main>'
+);
+merge_expect( ! str_contains( $number_result['html'], 'detail-number' ) && ! $number_result['conflicts'], 'Removing the Kontakt detail number does not warn about old snapshots.' );
 
 $result = merged(
 	'<main id="main-content"><section id="hero" class="new"><div class="wrapper"><h2 id="title" class="large">Default</h2><p>Description</p><a id="cta" class="button new" href="/default" target="_blank">Default label<span class="arrow" aria-hidden="true">NEW ICON</span></a></div></section></main>',

@@ -77,6 +77,18 @@ final class NStarter_HTML_Merge {
 		return array_values( array_filter( iterator_to_array( $node->childNodes ), static fn( DOMNode $child ): bool => $child instanceof DOMElement ) );
 	}
 
+	/** Retired Kontakt section numbers must not appear as saved-content conflicts. */
+	private function remove_contact_detail_number( DOMElement $fresh, DOMElement $old ): void {
+		$xpath = new DOMXPath( $fresh->ownerDocument );
+		if ( ! $xpath->query( './/section[contains(concat(" ", normalize-space(@class), " "), " contact-team-section ")]', $fresh )->length ) {
+			return;
+		}
+		$old_xpath = new DOMXPath( $old->ownerDocument );
+		foreach ( $old_xpath->query( './/section[contains(concat(" ", normalize-space(@class), " "), " contact-details ")]//span[contains(concat(" ", normalize-space(@class), " "), " detail-number ")]', $old ) as $number ) {
+			$number->parentNode->removeChild( $number );
+		}
+	}
+
 	/** Move the Kontakt hero cards into the new repeatable team section once. */
 	private function migrate_contact_people( DOMElement $fresh, DOMElement $old ): void {
 		$xpath = new DOMXPath( $fresh->ownerDocument );
@@ -682,6 +694,7 @@ final class NStarter_HTML_Merge {
 	public function merge( string $template, string $saved ): array {
 		$fresh = $this->parse( $template );
 		$old = $this->parse( $saved );
+		$this->remove_contact_detail_number( $fresh, $old );
 		$this->migrate_contact_people( $fresh, $old );
 		$this->index( $old, $this->old_keys );
 		$this->index( $fresh, $this->new_keys );

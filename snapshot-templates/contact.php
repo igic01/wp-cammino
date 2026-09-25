@@ -63,7 +63,6 @@ $cammino_asset_url = NSTARTER_URL . '/assets';
       <div class="container">
         <div class="details-heading" data-contact-reveal="up">
           <div>
-            <span class="detail-number">01</span>
             <h2 id="details-title">Nájdite svoju cestu <em>k nám</em></h2>
           </div>
         </div>
