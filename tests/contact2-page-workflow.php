@@ -22,6 +22,8 @@ contact2_expect( ! str_contains( $template, '<header' ) && ! str_contains( $temp
 contact2_expect( str_contains( $template, '<h1 id="contact2-title">' ) && str_contains( $template, 'contact2-lead' ), 'Editable information appears beside the form.' );
 contact2_expect( str_contains( $template, "nstarter_live_section( 'cammino_contact2_form' )" ), 'The snapshot stores a live form marker.' );
 contact2_expect( str_contains( $template, 'Náš tím' ) && str_contains( $template, "'contact2_people_count'" ) && str_contains( $template, 'data-nstarter-variable-items' ) && str_contains( $template, 'data-nstarter-variable-template' ), 'Contact2 has an independently editable repeatable team section.' );
+contact2_expect( ! str_contains( $template, 'class="info-card" data-contact2-reveal' ), 'The team section stays visible without the scroll reveal script.' );
+contact2_expect( str_contains( $styles, '.contact2-team-section .info-card' ), 'Contact2 keeps team cards visible even if an older snapshot has reveal attributes.' );
 contact2_expect( substr_count( $template, 'data-nstarter-variable-item>' ) === 3 && str_contains( $template, 'contact-person__icon' ), 'The copied team starts with two people and supports new icon or photo cards.' );
 contact2_expect( str_contains( $functions, "'cammino_contact2_form'" ), 'The second contact live section is registered.' );
 contact2_expect( str_contains( $functions, '[contact-form-7 id="b4ce2b6" title="Zapojte sa"]' ), 'The requested Contact Form 7 shortcode is rendered.' );

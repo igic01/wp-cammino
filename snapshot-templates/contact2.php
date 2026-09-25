@@ -55,7 +55,7 @@
 	</section>
 	<section class="section info-section contact2-team-section" aria-labelledby="contact2-team-title">
 		<div class="container">
-			<div class="info-card" data-contact2-reveal="left" <?php nstarter_variable_section_attributes( 'contact2_people_count', array( 'label' => 'Počet členov tímu', 'type' => 'number', 'control' => 'repeat', 'value' => 2, 'min' => 0, 'step' => 1, 'token' => 'person' ) ); ?>>
+			<div class="info-card" <?php nstarter_variable_section_attributes( 'contact2_people_count', array( 'label' => 'Počet členov tímu', 'type' => 'number', 'control' => 'repeat', 'value' => 2, 'min' => 0, 'step' => 1, 'token' => 'person' ) ); ?>>
 				<div class="info-intro">
 					<h2 id="contact2-team-title">Náš tím</h2>
 				</div>

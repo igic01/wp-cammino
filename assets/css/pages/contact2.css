@@ -11,6 +11,13 @@
 
 .contact2-team-section { padding-top: clamp(2rem, 4vw, 3rem); }
 
+/* Team details must stay visible even when a saved snapshot has an old reveal marker. */
+.contact2-team-section .info-card {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
 .contact2-section::before,
 .contact2-section::after {
   position: absolute;
