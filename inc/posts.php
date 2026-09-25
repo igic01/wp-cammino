@@ -1084,7 +1084,7 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 		array(
 			'post_type'           => 'post',
 			'post_status'         => 'publish',
-			'posts_per_page'      => 10,
+			'posts_per_page'      => -1,
 			'has_password'        => false,
 			'ignore_sticky_posts' => true,
 			'no_found_rows'       => true,
@@ -1105,7 +1105,18 @@ function cammino_render_all_events( array $args = array(), int $page_id = 0 ): s
 		)
 	);
 
-	$events = $query->posts;
+	// Keep the query's date order within each group, then show upcoming events first.
+	$upcoming = array();
+	$expired  = array();
+	$now      = time();
+	foreach ( $query->posts as $event ) {
+		if ( cammino_get_event_timestamp( (int) $event->ID ) < $now ) {
+			$expired[] = $event;
+		} else {
+			$upcoming[] = $event;
+		}
+	}
+	$events = array_slice( array_merge( $upcoming, $expired ), 0, 10 );
 	$types  = array();
 
 	foreach ( $events as $event ) {
