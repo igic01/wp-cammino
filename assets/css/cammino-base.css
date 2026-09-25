@@ -558,12 +558,13 @@ h2 em {
 
 .language-switcher__separator { color: var(--color-border); }
 
-/* Google serves the translated toolbar in an iframe. Move its native minimized bubble only. */
-html.translated-ltr iframe#gt-nvframe[style*="width: 56px"] {
-  top: auto !important;
-  right: max(1rem, env(safe-area-inset-right)) !important;
-  bottom: max(1rem, env(safe-area-inset-bottom)) !important;
-  left: auto !important;
+/* Hide Google's translation toolbar and reclaim the space it adds above the page. */
+html.translated-ltr iframe#gt-nvframe {
+  display: none !important;
+}
+
+html.translated-ltr body {
+  margin-top: 0 !important;
 }
 
 .nav-toggle {
