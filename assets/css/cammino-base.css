@@ -530,12 +530,33 @@ h2 em {
   transform: translateY(-2px);
 }
 
-.language-link {
-  padding-left: 1rem !important;
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-left: 0.9rem;
   border-left: 1px solid var(--color-border);
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
+
+.language-switcher__link {
+  padding: 0.45rem 0.2rem;
+  color: var(--color-plum);
+  opacity: 0.58;
+  transition: color var(--transition), opacity var(--transition);
+}
+
+.language-switcher__link:hover,
+.language-switcher__link:focus-visible,
+.language-switcher__link[aria-current="true"] {
+  color: var(--color-coral-dark);
+  opacity: 1;
+}
+
+.language-switcher__separator { color: var(--color-border); }
 
 .nav-toggle {
   display: none;
@@ -812,11 +833,14 @@ h2 em {
     white-space: normal;
   }
 
-  .language-link {
+  .language-switcher {
     margin-top: 0.7rem;
-    padding-left: 0 !important;
+    padding-left: 0;
     border: 0;
+    font-size: 1rem;
   }
+
+  .language-switcher__link { color: var(--color-cream); }
 
   .site-nav > .nav-donate {
     align-self: flex-start;

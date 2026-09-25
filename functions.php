@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.10.13' );
+define( 'NSTARTER_VERSION', '1.10.14' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
@@ -188,6 +188,9 @@ function cammino_render_shared_menu(): void {
  * Render the shared Cammino header for custom visual pages.
  */
 function cammino_render_site_header(): void {
+	$original_url = get_permalink( get_queried_object_id() ) ?: home_url( '/' );
+	$sk_url       = add_query_arg( 'cammino_lang', 'sk', $original_url );
+	$en_url       = 'https://translate.google.com/translate?sl=sk&tl=en&u=' . rawurlencode( $original_url );
 	?>
 	<a class="skip-link" href="#main-content"><?php esc_html_e( 'Preskočiť na obsah', 'cammino' ); ?></a>
 	<header class="site-header" data-header>
@@ -202,6 +205,11 @@ function cammino_render_site_header(): void {
 
 			<nav class="site-nav" id="site-nav" aria-label="<?php esc_attr_e( 'Hlavná navigácia', 'cammino' ); ?>" data-nav>
 				<?php cammino_render_shared_menu(); ?>
+				<div class="language-switcher notranslate" role="group" aria-label="<?php esc_attr_e( 'Jazyk stránky', 'cammino' ); ?>" data-language-switcher data-site-url="<?php echo esc_url( home_url( '/' ) ); ?>" data-original-url="<?php echo esc_url( $sk_url ); ?>" data-english-url="<?php echo esc_url( $en_url ); ?>" translate="no">
+					<a class="language-switcher__link" href="<?php echo esc_url( $sk_url ); ?>" data-language="sk" aria-label="<?php esc_attr_e( 'Slovenčina', 'cammino' ); ?>">SK</a>
+					<span class="language-switcher__separator" aria-hidden="true">/</span>
+					<a class="language-switcher__link" href="<?php echo esc_url( $en_url ); ?>" data-language="en" aria-label="<?php esc_attr_e( 'English', 'cammino' ); ?>">EN</a>
+				</div>
 				<a class="nav-donate" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Darovať', 'cammino' ); ?> <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
 			</nav>
 		</div>

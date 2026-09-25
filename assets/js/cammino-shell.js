@@ -1,3 +1,74 @@
+(() => {
+  const switcher = document.querySelector("[data-language-switcher]");
+  if (!switcher) return;
+
+  const original = switcher.querySelector('[data-language="sk"]');
+  const translated = switcher.querySelector('[data-language="en"]');
+  const siteUrl = switcher.dataset.siteUrl;
+  const originalUrl = switcher.dataset.originalUrl;
+  const englishUrl = switcher.dataset.englishUrl;
+  if (!original || !translated || !siteUrl || !originalUrl || !englishUrl) return;
+
+  const key = "cammino-language";
+  const onSite = window.location.origin === new URL(siteUrl).origin;
+  const preview = document.body.classList.contains("nstarter-editor-preview");
+  const params = new URLSearchParams(window.location.search);
+  const requested = params.get("cammino_lang");
+
+  const remember = (language) => {
+    try { window.localStorage.setItem(key, language); } catch (_) { /* Storage may be disabled. */ }
+    document.cookie = `${key}=${language}; Max-Age=31536000; Path=/; SameSite=Lax`;
+  };
+
+  const saved = () => {
+    try {
+      const value = window.localStorage.getItem(key);
+      if (value === "sk" || value === "en") return value;
+    } catch (_) { /* Use the cookie if storage is disabled. */ }
+    const value = document.cookie.split("; ").find((part) => part.startsWith(`${key}=`));
+    return value?.split("=")[1] === "en" ? "en" : "sk";
+  };
+
+  const setActive = (language) => {
+    for (const [link, code] of [[original, "sk"], [translated, "en"]]) {
+      if (language === code) link.setAttribute("aria-current", "true");
+      else link.removeAttribute("aria-current");
+    }
+  };
+
+  if (onSite && requested === "sk") {
+    remember("sk");
+    const cleanUrl = new URL(window.location.href);
+    cleanUrl.searchParams.delete("cammino_lang");
+    window.history.replaceState(window.history.state, "", cleanUrl);
+  }
+
+  const language = onSite ? saved() : "en";
+  setActive(language);
+
+  if (onSite && !preview && language === "en") {
+    window.location.replace(englishUrl);
+    return;
+  }
+
+  original.addEventListener("click", (event) => {
+    remember("sk");
+    if (onSite) {
+      event.preventDefault();
+      setActive("sk");
+    } else {
+      event.preventDefault();
+      window.location.assign(originalUrl);
+    }
+  });
+
+  translated.addEventListener("click", (event) => {
+    remember("en");
+    setActive("en");
+    if (!onSite) event.preventDefault();
+  });
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
   const header = document.querySelector("[data-header]");
   const navToggle = document.querySelector("[data-nav-toggle]");
