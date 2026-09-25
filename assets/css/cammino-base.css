@@ -854,9 +854,6 @@ html.translated-ltr body {
   .site-nav > .nav-donate {
     align-self: flex-start;
     margin-top: 1rem;
-  }
-
-  .site-nav > .nav-donate {
     padding: 0.75rem 1.25rem;
   }
 
@@ -878,6 +875,10 @@ html.translated-ltr body {
   :root {
     --gutter: 1.15rem;
     --section-space: 4.5rem;
+  }
+
+  .site-nav > .nav-donate {
+    padding-inline: 2rem;
   }
 
   body.cammino-visual-page #nstarter-snapshot > main#main-content,
