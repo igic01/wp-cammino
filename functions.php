@@ -361,6 +361,9 @@ function cammino_enqueue_visual_page_assets(): void {
 			'handle' => 'cammino-contact2',
 			'style'  => '/assets/css/pages/contact2.css',
 			'script' => '/assets/js/pages/contact2.js',
+			'before_styles' => array(
+				'cammino-contact2-team' => '/assets/css/pages/about-us.css',
+			),
 		),
 		'events'   => array(
 			'handle' => 'cammino-events',
