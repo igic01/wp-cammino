@@ -78,9 +78,10 @@ final class NStarter_HTML_Merge {
 	}
 
 	private function excluded( DOMElement $node ): bool {
+		// Team portraits and icons are decorative to readers but editable content.
 		return in_array( $node->tagName, array( 'script', 'style', 'svg', 'template', 'noscript' ), true )
 			|| (bool) preg_match( '/(?:^|\s)(?:site-header|site-footer|skip-link)(?:\s|$)/', $node->getAttribute( 'class' ) )
-			|| 'true' === $node->getAttribute( 'aria-hidden' )
+			|| ( 'true' === $node->getAttribute( 'aria-hidden' ) && ! str_contains( ' ' . $node->getAttribute( 'class' ) . ' ', ' contact-person__icon ' ) )
 			|| $node->hasAttribute( 'data-nstarter-editor-runtime' )
 			|| ( 'i' === $node->tagName && $node->hasAttribute( 'class' ) );
 	}
