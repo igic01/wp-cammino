@@ -63,7 +63,7 @@
 .contact-hero {
   position: relative;
   min-height: 0;
-  padding-bottom: clamp(2rem, 4vw, 3rem);
+  padding-bottom: clamp(4rem, 8vw, 6rem);
   overflow: hidden;
   background: transparent;
 }
@@ -715,7 +715,7 @@
 }
 
 @media (max-width: 760px) {
-  .contact-hero { min-height: 0; padding-bottom: 3rem; }
+  .contact-hero { min-height: 0; padding-bottom: 6rem; }
   .contact-team-section .contact-people { grid-template-columns: 1fr; }
   .contact-intro h1 { font-size: clamp(3.2rem, 14vw, 4.5rem); }
   .contact-form-card .wpcf7-form { grid-template-columns: 1fr; }
@@ -741,7 +741,7 @@
 }
 
 @media (max-width: 540px) {
-  .contact-hero { padding-bottom: 2.5rem; }
+  .contact-hero { padding-bottom: 5rem; }
   .person-card { grid-template-columns: 1fr; }
   .person-card:hover, .person-card:nth-child(2):hover { transform: translateY(-6px); }
   .contact-form-card { border-radius: var(--radius-md); }
