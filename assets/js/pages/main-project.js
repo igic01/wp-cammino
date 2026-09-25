@@ -4,6 +4,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const editorPreview = document.body.classList.contains("nstarter-editor-preview");
   const animatedCounters = new WeakSet();
 
+  if (!editorPreview) {
+    const galleryImages = ".main-project-gallery__item > img";
+    let imageDialog = null;
+    let enlargedImage = null;
+    let openedFrom = null;
+
+    document.querySelectorAll(galleryImages).forEach((image) => {
+      image.tabIndex = 0;
+      image.setAttribute("role", "button");
+      image.setAttribute("aria-label", image.alt ? `Zväčšiť obrázok: ${image.alt}` : "Zväčšiť obrázok");
+    });
+
+    const openImage = (image) => {
+      if (!imageDialog) {
+        imageDialog = document.createElement("dialog");
+        imageDialog.className = "main-project-gallery__dialog";
+        imageDialog.setAttribute("aria-label", "Zväčšený obrázok");
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "main-project-gallery__close";
+        close.setAttribute("aria-label", "Zavrieť obrázok");
+        close.textContent = "×";
+        enlargedImage = document.createElement("img");
+        imageDialog.append(close, enlargedImage);
+        document.body.append(imageDialog);
+        close.addEventListener("click", () => imageDialog.close());
+        imageDialog.addEventListener("click", (event) => {
+          if (event.target === imageDialog) imageDialog.close();
+        });
+        imageDialog.addEventListener("close", () => openedFrom?.focus());
+      }
+
+      openedFrom = image;
+      enlargedImage.src = image.currentSrc || image.src;
+      enlargedImage.alt = image.alt || "";
+      if (!imageDialog.open) imageDialog.showModal();
+    };
+
+    document.addEventListener("click", (event) => {
+      const image = event.target.closest?.(galleryImages);
+      if (!image) return;
+      event.preventDefault();
+      openImage(image);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const image = event.target.matches?.(galleryImages) ? event.target : null;
+      if (!image) return;
+      event.preventDefault();
+      openImage(image);
+    });
+  }
+
   const parseCounter = (counter) => {
     const source = counter.textContent.trim();
     const match = source.match(/^(.*?)(\d[\d\s.,]*)(.*?)$/);

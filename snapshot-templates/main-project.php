@@ -91,6 +91,36 @@ $cammino_donate_url         = CAMMINO_DONATE_URL;
 		</div>
 	</section>
 
+	<section class="section main-project-gallery" aria-labelledby="main-project-gallery-title"<?php
+	nstarter_variable_section_attributes(
+		'main_project_gallery_count',
+		array(
+			'label'   => 'Počet médií v galérii',
+			'type'    => 'number',
+			'control' => 'repeat',
+			'value'   => 3,
+			'min'     => 1,
+			'max'     => 9,
+			'step'    => 1,
+			'token'   => 'media',
+		)
+	);
+	?>>
+		<div class="container">
+			<div class="main-project-heading" data-main-project-reveal="up">
+				<h2 id="main-project-gallery-title">Galéria projektu</h2>
+			</div>
+			<div class="main-project-gallery__grid" data-nstarter-variable-items>
+				<figure class="main-project-gallery__item" data-nstarter-variable-item><img src="<?php echo esc_url( $cammino_main_project_image ); ?>" alt="Fotografia projektu 1" loading="lazy"></figure>
+				<figure class="main-project-gallery__item" data-nstarter-variable-item><img src="<?php echo esc_url( $cammino_main_project_image ); ?>" alt="Fotografia projektu 2" loading="lazy"></figure>
+				<figure class="main-project-gallery__item" data-nstarter-variable-item><img src="<?php echo esc_url( $cammino_main_project_image ); ?>" alt="Fotografia projektu 3" loading="lazy"></figure>
+			</div>
+			<template data-nstarter-variable-template>
+				<figure class="main-project-gallery__item" data-nstarter-variable-item><img src="<?php echo esc_url( $cammino_main_project_image ); ?>" alt="Fotografia projektu {{media}}" loading="lazy"></figure>
+			</template>
+		</div>
+	</section>
+
 	<section class="section main-project-stories" aria-labelledby="main-project-stories-title"<?php
 	nstarter_variable_section_attributes(
 		'main_project_stories',
