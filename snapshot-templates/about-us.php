@@ -143,9 +143,15 @@ $cammino_donation_qr = 'https://ozcammino.sk/wp-content/uploads/2026/06/qrkoddar
             <span class="identity-number">04</span>
             <h2 id="info-title">Pridajte sa <em>k nám</em></h2>
             <p>Máte nápad, otázku alebo chuť spolupracovať? Ozvite sa správnemu človeku priamo.</p>
+            <dl class="info-details" id="about-organization-details">
+              <div id="about-organization-name"><dt>Obchodné meno / názov</dt><dd>CAMMINO</dd></div>
+              <div id="about-organization-legal-form"><dt>Právna forma</dt><dd>občianske združenie</dd></div>
+              <div id="about-organization-ico"><dt>IČO</dt><dd>57183945</dd></div>
+              <div id="about-organization-dic"><dt>DIČ</dt><dd>2122645525</dd></div>
+            </dl>
             <div class="info-address">
               <span aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span>
-              <div><small>Adresa</small><strong>Miletičova 7, Bratislava</strong></div>
+              <div><small>Sídlo</small><strong>Miletičova 7, 821 08 Bratislava</strong></div>
             </div>
           </div>
 

@@ -750,6 +750,17 @@
 }
 .info-intro > p { max-width: 66ch; color: rgba(255, 255, 255, 0.72); }
 
+.info-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 1.25rem 2rem;
+  margin: 2rem 0 0;
+}
+
+.info-details > div { min-width: 0; }
+.info-details dt { color: rgba(255, 255, 255, 0.55); font-size: 0.875rem; }
+.info-details dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+
 .info-address {
   display: flex;
   align-items: center;

@@ -1,0 +1,18 @@
+/* Standard WordPress pages use the same shell as Cammino visual designs. */
+.cammino-default-page .cammino-default-content {
+  min-height: 60vh;
+  padding-top: calc(clamp(5.75rem, 8vw, 6.75rem) + var(--page-start-space));
+  padding-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.cammino-default-page .cammino-page-title {
+  margin-bottom: 1.5rem;
+}
+
+.cammino-default-page .entry-content {
+  overflow-wrap: anywhere;
+}
+
+.cammino-default-page .entry-content > * + * {
+  margin-top: 1.5rem;
+}

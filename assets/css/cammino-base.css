@@ -610,6 +610,17 @@ html.translated-ltr body {
   line-height: 1.65;
 }
 
+.footer-organization-details {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.footer-organization-details dt { color: rgba(255, 253, 249, 0.55); }
+.footer-organization-details dd { margin: 0; color: var(--color-white); }
+
 .social-links {
   display: flex;
   gap: 0.6rem;

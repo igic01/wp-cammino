@@ -185,7 +185,7 @@ function cammino_render_shared_menu(): void {
 }
 
 /**
- * Render the shared Cammino header for custom visual pages.
+ * Render the shared Cammino header.
  */
 function cammino_render_site_header(): void {
 	$original_url = get_permalink( get_queried_object_id() ) ?: home_url( '/' );
@@ -218,7 +218,7 @@ function cammino_render_site_header(): void {
 }
 
 /**
- * Render the shared Cammino footer for custom visual pages.
+ * Render the shared Cammino footer.
  */
 function cammino_render_site_footer(): void {
 	?>
@@ -229,6 +229,13 @@ function cammino_render_site_footer(): void {
 					<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/new_long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1668" height="370">
 				</a>
 				<p><?php esc_html_e( 'Pomáhame mladým ľuďom nájsť cestu k vzdelaniu, práci a samostatnej budúcnosti.', 'cammino' ); ?></p>
+				<dl class="footer-organization-details">
+					<div><dt><?php esc_html_e( 'Obchodné meno / názov', 'cammino' ); ?></dt><dd>CAMMINO</dd></div>
+					<div><dt><?php esc_html_e( 'Právna forma', 'cammino' ); ?></dt><dd><?php esc_html_e( 'občianske združenie', 'cammino' ); ?></dd></div>
+					<div><dt><?php esc_html_e( 'IČO', 'cammino' ); ?></dt><dd>57183945</dd></div>
+					<div><dt><?php esc_html_e( 'DIČ', 'cammino' ); ?></dt><dd>2122645525</dd></div>
+					<div><dt><?php esc_html_e( 'Sídlo', 'cammino' ); ?></dt><dd><?php esc_html_e( 'Miletičova 7, 821 08 Bratislava', 'cammino' ); ?></dd></div>
+				</dl>
 				<div class="social-links" aria-label="<?php esc_attr_e( 'Sociálne siete', 'cammino' ); ?>">
 					<a href="#" aria-label="<?php esc_attr_e( 'Instagram', 'cammino' ); ?>"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
 					<a href="#" aria-label="<?php esc_attr_e( 'Facebook', 'cammino' ); ?>"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
@@ -244,7 +251,6 @@ function cammino_render_site_footer(): void {
 			<div class="footer-contact">
 				<h2><?php esc_html_e( 'Prihláste sa na newsletter', 'cammino' ); ?></h2>
 				<a href="mailto:marketing@ozcammino.sk">marketing@ozcammino.sk</a>
-				<p><?php esc_html_e( 'Miletičova 7, Bratislava', 'cammino' ); ?></p>
 				<form class="newsletter" action="#" method="post">
 					<label class="sr-only" for="cammino-footer-email"><?php esc_html_e( 'Váš e-mail', 'cammino' ); ?></label>
 					<input id="cammino-footer-email" type="email" name="email" placeholder="<?php esc_attr_e( 'Váš e-mail', 'cammino' ); ?>" required>
@@ -295,10 +301,18 @@ function cammino_register_live_sections(): void {
 add_action( 'wp_enqueue_scripts', 'cammino_enqueue_child_styles', 15 );
 
 /**
+ * Whether this request uses the child theme's default page layout.
+ * Explicitly selected templates keep their own document and asset handling.
+ */
+function cammino_is_default_page_request(): bool {
+	return is_page() && '' === (string) get_page_template_slug( get_queried_object_id() );
+}
+
+/**
  * Load shared child-theme CSS on ordinary Astra pages.
  */
 function cammino_enqueue_child_styles(): void {
-	if ( ( is_page() && nstarter_is_visual_page( get_queried_object_id() ) ) || cammino_is_managed_post_request() ) {
+	if ( cammino_is_default_page_request() || ( is_page() && nstarter_is_visual_page( get_queried_object_id() ) ) || cammino_is_managed_post_request() ) {
 		return;
 	}
 
@@ -319,6 +333,11 @@ add_action( 'wp_enqueue_scripts', 'cammino_enqueue_visual_page_assets', 1000 );
  */
 function cammino_enqueue_visual_page_assets(): void {
 	if ( ! is_page() || nstarter_is_editor_request() ) {
+		return;
+	}
+
+	if ( cammino_is_default_page_request() ) {
+		cammino_enqueue_design_assets( 'cammino-default-page', '/assets/css/pages/default-page.css', '' );
 		return;
 	}
 
@@ -536,12 +555,12 @@ function cammino_enqueue_single_post_assets(): void {
 add_action( 'wp_enqueue_scripts', 'cammino_isolate_visual_page_assets', 999 );
 
 /**
- * Prevent Astra's presentation layer from leaking into opt-in Cammino pages.
+ * Prevent Astra's presentation layer from leaking into Cammino layouts.
  */
 function cammino_isolate_visual_page_assets(): void {
 	$is_visual_page = is_page() && nstarter_is_visual_page( get_queried_object_id() );
 
-	if ( ! $is_visual_page && ! cammino_is_managed_post_request() ) {
+	if ( ! $is_visual_page && ! cammino_is_default_page_request() && ! cammino_is_managed_post_request() ) {
 		return;
 	}
 
@@ -575,6 +594,11 @@ add_filter( 'body_class', 'cammino_visual_page_body_classes' );
  * @return string[]
  */
 function cammino_visual_page_body_classes( array $classes ): array {
+	if ( cammino_is_default_page_request() ) {
+		$classes[] = 'cammino-visual-page';
+		$classes[] = 'cammino-default-page';
+	}
+
 	if ( is_page() ) {
 		$slug         = nstarter_get_native_source_template_slug( get_queried_object_id() );
 		$page_classes = array(

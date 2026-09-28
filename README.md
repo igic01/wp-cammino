@@ -1,9 +1,9 @@
 # Cammino WordPress theme
 
 This repository contains a minimal child theme for [Astra](https://wpastra.com/).
-It deliberately relies on Astra's normal template hierarchy, so existing Astra
-and Elementor pages continue to work unchanged while new Cammino features are
-built incrementally. The opt-in custom pages currently include the editable
+Pages using **Default template** render their WordPress editor content with the
+same shared Cammino header and footer as the custom designs. Explicitly selected
+Astra and Elementor templates retain their own layouts. The custom pages include the editable
 **Domov**, **O nás**, **Naše aktivity**, **Kontakt**, **Zapojte sa**, **Všetky podujatia**, **Projekty**, **Hlavný projekt**, and donation designs, plus a
 shared single-post design for events, projects, and impact stories.
 
@@ -19,7 +19,10 @@ shared single-post design for events, projects, and impact stories.
 ## Current structure
 
 - `style.css` declares the Astra child theme and is the entry point for shared CSS.
-- `functions.php` loads the child stylesheet on ordinary pages and isolated
+- `page.php` is the default page layout; no custom template selection is needed
+  to use the shared Cammino header and footer. This also applies to existing
+  pages using **Default template**. Page content stays in the WordPress editor.
+- `functions.php` loads the child stylesheet on ordinary Astra requests and isolated
   Cammino assets on custom visual pages. It registers the shared Cammino header
   and footer as locked live sections on visual pages and uses the same renderers
   outside the editable content of managed posts.
