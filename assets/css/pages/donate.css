@@ -12,7 +12,6 @@
 [data-donate-reveal].is-visible { opacity: 1; filter: blur(0); transform: none; }
 
 .donation-options {
-  min-height: 100vh;
   overflow: hidden;
   background: transparent;
 }
