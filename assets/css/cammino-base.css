@@ -612,14 +612,17 @@ html.translated-ltr body {
 
 .footer-organization-details {
   display: grid;
-  gap: 0.75rem;
-  margin: 1.5rem 0 0;
-  font-size: 0.875rem;
+  gap: 0.3rem;
+  width: 100%;
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
-.footer-organization-details dt { color: rgba(255, 253, 249, 0.55); }
-.footer-organization-details dd { margin: 0; color: var(--color-white); }
+.footer-organization-details dt { display: inline; color: rgba(255, 253, 249, 0.55); }
+.footer-organization-details dt::after { content: ": "; }
+.footer-organization-details dd { display: inline; margin: 0; color: var(--color-white); }
 
 .social-links {
   display: flex;

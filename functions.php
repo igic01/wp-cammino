@@ -229,13 +229,6 @@ function cammino_render_site_footer(): void {
 					<img src="<?php echo esc_url( NSTARTER_URL . '/assets/logos/new_long_logo.svg' ); ?>" alt="<?php esc_attr_e( 'Cammino', 'cammino' ); ?>" width="1668" height="370">
 				</a>
 				<p><?php esc_html_e( 'Pomáhame mladým ľuďom nájsť cestu k vzdelaniu, práci a samostatnej budúcnosti.', 'cammino' ); ?></p>
-				<dl class="footer-organization-details">
-					<div><dt><?php esc_html_e( 'Obchodné meno / názov', 'cammino' ); ?></dt><dd>CAMMINO</dd></div>
-					<div><dt><?php esc_html_e( 'Právna forma', 'cammino' ); ?></dt><dd><?php esc_html_e( 'občianske združenie', 'cammino' ); ?></dd></div>
-					<div><dt><?php esc_html_e( 'IČO', 'cammino' ); ?></dt><dd>57183945</dd></div>
-					<div><dt><?php esc_html_e( 'DIČ', 'cammino' ); ?></dt><dd>2122645525</dd></div>
-					<div><dt><?php esc_html_e( 'Sídlo', 'cammino' ); ?></dt><dd><?php esc_html_e( 'Miletičova 7, 821 08 Bratislava', 'cammino' ); ?></dd></div>
-				</dl>
 				<div class="social-links" aria-label="<?php esc_attr_e( 'Sociálne siete', 'cammino' ); ?>">
 					<a href="#" aria-label="<?php esc_attr_e( 'Instagram', 'cammino' ); ?>"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
 					<a href="#" aria-label="<?php esc_attr_e( 'Facebook', 'cammino' ); ?>"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
@@ -256,6 +249,13 @@ function cammino_render_site_footer(): void {
 					<input id="cammino-footer-email" type="email" name="email" placeholder="<?php esc_attr_e( 'Váš e-mail', 'cammino' ); ?>" required>
 					<button type="submit" aria-label="<?php esc_attr_e( 'Prihlásiť sa na odber', 'cammino' ); ?>"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
 				</form>
+				<dl class="footer-organization-details">
+					<div><dt><?php esc_html_e( 'Obchodné meno / názov', 'cammino' ); ?></dt><dd>CAMMINO</dd></div>
+					<div><dt><?php esc_html_e( 'Právna forma', 'cammino' ); ?></dt><dd><?php esc_html_e( 'občianske združenie', 'cammino' ); ?></dd></div>
+					<div><dt><?php esc_html_e( 'IČO', 'cammino' ); ?></dt><dd>57183945</dd></div>
+					<div><dt><?php esc_html_e( 'DIČ', 'cammino' ); ?></dt><dd>2122645525</dd></div>
+					<div><dt><?php esc_html_e( 'Sídlo', 'cammino' ); ?></dt><dd><?php esc_html_e( 'Miletičova 7, 821 08 Bratislava', 'cammino' ); ?></dd></div>
+				</dl>
 			</div>
 		</div>
 		<div class="container footer-bottom">

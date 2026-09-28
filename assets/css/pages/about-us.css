@@ -752,7 +752,7 @@
 
 .info-details {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1.25rem 2rem;
   margin: 2rem 0 0;
 }
@@ -1002,6 +1002,7 @@
 }
 
 @media (max-width: 1050px) {
+  .info-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .about-hero__grid,
   .europe-grid {
     grid-template-columns: 1fr;
@@ -1073,6 +1074,7 @@
 }
 
 @media (max-width: 560px) {
+  .info-details { grid-template-columns: 1fr; }
   .about-hero { padding-bottom: 2.5rem; }
   .about-hero__visual { min-height: 390px; }
   .about-hero__image { inset: 2.5rem 0 1.5rem; border-width: 5px; }
