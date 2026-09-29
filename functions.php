@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.11.2' );
+define( 'NSTARTER_VERSION', '1.11.3' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
@@ -492,13 +492,6 @@ function cammino_enqueue_design_assets( string $handle, string $style, string $s
 		array( 'cammino-font-awesome' ),
 		NSTARTER_VERSION . '-' . filemtime( NSTARTER_PATH . '/assets/css/cammino-base.css' )
 	);
-	// Keep every page canvas plain even if a cache serves an older base stylesheet.
-	wp_add_inline_style(
-		'cammino-base',
-		'html body, html body.home-v2-page, html body.home-v3-page { background-color: #fff !important; background-image: none !important; }'
-		. ' html body.home-v3-page #nstarter-snapshot, html body.home-v3-page .home-v3 { background-color: transparent !important; background-image: none !important; }'
-	);
-
 	$style_dependencies = array( 'cammino-base' );
 
 	foreach ( $before_styles as $before_handle => $before_style ) {
