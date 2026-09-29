@@ -21,6 +21,13 @@ add_filter( 'template_include', static function ( string $template ): string {
 	return cammino_is_product_catalogue() ? NSTARTER_PATH . '/woocommerce/page-products.php' : $template;
 }, 100 );
 
+add_action( 'woocommerce_before_shop_loop', static function (): void {
+	if ( cammino_is_product_catalogue() ) {
+		remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
+		remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
+	}
+}, 1 );
+
 add_filter( 'body_class', static function ( array $classes ): array {
 	if ( cammino_is_product_catalogue() ) {
 		$classes[] = 'cammino-visual-page';
@@ -52,16 +59,11 @@ add_action( 'wp_enqueue_scripts', static function (): void {
 	cammino_enqueue_design_assets( 'cammino-products', '/woocommerce/assets/products.css', '' );
 }, 1001 );
 
-add_action( 'woocommerce_after_shop_loop_item_title', static function (): void {
-	if ( ! cammino_is_product_catalogue() ) {
-		return;
+// Both the Shop loop and product shortcode use this template-part filter.
+// Keep Astra's product markup on other pages; render our own catalogue cards.
+add_filter( 'wc_get_template_part', static function ( string $template, string $slug, string $name ): string {
+	if ( 'content' === $slug && 'product' === $name && cammino_is_product_catalogue() ) {
+		return NSTARTER_PATH . '/woocommerce/parts/product-card.php';
 	}
-	global $product;
-	if ( ! $product instanceof WC_Product ) {
-		return;
-	}
-	$description = wp_trim_words( strip_shortcodes( wp_strip_all_tags( $product->get_short_description() ) ), 30 );
-	if ( '' !== $description ) {
-		echo '<p class="cammino-product-description">' . esc_html( $description ) . '</p>';
-	}
-}, 7 );
+	return $template;
+}, 100, 3 );

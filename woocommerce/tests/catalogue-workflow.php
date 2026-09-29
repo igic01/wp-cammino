@@ -7,6 +7,7 @@ $state = array( 'page' => true, 'shop' => false, 'template' => 'woocommerce/page
 $checks = 0;
 function add_filter( $name, $callback, $priority = 10 ) { global $hooks; $hooks[ $name ][ $priority ] = $callback; }
 function add_action( $name, $callback, $priority = 10 ) { add_filter( $name, $callback, $priority ); }
+function remove_action( $name, $callback, $priority = 10 ) { global $hooks; if ( ( $hooks[$name][$priority] ?? null ) === $callback ) unset( $hooks[$name][$priority] ); }
 function is_page() { global $state; return $state['page']; }
 function is_shop() { global $state; return $state['shop']; }
 function get_queried_object_id() { return 42; }
@@ -65,14 +66,12 @@ expect( $state['assets'][1] === '/woocommerce/assets/products.css', 'Catalogue s
 $html = render_catalogue();
 expect( str_contains( $html, 'Products &amp; support' ) && str_contains( $html, 'Shortcode product' ), 'Regular page renders escaped title and live shortcode.' );
 expect( str_contains( $state['shortcode'], 'paginate="true"' ) && str_contains( $state['shortcode'], 'visibility="catalog"' ), 'Regular catalogue paginates and respects catalogue visibility.' );
-$product = new WC_Product();
-ob_start(); $hooks['woocommerce_after_shop_loop_item_title'][7](); $description = ob_get_clean();
-expect( str_contains( $description, 'Help &amp; hope' ) && ! str_contains( $description, '[hidden]' ), 'Description is escaped and excludes shortcodes.' );
+expect( $hooks['wc_get_template_part'][100]( '/original.php', 'content', 'product' ) === NSTARTER_PATH . '/woocommerce/parts/product-card.php', 'Catalogue uses its own card instead of Astra loop hooks.' );
 $state['page'] = false; $state['shop'] = true;
 expect( cammino_is_product_catalogue() && 17 === $state['template_id'], 'Shop archive checks the assigned Shop page template.' );
 $html = render_catalogue();
 expect( substr_count( $html, 'Native product' ) === 2, 'Shop archive renders the native product query.' );
-expect( in_array( 'woocommerce_before_shop_loop', $state['actions'], true ) && in_array( 'woocommerce_after_shop_loop', $state['actions'], true ), 'Shop retains sorting, notices and pagination hooks.' );
+expect( in_array( 'woocommerce_before_shop_loop', $state['actions'], true ) && in_array( 'woocommerce_after_shop_loop', $state['actions'], true ), 'Shop retains notices and pagination hooks.' );
 $state['actions'] = array(); render_catalogue();
 expect( in_array( 'woocommerce_no_products_found', $state['actions'], true ), 'Empty Shop uses the native empty-state hook.' );
 $state['shop'] = false; $state['page'] = true; $state['disabled'] = true;
@@ -81,4 +80,5 @@ $state['template'] = '';
 expect( ! cammino_is_product_catalogue() && '/original.php' === $hooks['template_include'][100]( '/original.php' ), 'Unassigned pages retain their original template.' );
 $state['page'] = false;
 expect( ! cammino_is_product_catalogue(), 'Product details and other archives are unaffected.' );
+expect( $hooks['wc_get_template_part'][100]( '/original.php', 'content', 'product' ) === '/original.php', 'Other pages retain their original product cards.' );
 echo "Passed $checks catalogue workflow checks.\n";
