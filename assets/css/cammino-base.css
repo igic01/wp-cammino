@@ -84,11 +84,8 @@ body {
   margin: 0;
   overflow-x: hidden;
   color: var(--color-charcoal);
-  background-color: var(--color-cream);
-  background-image: url("../images/bg2.svg");
-  background-position: center top;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
+  background-color: #fff;
+  background-image: none;
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.7;
