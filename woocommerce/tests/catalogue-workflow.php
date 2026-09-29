@@ -22,6 +22,7 @@ function strip_shortcodes( $text ) { return preg_replace( '/\[[^]]*\]/', '', $te
 function wp_trim_words( $text, $count ) { return implode( ' ', array_slice( explode( ' ', $text ), 0, $count ) ); }
 function esc_html( $text ) { return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' ); }
 function esc_html__( $text, $domain ) { return esc_html( $text ); }
+function __( $text, $domain ) { return $text; }
 function esc_html_e( $text, $domain ) { echo esc_html( $text ); }
 function language_attributes() { echo 'lang="sk"'; }
 function bloginfo( $key ) { echo 'UTF-8'; }
@@ -49,6 +50,9 @@ function expect( $condition, $message ) { global $checks; ++$checks; if ( ! $con
 function render_catalogue() { ob_start(); include NSTARTER_PATH . '/woocommerce/page-products.php'; return ob_get_clean(); }
 require NSTARTER_PATH . '/woocommerce/bootstrap.php';
 
+$templates = $hooks['theme_page_templates'][30]( array( 'existing.php' => 'Existing template' ) );
+expect( isset( $templates['woocommerce/page-products.php'] ) && 'Cammino — WooCommerce products' === $templates['woocommerce/page-products.php'], 'Catalogue is explicitly available in the template selector without file discovery.' );
+expect( 'Existing template' === $templates['existing.php'], 'Registration preserves other page templates.' );
 expect( cammino_is_product_catalogue(), 'Selected regular page uses catalogue.' );
 expect( $hooks['template_include'][100]( '/original.php' ) === NSTARTER_PATH . '/woocommerce/page-products.php', 'Selected template is routed after WooCommerce.' );
 expect( in_array( 'cammino-visual-page', $hooks['body_class'][10]( array() ), true ), 'Shared layout classes are set.' );

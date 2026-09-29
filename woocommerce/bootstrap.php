@@ -3,6 +3,13 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Register explicitly, like the snapshot designs, so the selector does not
+// depend on WordPress's cached discovery of PHP template file headers.
+add_filter( 'theme_page_templates', static function ( array $templates ): array {
+	$templates['woocommerce/page-products.php'] = __( 'Cammino — WooCommerce products', 'cammino' );
+	return $templates;
+}, 30 );
+
 /** The shop is an archive, so read its assigned page template explicitly. */
 function cammino_is_product_catalogue(): bool {
 	$page_id = function_exists( 'is_shop' ) && is_shop() ? wc_get_page_id( 'shop' ) : get_queried_object_id();
