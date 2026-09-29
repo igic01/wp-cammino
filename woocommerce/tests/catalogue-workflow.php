@@ -11,6 +11,9 @@ function remove_action( $name, $callback, $priority = 10 ) { global $hooks; if (
 function is_page() { global $state; return $state['page']; }
 function is_shop() { global $state; return $state['shop']; }
 function is_product() { global $state; return ! empty( $state['single_product'] ); }
+function is_product_taxonomy() { return false; }
+function get_template() { return 'astra'; }
+function get_stylesheet() { return 'wp-cammino'; }
 function get_queried_object_id() { return 42; }
 function wc_get_page_id( $type ) { return 17; }
 function wc_get_page_permalink( $type ) { return '/shop/'; }
@@ -71,7 +74,7 @@ expect( str_contains( $html, 'Products &amp; support' ) && str_contains( $html, 
 expect( str_contains( $state['shortcode'], 'paginate="true"' ) && str_contains( $state['shortcode'], 'visibility="catalog"' ), 'Regular catalogue paginates and respects catalogue visibility.' );
 expect( $hooks['wc_get_template_part'][100]( '/original.php', 'content', 'product' ) === NSTARTER_PATH . '/woocommerce/parts/product-card.php', 'Catalogue uses its own card instead of Astra loop hooks.' );
 $state['page'] = false; $state['shop'] = true;
-expect( cammino_is_product_catalogue() && 17 === $state['template_id'], 'Shop archive checks the assigned Shop page template.' );
+expect( cammino_is_product_catalogue(), 'Shop archives always use Cammino catalogue styling.' );
 $html = render_catalogue();
 expect( substr_count( $html, 'Native product' ) === 2, 'Shop archive renders the native product query.' );
 expect( in_array( 'woocommerce_before_shop_loop', $state['actions'], true ) && in_array( 'woocommerce_after_shop_loop', $state['actions'], true ), 'Shop retains notices and pagination hooks.' );

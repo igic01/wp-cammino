@@ -1,6 +1,6 @@
 <?php
 /**
- * Cammino child theme bootstrap.
+ * Cammino standalone theme bootstrap.
  *
  * @package Cammino
  */
@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.10.20' );
+define( 'NSTARTER_VERSION', '1.11.0' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
@@ -22,6 +22,7 @@ require_once NSTARTER_PATH . '/inc/variable-sections.php';
 require_once NSTARTER_PATH . '/inc/posts.php';
 require_once NSTARTER_PATH . '/inc/editor.php';
 require_once NSTARTER_PATH . '/woocommerce/bootstrap.php';
+require_once NSTARTER_PATH . '/inc/site-shell.php';
 
 add_action( 'init', 'cammino_register_live_sections' );
 add_action( 'after_setup_theme', 'cammino_register_navigation' );
@@ -302,15 +303,15 @@ function cammino_register_live_sections(): void {
 add_action( 'wp_enqueue_scripts', 'cammino_enqueue_child_styles', 15 );
 
 /**
- * Whether this request uses the child theme's default page layout.
- * Explicitly selected templates keep their own document and asset handling.
+ * Whether this request uses the standard Cammino page layout.
+ * Snapshot and WooCommerce designs have their own content layout.
  */
 function cammino_is_default_page_request(): bool {
-	return is_page() && '' === (string) get_page_template_slug( get_queried_object_id() );
+	return is_page() && ! nstarter_is_visual_page( get_queried_object_id() ) && ! cammino_is_product_catalogue();
 }
 
 /**
- * Load shared child-theme CSS on ordinary Astra pages.
+ * Load the theme's optional stylesheet on fallback/plugin requests.
  */
 function cammino_enqueue_child_styles(): void {
 	if ( cammino_is_default_page_request() || ( is_page() && nstarter_is_visual_page( get_queried_object_id() ) ) || cammino_is_managed_post_request() ) {
@@ -322,7 +323,7 @@ function cammino_enqueue_child_styles(): void {
 	wp_enqueue_style(
 		'cammino-child',
 		get_stylesheet_uri(),
-		array( 'astra-theme-css' ),
+		array(),
 		(string) $theme->get( 'Version' )
 	);
 }
@@ -567,20 +568,20 @@ function cammino_isolate_visual_page_assets(): void {
 
 	global $wp_styles, $wp_scripts;
 
-	$parent_url = trailingslashit( get_template_directory_uri() );
+	$parent_url = get_template() !== get_stylesheet() ? trailingslashit( get_template_directory_uri() ) : '';
 	$styles     = is_object( $wp_styles ) ? (array) $wp_styles->queue : array();
 	$scripts    = is_object( $wp_scripts ) ? (array) $wp_scripts->queue : array();
 
 	foreach ( $styles as $handle ) {
 		$source = isset( $wp_styles->registered[ $handle ] ) ? (string) $wp_styles->registered[ $handle ]->src : '';
-		if ( str_starts_with( $handle, 'astra-' ) || ( '' !== $source && str_contains( $source, $parent_url ) ) ) {
+		if ( str_starts_with( $handle, 'astra-' ) || ( '' !== $parent_url && '' !== $source && str_contains( $source, $parent_url ) ) ) {
 			wp_dequeue_style( $handle );
 		}
 	}
 
 	foreach ( $scripts as $handle ) {
 		$source = isset( $wp_scripts->registered[ $handle ] ) ? (string) $wp_scripts->registered[ $handle ]->src : '';
-		if ( str_starts_with( $handle, 'astra-' ) || ( '' !== $source && str_contains( $source, $parent_url ) ) ) {
+		if ( str_starts_with( $handle, 'astra-' ) || ( '' !== $parent_url && '' !== $source && str_contains( $source, $parent_url ) ) ) {
 			wp_dequeue_script( $handle );
 		}
 	}

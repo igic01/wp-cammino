@@ -16,3 +16,15 @@
 .cammino-default-page .entry-content > * + * {
   margin-top: 1.5rem;
 }
+
+.cammino-listing { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.5rem; margin: 2rem 0; }
+.cammino-listing-card { display: flex; flex-direction: column; align-items: flex-start; padding: 2rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-white); }
+.cammino-listing-card h2 { margin: 0 0 1rem; color: var(--color-plum); font-size: 2rem; line-height: 1.1; }
+.cammino-listing-link { margin-top: auto; padding-top: 1rem; color: var(--color-coral-dark); }
+.cammino-default-page .search-form { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0; }
+.cammino-default-page .search-field { max-width: 100%; min-height: 48px; padding: .8rem 1rem; border: 1px solid var(--color-border); border-radius: 1rem; background: var(--color-white); }
+.cammino-default-page .search-submit { min-height: 48px; padding: .8rem 1.5rem; border: 0; border-radius: var(--radius-pill); color: var(--color-white); background: var(--color-plum); }
+.cammino-default-page .pagination { margin-top: 2rem; }
+.cammino-default-page .page-numbers { display: inline-block; padding: .65rem 1rem; border-radius: var(--radius-pill); background: var(--color-white); color: var(--color-plum); }
+.cammino-default-page .page-numbers.current { background: var(--color-plum); color: var(--color-white); }
+@media (max-width: 700px) { .cammino-listing { grid-template-columns: 1fr; } }

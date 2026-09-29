@@ -1,9 +1,9 @@
 # Cammino WordPress theme
 
-This repository contains a minimal child theme for [Astra](https://wpastra.com/).
+This repository contains the standalone Cammino theme. Astra is no longer a parent theme.
 Pages using **Default template** render their WordPress editor content with the
-same shared Cammino header and footer as the custom designs. Explicitly selected
-Astra and Elementor templates retain their own layouts. The custom pages include the editable
+same shared Cammino header and footer as the custom designs. Previously selected
+Astra or Elementor page templates now render their content inside the shared Cammino shell. The custom pages include the editable
 **Domov**, **O nás**, **Naše aktivity**, **Kontakt**, **Zapojte sa**, **Všetky podujatia**, **Projekty**, **Hlavný projekt**, and donation designs, plus a
 shared single-post design for events, projects, and impact stories.
 
@@ -12,18 +12,16 @@ shared single-post design for events, projects, and impact stories.
 - WordPress 6.4 or newer
 - PHP 8.0 or newer
 - PHP DOM extension (used to merge saved HTML into updated page layouts)
-- Astra installed as the parent theme in `wp-content/themes/astra`
 - Elementor installed when existing Elementor pages require it
 - Contact Form 7 installed and active for the Kontakt and Zapojte sa pages
 
 ## Current structure
 
-- `style.css` declares the Astra child theme and is the entry point for shared CSS.
+- `style.css` declares the standalone theme. `inc/site-shell.php` registers theme and WooCommerce support, routes standard frontend pages through the shared shell, and blocks legacy Astra assets.
 - `page.php` is the default page layout; no custom template selection is needed
   to use the shared Cammino header and footer. This also applies to existing
   pages using **Default template**. Page content stays in the WordPress editor.
-- `functions.php` loads the child stylesheet on ordinary Astra requests and isolated
-  Cammino assets on custom visual pages. It registers the shared Cammino header
+- `functions.php` loads the Cammino design assets. It registers the shared Cammino header
   and footer as locked live sections on visual pages and uses the same renderers
   outside the editable content of managed posts.
 - `snapshot-templates/home.php` is the editable Cammino homepage source.
@@ -57,6 +55,8 @@ shared single-post design for events, projects, and impact stories.
 - `live/` is a local implementation reference and is ignored by Git/deployment.
 
 ## Create an editable Cammino page
+
+Deploy the complete theme together, including `style.css`, `index.php`, `header.php`, `footer.php`, `inc/site-shell.php`, and `woocommerce/`. On an existing installation, the first uncached request re-selects the same active theme with its standalone metadata; subsequent requests no longer load Astra's PHP. Clear the site's page cache after deployment. Existing theme mods and menu assignments remain under the same stylesheet name. The final template router gives all standard frontend pages the Cammino shell, including cart, checkout, account, product categories, search, and 404 pages. WordPress feeds, embeds, and administration keep their native output.
 
 1. Create or edit a WordPress page.
 2. In the page **Template** selector, choose the required **Cammino — ...**

@@ -12,9 +12,16 @@ add_filter( 'theme_page_templates', static function ( array $templates ): array 
 
 /** The shop is an archive, so read its assigned page template explicitly. */
 function cammino_is_product_catalogue(): bool {
+	if ( cammino_is_product_archive() ) {
+		return true;
+	}
 	$page_id = function_exists( 'is_shop' ) && is_shop() ? wc_get_page_id( 'shop' ) : get_queried_object_id();
 	return ( is_page() || ( function_exists( 'is_shop' ) && is_shop() ) )
 		&& 'woocommerce/page-products.php' === get_page_template_slug( $page_id );
+}
+
+function cammino_is_product_archive(): bool {
+	return function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() );
 }
 
 function cammino_is_single_product(): bool {
@@ -51,11 +58,11 @@ add_action( 'wp_enqueue_scripts', static function (): void {
 	}
 	// Use the same standalone document and shared shell as the donate page.
 	global $wp_styles, $wp_scripts;
-	$parent_url = trailingslashit( get_template_directory_uri() );
+	$parent_url = get_template() !== get_stylesheet() ? trailingslashit( get_template_directory_uri() ) : '';
 	foreach ( array( 'style' => $wp_styles, 'script' => $wp_scripts ) as $type => $registry ) {
 		foreach ( is_object( $registry ) ? (array) $registry->queue : array() as $handle ) {
 			$source = isset( $registry->registered[ $handle ] ) ? (string) $registry->registered[ $handle ]->src : '';
-			if ( str_starts_with( $handle, 'astra-' ) || ( '' !== $source && str_contains( $source, $parent_url ) ) ) {
+			if ( str_starts_with( $handle, 'astra-' ) || ( '' !== $parent_url && '' !== $source && str_contains( $source, $parent_url ) ) ) {
 				if ( 'style' === $type ) {
 					wp_dequeue_style( $handle );
 				} else {
