@@ -209,6 +209,8 @@
         const builder = contentBuilder();
         if (!config.isPost || !builder) return;
 
+        preparePostButtons();
+
         builder.querySelectorAll('[data-nstarter-editor-runtime]').forEach(function (element) {
             element.remove();
         });
@@ -338,13 +340,14 @@
         item.scrollIntoView({ block: 'center', behavior: 'smooth' });
         if (item.dataset.nstarterContentType === 'image' || item.dataset.nstarterContentType === 'gallery') return;
         const doc = item.ownerDocument;
+        const editable = item.dataset.nstarterContentType === 'button' ? item.querySelector('a') || item : item;
+        editable.focus();
         const selection = doc.getSelection();
         const range = doc.createRange();
-        range.selectNodeContents(item.dataset.nstarterContentType === 'button' ? item.querySelector('a') || item : item);
+        range.selectNodeContents(editable);
         range.collapse(false);
         selection.removeAllRanges();
         selection.addRange(range);
-        item.focus();
     }
 
     function handleInlinePostAction(event) {
@@ -1639,6 +1642,17 @@
         });
     }
 
+    function preparePostButtons() {
+        contentItems().forEach(function (item) {
+            if (item.dataset.nstarterContentType !== 'button') return;
+            // A separate editing host keeps the caret inside the link at its
+            // edges, and preserves the link when its entire label is deleted.
+            item.setAttribute('contenteditable', 'false');
+            const link = item.querySelector('a');
+            if (link) link.setAttribute('contenteditable', mode === 'text' ? 'true' : 'false');
+        });
+    }
+
     function applyMode(nextMode) {
         mode = nextMode;
         const doc = frameDocument();
@@ -1648,6 +1662,7 @@
         doc.body.classList.add('nstarter-mode-' + mode);
         lockLiveSections(doc);
         lockPostChrome(doc);
+        preparePostButtons();
         modeSelect.value = mode;
         refreshVideoSettingsTools();
         refreshVariableTools();
@@ -2482,6 +2497,12 @@
 
         copy.querySelectorAll('[data-nstarter-editor-runtime]').forEach(function (element) {
             element.remove();
+        });
+        copy.querySelectorAll('[data-nstarter-content-type="button"]').forEach(function (item) {
+            item.removeAttribute('contenteditable');
+            item.querySelectorAll('a').forEach(function (link) {
+                link.removeAttribute('contenteditable');
+            });
         });
         copy.querySelectorAll('.article-impact-story > a.button').forEach(function (element) {
             element.remove();

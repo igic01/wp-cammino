@@ -47,6 +47,10 @@ const server = createServer(async (req, res) => {
     } else if (pathname === '/font.woff2') {
         res.setHeader('Content-Type', 'font/woff2');
         res.end(readFileSync(join(root, 'assets/fonts/fredoka.woff2')));
+    } else if (pathname === '/button-preview') {
+        res.setHeader('Content-Type', 'text/html');
+        const button = '<div class="article-button" data-nstarter-content-item data-nstarter-content-type="button"><a class="button button--coral" href="https://example.org/donate">Donate</a></div>';
+        res.end(`<!doctype html><html><head><style>.button{display:inline-block;padding:16px;background:coral;min-width:40px;min-height:20px}</style></head><body class="nstarter-editor-preview"><div data-nstarter-snapshot-root data-nstarter-content-builder>${button}<template data-nstarter-content-template="button">${button}</template></div></body></html>`);
     } else if (pathname === '/social-preview') {
         res.setHeader('Content-Type', 'text/html');
         const selected = state.social.split(',');
@@ -99,7 +103,7 @@ const server = createServer(async (req, res) => {
         res.end(JSON.stringify({ success: true, data }));
     } else {
         res.setHeader('Content-Type', 'text/html');
-        res.end(pathname === '/social-editor' ? fixture.replaceAll('/preview', '/social-preview').replace('isPost:false', 'isPost:true') : fixture);
+        res.end(pathname === '/button-editor' ? fixture.replaceAll('/preview', '/button-preview').replace('isPost:false', 'isPost:true') : pathname === '/social-editor' ? fixture.replaceAll('/preview', '/social-preview').replace('isPost:false', 'isPost:true') : fixture);
     }
 });
 server.listen(0, '127.0.0.1');
@@ -205,6 +209,52 @@ try {
     await evaluate(`document.querySelector('[data-nstarter-social-select]').value='';document.querySelector('[data-nstarter-variable-form]').requestSubmit();document.querySelector('[data-nstarter-save]').click()`);
     await check(`document.querySelector('[data-nstarter-status]').classList.contains('is-success')`, 'Hide all can be saved');
     if (state.social !== '') throw new Error('Hide all was not persisted');
+    await call('Page.navigate', { url: address + '/button-editor' });
+    await check(`document.querySelector('[data-nstarter-frame]')?.contentDocument?.querySelector('.article-button a')?.getAttribute('contenteditable')==='true'`, 'Button labels have their own editing host');
+    const selectButton = async (position) => evaluate(`(() => {
+        const doc=document.querySelector('[data-nstarter-frame]').contentDocument;
+        const link=doc.querySelector('.article-button a');link.focus();
+        const range=doc.createRange();range.selectNodeContents(link);
+        ${position === 'all' ? '' : `range.collapse(${position === 'start'});`}
+        doc.getSelection().removeAllRanges();doc.getSelection().addRange(range);
+    })()`);
+    const key = async (name) => {
+        await call('Input.dispatchKeyEvent', { type: 'keyDown', key: name, code: name, windowsVirtualKeyCode: name === 'Backspace' ? 8 : 46 });
+        await call('Input.dispatchKeyEvent', { type: 'keyUp', key: name, code: name, windowsVirtualKeyCode: name === 'Backspace' ? 8 : 46 });
+    };
+    await selectButton('end');
+    await call('Input.insertText', { text: ' now' });
+    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.article-button').textContent==='Donate now' && document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.article-button a').textContent==='Donate now'`, 'Typing at the end stays inside the button');
+    await selectButton('start');
+    await call('Input.insertText', { text: 'Please ' });
+    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.article-button a').textContent==='Please Donate now'`, 'Typing at the start stays inside the button');
+    await selectButton('all');
+    await key('Backspace');
+    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.article-button a')?.textContent===''`, 'Deleting the whole label preserves the button');
+    await key('Backspace');
+    await key('Delete');
+    await check(`!!document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.article-button a')`, 'Deleting again in an empty button preserves it');
+    await evaluate(`document.querySelector('[data-nstarter-save]').click()`);
+    await check(`document.querySelector('[data-nstarter-status]').classList.contains('is-success')`, 'An empty button can be saved');
+    if (!state.saves.at(-1).includes('https://example.org/donate') || state.saves.at(-1).includes('contenteditable')) throw new Error('Saving an empty button lost its link or retained editor attributes');
+    checks++;
+    await selectButton('end');
+    await call('Input.insertText', { text: 'X' });
+    await key('Backspace');
+    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.article-button a')?.textContent===''`, 'Deleting the last character preserves the button');
+    await call('Input.insertText', { text: 'New label' });
+    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.article-button a').textContent==='New label'`, 'An empty button accepts a new label');
+    await evaluate(`document.querySelector('[data-nstarter-mode]').value='media';document.querySelector('[data-nstarter-mode]').dispatchEvent(new Event('change'))`);
+    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.article-button a').getAttribute('contenteditable')==='false'`, 'Button labels are locked outside text mode');
+    await evaluate(`document.querySelector('[data-nstarter-mode]').value='text';document.querySelector('[data-nstarter-mode]').dispatchEvent(new Event('change'));document.querySelector('[data-nstarter-save]').click()`);
+    await check(`document.querySelector('[data-nstarter-status]').classList.contains('is-success')`, 'Button changes save');
+    const savedButton = state.saves.at(-1);
+    if (!savedButton.includes('New label') || !savedButton.includes('https://example.org/donate') || savedButton.includes('contenteditable') || savedButton.includes('data-nstarter-editor-runtime')) throw new Error('Saved button lost content or retained editor attributes');
+    checks++;
+    await evaluate(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('[data-nstarter-inline-action="add-button"]').click()`);
+    await check(`Array.from(document.querySelector('[data-nstarter-frame]').contentDocument.querySelectorAll('[data-nstarter-content-item] a')).length===2 && Array.from(document.querySelector('[data-nstarter-frame]').contentDocument.querySelectorAll('[data-nstarter-content-item] a')).every(link=>link.getAttribute('contenteditable')==='true')`, 'New buttons also have isolated editable labels');
+    await call('Input.insertText', { text: ' today' });
+    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelectorAll('[data-nstarter-content-item] a')[1].textContent==='Donate today'`, 'New buttons focus their label and keep typing inside');
     if (errors.length) throw new Error(JSON.stringify(errors));
     console.log(`Passed ${checks} editor history browser checks.`);
 } finally {
