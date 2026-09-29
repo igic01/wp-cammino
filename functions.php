@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NSTARTER_VERSION', '1.10.19' );
+define( 'NSTARTER_VERSION', '1.10.20' );
 define( 'NSTARTER_PATH', get_stylesheet_directory() );
 define( 'NSTARTER_URL', get_stylesheet_directory_uri() );
 define( 'CAMMINO_DONATE_URL', 'https://cammino.darujme.sk/darujmeusmev/' );
@@ -499,7 +499,7 @@ function cammino_enqueue_design_assets( string $handle, string $style, string $s
 			$before_handle,
 			NSTARTER_URL . $before_style,
 			$style_dependencies,
-			NSTARTER_VERSION
+			NSTARTER_VERSION . '-' . filemtime( NSTARTER_PATH . $before_style )
 		);
 		$style_dependencies = array( $before_handle );
 	}

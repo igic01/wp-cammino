@@ -21,12 +21,14 @@ function cammino_is_single_product(): bool {
 	return function_exists( 'is_product' ) && is_product();
 }
 
+// WooCommerce and page builders can select their templates late in the request.
+// Choose the shared Cammino shell after those selectors have run.
 add_filter( 'template_include', static function ( string $template ): string {
 	if ( cammino_is_single_product() ) {
 		return NSTARTER_PATH . '/woocommerce/single-product.php';
 	}
 	return cammino_is_product_catalogue() ? NSTARTER_PATH . '/woocommerce/page-products.php' : $template;
-}, 100 );
+}, PHP_INT_MAX );
 
 add_action( 'woocommerce_before_shop_loop', static function (): void {
 	if ( cammino_is_product_catalogue() ) {

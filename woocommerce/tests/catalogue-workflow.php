@@ -58,7 +58,7 @@ $templates = $hooks['theme_page_templates'][30]( array( 'existing.php' => 'Exist
 expect( isset( $templates['woocommerce/page-products.php'] ) && 'Cammino — WooCommerce products' === $templates['woocommerce/page-products.php'], 'Catalogue is explicitly available in the template selector without file discovery.' );
 expect( 'Existing template' === $templates['existing.php'], 'Registration preserves other page templates.' );
 expect( cammino_is_product_catalogue(), 'Selected regular page uses catalogue.' );
-expect( $hooks['template_include'][100]( '/original.php' ) === NSTARTER_PATH . '/woocommerce/page-products.php', 'Selected template is routed after WooCommerce.' );
+expect( $hooks['template_include'][PHP_INT_MAX]( '/original.php' ) === NSTARTER_PATH . '/woocommerce/page-products.php', 'Selected template is routed after WooCommerce and page builders.' );
 expect( in_array( 'cammino-visual-page', $hooks['body_class'][10]( array() ), true ), 'Shared layout classes are set.' );
 $wp_styles = (object) array( 'queue' => array( 'astra-theme-css', 'parent-extra', 'woocommerce-general' ), 'registered' => array( 'parent-extra' => (object) array( 'src' => '/astra/extra.css' ) ) );
 $wp_scripts = (object) array( 'queue' => array( 'astra-theme-js', 'wc-add-to-cart' ), 'registered' => array() );
@@ -80,12 +80,19 @@ expect( in_array( 'woocommerce_no_products_found', $state['actions'], true ), 'E
 $state['shop'] = false; $state['page'] = true; $state['disabled'] = true;
 expect( str_contains( render_catalogue(), 'WooCommerce.' ), 'Inactive plugin shows an explanation without errors.' );
 $state['template'] = '';
-expect( ! cammino_is_product_catalogue() && '/original.php' === $hooks['template_include'][100]( '/original.php' ), 'Unassigned pages retain their original template.' );
+expect( ! cammino_is_product_catalogue() && '/original.php' === $hooks['template_include'][PHP_INT_MAX]( '/original.php' ), 'Unassigned pages retain their original template.' );
 $state['page'] = false;
 expect( ! cammino_is_product_catalogue(), 'Product details and other archives are unaffected.' );
 expect( $hooks['wc_get_template_part'][100]( '/original.php', 'content', 'product' ) === '/original.php', 'Other pages retain their original product cards.' );
 $state['single_product'] = true;
-expect( $hooks['template_include'][100]( '/original.php' ) === NSTARTER_PATH . '/woocommerce/single-product.php', 'Individual products use the shared site shell automatically.' );
+expect( $hooks['template_include'][PHP_INT_MAX]( '/original.php' ) === NSTARTER_PATH . '/woocommerce/single-product.php', 'Individual products use the shared site shell after other template selectors.' );
+$hooks['template_include'][999] = static fn( $template ) => '/astra/single-product.php';
+ksort( $hooks['template_include'] );
+$resolved_template = '/original.php';
+foreach ( $hooks['template_include'] as $selector ) {
+	$resolved_template = $selector( $resolved_template );
+}
+expect( $resolved_template === NSTARTER_PATH . '/woocommerce/single-product.php', 'A late parent or plugin selector cannot replace the Cammino product wrapper.' );
 expect( in_array( 'cammino-single-product', $hooks['body_class'][10]( array() ), true ), 'Individual products receive their own body class.' );
 $hooks['wp_enqueue_scripts'][1001]();
 expect( $state['assets'][1] === '/woocommerce/assets/single-product.css', 'Individual products load their own styles and shared design assets.' );
