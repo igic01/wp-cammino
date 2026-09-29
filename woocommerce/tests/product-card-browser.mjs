@@ -9,7 +9,8 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const php = process.env.PHP_BIN || 'C:/xampp/php/php.exe';
 const chromePath = process.env.BROWSER_BIN || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const fixture = spawnSync(php, [join(root, 'woocommerce/tests/product-card-workflow.php'), '--preview'], { encoding: 'utf8', windowsHide: true });
+const singleProduct = process.argv.includes('--single-product');
+const fixture = singleProduct ? { status: 0, stdout: readFileSync(join(root, 'woocommerce/tests/single-product-preview.html'), 'utf8') } : spawnSync(php, [join(root, 'woocommerce/tests/product-card-workflow.php'), '--preview'], { encoding: 'utf8', windowsHide: true });
 if (fixture.status !== 0) throw new Error(fixture.stderr);
 const server = createServer((req, res) => {
     const pathname = new URL(req.url, 'http://localhost').pathname;
@@ -54,7 +55,22 @@ try {
             const result = await call('Runtime.evaluate', { expression: 'document.readyState === "complete"', returnByValue: true });
             ready = result.result.value; if (!ready) await pause(100);
         }
-        const result = await call('Runtime.evaluate', { expression: `(async () => {
+        const expression = singleProduct ? `(async () => {
+            await document.fonts.ready;
+            const product = document.querySelector('.product');
+            const gallery = product.querySelector('.woocommerce-product-gallery').getBoundingClientRect();
+            const summary = product.querySelector('.summary').getBoundingClientRect();
+            const tabs = product.querySelector('.woocommerce-tabs').getBoundingClientRect();
+            return {
+                noOverflow: document.documentElement.scrollWidth <= innerWidth,
+                columns: getComputedStyle(product).gridTemplateColumns.split(' ').length,
+                cardsValid: (innerWidth > 850 ? summary.left >= gallery.right : summary.top >= gallery.bottom)
+                    && tabs.top >= Math.max(gallery.bottom, summary.bottom)
+                    && getComputedStyle(document.querySelector('.single-product-category')).display === 'none'
+                    && document.querySelector('.single_add_to_cart_button').getBoundingClientRect().height >= 48
+                    && getComputedStyle(document.querySelector('.zoomImg')).width === '901px'
+            };
+        })()` : `(async () => {
             await document.fonts.ready;
             const cards = [...document.querySelectorAll('.cammino-product-card')];
             return {
@@ -70,17 +86,18 @@ try {
                         && getComputedStyle(card.querySelector('img')).objectFit === 'contain';
                 })
             };
-        })()`, awaitPromise: true, returnByValue: true });
+        })()`;
+        const result = await call('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
         const layout = result.result.value;
         if (!layout.noOverflow || !layout.cardsValid || layout.columns !== (width > 850 ? 2 : 1)) throw new Error(`Layout failed at ${width}px: ${JSON.stringify(layout)}`);
         checks += 3;
         if (process.env.PREVIEW_DIR) {
             mkdirSync(process.env.PREVIEW_DIR, { recursive: true });
             const screenshot = await call('Page.captureScreenshot', { format: 'png' });
-            writeFileSync(join(process.env.PREVIEW_DIR, `products-${width}.png`), Buffer.from(screenshot.data, 'base64'));
+            writeFileSync(join(process.env.PREVIEW_DIR, `${singleProduct ? 'single-product' : 'products'}-${width}.png`), Buffer.from(screenshot.data, 'base64'));
         }
     }
-    console.log(`Passed ${checks} desktop/mobile product card browser checks.`);
+    console.log(`Passed ${checks} desktop/mobile ${singleProduct ? 'product detail' : 'product card'} browser checks.`);
 } finally {
     socket?.close(); chrome.kill();
     if (chrome.exitCode === null) await Promise.race([once(chrome, 'exit'), pause(5000)]);

@@ -10,8 +10,11 @@ function add_action( $name, $callback, $priority = 10 ) { add_filter( $name, $ca
 function remove_action( $name, $callback, $priority = 10 ) { global $hooks; if ( ( $hooks[$name][$priority] ?? null ) === $callback ) unset( $hooks[$name][$priority] ); }
 function is_page() { global $state; return $state['page']; }
 function is_shop() { global $state; return $state['shop']; }
+function is_product() { global $state; return ! empty( $state['single_product'] ); }
 function get_queried_object_id() { return 42; }
 function wc_get_page_id( $type ) { return 17; }
+function wc_get_page_permalink( $type ) { return '/shop/'; }
+function esc_url( $value ) { return esc_html( $value ); }
 function get_page_template_slug( $id ) { global $state; $state['template_id'] = $id; return $state['template']; }
 function trailingslashit( $value ) { return rtrim( $value, '/' ) . '/'; }
 function get_template_directory_uri() { return '/astra'; }
@@ -81,4 +84,13 @@ expect( ! cammino_is_product_catalogue() && '/original.php' === $hooks['template
 $state['page'] = false;
 expect( ! cammino_is_product_catalogue(), 'Product details and other archives are unaffected.' );
 expect( $hooks['wc_get_template_part'][100]( '/original.php', 'content', 'product' ) === '/original.php', 'Other pages retain their original product cards.' );
+$state['single_product'] = true;
+expect( $hooks['template_include'][100]( '/original.php' ) === NSTARTER_PATH . '/woocommerce/single-product.php', 'Individual products use the shared site shell automatically.' );
+expect( in_array( 'cammino-single-product', $hooks['body_class'][10]( array() ), true ), 'Individual products receive their own body class.' );
+$hooks['wp_enqueue_scripts'][1001]();
+expect( $state['assets'][1] === '/woocommerce/assets/single-product.css', 'Individual products load their own styles and shared design assets.' );
+expect( $hooks['wc_get_template_part'][100]( '/native-single.php', 'content', 'single-product' ) === '/native-single.php', 'Native WooCommerce product detail content is preserved.' );
+$state['products'] = 1;
+ob_start(); include NSTARTER_PATH . '/woocommerce/single-product.php'; $single_html = ob_get_clean();
+expect( str_contains( $single_html, '<header>Cammino</header>' ) && str_contains( $single_html, '<footer>Cammino</footer>' ) && str_contains( $single_html, 'Native product' ), 'Individual products render shared header, native product content, and shared footer.' );
 echo "Passed $checks catalogue workflow checks.\n";

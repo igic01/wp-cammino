@@ -17,7 +17,14 @@ function cammino_is_product_catalogue(): bool {
 		&& 'woocommerce/page-products.php' === get_page_template_slug( $page_id );
 }
 
+function cammino_is_single_product(): bool {
+	return function_exists( 'is_product' ) && is_product();
+}
+
 add_filter( 'template_include', static function ( string $template ): string {
+	if ( cammino_is_single_product() ) {
+		return NSTARTER_PATH . '/woocommerce/single-product.php';
+	}
 	return cammino_is_product_catalogue() ? NSTARTER_PATH . '/woocommerce/page-products.php' : $template;
 }, 100 );
 
@@ -29,15 +36,15 @@ add_action( 'woocommerce_before_shop_loop', static function (): void {
 }, 1 );
 
 add_filter( 'body_class', static function ( array $classes ): array {
-	if ( cammino_is_product_catalogue() ) {
+	if ( cammino_is_product_catalogue() || cammino_is_single_product() ) {
 		$classes[] = 'cammino-visual-page';
-		$classes[] = 'cammino-product-catalogue';
+		$classes[] = cammino_is_single_product() ? 'cammino-single-product' : 'cammino-product-catalogue';
 	}
 	return $classes;
 } );
 
 add_action( 'wp_enqueue_scripts', static function (): void {
-	if ( ! cammino_is_product_catalogue() ) {
+	if ( ! cammino_is_product_catalogue() && ! cammino_is_single_product() ) {
 		return;
 	}
 	// Use the same standalone document and shared shell as the donate page.
@@ -56,13 +63,17 @@ add_action( 'wp_enqueue_scripts', static function (): void {
 		}
 	}
 	wp_dequeue_style( 'cammino-child' );
-	cammino_enqueue_design_assets( 'cammino-products', '/woocommerce/assets/products.css', '' );
+	if ( cammino_is_single_product() ) {
+		cammino_enqueue_design_assets( 'cammino-single-product', '/woocommerce/assets/single-product.css', '', array( 'cammino-product-cards' => '/woocommerce/assets/products.css' ) );
+	} else {
+		cammino_enqueue_design_assets( 'cammino-products', '/woocommerce/assets/products.css', '' );
+	}
 }, 1001 );
 
 // Both the Shop loop and product shortcode use this template-part filter.
 // Keep Astra's product markup on other pages; render our own catalogue cards.
 add_filter( 'wc_get_template_part', static function ( string $template, string $slug, string $name ): string {
-	if ( 'content' === $slug && 'product' === $name && cammino_is_product_catalogue() ) {
+	if ( 'content' === $slug && 'product' === $name && ( cammino_is_product_catalogue() || cammino_is_single_product() ) ) {
 		return NSTARTER_PATH . '/woocommerce/parts/product-card.php';
 	}
 	return $template;

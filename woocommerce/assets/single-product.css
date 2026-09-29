@@ -1,0 +1,80 @@
+/* Product details: sage gallery, cream purchase panel, and plum/coral accents. */
+.cammino-product-back { display: inline-flex; align-items: center; gap: .7rem; min-height: 44px; margin-bottom: 1.5rem; color: var(--color-plum); font-size: .9rem; }
+.cammino-product-back span { font-size: 1.35rem; }
+.cammino-product-back:hover { color: var(--color-coral-dark); }
+.cammino-product-detail .woocommerce > div.product { position: relative; display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,.95fr); align-items: start; gap: clamp(1.5rem,4vw,3.5rem); padding: 0; margin: 0; }
+.cammino-product-detail .woocommerce > div.product::before,
+.cammino-product-detail .woocommerce > div.product::after { display: none; }
+.cammino-product-detail .woocommerce div.product div.woocommerce-product-gallery { float: none; width: 100%; min-width: 0; margin: 0; padding: clamp(1rem,3vw,2rem); overflow: hidden; border: 1px solid var(--color-border); border-radius: 2rem; background: #e6ecdf; }
+.cammino-product-detail .woocommerce-product-gallery__wrapper { margin: 0; }
+.cammino-product-detail .woocommerce-product-gallery__image > a { display: block; }
+.cammino-product-detail .woocommerce-product-gallery__image > a > img { display: block; width: 100%; height: auto; max-height: 560px; object-fit: contain; border-radius: 1rem; }
+.cammino-product-detail .woocommerce div.product .woocommerce-product-gallery .woocommerce-product-gallery__trigger { top: .9rem; right: .9rem; width: 44px; height: 44px; border-radius: 50%; background: var(--color-white); box-shadow: 0 4px 16px rgb(80 45 54 / 10%); }
+.cammino-product-detail .woocommerce div.product .flex-control-thumbs { display: flex; flex-wrap: wrap; gap: .65rem; padding-top: 1rem; }
+.cammino-product-detail .woocommerce div.product .flex-control-thumbs li { float: none; width: calc(25% - .5rem); overflow: hidden; border-radius: .65rem; }
+.cammino-product-detail .woocommerce div.product div.summary { float: none; width: 100%; min-width: 0; margin: 0; padding: clamp(1.5rem,3.5vw,2.75rem); border: 1px solid var(--color-border); border-radius: 2rem; background: var(--color-white); box-shadow: 0 16px 40px rgb(80 45 54 / 6%); }
+.cammino-product-detail .summary .woocommerce-breadcrumb,
+.cammino-product-detail .summary .single-product-category,
+.cammino-product-detail .product_meta .posted_in { display: none; }
+.cammino-product-detail .product_title { margin: 0 0 1.25rem; color: var(--color-plum); font-size: clamp(2.5rem,4.5vw,4rem); line-height: 1.05; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.cammino-product-detail .woocommerce div.product p.price,
+.cammino-product-detail .woocommerce div.product span.price { margin: 0 0 1.4rem; color: var(--color-plum); font-family: var(--font-display); font-size: 1.9rem; line-height: 1.3; }
+.cammino-product-detail .woocommerce div.product p.price:empty { display: none; }
+.cammino-product-detail .price del { color: #807371; font-size: 1rem; }
+.cammino-product-detail .price ins { background: none; text-decoration: none; }
+.cammino-product-detail .woocommerce-product-details__short-description { color: #685f5b; font-size: 1.02rem; line-height: 1.8; overflow-wrap: anywhere; }
+.cammino-product-detail .woocommerce-product-details__short-description p:last-child { margin-bottom: 0; }
+.cammino-product-detail .woocommerce div.product form.cart { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin: 1.75rem 0 0; padding-top: 1.5rem; border-top: 1px solid var(--color-border); }
+.cammino-product-detail .woocommerce div.product form.cart div.quantity { float: none; margin: 0; }
+.cammino-product-detail .quantity input.qty { width: 5rem; min-height: 52px; padding: .7rem; border: 1px solid var(--color-border); border-radius: 1rem; color: var(--color-plum); background: var(--color-cream); text-align: center; }
+.cammino-product-detail .woocommerce button.button.alt,
+.cammino-product-detail .woocommerce a.button.alt { float: none; min-height: 52px; max-width: 100%; padding: 1rem 1.65rem; color: var(--color-white); background: var(--color-coral); border: 0; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: .95rem; line-height: 1.4; white-space: normal; box-shadow: 0 6px 18px rgb(217 111 93 / 16%); }
+.cammino-product-detail .woocommerce button.button.alt:hover,
+.cammino-product-detail .woocommerce a.button.alt:hover { background: var(--color-coral-dark); }
+.cammino-product-detail .woocommerce button.button.alt.disabled { opacity: .55; }
+.cammino-product-detail .woocommerce div.product form.cart .variations,
+.cammino-product-detail .woocommerce div.product form.cart .single_variation_wrap { width: 100%; min-width: 0; }
+.cammino-product-detail .woocommerce div.product form.cart .variations th { text-align: left; padding-bottom: .75rem; color: var(--color-plum); }
+.cammino-product-detail .woocommerce div.product form.cart .variations select { width: 100%; min-height: 48px; padding: .65rem .9rem; border: 1px solid var(--color-border); border-radius: .8rem; background: var(--color-cream); color: var(--color-plum); font: inherit; }
+.cammino-product-detail .woocommerce-variation-add-to-cart { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+.cammino-product-detail .product_meta { margin-top: 1.5rem; color: #807371; font-size: .8rem; }
+.cammino-product-detail .product_meta > span { display: block; }
+.cammino-product-detail .product_meta:has(> .posted_in:only-child) { display: none; }
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs { grid-column: 1 / -1; min-width: 0; margin-top: .5rem; }
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs ul.tabs { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0 0 1.5rem; padding: 0; overflow: visible; list-style: none; }
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs ul.tabs::before,
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs ul.tabs li::before,
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs ul.tabs li::after { display: none; }
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs ul.tabs li { margin: 0; padding: 0; border: 0; border-radius: var(--radius-pill); background: var(--color-cream-deep); box-shadow: none; }
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs ul.tabs li a { display: block; min-height: 48px; padding: .85rem 1.5rem; color: var(--color-plum); font-size: .9rem; font-weight: 500; }
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs ul.tabs li.active { background: var(--color-plum); }
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs ul.tabs li.active a { color: var(--color-white); }
+.cammino-product-detail .woocommerce div.product .woocommerce-tabs .panel { margin: 0; padding: clamp(1.5rem,4vw,3rem); border: 1px solid var(--color-border); border-radius: 2rem; background: var(--color-white); color: #685f5b; font-size: 1rem; line-height: 1.85; overflow-wrap: anywhere; }
+.cammino-product-detail .woocommerce-tabs .panel > p { max-width: 75ch; }
+.cammino-product-detail .woocommerce-tabs .panel > :last-child { margin-bottom: 0; }
+.cammino-product-detail .woocommerce-tabs h2,
+.cammino-product-detail .related > h2,
+.cammino-product-detail .up-sells > h2 { margin: 0 0 1.4rem; color: var(--color-plum); font-size: clamp(1.8rem,3vw,2.6rem); line-height: 1.15; }
+.cammino-product-detail .woocommerce div.product > .related,
+.cammino-product-detail .woocommerce div.product > .up-sells { grid-column: 1 / -1; min-width: 0; margin-top: 1.5rem; }
+.cammino-product-detail .woocommerce div.product > .onsale { z-index: 2; top: 1rem; left: 1rem; padding: .5rem 1rem; min-height: 0; border-radius: var(--radius-pill); background: var(--color-plum); color: var(--color-white); line-height: 1.5; }
+.cammino-product-detail .woocommerce .stock { margin: 1rem 0; color: var(--color-plum); font-size: .9rem; }
+.cammino-product-detail .woocommerce .woocommerce-message,
+.cammino-product-detail .woocommerce .woocommerce-info,
+.cammino-product-detail .woocommerce .woocommerce-error { border-top-color: var(--color-coral); border-radius: 1rem; background: var(--color-white); color: var(--color-plum); }
+.cammino-product-detail .woocommerce table.shop_attributes { border-color: var(--color-border); }
+.cammino-product-detail .woocommerce table.shop_attributes th,
+.cammino-product-detail .woocommerce table.shop_attributes td { padding: .8rem; border-color: var(--color-border); background: transparent; font-style: normal; }
+.cammino-product-detail #review_form input:not([type="checkbox"]):not([type="submit"]),
+.cammino-product-detail #review_form textarea { max-width: 100%; padding: .85rem 1rem; border: 1px solid var(--color-border); border-radius: .8rem; background: var(--color-cream); color: var(--color-plum); font: inherit; }
+.cammino-product-detail #review_form textarea { width: 100%; min-height: 140px; }
+.cammino-product-detail :focus-visible { outline: 3px solid var(--color-plum); outline-offset: 4px; }
+@media (max-width: 850px) {
+  .cammino-product-detail .woocommerce > div.product { grid-template-columns: minmax(0,1fr); }
+  .cammino-product-detail .woocommerce-product-gallery__image > a > img { max-height: 460px; }
+}
+@media (max-width: 480px) {
+  .cammino-product-detail .woocommerce div.product div.summary { padding: 1.5rem; }
+  .cammino-product-detail .woocommerce button.button.alt { flex: 1; }
+  .cammino-product-detail .woocommerce div.product .woocommerce-tabs ul.tabs li a { padding-inline: 1.1rem; }
+}
