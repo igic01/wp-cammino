@@ -1,0 +1,14 @@
+.cammino-tipsters { min-height: 70vh; padding: calc(clamp(5.75rem, 8vw, 6.75rem) + var(--page-start-space)) 0 var(--section-space); }
+.cammino-tipsters__heading { max-width: 720px; margin-bottom: 2rem; }
+.cammino-tipsters__heading h1 { margin: .25rem 0 .75rem; color: var(--color-plum); font-size: clamp(2.4rem, 5vw, 3.75rem); }
+.cammino-tipsters__card h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+.cammino-tipsters__eyebrow { color: var(--color-plum); font-weight: 600; }
+.cammino-tipsters__card { padding: clamp(1.5rem, 4vw, 2.5rem); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-white); box-shadow: var(--shadow-soft); }
+.cammino-tipsters__login { max-width: 520px; }
+.cammino-tipsters form label { display: block; margin-bottom: .5rem; font-weight: 600; }
+.cammino-tipsters input:not([type="hidden"]) { display: block; width: 100%; min-height: 48px; margin-bottom: 1.25rem; padding: .75rem 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: #fff; color: var(--color-charcoal); font: inherit; }
+.cammino-tipsters input:focus-visible, .cammino-tipsters button:focus-visible { outline: 3px solid var(--color-plum); outline-offset: 3px; }
+.cammino-tipsters__login button { width: 100%; }
+.cammino-tipsters__help { margin: 1.5rem 0 0; font-size: .9rem; }
+.cammino-tipsters__error { padding: 1rem; border-left: 4px solid #a32929; border-radius: 8px; background: #fff0ed; color: #8a2222; }
+.cammino-tipsters__logout { margin-top: 1.5rem; }

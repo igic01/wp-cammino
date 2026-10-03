@@ -40,6 +40,9 @@ function cammino_use_site_shell( string $template ): string {
 	if ( is_feed() || is_embed() || is_admin() ) {
 		return $template;
 	}
+	if ( function_exists( 'cammino_tipsters_route' ) && cammino_tipsters_route() ) {
+		return NSTARTER_PATH . '/tipsters/templates/portal.php';
+	}
 	if ( cammino_is_single_product() ) {
 		return NSTARTER_PATH . '/woocommerce/single-product.php';
 	}

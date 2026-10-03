@@ -23,6 +23,7 @@ require_once NSTARTER_PATH . '/inc/posts.php';
 require_once NSTARTER_PATH . '/inc/editor.php';
 require_once NSTARTER_PATH . '/woocommerce/bootstrap.php';
 require_once NSTARTER_PATH . '/inc/site-shell.php';
+require_once NSTARTER_PATH . '/tipsters/bootstrap.php';
 
 add_action( 'init', 'cammino_register_live_sections' );
 add_action( 'after_setup_theme', 'cammino_register_navigation' );
@@ -207,11 +208,13 @@ function cammino_render_site_header(): void {
 
 			<nav class="site-nav" id="site-nav" aria-label="<?php esc_attr_e( 'Hlavná navigácia', 'cammino' ); ?>" data-nav>
 				<?php cammino_render_shared_menu(); ?>
+				<?php if ( ! function_exists( 'cammino_tipsters_route' ) || ! cammino_tipsters_route() ) : ?>
 				<div class="language-switcher notranslate" role="group" aria-label="<?php esc_attr_e( 'Jazyk stránky', 'cammino' ); ?>" data-language-switcher data-site-url="<?php echo esc_url( home_url( '/' ) ); ?>" data-original-url="<?php echo esc_url( $sk_url ); ?>" data-english-url="<?php echo esc_url( $en_url ); ?>" translate="no">
 					<a class="language-switcher__link" href="<?php echo esc_url( $sk_url ); ?>" data-language="sk" aria-label="<?php esc_attr_e( 'Slovenčina', 'cammino' ); ?>">SK</a>
 					<span class="language-switcher__separator" aria-hidden="true">/</span>
 					<a class="language-switcher__link" href="<?php echo esc_url( $en_url ); ?>" data-language="en" aria-label="<?php esc_attr_e( 'English', 'cammino' ); ?>">EN</a>
 				</div>
+				<?php endif; // Private account pages must not use the external translation proxy. ?>
 				<a class="nav-donate" href="<?php echo esc_url( CAMMINO_DONATE_URL ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Darovať', 'cammino' ); ?> <i class="fa-solid fa-heart" aria-hidden="true"></i></a>
 			</nav>
 		</div>
