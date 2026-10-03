@@ -3,8 +3,8 @@
 defined( 'ABSPATH' ) || exit;
 
 function cammino_tipsters_validate_password( string $password ) {
-	if ( strlen( $password ) < 12 || strlen( $password ) > 4096 || trim( $password ) !== $password ) {
-		return new WP_Error( 'invalid_password', __( 'Heslo musí mať 12 až 4096 znakov a nesmie začínať ani končiť medzerou.', 'cammino' ) );
+	if ( mb_strlen( $password, 'UTF-8' ) < 8 || strlen( $password ) > 4096 || trim( $password ) !== $password ) {
+		return new WP_Error( 'invalid_password', __( 'Heslo musí mať aspoň 8 znakov, najviac 4096 bajtov a nesmie začínať ani končiť medzerou.', 'cammino' ) );
 	}
 	return true;
 }

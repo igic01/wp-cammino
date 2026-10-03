@@ -16,6 +16,7 @@ separately at each review checkpoint.
 - Administrators create accounts with a unique username and an admin-set
   password. Only administrators can change tipster passwords. Tipsters cannot
   register themselves, change their password, or use password recovery/reset.
+  The minimum password length is 8 characters for creation and admin changes.
 - Disabling an account blocks access and preserves all its records. Permanently
   deleting an account deletes its tips, files, conversations, and related logs,
   including tips previously marked deleted by tipster.
@@ -219,7 +220,7 @@ account-level purge.
   including their existing password-recovery flows.
 
 Local verification: PHP 8.0.30, isolated WordPress 6.4.7 with temporary SQLite
-storage, 82 real WordPress account/workflow checks and 30 HTTP form/session
+storage, 85 real WordPress account/workflow checks and 30 HTTP form/session
 checks passed. Existing site-shell, post, WooCommerce catalogue, and page-spacing
 checks passed. Desktop and an emulated 390px mobile viewport were inspected;
 mobile content fits the viewport and starts below the shared header. Native

@@ -67,6 +67,9 @@ try {
 	}
 	expect_tipsters( is_wp_error( cammino_tipsters_create_account( 'invalid<username>', 'Valid-Password-123' ) ), 'Malformed username rejected.' );
 	expect_tipsters( is_wp_error( cammino_tipsters_create_account( $prefix, 'short' ) ), 'Short password rejected.' );
+	expect_tipsters( is_wp_error( cammino_tipsters_validate_password( 'Abcd12!' ) ), 'Seven-character password rejected.' );
+	expect_tipsters( true === cammino_tipsters_validate_password( 'Abcd123!' ), 'Eight-character password accepted.' );
+	expect_tipsters( is_wp_error( cammino_tipsters_validate_password( 'éééé' ) ), 'Multibyte passwords cannot bypass the eight-character minimum.' );
 	expect_tipsters( is_wp_error( cammino_tipsters_validate_password( ' Password-123456' ) ), 'Whitespace passwords are rejected instead of changed silently.' );
 	$id = cammino_tipsters_create_account( $prefix, 'Valid-Password-123' );
 	expect_tipsters( is_int( $id ) && $id > 0, 'Create account without email.' );
@@ -194,10 +197,10 @@ try {
 	do_action( 'woocommerce_save_account_details_errors', $errors, get_userdata( $subscriber ) );
 	expect_tipsters( ! $errors->has_errors(), 'Unrelated WooCommerce profile editing unaffected.' );
 	wp_set_current_user( $admin->ID );
-	$login_id = cammino_tipsters_create_account( $prefix . '_login', 'Login-Password-123' );
+	$login_id = cammino_tipsters_create_account( $prefix . '_login', 'Abcd123!' );
 	$users[] = $login_id;
 	wp_set_current_user( 0 );
-	$_POST = array( 'username' => $prefix . '_login', 'password' => 'Login-Password-123', '_wpnonce' => wp_create_nonce( 'cammino_tipster_login' ), 'cammino_login_token' => str_repeat( 'a', 64 ) );
+	$_POST = array( 'username' => $prefix . '_login', 'password' => 'Abcd123!', '_wpnonce' => wp_create_nonce( 'cammino_tipster_login' ), 'cammino_login_token' => str_repeat( 'a', 64 ) );
 	$_COOKIE[ 'cammino_tipsters_login_' . COOKIEHASH ] = str_repeat( 'b', 64 );
 	expect_tipsters( is_wp_error( cammino_tipsters_handle_login() ), 'Cross-browser login-CSRF token rejected.' );
 	$_COOKIE[ 'cammino_tipsters_login_' . COOKIEHASH ] = str_repeat( 'a', 64 );
@@ -210,7 +213,7 @@ try {
 	for ( $attempt = 0; $attempt < 8; ++$attempt ) {
 		cammino_tipsters_login_failed( $prefix . '_login' );
 	}
-	expect_tipsters( cammino_tipsters_login_limited( $prefix . '_login' ) && is_wp_error( wp_authenticate( $prefix . '_login', 'Login-Password-123' ) ), 'Native login cannot bypass portal tipster rate limit.' );
+	expect_tipsters( cammino_tipsters_login_limited( $prefix . '_login' ) && is_wp_error( wp_authenticate( $prefix . '_login', 'Abcd123!' ) ), 'Native login cannot bypass portal tipster rate limit.' );
 	expect_tipsters( wp_authenticate( $prefix . '_subscriber', 'Subscriber-Password-123' ) instanceof WP_User, 'Tipster throttling does not block unrelated native account authentication.' );
 	$GLOBALS['wp_query']->set( 'cammino_tipsters', 'dashboard' );
 	expect_tipsters( cammino_use_site_shell( '/other-template.php' ) === NSTARTER_PATH . '/tipsters/templates/portal.php', 'Final theme router uses live portal template.' );

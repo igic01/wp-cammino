@@ -35,7 +35,7 @@ Private screens omit the shared external translation proxy controls.
   Email is not required. An optional display name defaults to the username.
 - Usernames are fixed after creation, consistent with the account edit screen.
   Administrators can change display names and passwords.
-- Passwords require at least 12 characters and cannot have leading/trailing
+- Passwords require at least 8 characters and cannot have leading/trailing
   spaces. They are hashed by WordPress, never displayed after saving, and never
   included in feature notices, logs, or URLs. Deliver the credentials to the
   tipster yourself; account creation sends no notification email.
@@ -129,8 +129,12 @@ A cache serving before WordPress boots cannot be controlled by theme PHP alone.
 
 Login forms use a browser-specific CSRF cookie plus a WordPress nonce. Account
 actions and logout require nonces. A failed-login limit covers frontend and
-native tipster authentication: 8 failures per username/IP or 30 failures per IP
-over a 15-minute transient window. Keys are hashed; passwords are not logged.
+native tipster authentication: 8 failures per username/IP or 30 failures per IP.
+Counters expire after 15 minutes without another failed attempt; further failed
+attempts extend that cooldown. Keys are hashed; passwords are not logged. Login
+uses WordPress's `wp_signon()` password and session handling; these attempt limits
+are added by the tipster module. They cover tipsters, not ordinary administrator
+logins. IP-based limits do not prevent attackers from rotating IP addresses.
 Existing site-level security plugins may apply stricter limits. Proxy deployments
 should configure the web server's trusted client IP handling; the feature does
 not trust arbitrary forwarded-IP headers.
@@ -151,7 +155,7 @@ suite cleans up its own fixtures and does not require a particular admin passwor
 
 Stage 1 was checked with PHP 8.0.30 and an isolated WordPress 6.4.7 installation
 using a temporary SQLite database. The database adapter is test infrastructure;
-it is not a theme dependency. Verification included 82 account/workflow checks,
+it is not a theme dependency. Verification included 85 account/workflow checks,
 30 HTTP form/session checks, and the existing site-shell, post, and WooCommerce
 catalogue workflows. The separate admin area was also verified with 14 HTTP
 navigation checks covering list/search separation, submenus, role selectors, and
