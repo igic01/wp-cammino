@@ -5,11 +5,18 @@ defined( 'ABSPATH' ) || exit;
 add_action( 'admin_menu', static function (): void {
 	if ( cammino_tipsters_can_manage() ) {
 		add_menu_page( __( 'Tipsteri', 'cammino' ), __( 'Tipsteri', 'cammino' ), CAMMINO_TIPSTERS_CAP, 'cammino-tipsters', 'cammino_tipsters_admin_page', 'dashicons-groups', 58 );
+		add_submenu_page( 'cammino-tipsters', __( 'Tipsteri', 'cammino' ), __( 'Všetci tipsteri', 'cammino' ), CAMMINO_TIPSTERS_CAP, 'cammino-tipsters', 'cammino_tipsters_admin_page' );
+		add_submenu_page( 'cammino-tipsters', __( 'Pridať tipstera', 'cammino' ), __( 'Pridať tipstera', 'cammino' ), CAMMINO_TIPSTERS_CAP, 'cammino-tipsters-new', 'cammino_tipsters_admin_page' );
 	}
 } );
 
 function cammino_tipsters_admin_url( array $args = array() ): string {
-	return add_query_arg( array_merge( array( 'page' => 'cammino-tipsters' ), $args ), admin_url( 'admin.php' ) );
+	$page = 'cammino-tipsters';
+	if ( isset( $args['view'] ) && 'create' === $args['view'] ) {
+		$page = 'cammino-tipsters-new';
+		unset( $args['view'] );
+	}
+	return add_query_arg( array_merge( array( 'page' => $page ), $args ), admin_url( 'admin.php' ) );
 }
 
 function cammino_tipsters_admin_form_start( string $operation, int $id = 0 ): void {
@@ -80,6 +87,9 @@ function cammino_tipsters_admin_page(): void {
 	$notice = get_transient( 'cammino_tipster_notice_' . get_current_user_id() );
 	delete_transient( 'cammino_tipster_notice_' . get_current_user_id() );
 	$view = isset( $_GET['view'] ) && is_string( $_GET['view'] ) ? sanitize_key( wp_unslash( $_GET['view'] ) ) : '';
+	if ( isset( $_GET['page'] ) && 'cammino-tipsters-new' === $_GET['page'] ) {
+		$view = 'create';
+	}
 	$id = isset( $_GET['account_id'] ) && is_scalar( $_GET['account_id'] ) ? absint( $_GET['account_id'] ) : 0;
 	?>
 	<div class="wrap">
@@ -110,7 +120,7 @@ function cammino_tipsters_admin_page(): void {
 function cammino_tipsters_admin_list(): void {
 	$search = isset( $_GET['s'] ) && is_string( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 	$page = isset( $_GET['paged'] ) && is_scalar( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
-	$args = array( 'role' => CAMMINO_TIPSTER_ROLE, 'number' => 20, 'paged' => $page, 'orderby' => 'registered', 'order' => 'DESC' );
+	$args = array( 'role' => CAMMINO_TIPSTER_ROLE, 'role__not_in' => cammino_tipsters_other_roles(), 'number' => 20, 'paged' => $page, 'orderby' => 'registered', 'order' => 'DESC' );
 	if ( '' !== $search ) {
 		$args['search'] = '*' . $search . '*';
 		$args['search_columns'] = array( 'user_login', 'display_name' );

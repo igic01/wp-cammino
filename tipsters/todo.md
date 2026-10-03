@@ -189,6 +189,11 @@ account-level purge.
   edit/password-change, disable/re-enable, and permanent delete actions.
   Validate unique username and password requirements, and protect role
   assignments so these screens cannot modify unrelated administrators/users.
+- [x] Keep account management in the separate **Tipsteri** admin area, with
+  list/create subpages and dedicated account details/actions. Exclude tipsters
+  from the general Users list/search, counts, and role selectors. Route native
+  tipster edit/delete links into this area. Preserve the existing account forms
+  and leave unrelated/mixed-role users manageable through the normal screens.
 - [x] Implement disabling/re-enabling independently of deletion. Revoke sessions
   when disabling and block login, reads, writes, messages, and downloads for
   disabled accounts, including requests using existing cookies.
@@ -214,13 +219,16 @@ account-level purge.
   including their existing password-recovery flows.
 
 Local verification: PHP 8.0.30, isolated WordPress 6.4.7 with temporary SQLite
-storage, 69 real WordPress account/workflow checks and 30 HTTP form/session
+storage, 82 real WordPress account/workflow checks and 30 HTTP form/session
 checks passed. Existing site-shell, post, WooCommerce catalogue, and page-spacing
 checks passed. Desktop and an emulated 390px mobile viewport were inspected;
 mobile content fits the viewport and starts below the shared header. Native
 reset/profile/REST paths and the WooCommerce account-update guard were checked;
 the complete WooCommerce plugin flow and host cache/proxy configuration still
 need review on your installation.
+The dedicated admin navigation also passed 14 HTTP checks for menus, account
+creation/details, Users list/search isolation, role selectors, and old native
+tipster edit/delete URLs.
 
 Review instructions: [tipsters/README.md](README.md#stage-1-review-checklist).
 Admin menu label: **Tipsteri**. Frontend routes: `/tipsters/login/` and

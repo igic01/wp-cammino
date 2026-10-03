@@ -6,14 +6,20 @@ status screens, and conversations will be implemented after this checkpoint.
 
 ## Open the screens
 
-With the updated Cammino theme active, administrators have a **Tipsteri** menu in
-wp-admin. Roles and route rules initialize automatically on the first request,
+With the updated Cammino theme active, administrators have a separate **Tipsteri**
+menu in wp-admin, with **Všetci tipsteri** and **Pridať tipstera** pages. Account
+details, password changes, disabling, and deletion stay in that area. Tipsters
+are excluded from the general Users list/search and its role selectors; its
+counts and pagination reflect the remaining users. Existing tipster edit/delete
+links redirect to the dedicated screens. The account form layout is unchanged.
+Roles and route rules initialize automatically on the first request,
 including updates to an already-active theme. No WordPress pages need to be
 created, and these account screens do not use the visual snapshot editor.
 
 - Frontend login: `/tipsters/login/`
 - Private dashboard: `/tipsters/`
 - Admin accounts: `/wp-admin/admin.php?page=cammino-tipsters`
+- Create account: `/wp-admin/admin.php?page=cammino-tipsters-new`
 
 On installations with plain permalinks, use `/?cammino_tipsters=login` and
 `/?cammino_tipsters=dashboard`. The admin list links to the correct login URL.
@@ -47,12 +53,16 @@ Private screens omit the shared external translation proxy controls.
   username, a confirmation checkbox, and a valid nonce. It removes the account's
   tips (including `deleted_by_tipster`), all messages on those tips including
   admin replies, attached private files, and associated post/user metadata.
-  Native **Users -> Delete** also invokes private-record cleanup.
+  Native tipster deletion links redirect to this confirmation screen. The
+  WordPress account-deletion hook still ensures private-record cleanup for
+  supported programmatic deletion.
 - If cleanup fails, the account stays blocked with **Mazanie nedokončené** and
   can be deleted again after correcting the reported issue. It cannot be
   re-enabled while cleanup is incomplete. Other users' records are preserved.
 - Feature account actions reject administrators and accounts carrying additional
-  roles. This version supports full account deletion on single-site WordPress;
+  roles. Mixed-role accounts remain visible in the general Users screen so their
+  other roles can be managed; they are excluded from the dedicated tipster list.
+  This version supports full account deletion on single-site WordPress;
   multisite account deletion needs a separate network-aware policy.
 
 Native account restrictions run while the Cammino theme/module is active.
@@ -67,6 +77,9 @@ session deliberately receives 403 on the tipster-only pages.
 
 1. Open **Tipsteri**, create a username/password account, and find it through
    search. Confirm its display name defaults to the username if left blank.
+   Check that it appears in **Tipsteri -> Všetci tipsteri** and is absent from the
+   general **Users** list/search. Native user creation must not offer the Tipster
+   role; use **Tipsteri -> Pridať tipstera** for those accounts.
 2. In a separate session, open the login URL and sign in. Check the welcome
    message and empty **Moje tipy** section, then sign out and back in.
 3. As tipster, open `/wp-admin/` and `/wp-admin/profile.php`. Both should redirect
@@ -138,9 +151,11 @@ suite cleans up its own fixtures and does not require a particular admin passwor
 
 Stage 1 was checked with PHP 8.0.30 and an isolated WordPress 6.4.7 installation
 using a temporary SQLite database. The database adapter is test infrastructure;
-it is not a theme dependency. Verification included 69 account/workflow checks,
+it is not a theme dependency. Verification included 82 account/workflow checks,
 30 HTTP form/session checks, and the existing site-shell, post, and WooCommerce
-catalogue workflows. Desktop and mobile layouts were also inspected.
+catalogue workflows. The separate admin area was also verified with 14 HTTP
+navigation checks covering list/search separation, submenus, role selectors, and
+native edit/delete redirects. Desktop and mobile layouts were also inspected.
 
 Production cache/proxy/plugin behavior and your own installation remain part of
 the user review checkpoint. No production deployment was performed.

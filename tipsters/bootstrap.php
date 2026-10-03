@@ -14,6 +14,7 @@ const CAMMINO_MESSAGE_TIP_META = '_cammino_tip_id';
 require_once __DIR__ . '/permissions.php';
 require_once __DIR__ . '/accounts.php';
 require_once __DIR__ . '/admin.php';
+require_once __DIR__ . '/admin-navigation.php';
 require_once __DIR__ . '/frontend.php';
 
 add_action( 'init', 'cammino_tipsters_initialize', 5 );
