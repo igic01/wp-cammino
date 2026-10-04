@@ -13,26 +13,23 @@ $value = static function ( string $field ) use ( $editing, $edit_record ): strin
 <?php endif; ?>
 <section class="cammino-tipsters__card" aria-labelledby="tipster-form-title">
 	<h2 id="tipster-form-title"><?php echo esc_html( $editing ? __( 'Upraviť tip', 'cammino' ) : __( 'Odoslať nový tip', 'cammino' ) ); ?></h2>
-	<p><?php echo esc_html( $editing ? __( 'V diskusii môžete zmeniť texty a prílohy. Uložením zostane tip v diskusii.', 'cammino' ) : __( 'Vyplňte všetky textové polia. Po odoslaní bude tip uzamknutý, kým ho administrátor neotvorí na diskusiu.', 'cammino' ) ); ?></p>
-	<?php if ( is_wp_error( cammino_tipsters_storage_root() ) ) : ?>
-		<p class="cammino-tipsters__notice"><?php esc_html_e( 'Prílohy momentálne nie sú dostupné. Tip môžete odoslať bez súborov alebo kontaktovať administrátora.', 'cammino' ); ?></p>
-	<?php endif; ?>
+	<p><?php echo esc_html( $editing ? __( 'V diskusii môžete zmeniť texty a odkaz na súbory. Uložením zostane tip v diskusii.', 'cammino' ) : __( 'Vyplňte všetky textové polia. Po odoslaní bude tip uzamknutý, kým ho administrátor neotvorí na diskusiu.', 'cammino' ) ); ?></p>
 	<?php if ( $errors->has_errors() ) : ?>
 		<div class="cammino-tipsters__error" role="alert">
-			<p><?php echo esc_html( $editing ? __( 'Zmeny neboli uložené. Skontrolujte formulár. Nové prílohy je potrebné vybrať znova.', 'cammino' ) : __( 'Tip nebol odoslaný. Skontrolujte označené polia. Prílohy je potrebné vybrať znova.', 'cammino' ) ); ?></p>
+			<p><?php echo esc_html( $editing ? __( 'Zmeny neboli uložené. Skontrolujte formulár.', 'cammino' ) : __( 'Tip nebol odoslaný. Skontrolujte označené polia.', 'cammino' ) ); ?></p>
 			<?php foreach ( $errors->get_error_codes() as $code ) : ?>
-				<?php if ( ! in_array( $code, array( 'title', 'short_description', 'long_description' ), true ) ) : ?>
+				<?php if ( ! in_array( $code, array( 'title', 'short_description', 'long_description', 'file_link' ), true ) ) : ?>
 					<p><?php echo esc_html( $errors->get_error_message( $code ) ); ?></p>
 				<?php endif; ?>
 			<?php endforeach; ?>
 			<?php if ( $editing ) : ?><p><a href="<?php echo esc_url( cammino_tipsters_url( 'tip', $GLOBALS['cammino_tipsters_current_tip']->ID ) ); ?>"><?php esc_html_e( 'Obnoviť aktuálny tip', 'cammino' ); ?></a></p><?php endif; ?>
 		</div>
 	<?php endif; ?>
-	<form method="post" enctype="multipart/form-data" action="<?php echo esc_url( $editing ? cammino_tipsters_url( 'tip', $GLOBALS['cammino_tipsters_current_tip']->ID ) : cammino_tipsters_url( 'new' ) ); ?>">
+	<form method="post" action="<?php echo esc_url( $editing ? cammino_tipsters_url( 'tip', $GLOBALS['cammino_tipsters_current_tip']->ID ) : cammino_tipsters_url( 'new' ) ); ?>">
 		<?php wp_nonce_field( $editing ? 'cammino_edit_tip_' . $GLOBALS['cammino_tipsters_current_tip']->ID : 'cammino_submit_tip' ); ?>
 		<input type="hidden" name="operation" value="<?php echo $editing ? 'edit_tip' : 'submit_tip'; ?>">
 		<?php if ( $editing ) : ?>
-			<input type="hidden" name="tip_version" value="<?php echo esc_attr( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ? cammino_tipsters_input( 'tip_version' ) : $edit_record['version'] ); ?>">
+			<input type="hidden" name="tip_version" value="<?php echo esc_attr( 'edit_tip' === cammino_tipsters_input( 'operation' ) ? cammino_tipsters_input( 'tip_version' ) : $edit_record['version'] ); ?>">
 		<?php else : ?>
 			<input type="hidden" name="submission_token" value="<?php echo esc_attr( $GLOBALS['cammino_tipsters_submission_token'] ); ?>">
 		<?php endif; ?>
@@ -48,17 +45,10 @@ $value = static function ( string $field ) use ( $editing, $edit_record ): strin
 				<p class="cammino-tipsters__field-error" id="tip-<?php echo esc_attr( $field ); ?>-error"><?php echo esc_html( $errors->get_error_message( $field ) ); ?></p>
 			<?php endif; ?>
 		<?php endforeach; ?>
-		<?php if ( $editing && $edit_record['files'] ) : ?>
-			<fieldset class="cammino-tipsters__existing-files"><legend><?php esc_html_e( 'Aktuálne prílohy', 'cammino' ); ?></legend>
-				<p><?php esc_html_e( 'Označené prílohy zmiznú z vášho formulára. Administrátor si ich ponechá.', 'cammino' ); ?></p>
-				<?php foreach ( $edit_record['files'] as $file ) : if ( empty( $file['id'] ) ) { continue; } ?>
-					<label><input type="checkbox" name="remove_files[]" value="<?php echo esc_attr( $file['id'] ); ?>" <?php checked( isset( $_POST['remove_files'] ) && is_array( $_POST['remove_files'] ) && in_array( $file['id'], $_POST['remove_files'], true ) ); ?>> <?php echo esc_html( sprintf( __( 'Odstrániť: %s', 'cammino' ), $file['name'] ) ); ?></label>
-				<?php endforeach; ?>
-			</fieldset>
-		<?php endif; ?>
-		<label for="tip-files"><?php esc_html_e( 'Prílohy (nepovinné)', 'cammino' ); ?></label>
-		<input id="tip-files" name="tip_files[]" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" aria-describedby="tip-files-help">
-		<p class="cammino-tipsters__field-help" id="tip-files-help"><?php echo esc_html( sprintf( __( 'Najviac 5 súborov, každý do %s. PDF, JPG/JPEG, PNG, WEBP, DOC a DOCX. Celková veľkosť musí vyhovovať limitu hostingu.', 'cammino' ), size_format( cammino_tipsters_upload_limit() ) ) ); ?></p>
+		<label for="tip-file-link"><?php esc_html_e( 'Odkaz na súbory (nepovinné)', 'cammino' ); ?></label>
+		<input id="tip-file-link" name="file_link" type="url" maxlength="2048" value="<?php echo esc_attr( $value( 'file_link' ) ); ?>" aria-describedby="tip-file-link-help<?php echo $errors->get_error_message( 'file_link' ) ? ' tip-file-link-error' : ''; ?>" <?php echo $errors->get_error_message( 'file_link' ) ? 'aria-invalid="true"' : ''; ?>>
+		<p class="cammino-tipsters__field-help" id="tip-file-link-help"><?php esc_html_e( 'Vložte odkaz na Google Drive alebo iné úložisko. Viac súborov môžete zdieľať v jednom priečinku. Umožnite administrátorovi prístup k odkazu.', 'cammino' ); ?></p>
+		<?php if ( $errors->get_error_message( 'file_link' ) ) : ?><p class="cammino-tipsters__field-error" id="tip-file-link-error"><?php echo esc_html( $errors->get_error_message( 'file_link' ) ); ?></p><?php endif; ?>
 		<div class="cammino-tipsters__actions">
 			<button type="submit" class="button button--coral"><?php echo esc_html( $editing ? __( 'Uložiť zmeny', 'cammino' ) : __( 'Odoslať tip', 'cammino' ) ); ?></button>
 			<a class="button button--cream" href="<?php echo esc_url( cammino_tipsters_url() ); ?>"><?php esc_html_e( 'Späť na moje tipy', 'cammino' ); ?></a>

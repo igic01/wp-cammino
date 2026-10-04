@@ -14,14 +14,17 @@ $files = $record['files'];
 		<span class="cammino-tipsters__status"><?php echo esc_html( $statuses[ $status ] ); ?></span>
 	</div>
 	<p class="cammino-tipsters__dates"><?php echo esc_html( sprintf( __( 'Odoslané: %1$s · Aktualizované: %2$s', 'cammino' ), get_post_time( get_option( 'date_format' ) . ' H:i', false, $tip, true ), get_date_from_gmt( $record['updated_at'], get_option( 'date_format' ) . ' H:i' ) ) ); ?></p>
-	<p class="cammino-tipsters__notice"><?php echo esc_html( 'discussion' === $status ? __( 'Administrátor otvoril diskusiu. Formulár môžete upraviť nižšie. Komunikácia bude dostupná v ďalšej etape.', 'cammino' ) : ( 'approved' === $status ? __( 'Tip je schválený. Formulár aj prílohy sú uzamknuté.', 'cammino' ) : __( 'Tip čaká na kontrolu administrátorom. Formulár aj prílohy sú uzamknuté.', 'cammino' ) ) ); ?></p>
+	<p class="cammino-tipsters__notice"><?php echo esc_html( 'discussion' === $status ? __( 'Administrátor otvoril diskusiu. Formulár môžete upraviť a správu odoslať nižšie.', 'cammino' ) : ( 'approved' === $status ? __( 'Tip je schválený. Formulár je uzamknutý. Komunikácia zostáva otvorená.', 'cammino' ) : __( 'Tip čaká na kontrolu administrátorom. Formulár je uzamknutý.', 'cammino' ) ) ); ?></p>
 	<?php if ( 'discussion' !== $status && ! empty( $GLOBALS['cammino_tipsters_form_errors'] ) ) : ?><p class="cammino-tipsters__error" role="alert"><?php echo esc_html( $GLOBALS['cammino_tipsters_form_errors']->get_error_message() ); ?></p><?php endif; ?>
 	<?php if ( ! empty( $GLOBALS['cammino_tipsters_tip_action_error'] ) ) : ?><p class="cammino-tipsters__error" role="alert"><?php echo esc_html( $GLOBALS['cammino_tipsters_tip_action_error']->get_error_message() ); ?></p><?php endif; ?>
 	<h3><?php esc_html_e( 'Krátky popis', 'cammino' ); ?></h3>
 	<div class="cammino-tipsters__text"><?php echo esc_html( $record['short_description'] ); ?></div>
 	<h3><?php esc_html_e( 'Podrobný popis', 'cammino' ); ?></h3>
 	<div class="cammino-tipsters__text"><?php echo esc_html( $record['long_description'] ); ?></div>
-	<h3><?php esc_html_e( 'Prílohy', 'cammino' ); ?></h3>
+	<h3><?php esc_html_e( 'Odkaz na súbory', 'cammino' ); ?></h3>
+	<?php if ( ! empty( $record['file_link'] ) ) : ?><p><a href="<?php echo esc_url( $record['file_link'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $record['file_link'] ); ?></a></p><?php else : ?><p><?php esc_html_e( 'Bez odkazu.', 'cammino' ); ?></p><?php endif; ?>
+	<?php if ( $files ) : ?>
+	<h3><?php esc_html_e( 'Staršie prílohy', 'cammino' ); ?></h3>
 	<?php if ( ! $files ) : ?>
 		<p><?php esc_html_e( 'Bez príloh.', 'cammino' ); ?></p>
 	<?php else : ?>
@@ -32,10 +35,12 @@ $files = $record['files'];
 			<?php endforeach; ?>
 		</ul>
 	<?php endif; ?>
+	<?php endif; ?>
 </article>
 <?php if ( cammino_tipsters_can_edit_tip( $tip->ID ) ) : ?>
 	<?php $GLOBALS['cammino_tipsters_editing'] = true; require __DIR__ . '/new-tip.php'; unset( $GLOBALS['cammino_tipsters_editing'] ); ?>
 <?php endif; ?>
+<?php cammino_tipsters_render_conversation( $tip->ID ); ?>
 <section class="cammino-tipsters__card cammino-tipsters__delete">
 	<h2><?php esc_html_e( 'Odstrániť tip', 'cammino' ); ?></h2>
 	<p><?php esc_html_e( 'Tip zmizne z vášho účtu a nebudete k nemu mať prístup. Administrátorovi zostane zachovaný vrátane príloh a histórie. Obnovenie nie je dostupné.', 'cammino' ); ?></p>

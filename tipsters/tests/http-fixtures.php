@@ -30,6 +30,16 @@ if ( 'setup' === $mode ) {
 		if ( ! $user ) { continue; }
 		if ( 'cleanup' === $mode ) {
 			if ( 'admin' === $suffix ) { wp_delete_user( $user->ID ); } else { cammino_tipsters_delete_account( $user->ID ); }
+		} elseif ( 'legacy' === $mode && 'one' === $suffix ) {
+			$records = cammino_tipsters_account_records( (int) $user->ID );
+			$tip = (int) ( $records['tips'][0] ?? 0 );
+			if ( ! $tip ) { exit( 1 ); }
+			$body = '%PDF-1.4 disposable legacy upload';
+			$path = $prefix . '-legacy.pdf';
+			file_put_contents( trailingslashit( CAMMINO_TIPSTERS_STORAGE_PATH ) . $path, $body );
+			$file = array( 'id' => bin2hex( random_bytes( 16 ) ), 'path' => $path, 'name' => 'legacy.pdf', 'size' => strlen( $body ), 'mime' => 'application/pdf' );
+			update_post_meta( $tip, CAMMINO_TIP_FILES_META, array( $file ) );
+			$result = array( 'url' => cammino_tipsters_url( 'download', $tip, $file['id'] ), 'body' => $body );
 		} elseif ( 'snapshot' === $mode && 'admin' !== $suffix ) {
 			$records = cammino_tipsters_account_records( (int) $user->ID );
 			$result[ $suffix ] = array( 'tips' => count( $records['tips'] ), 'files' => array() );

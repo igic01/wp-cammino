@@ -1,9 +1,9 @@
 # Tipsters: accounts and private submissions
 
-Stages 1–3 provide administrator account management, frontend authentication,
-private tip submissions/files, a paginated dashboard, admin review and status
-history, discussion-only editing, and tipster deletion with admin retention.
-Stage 3 is ready for your review. Conversations belong to Stage 4.
+Stages 1-4 provide account management, frontend login, private submissions,
+shared-file links, administrator review/status history, discussion-only editing,
+tipster deletion with admin retention, and persistent per-tip conversations.
+Stage 4 is ready for your review; Stage 5 has not started.
 
 ## Open the screens
 
@@ -115,33 +115,30 @@ relative to `CAMMINO_TIPSTERS_STORAGE_PATH`, sanitized original `name`, detected
 `mime`, and byte `size`. Files are not WordPress media attachments and have no
 public upload URL. Downloads require an enabled owning tipster or an authorized
 administrator, and are served as attachments with private/no-store headers.
-Message records use `_cammino_tip_id` to link to their tip. Business status is
+New messages link to their tip through `post_parent`; `_cammino_tip_id` is a legacy mirror. Sender, username snapshot, body, signed retry identifier and server time are stored in the same private post row. Business status is
 stored in `_cammino_tip_status`, separately from the private post status.
 
-Before accepting uploads, configure an existing writable directory outside the
-served web root in `wp-config.php`, for example:
+New submissions use an optional shared-file URL, so they require no private-file
+storage configuration. Use a Google Drive folder (or another provider) to share
+multiple documents through one link. The owner controls the provider's sharing
+permissions; WordPress stores the URL and does not upload, download, embed, or
+change permissions on external files. Full account deletion removes the saved
+link, but does not delete files held by an external provider.
+
+Existing uploads remain available through the authenticated download handler.
+Keep their original storage location and configure it in `wp-config.php`:
 
 ```php
 define( 'CAMMINO_TIPSTERS_STORAGE_PATH', '/srv/cammino-private/tipsters' );
 ```
 
-Use a Windows absolute directory on Windows hosting, for example
-`C:/cammino-private/tipsters`, when the actual served root is elsewhere. Grant
-the PHP/web-server account read/write access; use directory permissions 0700
-on systems supporting Unix permissions. The module does not create the root.
-Upload and download handlers reject storage within ABSPATH, WP_CONTENT_DIR, or
-the server's DOCUMENT_ROOT. Verify your web-server aliases, CDN, and static-file
-configuration do not expose this directory; PHP cannot discover every alias.
-Private files must remain protected independently of the active theme.
-Submissions without attachments work without storage configuration.
-
-Uploads require PHP `fileinfo`; DOCX validation additionally needs `ZipArchive`.
-Set `upload_max_filesize` to at least 10M and `post_max_size` comfortably above
-50M (for example 64M) to support five 10 MB attachments in one request. Also
-configure proxy/server request-body limits and `max_file_uploads` to allow five
-files. A lower WordPress/hosting file limit is respected and shown on the form.
-Exceeding the total request limit can leave PHP with an empty POST; the form then
-reports that the request expired or exceeded the hosting limit.
+On Windows use an absolute path outside the served root, for example
+`C:/cammino-private/tipsters`. PHP needs read/write access for downloads and
+account purges. The module does not create the root. Verify server aliases,
+CDNs and static-file rules do not expose this directory. Files must remain
+protected even when the theme is inactive. Active and previously retained
+attachments stay preserved; the new form cannot add/remove uploaded files.
+Existing interrupted upload journals are still included in full account purges.
 
 Cleanup validates every path before removing anything, rejects paths escaping
 the configured directory, and fails rather than deleting an unrecognized file.
@@ -153,118 +150,101 @@ whether message retention overrides account deletion remain questions in
 
 ## Stage 2 behavior and review checklist
 
-Text fields are required and plain text: title up to 200 characters, short
-description up to 1,000, and long description up to 20,000. Files are optional:
-PDF, JPG/JPEG, PNG, WEBP, DOC, DOCX, up to five per tip, up to 10 MB each subject
-to the host limit. These are the plan's initial file limits for this checkpoint.
-Browser-supplied MIME and size are not trusted. Validation checks extension and
-content; DOCX packages are checked for Word content, macro/executable entries,
-and excessive expanded size. Allowed document formats are not a malware scan.
+Title (200 characters), short description (1,000), and long description (20,000)
+are required plain text. Stage 4 replaces uploads with one optional **Odkaz na
+subory** field: an HTTP/HTTPS URL up to 2,048 bytes. Use a shared folder for
+multiple files. Unsafe schemes, credentials, whitespace/control characters and
+malformed URLs are rejected. Invalid forms preserve entered values.
 
-The server fixes ownership to the logged-in tipster and status to `submitted`.
-The dashboard lists only that owner's completed, non-deleted tips, ten per page,
-with title, status, submitted/updated times, and detail links. Tip pages render
-escaped text with line breaks and private attachment links. At the Stage 2
-checkpoint tips were read-only. Stage 3 adds discussion editing and confirmed
-deletion as described below; conversations are still pending. No email is
-requested or sent.
+Ownership and submitted status are assigned by the server. Signed form tokens
+prevent duplicate submissions. The dashboard lists only the enabled owner's
+non-deleted tips, ten per page. An account lock serializes submission, editing,
+status changes, messaging, disabling and deletion. Forms expire after one day;
+interrupted locks can be reclaimed after 30 minutes.
 
-A signed form identifier prevents repeat submissions from creating duplicate
-records/files. Successful POSTs redirect to the saved tip. Invalid requests keep
-the entered text and display errors; browsers require files to be selected again.
-An account write lock prevents submission from racing disabling/deletion.
-Unexpected failures remove partial records/files where possible; interrupted
-or failed cleanup records stay hidden as `building` and remain included in full
-account cleanup. An interrupted lock can be reclaimed after 30 minutes; forms
-expire after one day. A new form creates a new tip, even with identical text.
-
-Use two disposable tipster accounts and a separate administrator session:
-
-1. Configure private storage above, log in as the first tipster, and select
-   **Nový tip** on `/tipsters/`.
-2. Submit a tip with a PDF and image, then submit another without attachments.
-   Both should appear on **Moje tipy** as **Odoslaný**. Open each and check its
-   descriptions, line breaks, dates, and attachment downloads.
-3. Try empty fields, a renamed text file as PDF, an executable, six files, and
-   an oversized file. No tip should be created; entered text should remain.
-4. Refresh the saved detail page and retry the same original form: no duplicate
-   tip should appear. A newly opened form can create another tip.
-5. In the second tipster session, verify its dashboard is separate. Paste the
-   first tipster's tip and download URLs: access must be denied. Try downloading
-   while signed out, and altering either the tip ID or file ID.
-6. As admin, disable/re-enable the first account and verify access is revoked
-   and restored while records/files remain. For a disposable account, use the
-   dedicated deletion confirmation and check all its attachments are removed.
-7. Check the form, list, and detail layouts on desktop and phone. Confirm the
-   text/file limits before we begin Stage 3.
-
-Admin listing and review controls are now available under **Tipy**. Administrators
-can use attachment download URLs even when the owning account is disabled.
+To check submissions, create two tips with different shared links. Verify their
+content and links, invalid-field errors, retry protection, and separate
+accounts' dashboards. Other tipsters must not access the first owner's tip URL.
+Older attachment URLs retain their existing authorization checks.
 
 ## Stage 3 behavior and review checklist
 
-The separate **Tipy** admin page lists all completed submissions, twenty per
-page. Open a title to read the tip, download its files, change its status, and
-view changes with the actor and server timestamp. Filters include **Odstránený
-tipsterom**; owner links filter the list, and account details link to their tips.
+Open **wp-admin -> Tipy** to find all completed tips, twenty per page, with
+search, owner/status filters and a private detail screen. Admins can read fields,
+open the shared link, download legacy attachments and inspect change history.
 
-Allowed changes are submitted → discussion or approved, discussion → approved,
-and approved → discussion after an explicit reopen checkbox. No other backward
-changes or restoration of deleted tips are available in this version.
-Admins can review disabled owners' tips, but cannot edit tip content or change
-records while an account purge is underway.
+Allowed transitions: submitted -> discussion/approved, discussion -> approved,
+and approved -> discussion with explicit reopen confirmation. Owners can change
+text and the shared link only in discussion; saving keeps discussion status.
+Submitted/approved forms are locked on both the page and server. Version checks
+reject stale forms, including forms left open through approval/reopening.
 
-Owners see an edit form only during discussion. They can update all text fields,
-add files, or mark existing files for removal, with the same validation and
-maximum five active attachments. Saving preserves discussion status. Submitted
-and approved forms are locked on both the page and server. Every mutation needs
-the current version; stale admin/owner forms are rejected, including forms left
-open through approval and reopening.
+Owner deletion requires confirmation, records deleted_by_tipster and hides the
+tip and its conversation/legacy downloads from that owner. Admins retain read
+access. No individual permanent tip deletion or restoration is exposed. Account
+disabling preserves records and revokes access; full account deletion purges
+all tips, conversations (including admin replies), private legacy files, history
+and temporary message drafts. External provider files are not removed.
 
-Owner deletion requires a checkbox and is allowed in submitted, discussion, and
-approved. It records `deleted_by_tipster`, previous status, actor, and time. The
-tip disappears from the owner's dashboard; their direct tip/file access is
-denied. Admins retain the tip, active and removed files, and existing messages.
-This is independent of full account deletion, which still removes everything.
+The `_cammino_tip_workflow` aggregate holds current fields/status, version,
+legacy files, deletion details and history together. Old tips work immediately;
+existing aggregates remain readable without GET migrations. The shared-link
+field joins the aggregate on an edit. Index mirrors support search/filtering.
 
-Attachments removed during discussion are archived for administrators and
-physically retained until full account deletion. They no longer count toward
-the five active files and cannot be downloaded by the owner. This is the initial
-retention choice for this checkpoint; confirm it matches your workflow.
+To check review, open discussion, edit text/link, approve, and try saving an old
+form. Reopen with confirmation and verify fresh edits work. Delete a tip as its
+owner and find it under the admin's deleted-tip filter. Verify disabling retains
+it, and use a disposable account to check permanent deletion.
 
-The `_cammino_tip_workflow` metadata aggregate stores current fields/status,
-version, active/retained files, deletion details, and change history together.
-Old Stage 2 tips work immediately and acquire that aggregate on their first
-successful mutation; reads do not bulk-migrate or rewrite submissions. WordPress
-post fields and status/file metadata remain search/index mirrors; server access
-and templates use the aggregate. Pending upload paths are journaled under
-`_cammino_tip_pending_files` before transfer, so account purges also include
-interrupted uploads. A failed normal save restores mirrors and removes newly
-uploaded files; an interrupted journal stays private and purgeable.
+## Stage 4 behavior and review checklist
 
-Use a disposable tip with attachments and separate admin/tipster browser sessions:
+Each frontend tip detail and **Tipy** admin detail contains **Komunikacia**.
+Messaging opens in discussion and stays open in approved, independently of the
+locked form. Submitted tips, owner-deleted tips, disabled accounts and accounts
+being purged cannot receive new messages. Admins retain readable history for
+disabled/deleted tips; their owners lose access as appropriate.
 
-1. Open **wp-admin → Tipy**. Find the tip you already submitted and open its
-   title. Check the fields, owner, dates, and file downloads; try search and
-   status/owner filters.
-2. Select **Otvoriť diskusiu**. Reload the tipster's tip detail. Change the text,
-   remove an existing file, add another, and select **Uložiť zmeny**. The tip
-   remains **Diskusia**; admin history shows the update and file changes.
-3. Verify the removed file is unavailable to the tipster but still downloadable
-   under the admin's **Prílohy odstránené z formulára** section.
-4. Leave a discussion edit form open. As admin select **Schváliť tip**, then try
-   saving that old form. It must be rejected. Reload to see the locked form.
-5. Confirm **Znovu otvoriť diskusiu** to allow fresh edits. A form saved before
-   approval/reopening must remain stale. Test direct approval on another
-   submitted tip if useful.
-6. As owner, confirm **Odstrániť tip**. It should disappear and direct URLs
-   should fail. In **Tipy**, filter **Odstránený tipsterom** and verify the tip,
-   deletion details, history, and both current/removed attachments remain.
-7. Disable the account and verify admin records remain. On a disposable account,
-   confirm full account deletion removes tips, all current/retained/pending
-   uploads, existing messages, and history. Other accounts must remain intact.
+Messages are plain text, 1-5,000 characters, ordered oldest first with username,
+role and site-local time. Twenty messages appear per page; successful sends
+redirect to the latest page. Refresh to see new replies. No message attachments,
+email notifications, individual editing or individual deletion are provided.
+No tipster email is needed.
 
-Stop at review checkpoint 3. Messaging is still scheduled for Stage 4.
+Messages persist as private database records. Standard editors/REST are disabled,
+native edit/delete capabilities are denied, and ordinary core update/trash/delete
+operations cannot alter saved message fields. Accepted messages are verified
+before success; nonce checks and signed sender/tip-bound tokens prevent forged
+requests and duplicate retries. The same account lock protects posting against
+status/account changes and purges. Trusted code with direct database access is
+outside these application protections.
+
+Admin validation errors preserve at most 5,000 draft characters in a transient
+bound to that admin and tip for five minutes, consumed on the next detail view.
+The draft is tracked for removal during account purging. These drafts are not
+accepted conversation messages. Conversation records are the persistent log;
+this does not establish a legal retention obligation or tamper-proof audit store.
+The retention/backups question remains in `todo.md`.
+
+Use separate admin and tipster sessions and disposable accounts:
+
+1. Submit a tip using a shared-file or folder link. Confirm no upload input is
+   shown; check the link and its permissions from the administrator's session.
+2. Open the tip under **Tipy**. Submitted must have no message form. Select
+   **Otvorit diskusiu**, then exchange messages from both sessions.
+3. Reload and log out/in: both replies, usernames, roles and timestamps remain.
+   Create a second tip and verify its conversation is separate. Try empty and
+   oversized messages and retry the same POST: no duplicate should appear.
+4. Approve the first tip. Text/link edits lock; both parties can still reply.
+   Reopening restores editing. There are no message edit/delete controls.
+5. Disable its account: admin history remains, posting closes and the owner
+   loses access. Re-enable and log in again. Delete the tip as owner: admin keeps
+   its read-only conversation under the deleted-tip filter.
+6. Permanently delete the disposable account with confirmation. Its tips,
+   messages, history and legacy uploads disappear; unrelated accounts remain.
+   Files on Google Drive or other providers stay under the provider's control.
+7. Check desktop/mobile forms, long messages, links and conversation pagination.
+
+**Stop at review checkpoint 4. Stage 5 waits for your feedback.**
 
 ## Hosting and login protection
 
@@ -293,8 +273,10 @@ An integration suite uses actual WordPress APIs and a disposable test database:
 php tipsters/tests/accounts-workflow.php /path/to/disposable/wordpress/wp-load.php
 php tipsters/tests/submissions-workflow.php /path/to/disposable/wordpress/wp-load.php
 php tipsters/tests/review-workflow.php /path/to/disposable/wordpress/wp-load.php
+php tipsters/tests/messages-workflow.php /path/to/disposable/wordpress/wp-load.php
 python tipsters/tests/submissions-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 python tipsters/tests/review-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
+python tipsters/tests/messages-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 ```
 
 The test installation must activate this theme and explicitly define both
@@ -332,6 +314,17 @@ retained downloads, disabling, soft deletion, and full physical account cleanup.
 Twelve Chrome desktop/mobile layout checks plus browser submission, admin
 review, and discussion editing passed; screenshots were inspected. The original
 85 account and 64 submission checks and existing theme regressions also pass.
+
+Stage 4 passed 45 real WordPress conversation/link checks and 36 HTTP checks:
+message persistence and failed-save cleanup, sender/tip token binding,
+permission/status/account changes, immutable messages, pagination and full
+purging (including admin replies and temporary drafts). Sixteen Chrome
+desktop/mobile layout checks plus browser submission, review, editing and replies
+passed; screenshots were inspected. The 85 account, 64 submission and 70 review
+WordPress checks also pass, along with the updated 55 submission/link/legacy
+HTTP checks and 41 review HTTP checks. Existing site-shell/post/page-spacing/
+catalogue regression checks passed. Earlier upload test results above describe
+Stages 2-3; the current HTTP suites test links and preserved legacy downloads.
 
 For browser review, start headless Chrome with a debugging port and use the
 guarded fixture helper to create a temporary credentials JSON, then run

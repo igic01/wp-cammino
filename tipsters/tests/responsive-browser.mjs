@@ -41,10 +41,11 @@ async function screenshot(name, width, height) {
 	await waitFor("document.readyState === 'complete'");
   await cdp('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: width < 600});
   await pause(250); await evaluate('document.fonts.ready.then(() => true)');
+  await evaluate("scrollTo({top:0,left:0,behavior:'instant'}); true"); await pause(100);
   const bounds = await evaluate(`(() => {
     const card = document.querySelector('.cammino-tipsters__card').getBoundingClientRect();
     return {width:innerWidth, body:document.body.scrollWidth, cardRight:card.right,
-      headingTop:document.querySelector('.cammino-tipsters__heading').getBoundingClientRect().top,
+      headingTop:document.querySelector('.cammino-tipsters__heading').getBoundingClientRect().top + scrollY,
       headerBottom:document.querySelector('.site-header').getBoundingClientRect().bottom,
       translation:!!document.querySelector('[data-language-switcher]'),
       unlabeled:[...document.querySelectorAll('input:not([type=hidden]),textarea')].filter(x=>!x.labels?.length).length};
@@ -65,17 +66,11 @@ try {
   await navigate('/tipsters/new/', '!!document.getElementById("tip-title")');
   await screenshot('new-tip-desktop', 1280, 1100);
   await screenshot('new-tip-mobile', 390, 844);
-  if (process.argv[6] === 'review') {
-    const filePath = join(output, 'browser-attachment.pdf');
-    writeFileSync(filePath, '%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n');
-    const doc = await cdp('DOM.getDocument');
-    const input = await cdp('DOM.querySelector', {nodeId: doc.root.nodeId, selector:'#tip-files'});
-    await cdp('DOM.setFileInputFiles', {nodeId:input.nodeId, files:[filePath]});
-  }
+  await evaluate(`document.getElementById('tip-file-link').value='https://drive.google.com/drive/folders/example?usp=sharing'; true;`);
   await evaluate(`document.getElementById('tip-title').value='Tip z prehliadača';
     document.getElementById('tip-short_description').value=${JSON.stringify('Krátky popis\nDruhý riadok')};
     document.getElementById('tip-long_description').value='Podrobný popis odoslaný cez prehliadač.';
-    document.querySelector('form[enctype]').requestSubmit(); true;`);
+    document.getElementById('tip-title').form.requestSubmit(); true;`);
   await waitFor('!!document.querySelector(".cammino-tipsters__detail")');
   const tipPath = await evaluate('location.pathname');
   await screenshot('tip-detail-mobile', 390, 844);
@@ -106,6 +101,10 @@ try {
     await evaluate(`document.querySelector('input[name=status][value=discussion]').form.requestSubmit(); true;`);
     await waitFor(`!document.querySelector('input[name=status][value=discussion]') && !!document.querySelector('input[name=status][value=approved]')`);
     await adminScreenshot('admin-tip-discussion-mobile',390,844);
+    await evaluate(`document.getElementById('message-body').value='Admin browser reply';document.getElementById('message-body').form.requestSubmit();true;`);
+    await waitFor(`document.querySelector('.cammino-conversation__text')?.textContent === 'Admin browser reply' && document.readyState === 'complete'`);
+    await adminScreenshot('admin-conversation-desktop',1280,1000);
+    await adminScreenshot('admin-conversation-mobile',390,844);
     await evaluate(`location.href=document.querySelector('#wp-admin-bar-logout a').href;true;`);
     await waitFor('!!document.getElementById("user_login")');
     await navigate('/tipsters/login/','!!document.getElementById("tipster-username")');
@@ -114,9 +113,13 @@ try {
     await waitFor('!!document.getElementById("tipster-tips-title")');
     await navigate(tipPath,'!!document.getElementById("tip-title")');
     await screenshot('discussion-edit-mobile',390,844);
-    await evaluate(`document.getElementById('tip-title').value='Upravený tip z prehliadača';document.querySelector('form[enctype]').requestSubmit();true;`);
+    await evaluate(`document.getElementById('tip-title').value='Upravený tip z prehliadača';document.getElementById('tip-title').form.requestSubmit();true;`);
     await waitFor(`!!document.querySelector('.cammino-tipsters__detail h2') && document.querySelector('.cammino-tipsters__detail h2').textContent==='Upravený tip z prehliadača'`);
     await screenshot('discussion-edit-desktop',1280,1000);
+    await evaluate(`document.getElementById('message-body').value=${JSON.stringify('Owner browser reply\nSecond line')};document.getElementById('message-body').form.requestSubmit();true;`);
+    await waitFor(`document.querySelectorAll('.cammino-conversation__text').length === 2 && document.readyState === 'complete'`);
+    await screenshot('conversation-desktop',1280,1000);
+    await screenshot('conversation-mobile',390,844);
   }
   console.log(`Passed ${checks} Chrome desktop/mobile layout checks and browser form submission.`);
 } finally {

@@ -15,6 +15,7 @@ function cammino_tipsters_tip_record( int $id ): array {
 	$files = get_post_meta( $id, CAMMINO_TIP_FILES_META, true );
 	$record = array(
 		'title' => $post->post_title, 'short_description' => $post->post_excerpt, 'long_description' => $post->post_content,
+		'file_link' => (string) get_post_meta( $id, '_cammino_tip_file_link', true ),
 		'status' => (string) get_post_meta( $id, '_cammino_tip_status', true ),
 		'files' => is_array( $files ) ? $files : array(), 'retained_files' => array(),
 		'updated_at' => $post->post_modified_gmt, 'history' => array(), 'deleted' => array(),
@@ -90,10 +91,10 @@ function cammino_tipsters_mutate_tip( int $id, string $version, callable $operat
 
 /** Mirror fields for WordPress search/indexing; the aggregate is the authoritative view. */
 function cammino_tipsters_mirror_record( int $id, array $record ) {
-	$result = wp_update_post( wp_slash( array(
+	$result = cammino_tipsters_save_plain_post( array(
 		'ID' => $id, 'post_title' => $record['title'], 'post_excerpt' => $record['short_description'], 'post_content' => $record['long_description'],
 		'post_modified_gmt' => $record['updated_at'], 'post_modified' => get_date_from_gmt( $record['updated_at'] ),
-	) ), true );
+	), true );
 	if ( is_wp_error( $result ) ) { return false; }
 	update_post_meta( $id, '_cammino_tip_status', $record['status'] );
 	update_post_meta( $id, CAMMINO_TIP_FILES_META, wp_slash( $record['files'] ) );
@@ -163,57 +164,14 @@ function cammino_tipsters_edit_tip( int $id, array $input, array $files, array $
 		if ( 'discussion' !== $old['status'] ) { return new WP_Error( 'locked', __( 'Formulár je uzamknutý. Úpravy sú povolené iba v diskusii.', 'cammino' ) ); }
 		$data = cammino_tipsters_validate_tip( $input );
 		if ( is_wp_error( $data ) ) { return $data; }
-		$active = $removed = array();
-		$ids = array_column( $old['files'], 'id' );
-		foreach ( $remove as $file_id ) {
-			if ( ! is_string( $file_id ) || ! in_array( $file_id, $ids, true ) ) { return new WP_Error( 'files', __( 'Neplatná príloha na odstránenie.', 'cammino' ) ); }
-		}
-		foreach ( $old['files'] as $file ) {
-			if ( in_array( $file['id'] ?? '', $remove, true ) ) { $removed[] = $file; } else { $active[] = $file; }
-		}
 		$uploads = cammino_tipsters_upload_inputs( $files );
 		if ( is_wp_error( $uploads ) ) { return $uploads; }
-		if ( count( $active ) + count( $uploads ) > 5 ) { return new WP_Error( 'files', __( 'Tip môže obsahovať najviac 5 aktuálnych príloh. Najprv označte prílohu na odstránenie.', 'cammino' ) ); }
-		$root = $uploads ? cammino_tipsters_storage_root() : '';
-		if ( is_wp_error( $root ) ) { return $root; }
-		$validated = array();
-		foreach ( $uploads as $upload ) {
-			if ( ! is_uploaded_file( $upload['tmp_name'] ) ) { return new WP_Error( 'files', __( 'Neplatný nahraný súbor.', 'cammino' ) ); }
-			$file = cammino_tipsters_validate_upload( $upload );
-			if ( is_wp_error( $file ) ) { return $file; }
-			$validated[] = $file;
-		}
-		$pending = get_post_meta( $id, CAMMINO_TIP_PENDING_FILES_META, true );
-		$pending = is_array( $pending ) ? $pending : array();
-		$added = array();
-		try {
-			foreach ( $validated as $file ) {
-				$file['id'] = bin2hex( random_bytes( 16 ) ); $file['path'] = bin2hex( random_bytes( 24 ) ) . '.' . $file['extension'];
-				$source = $file['tmp_name']; unset( $file['tmp_name'], $file['extension'] ); $added[] = $file;
-				$journal = array_merge( $pending, $added );
-				update_post_meta( $id, CAMMINO_TIP_PENDING_FILES_META, wp_slash( $journal ) );
-				if ( get_post_meta( $id, CAMMINO_TIP_PENDING_FILES_META, true ) !== $journal || ! cammino_tipsters_lock_owned( $lock ) || ! move_uploaded_file( $source, $root . $file['path'] ) ) { throw new RuntimeException( 'Upload failed.' ); }
-				chmod( $root . $file['path'], 0600 );
-			}
-			$next = array_merge( $old, $data );
-			$next['files'] = array_merge( $active, $added );
-			$next['retained_files'] = array_merge( $old['retained_files'], $removed );
-			$fields = array();
-			foreach ( $data as $key => $value ) { if ( $old[ $key ] !== $value ) { $fields[] = $key; } }
-			if ( ! $fields && ! $added && ! $removed ) { return true; }
-			$next['history'][] = cammino_tipsters_history_event( 'edited', array( 'fields' => $fields, 'added' => array_column( $added, 'name' ), 'removed' => array_column( $removed, 'name' ) ) );
-			$result = cammino_tipsters_commit_record( $id, $old, $next, $lock );
-			if ( is_wp_error( $result ) ) { throw new RuntimeException( 'Save failed.' ); }
-			update_post_meta( $id, CAMMINO_TIP_PENDING_FILES_META, wp_slash( $pending ) );
-			return true;
-		} catch ( Throwable $error ) {
-			$clean = true;
-			foreach ( $added as $file ) {
-				$path = cammino_tipsters_private_file( $file['path'] );
-				if ( is_wp_error( $path ) || ( is_file( $path ) && ! unlink( $path ) ) ) { $clean = false; }
-			}
-			if ( $clean ) { update_post_meta( $id, CAMMINO_TIP_PENDING_FILES_META, wp_slash( $pending ) ); }
-			return new WP_Error( 'save_failed', __( 'Zmeny sa nepodarilo uložiť. Skúste to znova alebo kontaktujte administrátora.', 'cammino' ) );
-		}
+		if ( $uploads || $remove ) { return new WP_Error( 'files', __( 'Použite odkaz na zdieľané súbory. Staršie prílohy zostávajú zachované.', 'cammino' ) ); }
+		$next = array_merge( $old, $data );
+		$fields = array();
+		foreach ( $data as $key => $value ) { if ( ( $old[ $key ] ?? '' ) !== $value ) { $fields[] = $key; } }
+		if ( ! $fields ) { return true; }
+		$next['history'][] = cammino_tipsters_history_event( 'edited', array( 'fields' => $fields, 'added' => array(), 'removed' => array() ) );
+		return cammino_tipsters_commit_record( $id, $old, $next, $lock );
 	} );
 }

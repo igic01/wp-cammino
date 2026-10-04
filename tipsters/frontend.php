@@ -223,19 +223,21 @@ function cammino_tipsters_handle_frontend(): void {
 		}
 		if ( 'POST' === $method ) {
 			$operation = cammino_tipsters_input( 'operation' );
-			if ( ! in_array( $operation, array( 'edit_tip', 'delete_tip' ), true ) || ! wp_verify_nonce( cammino_tipsters_input( '_wpnonce' ), 'cammino_' . $operation . '_' . $id ) ) {
+			if ( ! in_array( $operation, array( 'edit_tip', 'delete_tip', 'send_message' ), true ) || ! wp_verify_nonce( cammino_tipsters_input( '_wpnonce' ), 'cammino_' . $operation . '_' . $id ) ) {
 				wp_die( esc_html__( 'Neplatná požiadavka.', 'cammino' ), '', array( 'response' => 403 ) );
 			}
-			if ( 'delete_tip' === $operation ) {
+			if ( 'send_message' === $operation ) {
+				$result = cammino_tipsters_send_message( $id, cammino_tipsters_input( 'message_body' ), cammino_tipsters_input( 'message_token' ) );
+			} elseif ( 'delete_tip' === $operation ) {
 				$result = cammino_tipsters_delete_tip( $id, cammino_tipsters_input( 'tip_version' ), 'yes' === cammino_tipsters_input( 'confirm_delete_tip' ) );
 			} else {
 				$remove = $_POST['remove_files'] ?? array();
 				$result = ! is_array( $remove ) ? new WP_Error( 'files', __( 'Neplatný zoznam príloh.', 'cammino' ) ) : cammino_tipsters_edit_tip( $id, array(
-					'title' => cammino_tipsters_input( 'title' ), 'short_description' => cammino_tipsters_input( 'short_description' ), 'long_description' => cammino_tipsters_input( 'long_description' ),
+					'title' => cammino_tipsters_input( 'title' ), 'short_description' => cammino_tipsters_input( 'short_description' ), 'long_description' => cammino_tipsters_input( 'long_description' ), 'file_link' => cammino_tipsters_input( 'file_link' ),
 				), isset( $_FILES['tip_files'] ) && is_array( $_FILES['tip_files'] ) ? $_FILES['tip_files'] : array(), wp_unslash( $remove ), cammino_tipsters_input( 'tip_version' ) );
 			}
-			if ( ! is_wp_error( $result ) ) { wp_safe_redirect( 'delete_tip' === $operation ? cammino_tipsters_url() : cammino_tipsters_url( 'tip', $id ), 303 ); exit; }
-			$GLOBALS[ 'delete_tip' === $operation ? 'cammino_tipsters_tip_action_error' : 'cammino_tipsters_form_errors' ] = $result;
+			if ( ! is_wp_error( $result ) ) { wp_safe_redirect( 'send_message' === $operation ? cammino_tipsters_message_redirect_url( $id ) : ( 'delete_tip' === $operation ? cammino_tipsters_url() : cammino_tipsters_url( 'tip', $id ) ), 303 ); exit; }
+			$GLOBALS[ 'send_message' === $operation ? 'cammino_tipsters_message_error' : ( 'delete_tip' === $operation ? 'cammino_tipsters_tip_action_error' : 'cammino_tipsters_form_errors' ) ] = $result;
 			if ( ! cammino_tipsters_can_read_tip( $id ) ) { wp_die( esc_html__( 'Tip nie je dostupný.', 'cammino' ), '', array( 'response' => 404 ) ); }
 		}
 		$GLOBALS['cammino_tipsters_current_tip'] = get_post( $id );
@@ -244,10 +246,10 @@ function cammino_tipsters_handle_frontend(): void {
 		$token = cammino_tipsters_input( 'submission_token' );
 		if ( 'POST' === $method ) {
 			if ( 'submit_tip' !== cammino_tipsters_input( 'operation' ) || ! wp_verify_nonce( cammino_tipsters_input( '_wpnonce' ), 'cammino_submit_tip' ) ) {
-				$GLOBALS['cammino_tipsters_form_errors'] = new WP_Error( 'expired', __( 'Platnosť formulára vypršala. Obnovte stránku a skúste to znova. Pri veľkej prílohe skontrolujte limit nahrávania.', 'cammino' ) );
+				$GLOBALS['cammino_tipsters_form_errors'] = new WP_Error( 'expired', __( 'Platnosť formulára vypršala. Obnovte stránku a skúste to znova.', 'cammino' ) );
 			} else {
 				$result = cammino_tipsters_create_tip( array(
-					'title' => cammino_tipsters_input( 'title' ), 'short_description' => cammino_tipsters_input( 'short_description' ), 'long_description' => cammino_tipsters_input( 'long_description' ),
+					'title' => cammino_tipsters_input( 'title' ), 'short_description' => cammino_tipsters_input( 'short_description' ), 'long_description' => cammino_tipsters_input( 'long_description' ), 'file_link' => cammino_tipsters_input( 'file_link' ),
 				), isset( $_FILES['tip_files'] ) && is_array( $_FILES['tip_files'] ) ? $_FILES['tip_files'] : array(), $token );
 				if ( ! is_wp_error( $result ) ) {
 					wp_safe_redirect( cammino_tipsters_url( 'tip', $result ), 303 );

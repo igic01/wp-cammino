@@ -67,7 +67,9 @@ try {
 	$file_tip = review_tip( $one, 'discussion' );
 	$file = array( 'id' => $file_id, 'path' => $relative, 'name' => 'old-report.pdf', 'size' => filesize( $root . $relative ), 'mime' => 'application/pdf' );
 	update_post_meta( $file_tip, CAMMINO_TIP_FILES_META, array( $file ) );
-	expect_review( true === cammino_tipsters_edit_tip( $file_tip, $input, array(), array( $file_id ), review_version( $file_tip ) ), 'Owner can remove an active attachment during discussion.' );
+	expect_review( is_wp_error( cammino_tipsters_edit_tip( $file_tip, $input, array(), array( $file_id ), review_version( $file_tip ) ) ), 'Legacy files cannot be removed through the shared-link form.' );
+	$legacy = cammino_tipsters_tip_record( $file_tip ); $legacy['files'] = array(); $legacy['retained_files'] = array( $file );
+	update_post_meta( $file_tip, CAMMINO_TIP_WORKFLOW_META, $legacy );
 	$record = cammino_tipsters_tip_record( $file_tip );
 	expect_review( ! $record['files'] && 1 === count( $record['retained_files'] ) && file_exists( $root . $relative ) && is_wp_error( cammino_tipsters_tip_file( $file_tip, $file_id ) ), 'Removed attachment remains on disk and is inaccessible to owner.' );
 	expect_review( is_wp_error( cammino_tipsters_edit_tip( $file_tip, $input, array(), array( bin2hex( random_bytes( 16 ) ) ), review_version( $file_tip ) ) ), 'Foreign removal ID rejected.' );

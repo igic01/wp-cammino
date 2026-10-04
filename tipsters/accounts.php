@@ -101,6 +101,7 @@ function cammino_tipsters_account_records( int $id ): array {
 			'post_status' => array_keys( get_post_stati() ), 'numberposts' => -1, 'fields' => 'ids',
 			'meta_key' => CAMMINO_MESSAGE_TIP_META, 'meta_value' => $tip,
 		) ) );
+		$messages = array_merge( $messages, get_posts( array( 'post_type' => CAMMINO_MESSAGE_POST_TYPE, 'post_status' => array_keys( get_post_stati() ), 'numberposts' => -1, 'fields' => 'ids', 'post_parent' => $tip ) ) );
 		foreach ( cammino_tipsters_all_tip_files( (int) $tip ) as $file ) {
 			if ( is_array( $file ) && isset( $file['path'] ) ) {
 				$files[] = $file;
@@ -166,7 +167,12 @@ function cammino_tipsters_purge_records_locked( int $id ) {
 		}
 	}
 	foreach ( array_merge( $records['messages'], $records['tips'] ) as $post_id ) {
-		if ( ! wp_delete_post( $post_id, true ) ) {
+		if ( CAMMINO_TIP_POST_TYPE === get_post_type( $post_id ) ) {
+			foreach ( get_post_meta( $post_id, '_cammino_message_draft_user' ) as $sender ) {
+				delete_transient( 'cammino_message_draft_' . (int) $sender . '_' . $post_id );
+			}
+		}
+		if ( ! ( CAMMINO_MESSAGE_POST_TYPE === get_post_type( $post_id ) ? cammino_tipsters_delete_message_record( $post_id ) : wp_delete_post( $post_id, true ) ) ) {
 			return new WP_Error( 'record_delete_failed', __( 'Záznam sa nepodarilo odstrániť. Účet zostáva zablokovaný; zopakujte mazanie.', 'cammino' ) );
 		}
 	}

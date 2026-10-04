@@ -4,3 +4,9 @@
 .cammino-admin-tips__panel h2 { margin-top: 0; }
 .cammino-admin-tips__status-form { margin: .8rem 0; }
 .cammino-admin-tips td, .cammino-admin-tips li { overflow-wrap: anywhere; }
+.cammino-conversation__messages { list-style: none; padding: 0; }
+.cammino-conversation__messages li { border-bottom: 1px solid #ddd; padding: 1rem 0; }
+.cammino-conversation time { display: block; }
+.cammino-conversation__text { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: .5rem; }
+.cammino-conversation textarea { box-sizing: border-box; display: block; width: 100%; margin-top: .5rem; }
+.cammino-admin-tips__panel a { overflow-wrap: anywhere; }

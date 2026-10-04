@@ -22,7 +22,32 @@ function cammino_tipsters_validate_tip( array $input ) {
 			$errors->add( $field, sprintf( __( 'Zadajte najviac %d znakov.', 'cammino' ), $max ) );
 		}
 	}
+	$link = $input['file_link'] ?? '';
+	if ( ! is_string( $link ) ) { $link = 'invalid'; }
+	$link = trim( $link );
+	$parts = wp_parse_url( $link );
+	if ( '' !== $link && ( strlen( $link ) > 2048 || preg_match( '/[\x00-\x20\x7f<>"\\\\]/', $link )
+		|| ! is_array( $parts ) || empty( $parts['host'] ) || ! in_array( strtolower( $parts['scheme'] ?? '' ), array( 'http', 'https' ), true )
+		|| isset( $parts['user'] ) || isset( $parts['pass'] ) || esc_url_raw( $link, array( 'http', 'https' ) ) !== $link ) ) {
+		$errors->add( 'file_link', __( 'Zadajte platný odkaz HTTP alebo HTTPS (najviac 2 048 znakov).', 'cammino' ) );
+	}
+	$data['file_link'] = $link;
 	return $errors->has_errors() ? $errors : $data;
+}
+
+/** These private fields are already sanitized plain text and escaped on output.
+ * WordPress's HTML filters otherwise encode literal ampersands in tipster writes.
+ * Suspend only those core filters during this write, restoring their exact priorities.
+ */
+function cammino_tipsters_save_plain_post( array $fields, bool $update = false ) {
+	$filters = array( 'title_save_pre' => 'wp_filter_kses', 'content_save_pre' => 'wp_filter_post_kses', 'excerpt_save_pre' => 'wp_filter_post_kses' );
+	$priorities = array();
+	foreach ( $filters as $hook => $callback ) {
+		$priority = has_filter( $hook, $callback );
+		if ( false !== $priority ) { $priorities[ $hook ] = $priority; remove_filter( $hook, $callback, $priority ); }
+	}
+	try { return $update ? wp_update_post( wp_slash( $fields ), true ) : wp_insert_post( wp_slash( $fields ), true ); }
+	finally { foreach ( $priorities as $hook => $priority ) { add_filter( $hook, $filters[ $hook ], $priority ); } }
 }
 
 /** Signed one-day form identifiers are bound to the owner; nonces protect the POST. */
@@ -81,7 +106,6 @@ function cammino_tipsters_create_tip( array $input, array $files, string $token 
 		return $lock;
 	}
 	$id = 0;
-	$stored = array();
 	try {
 		$previous = get_posts( array( 'post_type' => CAMMINO_TIP_POST_TYPE, 'post_status' => 'private', 'author' => $owner, 'numberposts' => 1, 'fields' => 'ids', 'meta_key' => '_cammino_tip_submission', 'meta_value' => hash( 'sha256', $token ) ) );
 		if ( $previous && cammino_tipsters_tip_ready( (int) $previous[0] ) ) {
@@ -98,65 +122,30 @@ function cammino_tipsters_create_tip( array $input, array $files, string $token 
 		if ( is_wp_error( $uploads ) ) {
 			return $uploads;
 		}
-		$root = $uploads ? cammino_tipsters_storage_root() : '';
-		if ( is_wp_error( $root ) ) {
-			return $root;
-		}
-		$validated = array();
-		foreach ( $uploads as $upload ) {
-			if ( ! is_uploaded_file( $upload['tmp_name'] ) ) {
-				return new WP_Error( 'files', __( 'Neplatný nahraný súbor.', 'cammino' ) );
-			}
-			$file = cammino_tipsters_validate_upload( $upload );
-			if ( is_wp_error( $file ) ) {
-				return $file;
-			}
-			$validated[] = $file;
-		}
+		if ( $uploads ) { return new WP_Error( 'files', __( 'Nahrávanie súborov bolo nahradené odkazom na zdieľané súbory.', 'cammino' ) ); }
 		if ( ! cammino_tipsters_account_enabled( $owner ) ) {
 			return new WP_Error( 'forbidden', __( 'Účet nie je aktívny.', 'cammino' ) );
 		}
-		$id = wp_insert_post( wp_slash( array(
+		$id = cammino_tipsters_save_plain_post( array(
 			'post_type' => CAMMINO_TIP_POST_TYPE, 'post_status' => 'private', 'post_author' => $owner,
 			'post_title' => $data['title'], 'post_excerpt' => $data['short_description'], 'post_content' => $data['long_description'],
-			'meta_input' => array( '_cammino_tip_status' => 'building', '_cammino_tip_submission' => hash( 'sha256', $token ) ),
-		) ), true );
+			'meta_input' => array( '_cammino_tip_status' => 'building', '_cammino_tip_submission' => hash( 'sha256', $token ), '_cammino_tip_file_link' => $data['file_link'] ),
+		) );
 		if ( is_wp_error( $id ) ) {
 			return $id;
-		}
-		foreach ( $validated as $file ) {
-			$file['id'] = bin2hex( random_bytes( 16 ) );
-			$file['path'] = bin2hex( random_bytes( 24 ) ) . '.' . $file['extension'];
-			$source = $file['tmp_name'];
-			unset( $file['tmp_name'], $file['extension'] );
-			$stored[] = $file;
-			// Record planned paths first, so interrupted uploads remain purgeable.
-			update_post_meta( $id, CAMMINO_TIP_FILES_META, $stored );
-			if ( $stored !== get_post_meta( $id, CAMMINO_TIP_FILES_META, true ) || ! move_uploaded_file( $source, $root . $file['path'] ) ) {
-				throw new RuntimeException( 'File storage failed.' );
-			}
-			chmod( $root . $file['path'], 0600 );
 		}
 		wp_cache_delete( $lock['key'], 'options' );
 		if ( ! cammino_tipsters_account_enabled( $owner ) || get_option( $lock['key'] ) !== $lock['value'] ) {
 			throw new RuntimeException( 'Account state changed.' );
 		}
+		if ( get_post_meta( $id, '_cammino_tip_file_link', true ) !== $data['file_link'] ) { throw new RuntimeException( 'Link storage failed.' ); }
 		update_post_meta( $id, '_cammino_tip_status', 'submitted' );
 		if ( 'submitted' !== get_post_meta( $id, '_cammino_tip_status', true ) ) {
 			throw new RuntimeException( 'Submission failed.' );
 		}
 		return (int) $id;
 	} catch ( Throwable $error ) {
-		$clean = true;
-		foreach ( $stored as $file ) {
-			$path = cammino_tipsters_private_file( $file['path'] );
-			if ( is_wp_error( $path ) || ( file_exists( $path ) && ! unlink( $path ) ) ) {
-				$clean = false;
-			}
-		}
-		if ( $id && ! is_wp_error( $id ) && $clean ) {
-			wp_delete_post( $id, true );
-		}
+		if ( $id && ! is_wp_error( $id ) ) { wp_delete_post( $id, true ); }
 		return new WP_Error( 'save_failed', __( 'Tip sa nepodarilo uložiť. Skúste to znova alebo kontaktujte administrátora.', 'cammino' ) );
 	} finally {
 		cammino_tipsters_release_lock( $lock );

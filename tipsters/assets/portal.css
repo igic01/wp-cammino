@@ -38,3 +38,9 @@
   .cammino-tipsters__list-item { flex-direction: column; }
   .cammino-tipsters__actions > .button { width: 100%; text-align: center; }
 }
+.cammino-conversation { margin-top: 1.5rem; }
+.cammino-conversation__messages { list-style: none; padding: 0; margin: 1.5rem 0; }
+.cammino-conversation__messages li { border-bottom: 1px solid #ddd; padding: 1rem 0; }
+.cammino-conversation time { display: block; font-size: .85em; }
+.cammino-conversation__text { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: .5rem; }
+.cammino-tipsters__detail a { overflow-wrap: anywhere; }

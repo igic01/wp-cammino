@@ -41,6 +41,14 @@ function cammino_tipsters_admin_tips_page(): void {
 	if ( ! cammino_tipsters_can_manage() ) { wp_die( esc_html__( 'Nemáte oprávnenie spravovať tipy.', 'cammino' ), '', array( 'response' => 403 ) ); }
 	$id = isset( $_GET['tip_id'] ) && is_scalar( $_GET['tip_id'] ) ? absint( $_GET['tip_id'] ) : 0;
 	if ( $id && ( ! cammino_tipsters_can_read_tip( $id ) || ! cammino_tipsters_tip_ready( $id ) ) ) { wp_die( esc_html__( 'Tip nie je dostupný.', 'cammino' ), '', array( 'response' => 404 ) ); }
+	if ( $id ) {
+		$key = 'cammino_message_draft_' . get_current_user_id() . '_' . $id;
+		$draft = get_transient( $key ); delete_transient( $key );
+		if ( is_array( $draft ) ) {
+			$GLOBALS['cammino_tipsters_message_error'] = new WP_Error( 'message', $draft['error'] );
+			$GLOBALS['cammino_tipsters_message_draft'] = $draft;
+		}
+	}
 	$notice = get_transient( 'cammino_tip_status_notice_' . get_current_user_id() ); delete_transient( 'cammino_tip_status_notice_' . get_current_user_id() );
 	echo '<div class="wrap cammino-admin-tips"><h1>' . esc_html__( 'Tipy', 'cammino' ) . '</h1>';
 	if ( is_array( $notice ) ) { echo '<div class="notice ' . esc_attr( $notice['error'] ? 'notice-error' : 'notice-success' ) . '"><p>' . esc_html( $notice['message'] ) . '</p></div>'; }
@@ -100,7 +108,9 @@ function cammino_tipsters_admin_tip_detail( int $id ): void {
 		<p><?php echo esc_html( sprintf( __( 'Odoslané: %1$s · Aktualizované: %2$s', 'cammino' ), get_post_time( get_option( 'date_format' ) . ' H:i', false, $post, true ), get_date_from_gmt( $record['updated_at'], get_option( 'date_format' ) . ' H:i' ) ) ); ?></p>
 		<h3><?php esc_html_e( 'Krátky popis', 'cammino' ); ?></h3><div class="cammino-admin-tips__text"><?php echo esc_html( $record['short_description'] ); ?></div>
 		<h3><?php esc_html_e( 'Podrobný popis', 'cammino' ); ?></h3><div class="cammino-admin-tips__text"><?php echo esc_html( $record['long_description'] ); ?></div>
-		<h3><?php esc_html_e( 'Aktuálne prílohy', 'cammino' ); ?></h3><?php cammino_tipsters_admin_file_list( $id, $record['files'] ); ?>
+		<h3><?php esc_html_e( 'Odkaz na súbory', 'cammino' ); ?></h3>
+		<?php if ( ! empty( $record['file_link'] ) ) : ?><p><a href="<?php echo esc_url( $record['file_link'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $record['file_link'] ); ?></a></p><?php else : ?><p><?php esc_html_e( 'Bez odkazu.', 'cammino' ); ?></p><?php endif; ?>
+		<?php if ( $record['files'] ) : ?><h3><?php esc_html_e( 'Staršie prílohy', 'cammino' ); ?></h3><?php cammino_tipsters_admin_file_list( $id, $record['files'] ); ?><?php endif; ?>
 		<?php if ( $record['retained_files'] ) : ?><h3><?php esc_html_e( 'Prílohy odstránené z formulára', 'cammino' ); ?></h3><p><?php esc_html_e( 'Zachované pre administrátora; tipster ich už nemôže stiahnuť.', 'cammino' ); ?></p><?php cammino_tipsters_admin_file_list( $id, $record['retained_files'] ); ?><?php endif; ?>
 	</div>
 	<div class="cammino-admin-tips__panel"><h2><?php esc_html_e( 'Zmeniť stav', 'cammino' ); ?></h2>
@@ -108,7 +118,7 @@ function cammino_tipsters_admin_tip_detail( int $id ): void {
 			<p><?php echo esc_html( sprintf( __( 'Odstránil: %1$s · Čas: %2$s · Predchádzajúci stav: %3$s', 'cammino' ), $actor ? $actor->display_name : __( 'Tipster', 'cammino' ), get_date_from_gmt( $record['deleted']['time'], get_option( 'date_format' ) . ' H:i' ), $labels[ $record['deleted']['previous_status'] ] ) ); ?></p>
 			<p><?php esc_html_e( 'Tip zostáva zachovaný. Obnovenie ani nové zmeny nie sú povolené.', 'cammino' ); ?></p>
 		<?php else : ?>
-			<p><?php esc_html_e( 'Diskusia umožní tipsterovi upraviť formulár. Schválenie uzamkne formulár aj prílohy. Komunikácia bude doplnená v ďalšej etape.', 'cammino' ); ?></p>
+			<p><?php esc_html_e( 'Diskusia umožní tipsterovi upraviť formulár. Schválenie uzamkne formulár. Komunikácia zostáva otvorená aj po schválení.', 'cammino' ); ?></p>
 			<?php foreach ( cammino_tipsters_tip_transitions( $record['status'] ) as $target ) : ?>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="cammino-admin-tips__status-form">
 					<input type="hidden" name="action" value="cammino_tip_status"><input type="hidden" name="tip_id" value="<?php echo esc_attr( $id ); ?>"><input type="hidden" name="tip_version" value="<?php echo esc_attr( $record['version'] ); ?>"><input type="hidden" name="status" value="<?php echo esc_attr( $target ); ?>">
@@ -119,12 +129,13 @@ function cammino_tipsters_admin_tip_detail( int $id ): void {
 			<?php endforeach; ?>
 		<?php endif; ?>
 	</div>
+	<?php cammino_tipsters_render_conversation( $id, true ); ?>
 	<div class="cammino-admin-tips__panel"><h2><?php esc_html_e( 'História zmien', 'cammino' ); ?></h2>
 		<p><?php echo esc_html( sprintf( __( 'Tip odoslaný: %s.', 'cammino' ), get_post_time( get_option( 'date_format' ) . ' H:i', false, $post, true ) ) ); ?></p>
 		<ol><?php foreach ( array_reverse( $record['history'] ) as $event ) : $actor = get_userdata( $event['actor'] ); ?>
 			<li><strong><?php echo esc_html( get_date_from_gmt( $event['time'], get_option( 'date_format' ) . ' H:i:s' ) . ' · ' . ( $actor ? $actor->display_name . ' (' . $actor->user_login . ')' : __( 'Odstránený účet', 'cammino' ) ) ); ?></strong>
 				<?php if ( 'edited' === $event['type'] ) : ?>
-					<p><?php esc_html_e( 'Tipster upravil formulár.', 'cammino' ); ?> <?php echo esc_html( implode( ', ', array_intersect_key( array( 'title' => __( 'Názov', 'cammino' ), 'short_description' => __( 'Krátky popis', 'cammino' ), 'long_description' => __( 'Podrobný popis', 'cammino' ) ), array_flip( $event['fields'] ) ) ) ); ?></p>
+					<p><?php esc_html_e( 'Tipster upravil formulár.', 'cammino' ); ?> <?php echo esc_html( implode( ', ', array_intersect_key( array( 'title' => __( 'Názov', 'cammino' ), 'short_description' => __( 'Krátky popis', 'cammino' ), 'long_description' => __( 'Podrobný popis', 'cammino' ), 'file_link' => __( 'Odkaz na súbory', 'cammino' ) ), array_flip( $event['fields'] ) ) ) ); ?></p>
 					<?php if ( $event['added'] ) : ?><p><?php echo esc_html( __( 'Pridané prílohy: ', 'cammino' ) . implode( ', ', $event['added'] ) ); ?></p><?php endif; ?>
 					<?php if ( $event['removed'] ) : ?><p><?php echo esc_html( __( 'Odstránené prílohy: ', 'cammino' ) . implode( ', ', $event['removed'] ) ); ?></p><?php endif; ?>
 				<?php else : ?><p><?php echo esc_html( ( $labels[ $event['from'] ] ?? $event['from'] ) . ' → ' . ( $labels[ $event['to'] ] ?? $event['to'] ) ); ?></p><?php endif; ?>
@@ -138,4 +149,31 @@ add_action( 'admin_enqueue_scripts', static function (): void {
 	if ( isset( $_GET['page'] ) && 'cammino-tips' === $_GET['page'] && cammino_tipsters_can_manage() ) {
 		wp_enqueue_style( 'cammino-admin-tips', get_template_directory_uri() . '/tipsters/assets/admin-tips.css', array(), CAMMINO_TIPSTERS_VERSION );
 	}
+} );
+
+add_action( 'admin_post_cammino_tip_message', static function (): void {
+	if ( ! cammino_tipsters_can_manage() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) { wp_die( esc_html__( 'Nemáte oprávnenie odoslať správu.', 'cammino' ), '', array( 'response' => 403 ) ); }
+	$id = absint( cammino_tipsters_input( 'tip_id' ) );
+	check_admin_referer( 'cammino_send_message_' . $id );
+	$result = cammino_tipsters_send_message( $id, cammino_tipsters_input( 'message_body' ), cammino_tipsters_input( 'message_token' ) );
+	if ( ! is_wp_error( $result ) ) { wp_safe_redirect( cammino_tipsters_message_redirect_url( $id, true ), 303 ); exit; }
+	if ( ! cammino_tipsters_can_read_tip( $id ) || ! cammino_tipsters_tip_ready( $id ) ) { wp_die( esc_html__( 'Tip nie je dostupný.', 'cammino' ), '', array( 'response' => 404 ) ); }
+	nocache_headers(); header( 'Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0' );
+	$tip = get_post( $id ); $owner = (int) $tip->post_author;
+	$lock = cammino_tipsters_write_lock( $owner );
+	if ( is_wp_error( $lock ) ) { wp_die( esc_html( $result->get_error_message() ), '', array( 'response' => 409, 'back_link' => true ) ); }
+	try {
+		clean_post_cache( $id ); wp_cache_delete( $owner, 'user_meta' );
+		if ( ! get_post( $id ) || 'deleting' === get_user_meta( $owner, CAMMINO_TIPSTER_STATE_META, true ) ) { wp_die( esc_html__( 'Tip nie je dostupný.', 'cammino' ), '', array( 'response' => 404 ) ); }
+		// Track temporary drafts so a complete account purge clears them, including cache-backed transients.
+		$users = array_map( 'intval', get_post_meta( $id, '_cammino_message_draft_user' ) );
+		if ( ! in_array( get_current_user_id(), $users, true ) && ! add_post_meta( $id, '_cammino_message_draft_user', get_current_user_id() ) ) {
+			wp_die( esc_html( $result->get_error_message() ), '', array( 'response' => 500, 'back_link' => true ) );
+		}
+		set_transient( 'cammino_message_draft_' . get_current_user_id() . '_' . $id, array(
+		'error' => $result->get_error_message(), 'body' => mb_substr( cammino_tipsters_input( 'message_body' ), 0, 5000, 'UTF-8' ),
+		'token' => cammino_tipsters_input( 'message_token' ),
+		), 5 * MINUTE_IN_SECONDS );
+	} finally { cammino_tipsters_release_lock( $lock ); }
+	wp_safe_redirect( cammino_tipsters_admin_tips_url( array( 'tip_id' => $id ) ) . '#conversation', 303 ); exit;
 } );
