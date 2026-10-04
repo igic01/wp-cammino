@@ -4,11 +4,17 @@ defined( 'ABSPATH' ) || exit;
 
 add_filter( 'query_vars', static function ( $vars ) {
 	$vars[] = 'cammino_tipsters';
+	$vars[] = 'cammino_tip_id';
+	$vars[] = 'cammino_file_id';
+	$vars[] = 'cammino_tips_page';
 	return $vars;
 } );
 
 add_action( 'init', static function (): void {
 	add_rewrite_rule( '^tipsters/login/?$', 'index.php?cammino_tipsters=login', 'top' );
+	add_rewrite_rule( '^tipsters/new/?$', 'index.php?cammino_tipsters=new', 'top' );
+	add_rewrite_rule( '^tipsters/tip/([0-9]+)/file/([a-f0-9]{32})/?$', 'index.php?cammino_tipsters=download&cammino_tip_id=$matches[1]&cammino_file_id=$matches[2]', 'top' );
+	add_rewrite_rule( '^tipsters/tip/([0-9]+)/?$', 'index.php?cammino_tipsters=tip&cammino_tip_id=$matches[1]', 'top' );
 	add_rewrite_rule( '^tipsters/?$', 'index.php?cammino_tipsters=dashboard', 'top' );
 }, 20 );
 
@@ -22,14 +28,25 @@ add_action( 'wp_loaded', static function (): void {
 
 function cammino_tipsters_route(): string {
 	$route = get_query_var( 'cammino_tipsters', '' );
-	return in_array( $route, array( 'login', 'dashboard' ), true ) ? $route : '';
+	return in_array( $route, array( 'login', 'dashboard', 'new', 'tip', 'download' ), true ) ? $route : '';
 }
 
-function cammino_tipsters_url( string $route = 'dashboard' ): string {
-	if ( ! get_option( 'permalink_structure' ) ) {
-		return add_query_arg( 'cammino_tipsters', 'login' === $route ? 'login' : 'dashboard', home_url( '/' ) );
+function cammino_tipsters_url( string $route = 'dashboard', int $tip_id = 0, string $file_id = '' ): string {
+	if ( ! in_array( $route, array( 'login', 'dashboard', 'new', 'tip', 'download' ), true ) ) {
+		$route = 'dashboard';
 	}
-	return home_url( 'login' === $route ? '/tipsters/login/' : '/tipsters/' );
+	if ( ! get_option( 'permalink_structure' ) ) {
+		$args = array( 'cammino_tipsters' => $route );
+		if ( in_array( $route, array( 'tip', 'download' ), true ) ) {
+			$args['cammino_tip_id'] = $tip_id;
+		}
+		if ( 'download' === $route ) {
+			$args['cammino_file_id'] = $file_id;
+		}
+		return add_query_arg( $args, home_url( '/' ) );
+	}
+	$paths = array( 'login' => '/tipsters/login/', 'dashboard' => '/tipsters/', 'new' => '/tipsters/new/', 'tip' => '/tipsters/tip/' . $tip_id . '/', 'download' => '/tipsters/tip/' . $tip_id . '/file/' . $file_id . '/' );
+	return home_url( $paths[ $route ] );
 }
 
 add_action( 'parse_request', static function ( $wp ): void {
@@ -51,7 +68,8 @@ add_filter( 'wp_robots', static function ( $robots ) {
 } );
 add_filter( 'document_title_parts', static function ( $title ) {
 	if ( cammino_tipsters_route() ) {
-		$title['title'] = 'login' === cammino_tipsters_route() ? __( 'Prihlásenie tipstera', 'cammino' ) : __( 'Môj účet tipstera', 'cammino' );
+		$labels = array( 'login' => __( 'Prihlásenie tipstera', 'cammino' ), 'dashboard' => __( 'Môj účet tipstera', 'cammino' ), 'new' => __( 'Nový tip', 'cammino' ), 'tip' => __( 'Detail tipu', 'cammino' ) );
+		$title['title'] = $labels[ cammino_tipsters_route() ] ?? __( 'Príloha tipu', 'cammino' );
 	}
 	return $title;
 } );
@@ -153,6 +171,11 @@ function cammino_tipsters_handle_frontend(): void {
 	nocache_headers();
 	header( 'Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0' );
 	header( 'X-Robots-Tag: noindex, nofollow', true );
+	header( 'Referrer-Policy: same-origin' );
+	// Administrators download attachments from these URLs too, without entering the tipster portal.
+	if ( 'download' === $route ) {
+		cammino_tipsters_download();
+	}
 	$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 	if ( ! in_array( $method, array( 'GET', 'HEAD', 'POST' ), true ) ) {
 		wp_die( esc_html__( 'Nepodporovaná požiadavka.', 'cammino' ), '', array( 'response' => 405 ) );
@@ -166,7 +189,7 @@ function cammino_tipsters_handle_frontend(): void {
 		wp_safe_redirect( cammino_tipsters_url( 'login' ) );
 		exit;
 	}
-	if ( 'dashboard' === $route && ! $user->ID ) {
+	if ( 'login' !== $route && ! $user->ID ) {
 		wp_safe_redirect( cammino_tipsters_url( 'login' ) );
 		exit;
 	}
@@ -192,6 +215,34 @@ function cammino_tipsters_handle_frontend(): void {
 	}
 	if ( 'login' === $route ) {
 		$GLOBALS['cammino_tipsters_login_token'] = cammino_tipsters_login_token();
+	}
+	if ( 'tip' === $route ) {
+		$id = absint( get_query_var( 'cammino_tip_id' ) );
+		if ( ! cammino_tipsters_can_read_tip( $id ) || ! cammino_tipsters_tip_ready( $id ) ) {
+			wp_die( esc_html__( 'Tip nie je dostupný.', 'cammino' ), '', array( 'response' => 404 ) );
+		}
+		if ( 'POST' === $method ) {
+			wp_die( esc_html__( 'Tento tip je v tejto fáze iba na čítanie.', 'cammino' ), '', array( 'response' => 403 ) );
+		}
+		$GLOBALS['cammino_tipsters_current_tip'] = get_post( $id );
+	}
+	if ( 'new' === $route ) {
+		$token = cammino_tipsters_input( 'submission_token' );
+		if ( 'POST' === $method ) {
+			if ( 'submit_tip' !== cammino_tipsters_input( 'operation' ) || ! wp_verify_nonce( cammino_tipsters_input( '_wpnonce' ), 'cammino_submit_tip' ) ) {
+				$GLOBALS['cammino_tipsters_form_errors'] = new WP_Error( 'expired', __( 'Platnosť formulára vypršala. Obnovte stránku a skúste to znova. Pri veľkej prílohe skontrolujte limit nahrávania.', 'cammino' ) );
+			} else {
+				$result = cammino_tipsters_create_tip( array(
+					'title' => cammino_tipsters_input( 'title' ), 'short_description' => cammino_tipsters_input( 'short_description' ), 'long_description' => cammino_tipsters_input( 'long_description' ),
+				), isset( $_FILES['tip_files'] ) && is_array( $_FILES['tip_files'] ) ? $_FILES['tip_files'] : array(), $token );
+				if ( ! is_wp_error( $result ) ) {
+					wp_safe_redirect( cammino_tipsters_url( 'tip', $result ), 303 );
+					exit;
+				}
+				$GLOBALS['cammino_tipsters_form_errors'] = $result;
+			}
+		}
+		$GLOBALS['cammino_tipsters_submission_token'] = cammino_tipsters_valid_submission_token( $token ) ? $token : cammino_tipsters_submission_token();
 	}
 	global $wp_query;
 	$wp_query->is_404 = false;

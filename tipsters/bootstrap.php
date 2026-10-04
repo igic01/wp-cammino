@@ -2,7 +2,7 @@
 /** Private tipster account module. @package Cammino */
 defined( 'ABSPATH' ) || exit;
 
-const CAMMINO_TIPSTERS_VERSION = '1.0.0';
+const CAMMINO_TIPSTERS_VERSION = '1.1.0';
 const CAMMINO_TIPSTER_ROLE = 'cammino_tipster';
 const CAMMINO_TIPSTERS_CAP = 'manage_cammino_tipsters';
 const CAMMINO_TIP_POST_TYPE = 'cammino_tip';
@@ -12,6 +12,8 @@ const CAMMINO_TIP_FILES_META = '_cammino_tip_files';
 const CAMMINO_MESSAGE_TIP_META = '_cammino_tip_id';
 
 require_once __DIR__ . '/permissions.php';
+require_once __DIR__ . '/uploads.php';
+require_once __DIR__ . '/tips.php';
 require_once __DIR__ . '/accounts.php';
 require_once __DIR__ . '/admin.php';
 require_once __DIR__ . '/admin-navigation.php';
@@ -40,6 +42,10 @@ function cammino_tipsters_register_models(): void {
 	$capabilities = array();
 	foreach ( array( 'edit_post', 'read_post', 'delete_post', 'edit_posts', 'edit_others_posts', 'publish_posts', 'read_private_posts', 'delete_posts', 'delete_private_posts', 'delete_published_posts', 'delete_others_posts', 'edit_private_posts', 'edit_published_posts', 'create_posts' ) as $cap ) {
 		$capabilities[ $cap ] = CAMMINO_TIPSTERS_CAP;
+	}
+	// Custom handlers use the management/ownership helpers, never native editors.
+	foreach ( array( 'edit_post', 'delete_post', 'create_posts' ) as $cap ) {
+		$capabilities[ $cap ] = 'do_not_allow';
 	}
 	foreach ( array( CAMMINO_TIP_POST_TYPE, CAMMINO_MESSAGE_POST_TYPE ) as $type ) {
 		register_post_type( $type, array(

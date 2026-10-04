@@ -1,7 +1,8 @@
 # Tipsters feature: implementation plan
 
-Status: Stage 1 implemented and locally verified. Waiting for your review at
-checkpoint 1 before Stage 2. Tip submission and conversations are not yet built.
+Status: Stages 1 and 2 implemented and locally verified. Stage 2 is ready for
+your review at checkpoint 2. Admin status controls, editing, and conversations
+are not yet built.
 
 We will implement this in stages. At every **STOP / REVIEW** checkpoint, I will
 describe what is ready, give you exact steps to try it, and wait for your feedback
@@ -17,6 +18,7 @@ separately at each review checkpoint.
   password. Only administrators can change tipster passwords. Tipsters cannot
   register themselves, change their password, or use password recovery/reset.
   The minimum password length is 8 characters for creation and admin changes.
+  Tipster accounts have no email field; Stage 2 adds no email requirement or notifications.
 - Disabling an account blocks access and preserves all its records. Permanently
   deleting an account deletes its tips, files, conversations, and related logs,
   including tips previously marked deleted by tipster.
@@ -247,26 +249,47 @@ the site features, and the tipster cannot enter wp-admin.
 - [x] Implement and verify the review workflow on an isolated local installation;
   provide the exact review checklist in `tipsters/README.md`.
 - [ ] You check the account/login/dashboard workflow on your installation.
-- [ ] Collect your feedback and wait before Stage 2.
+- [x] Receive your instruction to proceed to Stage 2. Further account feedback
+  can still be addressed without assuming every hosting check is complete.
 
 ### Stage 2 — Submit multiple tips and upload private files
 
-- [ ] Build the new-tip form with the agreed required fields and limits.
-- [ ] Validate/sanitize fields server-side and escape them when rendering.
+- [x] Build the new-tip form with required title (200 characters), short
+  description (1,000), and long description (20,000). Plain text; files optional.
+- [x] Validate/sanitize fields server-side and escape them when rendering.
   Preserve entered text and show useful field errors after an invalid request.
-- [ ] Implement multiple uploads with an explicit format allowlist, filename and
+- [x] Implement multiple uploads with an explicit format allowlist, filename and
   content/MIME checks, count/size limits, safe filenames, and no executable files.
-- [ ] Verify protected storage and authorized downloads, including attempts to
+- [x] Verify protected storage and authorized downloads, including attempts to
   fetch files directly without logging in. Do not expose public upload URLs.
-- [ ] Save successful submissions with the logged-in owner and submitted status.
+- [x] Save successful submissions with the logged-in owner and submitted status.
   Prevent repeated form submissions from creating duplicates. Clean up temporary
   files and partial records when a submission fails.
-- [ ] Expand the dashboard to list only the owner's tips with title, status,
+- [x] Expand the dashboard to list only the owner's tips with title, status,
   submitted/updated dates, and links. Include pagination and a new-tip action.
-- [ ] Add a private tip detail page with submitted fields and downloads. In this
+- [x] Add a private tip detail page with submitted fields and downloads. In this
   stage submitted tips are read-only and communication is closed.
-- [ ] Verify multiple tips from one account and isolation between two tipsters,
+- [x] Verify multiple tips from one account and isolation between two tipsters,
   including altered tip/file IDs and public discovery endpoints.
+
+Implementation uses the initial proposed PDF/JPG/JPEG/PNG/WEBP/DOC/DOCX allowlist,
+five files, 10 MB per file subject to hosting limits. File limits remain open to
+your checkpoint feedback. Private storage must be configured outside the served
+web root before attaching files; text-only submissions do not need it.
+
+Local verification: 64 WordPress submission/upload checks and 55 HTTP checks
+passed, plus the existing 85 account checks. HTTP verification includes real
+multipart PDF/PNG/DOCX uploads, byte-exact downloads, owner/anonymous isolation,
+form nonces and idempotency, invalid content/count/size, public discovery routes,
+disabled account access, and full deletion of physical uploads. Failed-save
+rollback and lock acquisition with a stale cache were tested. Six Chrome
+desktop/mobile layout checks and a browser form submission passed; screenshots
+were inspected. Site-shell/post/page-spacing/catalogue regression checks passed.
+Actual host aliases/cache/proxy configuration still needs review on your installation.
+
+Review instructions: [tipsters/README.md](README.md#stage-2-behavior-and-review-checklist).
+New routes: `/tipsters/new/` and `/tipsters/tip/{id}/`; both also support plain
+permalink query URLs. No WordPress pages need creating. Stage 3 is not started.
 
 **STOP / REVIEW 2 — Submission and dashboard**
 
@@ -274,7 +297,8 @@ You submit two tips, try valid/invalid uploads and form errors, and open each ti
 from your dashboard. Using a second account, verify that the first account's tips
 and files cannot be accessed. Check the form layout and file limits.
 
-- [ ] Demonstrate submission, private downloads, and dashboard behavior.
+- [x] Implement and verify submission, private downloads, and dashboard behavior;
+  provide the exact review checklist in `tipsters/README.md`.
 - [ ] Collect your feedback and wait before Stage 3.
 
 ### Stage 3 — Admin review, statuses, and conditional editing

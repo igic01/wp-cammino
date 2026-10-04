@@ -4,12 +4,13 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 $login = 'login' === cammino_tipsters_route();
 $user = wp_get_current_user();
+$titles = array( 'login' => __( 'Prihlásenie tipstera', 'cammino' ), 'dashboard' => __( 'Môj účet', 'cammino' ), 'new' => __( 'Nový tip', 'cammino' ), 'tip' => __( 'Detail tipu', 'cammino' ) );
 ?>
 <main id="main-content" class="cammino-tipsters">
 	<div class="container">
 		<div class="cammino-tipsters__heading">
 			<p class="cammino-tipsters__eyebrow"><?php esc_html_e( 'Cammino · Tipsteri', 'cammino' ); ?></p>
-			<h1><?php echo esc_html( $login ? __( 'Prihlásenie tipstera', 'cammino' ) : __( 'Môj účet', 'cammino' ) ); ?></h1>
+			<h1><?php echo esc_html( $titles[ cammino_tipsters_route() ] ?? __( 'Môj účet', 'cammino' ) ); ?></h1>
 			<p><?php echo esc_html( $login ? __( 'Prihláste sa údajmi, ktoré vám poskytol administrátor.', 'cammino' ) : sprintf( __( 'Vitajte, %s.', 'cammino' ), $user->display_name ) ); ?></p>
 		</div>
 		<?php if ( $login ) : ?>
@@ -29,10 +30,7 @@ $user = wp_get_current_user();
 				<p class="cammino-tipsters__help"><?php esc_html_e( 'Ak nemáte prístupové údaje alebo potrebujete nové heslo, kontaktujte administrátora. Účty a heslá spravuje administrátor.', 'cammino' ); ?></p>
 			</div>
 		<?php else : ?>
-			<section class="cammino-tipsters__card" aria-labelledby="tipster-tips-title">
-				<h2 id="tipster-tips-title"><?php esc_html_e( 'Moje tipy', 'cammino' ); ?></h2>
-				<p><?php esc_html_e( 'Zatiaľ nemáte žiadne tipy.', 'cammino' ); ?></p>
-			</section>
+			<?php require __DIR__ . '/' . ( 'new' === cammino_tipsters_route() ? 'new-tip' : ( 'tip' === cammino_tipsters_route() ? 'tip-detail' : 'dashboard' ) ) . '.php'; ?>
 			<form class="cammino-tipsters__logout" method="post" action="<?php echo esc_url( cammino_tipsters_url() ); ?>">
 				<?php wp_nonce_field( 'cammino_tipster_logout' ); ?>
 				<input type="hidden" name="operation" value="logout">

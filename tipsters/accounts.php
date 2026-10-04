@@ -55,6 +55,21 @@ function cammino_tipsters_set_enabled( int $id, bool $enabled ) {
 	if ( ! cammino_tipsters_can_manage() || ! cammino_tipsters_managed_account( $id ) ) {
 		return new WP_Error( 'forbidden', __( 'Tento účet nemôžete upraviť.', 'cammino' ) );
 	}
+	$lock = cammino_tipsters_write_lock( $id );
+	if ( is_wp_error( $lock ) ) {
+		return $lock;
+	}
+	try {
+		return cammino_tipsters_set_enabled_locked( $id, $enabled );
+	} finally {
+		cammino_tipsters_release_lock( $lock );
+	}
+}
+
+function cammino_tipsters_set_enabled_locked( int $id, bool $enabled ) {
+	if ( ! cammino_tipsters_can_manage() || ! cammino_tipsters_managed_account( $id ) ) {
+		return new WP_Error( 'forbidden', __( 'Tento účet nemôžete upraviť.', 'cammino' ) );
+	}
 	if ( 'deleting' === get_user_meta( $id, CAMMINO_TIPSTER_STATE_META, true ) ) {
 		return new WP_Error( 'deleting', __( 'Mazanie účtu ešte nebolo dokončené. Dokončite ho opätovným potvrdením odstránenia.', 'cammino' ) );
 	}
@@ -119,6 +134,18 @@ function cammino_tipsters_private_file( string $relative ) {
 
 /** Safe to retry: keep file metadata until all unlink operations succeed. */
 function cammino_tipsters_purge_records( int $id ) {
+	$lock = cammino_tipsters_write_lock( $id );
+	if ( is_wp_error( $lock ) ) {
+		return $lock;
+	}
+	try {
+		return cammino_tipsters_purge_records_locked( $id );
+	} finally {
+		cammino_tipsters_release_lock( $lock );
+	}
+}
+
+function cammino_tipsters_purge_records_locked( int $id ) {
 	update_user_meta( $id, CAMMINO_TIPSTER_STATE_META, 'deleting' );
 	if ( 'deleting' !== get_user_meta( $id, CAMMINO_TIPSTER_STATE_META, true ) ) {
 		return new WP_Error( 'state_failed', __( 'Účet sa nepodarilo zablokovať. Mazanie bolo zastavené.', 'cammino' ) );

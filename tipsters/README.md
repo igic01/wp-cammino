@@ -1,8 +1,9 @@
-# Tipster accounts: Stage 1
+# Tipsters: accounts and private submissions
 
-Stage 1 provides administrator account management and frontend authentication.
-The dashboard currently has an empty state. Tip submission, upload/download UI,
-status screens, and conversations will be implemented after this checkpoint.
+Stages 1 and 2 provide administrator account management, frontend authentication,
+multiple private tip submissions, attachments, a paginated owner dashboard, and
+read-only tip details. Stage 2 is ready for your review. Admin status screens,
+discussion editing, tipster deletion, and conversations belong to later stages.
 
 ## Open the screens
 
@@ -18,11 +19,16 @@ created, and these account screens do not use the visual snapshot editor.
 
 - Frontend login: `/tipsters/login/`
 - Private dashboard: `/tipsters/`
+- New tip: `/tipsters/new/`
+- Private detail: `/tipsters/tip/{id}/`
 - Admin accounts: `/wp-admin/admin.php?page=cammino-tipsters`
 - Create account: `/wp-admin/admin.php?page=cammino-tipsters-new`
 
 On installations with plain permalinks, use `/?cammino_tipsters=login` and
-`/?cammino_tipsters=dashboard`. The admin list links to the correct login URL.
+`/?cammino_tipsters=dashboard`. New submissions use `/?cammino_tipsters=new`;
+details use `/?cammino_tipsters=tip&cammino_tip_id={id}`. Download links are
+generated automatically and also work with plain permalinks.
+The admin list links to the correct login URL.
 If pretty routes return 404 after installation, save **Settings -> Permalinks**
 once and check the site's normal rewrite configuration.
 
@@ -32,7 +38,7 @@ Private screens omit the shared external translation proxy controls.
 ## Account behavior
 
 - Create an account with a unique username and an administrator-set password.
-  Email is not required. An optional display name defaults to the username.
+  Tipster accounts have no email field. An optional display name defaults to the username.
 - Usernames are fixed after creation, consistent with the account edit screen.
   Administrators can change display names and passwords.
 - Passwords require at least 8 characters and cannot have leading/trailing
@@ -97,28 +103,95 @@ session deliberately receives 403 on the tipster-only pages.
 
 ## Private storage and retention
 
-No upload UI exists in Stage 1. The deletion foundation uses this schema for the
-next stage: `_cammino_tip_files` contains file records with a `path` relative to
-`CAMMINO_TIPSTERS_STORAGE_PATH`. Message records use `_cammino_tip_id` to link to
-their tip. Status is stored in `_cammino_tip_status`.
+`_cammino_tip_files` contains file records with an opaque `id`, a random `path`
+relative to `CAMMINO_TIPSTERS_STORAGE_PATH`, sanitized original `name`, detected
+`mime`, and byte `size`. Files are not WordPress media attachments and have no
+public upload URL. Downloads require an enabled owning tipster or an authorized
+administrator, and are served as attachments with private/no-store headers.
+Message records use `_cammino_tip_id` to link to their tip. Business status is
+stored in `_cammino_tip_status`, separately from the private post status.
 
-Before uploads are implemented, configure a directory outside the served web
-root in `wp-config.php`, for example:
+Before accepting uploads, configure an existing writable directory outside the
+served web root in `wp-config.php`, for example:
 
 ```php
 define( 'CAMMINO_TIPSTERS_STORAGE_PATH', '/srv/cammino-private/tipsters' );
 ```
 
-Use a Windows absolute directory on Windows hosting. The directory must exist;
-Stage 1 does not create storage or accept uploads. Cleanup validates every file
-path before removing anything, rejects paths escaping the configured directory,
-and fails rather than deleting an unrecognized/outside file. Private files must
-remain protected independently of the active theme.
+Use a Windows absolute directory on Windows hosting, for example
+`C:/cammino-private/tipsters`, when the actual served root is elsewhere. Grant
+the PHP/web-server account read/write access; use directory permissions 0700
+on systems supporting Unix permissions. The module does not create the root.
+Upload and download handlers reject storage within ABSPATH, WP_CONTENT_DIR, or
+the server's DOCUMENT_ROOT. Verify your web-server aliases, CDN, and static-file
+configuration do not expose this directory; PHP cannot discover every alias.
+Private files must remain protected independently of the active theme.
+Submissions without attachments work without storage configuration.
+
+Uploads require PHP `fileinfo`; DOCX validation additionally needs `ZipArchive`.
+Set `upload_max_filesize` to at least 10M and `post_max_size` comfortably above
+50M (for example 64M) to support five 10 MB attachments in one request. Also
+configure proxy/server request-body limits and `max_file_uploads` to allow five
+files. A lower WordPress/hosting file limit is respected and shown on the form.
+Exceeding the total request limit can leave PHP with an empty POST; the form then
+reports that the request expired or exceeded the hosting limit.
+
+Cleanup validates every path before removing anything, rejects paths escaping
+the configured directory, and fails rather than deleting an unrecognized file.
 
 Deletion removes live application records and files. It does not erase hosting
 backups or unrelated infrastructure logs. Legal retention, backup schedules, and
 whether message retention overrides account deletion remain questions in
 `todo.md`; the implementation does not establish legal compliance.
+
+## Stage 2 behavior and review checklist
+
+Text fields are required and plain text: title up to 200 characters, short
+description up to 1,000, and long description up to 20,000. Files are optional:
+PDF, JPG/JPEG, PNG, WEBP, DOC, DOCX, up to five per tip, up to 10 MB each subject
+to the host limit. These are the plan's initial file limits for this checkpoint.
+Browser-supplied MIME and size are not trusted. Validation checks extension and
+content; DOCX packages are checked for Word content, macro/executable entries,
+and excessive expanded size. Allowed document formats are not a malware scan.
+
+The server fixes ownership to the logged-in tipster and status to `submitted`.
+The dashboard lists only that owner's completed, non-deleted tips, ten per page,
+with title, status, submitted/updated times, and detail links. Tip pages render
+escaped text with line breaks and private attachment links. No editing or
+conversation controls are enabled in this stage. No email is requested or sent.
+
+A signed form identifier prevents repeat submissions from creating duplicate
+records/files. Successful POSTs redirect to the saved tip. Invalid requests keep
+the entered text and display errors; browsers require files to be selected again.
+An account write lock prevents submission from racing disabling/deletion.
+Unexpected failures remove partial records/files where possible; interrupted
+or failed cleanup records stay hidden as `building` and remain included in full
+account cleanup. An interrupted lock can be reclaimed after 30 minutes; forms
+expire after one day. A new form creates a new tip, even with identical text.
+
+Use two disposable tipster accounts and a separate administrator session:
+
+1. Configure private storage above, log in as the first tipster, and select
+   **Nový tip** on `/tipsters/`.
+2. Submit a tip with a PDF and image, then submit another without attachments.
+   Both should appear on **Moje tipy** as **Odoslaný**. Open each and check its
+   descriptions, line breaks, dates, and attachment downloads.
+3. Try empty fields, a renamed text file as PDF, an executable, six files, and
+   an oversized file. No tip should be created; entered text should remain.
+4. Refresh the saved detail page and retry the same original form: no duplicate
+   tip should appear. A newly opened form can create another tip.
+5. In the second tipster session, verify its dashboard is separate. Paste the
+   first tipster's tip and download URLs: access must be denied. Try downloading
+   while signed out, and altering either the tip ID or file ID.
+6. As admin, disable/re-enable the first account and verify access is revoked
+   and restored while records/files remain. For a disposable account, use the
+   dedicated deletion confirmation and check all its attachments are removed.
+7. Check the form, list, and detail layouts on desktop and phone. Confirm the
+   text/file limits before we begin Stage 3.
+
+Admin tip listing and review/status controls arrive in Stage 3. Administrators
+already have permission to use attachment download URLs, including when the
+owning account is disabled.
 
 ## Hosting and login protection
 
@@ -145,6 +218,8 @@ An integration suite uses actual WordPress APIs and a disposable test database:
 
 ```text
 php tipsters/tests/accounts-workflow.php /path/to/disposable/wordpress/wp-load.php
+php tipsters/tests/submissions-workflow.php /path/to/disposable/wordpress/wp-load.php
+python tipsters/tests/submissions-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 ```
 
 The test installation must activate this theme and explicitly define both
@@ -152,6 +227,12 @@ The test installation must activate this theme and explicitly define both
 `CAMMINO_TIPSTERS_STORAGE_PATH` in its config. Never opt a real site into these
 tests: they create and delete fixture accounts, tips, messages, and files. The
 suite cleans up its own fixtures and does not require a particular admin password.
+The HTTP suite needs the disposable web server running and uses the guarded
+`http-fixtures.php` CLI helper to create/clean temporary accounts. Give that
+server at least 12M upload_max_filesize, 64M post_max_size, and max_file_uploads
+of 10 to exercise application size/count rejection rather than silent PHP
+truncation. The responsive CDP script can additionally inspect a headless Chrome
+session using credentials generated by that same helper; clean fixtures after it.
 
 Stage 1 was checked with PHP 8.0.30 and an isolated WordPress 6.4.7 installation
 using a temporary SQLite database. The database adapter is test infrastructure;
@@ -160,6 +241,14 @@ it is not a theme dependency. Verification included 85 account/workflow checks,
 catalogue workflows. The separate admin area was also verified with 14 HTTP
 navigation checks covering list/search separation, submenus, role selectors, and
 native edit/delete redirects. Desktop and mobile layouts were also inspected.
+
+Stage 2 passed 64 real WordPress submission/upload checks and 55 HTTP checks,
+including real PDF/PNG/DOCX uploads, duplicate prevention, tampered IDs/nonces,
+anonymous/other-owner download denial, public endpoint isolation, disabling, and
+physical file deletion. Failed-save rollback and stale-cache lock acquisition
+were also checked. Six Chrome desktop/mobile layout checks and an actual browser
+form submission passed, with screenshots inspected. The original 85 account
+checks and the site-shell/post/page-spacing/catalogue workflows also pass.
 
 Production cache/proxy/plugin behavior and your own installation remain part of
 the user review checkpoint. No production deployment was performed.
