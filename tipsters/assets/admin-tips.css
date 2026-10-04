@@ -10,3 +10,4 @@
 .cammino-conversation__text { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: .5rem; }
 .cammino-conversation textarea { box-sizing: border-box; display: block; width: 100%; margin-top: .5rem; }
 .cammino-admin-tips__panel a { overflow-wrap: anywhere; }
+.cammino-conversation [hidden] { display: none !important; }

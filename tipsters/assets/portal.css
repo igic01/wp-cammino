@@ -44,3 +44,4 @@
 .cammino-conversation time { display: block; font-size: .85em; }
 .cammino-conversation__text { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: .5rem; }
 .cammino-tipsters__detail a { overflow-wrap: anywhere; }
+.cammino-conversation [hidden] { display: none !important; }

@@ -205,10 +205,29 @@ being purged cannot receive new messages. Admins retain readable history for
 disabled/deleted tips; their owners lose access as appropriate.
 
 Messages are plain text, 1-5,000 characters, ordered oldest first with username,
-role and site-local time. Twenty messages appear per page; successful sends
-redirect to the latest page. Refresh to see new replies. No message attachments,
+role and site-local time. Twenty historical messages appear per page. With JavaScript, new messages
+appear automatically in a separate live section and sending does not reload
+the page. Without JavaScript, standard forms and paginated history still work. No message attachments,
 email notifications, individual editing or individual deletion are provided.
 No tipster email is needed.
+
+Automatic updates use the existing authenticated WordPress AJAX endpoint, with
+no external service or persistent connection. A visible tab checks every 5-15
+seconds (5 while composing, slowing during idle time). Hidden/offline tabs pause;
+returning or reconnecting starts an immediate check. Failed requests back off to
+at most one check per minute. Polls never overlap and time out after 15 seconds.
+Each request rechecks the session, nonce, ownership and account state.
+
+The response contains only messages after the last received ID, at most 50 per
+request, with an indexed parent lookup and no historical count query on idle
+polls. Large backlogs drain in bounded batches. The initial watermark covers all
+history, so opening an older history page does not replay later historical
+messages as new. Up to 200 live messages remain in the DOM; all records remain
+in paginated history. New content uses text nodes, preserves drafts and does
+not force scrolling. Status changes automatically open/close the composer.
+Session expiration or lost access stops polling and clears displayed messages.
+Sending uses the existing immutable, deduplicated persistence service; a failed
+network send retains its draft and retry token.
 
 Messages persist as private database records. Standard editors/REST are disabled,
 native edit/delete capabilities are denied, and ordinary core update/trash/delete
@@ -229,9 +248,11 @@ Use separate admin and tipster sessions and disposable accounts:
 
 1. Submit a tip using a shared-file or folder link. Confirm no upload input is
    shown; check the link and its permissions from the administrator's session.
-2. Open the tip under **Tipy**. Submitted must have no message form. Select
+2. Open the tip under **Tipy**. Submitted must have no visible message form. Select
    **Otvorit diskusiu**, then exchange messages from both sessions.
-3. Reload and log out/in: both replies, usernames, roles and timestamps remain.
+3. Keep both pages open: replies should appear automatically without reloading,
+   and an unsent draft should stay intact. Hide a tab or disconnect briefly,
+   then return/reconnect and verify it catches up. Log out/in to verify persistence.
    Create a second tip and verify its conversation is separate. Try empty and
    oversized messages and retry the same POST: no duplicate should appear.
 4. Approve the first tip. Text/link edits lock; both parties can still reply.
@@ -274,9 +295,11 @@ php tipsters/tests/accounts-workflow.php /path/to/disposable/wordpress/wp-load.p
 php tipsters/tests/submissions-workflow.php /path/to/disposable/wordpress/wp-load.php
 php tipsters/tests/review-workflow.php /path/to/disposable/wordpress/wp-load.php
 php tipsters/tests/messages-workflow.php /path/to/disposable/wordpress/wp-load.php
+php tipsters/tests/conversation-live-workflow.php /path/to/disposable/wordpress/wp-load.php
 python tipsters/tests/submissions-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 python tipsters/tests/review-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 python tipsters/tests/messages-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
+python tipsters/tests/conversation-live-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 ```
 
 The test installation must activate this theme and explicitly define both
@@ -325,6 +348,12 @@ WordPress checks also pass, along with the updated 55 submission/link/legacy
 HTTP checks and 41 review HTTP checks. Existing site-shell/post/page-spacing/
 catalogue regression checks passed. Earlier upload test results above describe
 Stages 2-3; the current HTTP suites test links and preserved legacy downloads.
+
+Automatic-update verification also passed 7 WordPress delta/backlog checks,
+22 HTTP AJAX checks and 8 checks in two isolated Chrome sessions, including
+incoming updates without reload, draft preservation, AJAX sending, hidden-tab
+pausing and reconnect catch-up. Run the two-session browser workflow with
+`node tipsters/tests/conversation-live-browser.mjs fixtures.json http://127.0.0.1:8765 9225`.
 
 For browser review, start headless Chrome with a debugging port and use the
 guarded fixture helper to create a temporary credentials JSON, then run

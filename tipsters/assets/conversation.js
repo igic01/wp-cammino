@@ -1,0 +1,128 @@
+/* Incremental private conversations. No framework, page reload or overlapping polls. */
+(() => {
+  'use strict';
+  const root = document.querySelector('.cammino-conversation[data-endpoint]');
+  if (!root || !window.fetch) return;
+  const form = root.querySelector('[data-message-form]');
+  const textarea = form.querySelector('textarea');
+  const button = form.querySelector('button[type=submit]');
+  const status = root.querySelector('[data-live-status]');
+  const live = root.querySelector('[data-live-messages]');
+  const list = live.querySelector('ol');
+  const seen = new Set([...root.querySelectorAll('[data-message-id]')].map(node => Number(node.dataset.messageId)));
+  let cursor = Number(root.dataset.cursor), timer, controller;
+  let stopped = false, busy = false, sending = false, writable = !form.hidden, idle = 0, failures = 0;
+  let pollFinished = Promise.resolve(), finishPoll, connectionError = false;
+
+  function availability(value) {
+    writable = value;
+    form.hidden = !value;
+    form.elements.operation.value = value ? 'send_message' : '';
+    root.querySelector('[data-closed]').hidden = value;
+    button.disabled = !value || sending || stopped;
+  }
+  function append(data) {
+    availability(data.can_send);
+    const fragment = document.createDocumentFragment();
+    let added = 0;
+    for (const message of data.messages || []) {
+      if (seen.has(message.id)) continue;
+      seen.add(message.id); ++added;
+      const item = document.createElement('li'); item.dataset.messageId = message.id;
+      const sender = document.createElement('strong'); sender.textContent = message.sender;
+      const time = document.createElement('time'); time.dateTime = message.datetime; time.textContent = message.time;
+      const body = document.createElement('div'); body.className = 'cammino-conversation__text'; body.textContent = message.body;
+      item.append(sender, time, body); fragment.append(item);
+    }
+    list.append(fragment);
+    if (added) {
+      live.hidden = false;
+      root.querySelector('[data-empty]')?.remove();
+      status.textContent = 'Nové správy sú dostupné nižšie.';
+    }
+    // Bound live DOM and duplicate tracking; older messages remain in paginated history.
+    while (list.children.length > 200) list.firstElementChild.remove();
+    if (seen.size > 300) {
+      seen.clear();
+      root.querySelectorAll('[data-message-id]').forEach(node => seen.add(Number(node.dataset.messageId)));
+    }
+    cursor = Math.max(cursor, Number(data.cursor));
+    return added;
+  }
+  function schedule(delay) {
+    clearTimeout(timer);
+    if (!stopped && !sending && !document.hidden && navigator.onLine) timer = setTimeout(poll, delay);
+  }
+  async function request(operation, extra = {}) {
+    controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(root.dataset.endpoint, {
+        method: 'POST', credentials: 'same-origin', cache: 'no-store', signal: controller.signal,
+        body: new URLSearchParams({action: 'cammino_conversation', tip_id: root.dataset.tip,
+          _wpnonce: root.dataset.nonce, operation, after: String(cursor), ...extra})
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        const error = new Error(result.data?.message || 'Správu sa nepodarilo načítať. Skúste to znova.');
+        error.code = response.status; error.data = result.data; throw error;
+      }
+      failures = 0; return result.data;
+    } finally { clearTimeout(timeout); controller = null; }
+  }
+  function errorState(error, send = false) {
+    if (error.code === 403 || error.code === 404) {
+      stopped = true; availability(false);
+      // Remove private content after the current session loses access.
+      root.querySelectorAll('.cammino-conversation__messages').forEach(node => node.replaceChildren());
+    }
+    if (typeof error.data?.can_send === 'boolean') availability(error.data.can_send);
+    connectionError = !error.code || error.code >= 500;
+    status.textContent = error.message && error.code ? error.message :
+      (send ? 'Odoslanie sa nepodarilo potvrdiť. Skúste znova; správa sa neodošle dvakrát.' : 'Spojenie bolo prerušené. Nové správy sa načítajú po obnovení spojenia.');
+  }
+  async function poll() {
+    if (busy || sending || stopped || document.hidden || !navigator.onLine) return;
+    busy = true;
+    pollFinished = new Promise(resolve => { finishPoll = resolve; });
+    let more = false;
+    try {
+      const data = await request('poll');
+      if (connectionError) { status.textContent = 'Spojenie bolo obnovené.'; connectionError = false; }
+      idle = append(data) ? 0 : idle + 1; more = data.more;
+    } catch (error) {
+      if (error.name !== 'AbortError' || (!document.hidden && !sending)) { ++failures; errorState(error); }
+    } finally {
+      busy = false;
+      finishPoll();
+      schedule(more ? 250 : failures ? Math.min(60000, 5000 * 2 ** Math.min(failures, 4)) :
+        document.activeElement === textarea ? 5000 : Math.min(15000, 5000 + idle * 2500));
+    }
+  }
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (sending || stopped || !writable) return;
+    const body = textarea.value;
+    sending = true; clearTimeout(timer); button.disabled = true;
+    controller?.abort(); await pollFinished;
+    if (stopped || !writable) { sending = false; button.disabled = true; return; }
+    busy = true;
+    status.textContent = 'Odosielanie…';
+    try {
+      const data = await request('send_message', {message_body: body, message_token: form.elements.message_token.value});
+      append(data); form.elements.message_token.value = data.message_token;
+      if (textarea.value === body) textarea.value = '';
+      status.textContent = 'Správa bola odoslaná.'; idle = 0;
+    } catch (error) { errorState(error, true); }
+    finally { busy = sending = false; button.disabled = !writable || stopped; schedule(250); }
+  });
+  document.addEventListener('visibilitychange', () => {
+    clearTimeout(timer);
+    if (document.hidden) { if (!sending) controller?.abort(); }
+    else { idle = 0; schedule(0); }
+  });
+  window.addEventListener('offline', () => { clearTimeout(timer); if (!sending) controller?.abort(); });
+  window.addEventListener('online', () => { idle = failures = 0; schedule(0); });
+  window.addEventListener('pagehide', () => { clearTimeout(timer); controller?.abort(); });
+  schedule(0);
+})();

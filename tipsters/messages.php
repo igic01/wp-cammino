@@ -119,6 +119,8 @@ function cammino_tipsters_message_redirect_url( int $id, bool $admin = false ): 
 
 function cammino_tipsters_render_conversation( int $id, bool $admin = false ): void {
 	if ( ! cammino_tipsters_can_read_tip( $id ) || ! cammino_tipsters_tip_ready( $id ) ) { return; }
+	// Capture the watermark before querying history so a concurrent insert is never missed.
+	$cursor = cammino_tipsters_message_cursor( $id );
 	$page = isset( $_GET['messages_page'] ) && is_scalar( $_GET['messages_page'] ) ? max( 1, absint( $_GET['messages_page'] ) ) : 1;
 	$query = cammino_tipsters_messages( $id, $page );
 	$url = $admin ? cammino_tipsters_admin_tips_url( array( 'tip_id' => $id ) ) : cammino_tipsters_url( 'tip', $id );
@@ -129,3 +131,73 @@ function cammino_tipsters_render_conversation( int $id, bool $admin = false ): v
 	$token = cammino_tipsters_valid_message_token( $id, $token ) ? $token : cammino_tipsters_message_token( $id );
 	require __DIR__ . '/templates/conversation.php';
 }
+
+/** One bounded query per poll, using the posts primary key as the incremental cursor. */
+function cammino_tipsters_live_message_rows( int $id, int $after = 0, bool $latest = false ): array {
+	if ( ! cammino_tipsters_can_read_tip( $id ) || ! cammino_tipsters_tip_ready( $id ) ) { return array(); }
+	global $wpdb;
+	$columns = $latest ? 'p.ID' : 'p.*';
+	$order = $latest ? 'DESC LIMIT 1' : 'ASC LIMIT 51';
+	// Legacy metadata-only records are immutable history. Include them in the initial
+	// watermark, but poll newly accepted messages through the indexed parent column.
+	$link = $latest ? $wpdb->prepare( "(p.post_parent = %d OR (p.post_parent = 0 AND EXISTS (SELECT 1 FROM {$wpdb->postmeta} m WHERE m.post_id = p.ID AND m.meta_key = %s AND m.meta_value = %s)))", $id, CAMMINO_MESSAGE_TIP_META, (string) $id ) : $wpdb->prepare( 'p.post_parent = %d', $id );
+	return $wpdb->get_results( $wpdb->prepare(
+		"SELECT $columns FROM {$wpdb->posts} p WHERE p.post_type = %s AND p.post_status = 'private' AND p.ID > %d
+		AND $link ORDER BY p.ID $order",
+		CAMMINO_MESSAGE_POST_TYPE, $after
+	) ) ?: array();
+}
+
+function cammino_tipsters_message_cursor( int $id ): int {
+	$rows = cammino_tipsters_live_message_rows( $id, 0, true );
+	return $rows ? (int) $rows[0]->ID : 0;
+}
+
+function cammino_tipsters_live_message_data( int $id, int $after ): array {
+	$rows = cammino_tipsters_live_message_rows( $id, $after );
+	$more = count( $rows ) > 50;
+	$messages = array(); $owner = (int) get_post( $id )->post_author;
+	foreach ( array_slice( $rows, 0, 50 ) as $row ) {
+		$message = new WP_Post( $row );
+		$messages[] = array( 'id' => (int) $message->ID, 'body' => $message->post_content,
+			'sender' => ( $message->post_title ?: __( 'Odosielateľ', 'cammino' ) ) . ' · ' . ( (int) $message->post_author === $owner ? __( 'Tipster', 'cammino' ) : __( 'Administrátor', 'cammino' ) ),
+			'time' => get_post_time( get_option( 'date_format' ) . ' H:i:s', false, $message, true ),
+			'datetime' => str_replace( ' ', 'T', $message->post_date_gmt ) . 'Z' );
+		$after = (int) $message->ID;
+	}
+	return array( 'messages' => $messages, 'cursor' => $after, 'more' => $more, 'can_send' => cammino_tipsters_can_message( $id ) );
+}
+
+/** AJAX requests use the same authorization, account lock and persistence service as normal forms. */
+function cammino_tipsters_conversation_ajax(): void {
+	nocache_headers(); header( 'Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0' );
+	header( 'X-Robots-Tag: noindex, nofollow' );
+	$id = absint( cammino_tipsters_input( 'tip_id' ) );
+	if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) || ! is_user_logged_in() || ! wp_verify_nonce( cammino_tipsters_input( '_wpnonce' ), 'cammino_conversation_' . $id ) ) {
+		wp_send_json_error( array( 'message' => __( 'Prihlásenie alebo platnosť stránky vypršala. Prihláste sa znova alebo obnovte stránku.', 'cammino' ) ), 403 );
+	}
+	if ( ! cammino_tipsters_can_read_tip( $id ) || ! cammino_tipsters_tip_ready( $id ) ) {
+		wp_send_json_error( array( 'message' => __( 'Tip už nie je dostupný.', 'cammino' ) ), 404 );
+	}
+	$operation = cammino_tipsters_input( 'operation' );
+	if ( ! in_array( $operation, array( 'poll', 'send_message' ), true ) ) { wp_send_json_error( array(), 400 ); }
+	if ( 'send_message' === $operation ) {
+		$result = cammino_tipsters_send_message( $id, cammino_tipsters_input( 'message_body' ), cammino_tipsters_input( 'message_token' ) );
+		if ( is_wp_error( $result ) ) { wp_send_json_error( array( 'message' => $result->get_error_message(), 'can_send' => cammino_tipsters_can_message( $id ) ), 'busy' === $result->get_error_code() ? 409 : 422 ); }
+	}
+	$data = cammino_tipsters_live_message_data( $id, absint( cammino_tipsters_input( 'after' ) ) );
+	if ( 'send_message' === $operation ) { $data['message_token'] = cammino_tipsters_message_token( $id ); }
+	wp_send_json_success( $data );
+}
+add_action( 'wp_ajax_cammino_conversation', 'cammino_tipsters_conversation_ajax' );
+add_action( 'wp_ajax_nopriv_cammino_conversation', 'cammino_tipsters_conversation_ajax' );
+
+function cammino_tipsters_enqueue_conversation(): void {
+	wp_enqueue_script( 'cammino-conversation', get_template_directory_uri() . '/tipsters/assets/conversation.js', array(), CAMMINO_TIPSTERS_VERSION, true );
+}
+add_action( 'wp_enqueue_scripts', static function (): void {
+	if ( 'tip' === cammino_tipsters_route() ) { cammino_tipsters_enqueue_conversation(); }
+} );
+add_action( 'admin_enqueue_scripts', static function (): void {
+	if ( isset( $_GET['page'], $_GET['tip_id'] ) && 'cammino-tips' === $_GET['page'] && cammino_tipsters_can_manage() ) { cammino_tipsters_enqueue_conversation(); }
+} );

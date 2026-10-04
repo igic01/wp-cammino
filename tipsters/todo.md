@@ -55,7 +55,7 @@ Please answer or change them before the affected stage is implemented.
 | When a tipster saves edits during discussion, should the tip return to submitted? | Keep it in discussion until the admin changes it. |
 | Which form fields are required, and do descriptions need formatted text? | Title and both descriptions required; shared link optional. Descriptions are plain text with line breaks. Set length limits before implementing validation. |
 | How should external file access work? | One optional HTTP/HTTPS link, up to 2,048 bytes; use a shared folder for multiple files. Tipster grants the administrator access through the provider. WordPress does not verify provider permissions or delete external files. Existing uploads remain private and downloadable. |
-| Do messages need attachments or email notifications? | Saving messages and preventing individual edits/deletions are confirmed. Attachments and notifications are still undecided. Proposed first version: text messages on page load/refresh, no attachments or notifications. Username/password is sufficient for an account; if notifications are requested, decide whether to add an email field and who receives admin notifications. |
+| Do messages need attachments or email notifications? | Saving messages and preventing individual edits/deletions are confirmed. Attachments and notifications are still undecided. Current version: automatic text-message updates and sending, no attachments or notifications. Username/password is sufficient for an account; if notifications are requested, decide whether to add an email field and who receives admin notifications. |
 | Should admins be able to edit tip content or permanently delete individual tips? | Tipster deletion is confirmed and preserves the tip for admins. Proposed first version: no admin content override or individual permanent tip deletion; full account deletion still removes all associated records. |
 | Can a tipster delete a tip in every review status, and what should they see afterwards? Can an admin restore it? | Proposed: allow deletion from submitted, discussion, and approved after confirmation; hide it from the tipster dashboard and block their direct tip/file/conversation access. Admin retains read access to everything. No new messages or restoration on a deleted tip initially. Confirm these details. |
 | How should legal message retention interact with deleting an account and its entire history? | Your product rules require saved, uneditable messages and full account deletion. Proposed technical scope: no individual message deletion, but a confirmed account deletion purges its conversations. We have not established a legal retention obligation or period. Confirm any applicable retention policy before using permanent deletion with real records, including whether backups must retain or erase data on a schedule. |
@@ -367,6 +367,13 @@ removes it and its files completely.
 ### Stage 4 — Per-tip communication
 
 - [x] Add a conversation to the admin tip screen and frontend tip detail page.
+- [x] Update both conversations automatically through authenticated incremental
+  AJAX polling (5-15 seconds while visible; pause hidden/offline; reconnect
+  immediately; retry failures with backoff). Send without page reload, preserve
+  drafts, deduplicate replies, bound batches/live DOM, and reflect composer access.
+- [x] Verify automatic updates with two isolated browser sessions, plus HTTP
+  authorization/session/account-state checks and bounded backlog queries.
+
 - [x] Show messages in chronological order with sender and timestamp, with
   pagination/loading for long conversations.
 - [x] Let the admin and the owning tipster post messages only in the agreed
@@ -458,7 +465,7 @@ permanent account deletion under the settled retention policy.
 ## 6. Scope boundaries for the first version
 
 There is no public self-registration or tipster password change/reset. Unless
-changed during review, there is no live chat/polling, message attachment support,
+changed during review, there is no message attachment support,
 tip publication, administrator content override, or advanced reporting.
 Account CRUD with disabling and full deletion, administrator-controlled
 passwords, multiple private tips, shared-file links and preserved legacy uploads, administrator review statuses,
