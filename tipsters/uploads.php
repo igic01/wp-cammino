@@ -124,7 +124,7 @@ function cammino_tipsters_tip_file( int $tip, string $file_id ) {
 	if ( ! cammino_tipsters_can_read_tip( $tip ) || ! cammino_tipsters_tip_ready( $tip ) || ! preg_match( '/^[a-f0-9]{32}$/', $file_id ) ) {
 		return new WP_Error( 'file_not_found', __( 'Súbor nie je dostupný.', 'cammino' ), array( 'status' => 404 ) );
 	}
-	foreach ( (array) get_post_meta( $tip, CAMMINO_TIP_FILES_META, true ) as $file ) {
+	foreach ( cammino_tipsters_tip_files( $tip, cammino_tipsters_can_manage() ) as $file ) {
 		if ( is_array( $file ) && ( $file['id'] ?? '' ) === $file_id ) {
 			$root = cammino_tipsters_storage_root();
 			$path = is_wp_error( $root ) ? $root : cammino_tipsters_private_file( $file['path'] );

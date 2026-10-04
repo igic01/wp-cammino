@@ -222,7 +222,21 @@ function cammino_tipsters_handle_frontend(): void {
 			wp_die( esc_html__( 'Tip nie je dostupný.', 'cammino' ), '', array( 'response' => 404 ) );
 		}
 		if ( 'POST' === $method ) {
-			wp_die( esc_html__( 'Tento tip je v tejto fáze iba na čítanie.', 'cammino' ), '', array( 'response' => 403 ) );
+			$operation = cammino_tipsters_input( 'operation' );
+			if ( ! in_array( $operation, array( 'edit_tip', 'delete_tip' ), true ) || ! wp_verify_nonce( cammino_tipsters_input( '_wpnonce' ), 'cammino_' . $operation . '_' . $id ) ) {
+				wp_die( esc_html__( 'Neplatná požiadavka.', 'cammino' ), '', array( 'response' => 403 ) );
+			}
+			if ( 'delete_tip' === $operation ) {
+				$result = cammino_tipsters_delete_tip( $id, cammino_tipsters_input( 'tip_version' ), 'yes' === cammino_tipsters_input( 'confirm_delete_tip' ) );
+			} else {
+				$remove = $_POST['remove_files'] ?? array();
+				$result = ! is_array( $remove ) ? new WP_Error( 'files', __( 'Neplatný zoznam príloh.', 'cammino' ) ) : cammino_tipsters_edit_tip( $id, array(
+					'title' => cammino_tipsters_input( 'title' ), 'short_description' => cammino_tipsters_input( 'short_description' ), 'long_description' => cammino_tipsters_input( 'long_description' ),
+				), isset( $_FILES['tip_files'] ) && is_array( $_FILES['tip_files'] ) ? $_FILES['tip_files'] : array(), wp_unslash( $remove ), cammino_tipsters_input( 'tip_version' ) );
+			}
+			if ( ! is_wp_error( $result ) ) { wp_safe_redirect( 'delete_tip' === $operation ? cammino_tipsters_url() : cammino_tipsters_url( 'tip', $id ), 303 ); exit; }
+			$GLOBALS[ 'delete_tip' === $operation ? 'cammino_tipsters_tip_action_error' : 'cammino_tipsters_form_errors' ] = $result;
+			if ( ! cammino_tipsters_can_read_tip( $id ) ) { wp_die( esc_html__( 'Tip nie je dostupný.', 'cammino' ), '', array( 'response' => 404 ) ); }
 		}
 		$GLOBALS['cammino_tipsters_current_tip'] = get_post( $id );
 	}

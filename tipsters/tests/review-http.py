@@ -1,0 +1,113 @@
+"""Stage 3 real HTTP workflow. Same CLI arguments and fixture guard as submissions-http.py."""
+import http_support as support
+from http_support import *
+
+def status_form(body, status):
+    text = body.decode()
+    for form in re.findall(r'<form\b[^>]*>(.*?)</form>', text, re.S):
+        if f'name="status" value="{status}"' in form:
+            return fields(('<form>' + form + '</form>').encode())
+    raise AssertionError('Status form missing: ' + status)
+
+def texts(form, title):
+    form.update(title=title, short_description='Short updated\nSecond line', long_description='Long updated \\ path and "quotes".')
+    return form
+
+fixtures = fixture('setup')
+prefix = fixtures['prefix']
+try:
+    one, two, admin, guest = session(), session(), session(), session()
+    login(one, fixtures['users']['one']['username'], fixtures['password'])
+    login(two, fixtures['users']['two']['username'], fixtures['password'])
+    request(admin, '/wp-login.php')
+    request(admin, '/wp-login.php', {'log':fixtures['users']['admin']['username'], 'pwd':fixtures['password'], 'redirect_to':base+'/wp-admin/', 'testcookie':'1'})
+    pdf = b'%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n'
+    first = request(one, '/tipsters/new/', texts(new_form(one), 'Stage three original'), [('original.pdf', pdf)])
+    tip_url = first[1]; tip_id = re.search(r'/tip/(\d+)/', tip_url).group(1)
+    file_url = html.unescape(next(url for url in re.findall(r'href="([^"]+)"', first[3].decode()) if '/file/' in url))
+    second = request(two, '/tipsters/new/', texts(new_form(two), 'Other owner private'))
+    admin_url = '/wp-admin/admin.php?page=cammino-tips&tip_id=' + tip_id
+    listing = request(admin, '/wp-admin/admin.php?page=cammino-tips')
+    check(listing[0] == 200 and b'toplevel_page_cammino-tips' in listing[3] and b'Stage three original' in listing[3] and b'Other owner private' in listing[3], 'Separate Tipy tab lists both owners')
+    owner_list = request(admin, '/wp-admin/admin.php?page=cammino-tips&owner=' + str(fixtures['users']['two']['id']))
+    check(b'Other owner private' in owner_list[3] and b'Stage three original' not in owner_list[3], 'Owner filter isolates admin list')
+    check(b'Stage three original' in request(admin, '/wp-admin/admin.php?page=cammino-tips&s=Stage')[3], 'Admin search finds submitted tip')
+    check(b'Stage three original' not in request(admin, '/wp-admin/admin.php?page=cammino-tips&status=approved')[3], 'Approved filter excludes submitted tip')
+    detail = request(admin, admin_url)
+    check(b'Stage three original' in detail[3] and b'original.pdf' in detail[3] and b'Short updated' in detail[3] and b'Hist' in detail[3], 'Admin reads full private fields/files/history')
+    check(request(admin, file_url)[3] == pdf, 'Admin detail download works')
+    guest_admin = request(guest, admin_url); tipster_admin = request(two, admin_url)
+    check(guest_admin[1].startswith(base + '/wp-login.php') and (tipster_admin[0] >= 400 or tipster_admin[1].endswith('/tipsters/')) and b'Stage three original' not in tipster_admin[3], 'Guest and tipster cannot open admin tips')
+    check(b'operation" value="edit_tip' not in first[3], 'Submitted tip has no edit form')
+    status = status_form(detail[3], 'discussion'); invalid = dict(status); invalid['_wpnonce'] = 'bad'
+    check(request(admin, '/wp-admin/admin-post.php', invalid)[0] == 403, 'Bad status nonce denied')
+    check(request(two, '/wp-admin/admin-post.php', status)[0] == 403, 'Tipster cannot invoke administrator status action')
+    opened = request(admin, '/wp-admin/admin-post.php', status)
+    check(opened[0] == 200 and 'Diskusia'.encode() in opened[3], 'Administrator opens discussion')
+    own = request(one, tip_url)
+    edit = fields(own[3], 'edit_tip')
+    check(edit.get('title') == 'Stage three original' and 'tip_version' in edit, 'Discussion edit form is prefilled and versioned')
+    invalid = texts(dict(edit), 'Keep entered text'); invalid['short_description'] = ''
+    rejected = request(one, tip_url, invalid)
+    check(b'role="alert"' in rejected[3] and b'Keep entered text' in rejected[3] and b'aria-invalid="true"' in rejected[3], 'Edit validation preserves entered text and field errors')
+    invalid = texts(dict(edit), 'Bad nonce'); invalid['_wpnonce'] = 'bad'
+    check(request(one, tip_url, invalid)[0] == 403, 'Bad edit nonce denied')
+    edited = request(one, tip_url, texts(dict(edit), 'Stage three changed'))
+    check(edited[0] == 200 and b'Stage three changed' in edited[3] and 'Diskusia'.encode() in edited[3], 'Owner saves edits and remains in discussion')
+    stale = request(one, tip_url, texts(dict(edit), 'Stale overwrite'))
+    check(b'role="alert"' in stale[3] and b'Stage three changed' in request(admin, admin_url)[3] and b'Stale overwrite' not in request(admin, admin_url)[3], 'Stale edit cannot overwrite newer content')
+    check(b'Stage three changed' in request(admin, '/wp-admin/admin.php?page=cammino-tips&s=changed')[3], 'Search indexes edited title')
+    edit = fields(request(one, tip_url)[3], 'edit_tip')
+    replacement = texts(dict(edit), 'Stage three changed'); replacement['remove_files[]'] = re.search(r'name="remove_files\[\]" value="([a-f0-9]{32})"', request(one, tip_url)[3].decode()).group(1)
+    replaced = request(one, tip_url, replacement, [('replacement.pdf', pdf + b'\nreplacement')])
+    check(b'replacement.pdf' in replaced[3] and b'original.pdf' not in replaced[3], 'Owner replaces an attachment during discussion')
+    check(request(one, file_url)[0] == 404 and request(admin, file_url)[3] == pdf, 'Removed file hidden from owner and retained for administrator')
+    current_file = html.unescape(next(url for url in re.findall(r'href="([^"]+)"', replaced[3].decode()) if '/file/' in url))
+    filled = request(one, tip_url, texts(fields(replaced[3], 'edit_tip'), 'Stage three changed'), [(f'extra{i}.pdf', pdf) for i in range(4)])
+    check(len([url for url in re.findall(r'href="([^"]+)"', filled[3].decode()) if '/file/' in url]) == 5, 'Discussion editing permits five active attachments')
+    current_edit = fields(filled[3], 'edit_tip')
+    too_many = request(one, tip_url, texts(dict(current_edit), 'Stage three changed'), [('sixth.pdf', pdf)])
+    check(b'role="alert"' in too_many[3] and len(fixture('snapshot', prefix)['one']['files']) == 6, 'Active attachment limit includes existing files; retained originals do not consume that limit')
+    other_edit = dict(current_edit); other_edit.update(_wpnonce=fields(request(two, second[1])[3], 'delete_tip')['_wpnonce'])
+    check(request(two, tip_url, texts(other_edit, 'Foreign overwrite'))[0] == 404, 'Other tipster cannot edit known tip ID')
+    approval = status_form(request(admin, admin_url)[3], 'approved')
+    approved = request(admin, '/wp-admin/admin-post.php', approval)
+    check('Schválený'.encode() in approved[3], 'Administrator approves discussion tip')
+    check(b'operation" value="edit_tip' not in request(one, tip_url)[3], 'Approved form visibly locked')
+    attempted = request(one, tip_url, texts(dict(current_edit), 'Overwrite approval'), [('bad.exe', b'MZ')])
+    check(b'role="alert"' in attempted[3] and b'Overwrite approval' not in request(admin, admin_url)[3], 'Approval blocks stale text and upload writes')
+    reopen = status_form(request(admin, admin_url)[3], 'discussion')
+    request(admin, '/wp-admin/admin-post.php', reopen)
+    check('Schválený'.encode() in request(one, tip_url)[3] and b'operation" value="edit_tip' not in request(one, tip_url)[3], 'Unconfirmed reopen is rejected')
+    reopen['confirm_reopen'] = 'yes'; request(admin, '/wp-admin/admin-post.php', reopen)
+    check(b'operation" value="edit_tip' in request(one, tip_url)[3], 'Confirmed reopen restores edit form')
+    check(b'role="alert"' in request(one, tip_url, texts(dict(current_edit), 'Before approval cycle'))[3], 'Old discussion version invalid after approval/reopen cycle')
+    new_edit = fields(request(one, tip_url)[3], 'edit_tip')
+    account_url = '/wp-admin/admin.php?page=cammino-tipsters&account_id=' + str(fixtures['users']['one']['id'])
+    request(admin, '/wp-admin/admin-post.php', fields(request(admin, account_url)[3], 'disable'))
+    check(request(one, tip_url, texts(dict(new_edit), 'Disabled write'))[1].endswith('/tipsters/login/'), 'Disabled account cannot submit an open edit form')
+    check(request(admin, current_file)[0] == 200 and request(admin, file_url)[0] == 200, 'Disabling preserves current and retained files for admin')
+    request(admin, '/wp-admin/admin-post.php', fields(request(admin, account_url)[3], 'enable'))
+    login(one, fixtures['users']['one']['username'], fixtures['password'])
+    delete = fields(request(one, tip_url)[3], 'delete_tip')
+    rejected = request(one, tip_url, delete)
+    check(b'role="alert"' in rejected[3] and request(one, tip_url)[0] == 200, 'Unconfirmed tip deletion rejected')
+    delete['confirm_delete_tip'] = 'yes'; deleted = request(one, tip_url, delete)
+    check(deleted[1].endswith('/tipsters/') and b'Stage three changed' not in deleted[3], 'Deleted tip disappears from owner dashboard')
+    check(request(one, tip_url)[0] == 404 and request(one, current_file)[0] == 404, 'Deleted owner detail and files denied')
+    check(request(admin, file_url)[0] == 200 and request(admin, current_file)[0] == 200, 'Tip deletion preserves every file for admin')
+    retained = request(admin, admin_url)
+    check('Odstránený tipsterom'.encode() in retained[3] and b'Stage three changed' in retained[3] and b'confirm_reopen' not in retained[3] and b'name="status"' not in retained[3], 'Deleted detail retained with no restore/status actions')
+    check(b'Stage three changed' in request(admin, '/wp-admin/admin.php?page=cammino-tips&status=deleted_by_tipster')[3], 'Deleted filter finds soft-deleted tip')
+    check(request(two, second[1])[0] == 200, 'Other owner tip remains intact')
+    # Submitted -> approved is also supported directly.
+    second_id = re.search(r'/tip/(\d+)/', second[1]).group(1)
+    direct = status_form(request(admin, '/wp-admin/admin.php?page=cammino-tips&tip_id=' + second_id)[3], 'approved')
+    check('Schválený'.encode() in request(admin, '/wp-admin/admin-post.php', direct)[3], 'Direct submitted approval works')
+    uploaded_paths = [Path(fixtures['storage_root']) / item['path'] for item in fixture('snapshot', prefix)['one']['files']]
+    purge = fields(request(admin, account_url + '&view=delete')[3], 'delete'); purge.update(confirm_delete='yes', confirm_username=fixtures['users']['one']['username'])
+    request(admin, '/wp-admin/admin-post.php', purge)
+    check(all(not path.exists() for path in uploaded_paths) and request(admin, admin_url)[0] == 404, 'Full account deletion purges soft-deleted tip and current/retained files')
+    print(f'Passed {support.checks} HTTP tip review checks.')
+finally:
+    fixture('cleanup', prefix)

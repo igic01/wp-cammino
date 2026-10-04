@@ -1,0 +1,6 @@
+.cammino-admin-tips__filters { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: 1.25rem 0; }
+.cammino-admin-tips__panel { max-width: 1100px; margin: 1rem 0; padding: 1.25rem; background: #fff; border: 1px solid #c3c4c7; }
+.cammino-admin-tips__text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.cammino-admin-tips__panel h2 { margin-top: 0; }
+.cammino-admin-tips__status-form { margin: .8rem 0; }
+.cammino-admin-tips td, .cammino-admin-tips li { overflow-wrap: anywhere; }

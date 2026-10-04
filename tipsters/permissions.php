@@ -35,13 +35,13 @@ function cammino_tipsters_can_read_tip( int $id ): bool {
 	$user = wp_get_current_user();
 	return cammino_tipsters_account_enabled( (int) $user->ID )
 		&& (int) $post->post_author === (int) $user->ID
-		&& 'deleted_by_tipster' !== get_post_meta( $id, '_cammino_tip_status', true );
+		&& 'deleted_by_tipster' !== cammino_tipsters_tip_status( $id );
 }
 
 function cammino_tipsters_can_edit_tip( int $id ): bool {
 	return cammino_tipsters_is_tipster( wp_get_current_user() )
 		&& cammino_tipsters_can_read_tip( $id )
-		&& 'discussion' === get_post_meta( $id, '_cammino_tip_status', true );
+		&& 'discussion' === cammino_tipsters_tip_status( $id );
 }
 
 add_filter( 'authenticate', 'cammino_tipsters_authenticate', PHP_INT_MAX, 3 );

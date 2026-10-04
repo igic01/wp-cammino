@@ -2,7 +2,7 @@
 /** Private tipster account module. @package Cammino */
 defined( 'ABSPATH' ) || exit;
 
-const CAMMINO_TIPSTERS_VERSION = '1.1.0';
+const CAMMINO_TIPSTERS_VERSION = '1.2.0';
 const CAMMINO_TIPSTER_ROLE = 'cammino_tipster';
 const CAMMINO_TIPSTERS_CAP = 'manage_cammino_tipsters';
 const CAMMINO_TIP_POST_TYPE = 'cammino_tip';
@@ -10,12 +10,16 @@ const CAMMINO_MESSAGE_POST_TYPE = 'cammino_tip_message';
 const CAMMINO_TIPSTER_STATE_META = '_cammino_tipster_state';
 const CAMMINO_TIP_FILES_META = '_cammino_tip_files';
 const CAMMINO_MESSAGE_TIP_META = '_cammino_tip_id';
+const CAMMINO_TIP_WORKFLOW_META = '_cammino_tip_workflow';
+const CAMMINO_TIP_PENDING_FILES_META = '_cammino_tip_pending_files';
 
 require_once __DIR__ . '/permissions.php';
 require_once __DIR__ . '/uploads.php';
 require_once __DIR__ . '/tips.php';
+require_once __DIR__ . '/workflow.php';
 require_once __DIR__ . '/accounts.php';
 require_once __DIR__ . '/admin.php';
+require_once __DIR__ . '/admin-tips.php';
 require_once __DIR__ . '/admin-navigation.php';
 require_once __DIR__ . '/frontend.php';
 

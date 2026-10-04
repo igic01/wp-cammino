@@ -1,8 +1,7 @@
 # Tipsters feature: implementation plan
 
-Status: Stages 1 and 2 implemented and locally verified. Stage 2 is ready for
-your review at checkpoint 2. Admin status controls, editing, and conversations
-are not yet built.
+Status: Stages 1–3 implemented and locally verified. Stage 3 is ready for
+your review at checkpoint 3. Conversations are not yet built.
 
 We will implement this in stages. At every **STOP / REVIEW** checkpoint, I will
 describe what is ready, give you exact steps to try it, and wait for your feedback
@@ -299,33 +298,56 @@ and files cannot be accessed. Check the form layout and file limits.
 
 - [x] Implement and verify submission, private downloads, and dashboard behavior;
   provide the exact review checklist in `tipsters/README.md`.
-- [ ] Collect your feedback and wait before Stage 3.
+- [x] Receive your instruction to proceed to Stage 3, with tips in a separate
+  wp-admin tab. Further Stage 2 feedback can still be addressed.
 
 ### Stage 3 — Admin review, statuses, and conditional editing
 
-- [ ] Add **Tipsters -> Tips** in wp-admin, with owner/title/date columns,
+- [x] Add a separate **Tipy** top-level wp-admin menu next to **Tipsteri**, with owner/title/date columns,
   status filtering, search, pagination, and a tip detail screen.
-- [ ] Let admins read all tip fields and download the attached files.
-- [ ] Add the agreed status actions with clear explanations and a status history.
-- [ ] Centralize allowed transitions and enforce administrator authorization.
-- [ ] Add a confirmed **Delete tip** action for the owner. Store
+- [x] Let admins read all tip fields and download the attached files.
+- [x] Add status actions with clear explanations and actor/timestamp history.
+- [x] Centralize allowed transitions and enforce administrator authorization.
+- [x] Add a confirmed **Delete tip** action for the owner. Store
   deleted_by_tipster instead of erasing the tip, uploads, or conversation.
   Apply the agreed rules for owner visibility, messaging, and restoration.
-- [ ] Keep deleted tips visible in the admin list/detail with a clear
+- [x] Keep deleted tips visible in the admin list/detail with a clear
   **Deleted by tipster** label, deletion time/actor, and status filter.
-- [ ] Enable tipster editing only during discussion, including adding/removing
+- [x] Enable tipster editing only during discussion, including adding/removing
   files under the same upload limits. Follow the agreed file-retention policy
   and delete physical files only when no retained record references them.
-- [ ] Recheck permissions and current status at save time for every field and
+- [x] Recheck permissions and current status at save time for every field and
   file operation. Protect against stale forms and concurrent admin status
   changes so an outdated save cannot overwrite an approval or newer edit.
-- [ ] Make submitted/approved views visibly locked and explain why. Saving during
+- [x] Make submitted/approved views visibly locked and explain why. Saving during
   discussion follows the agreed status rule, rather than trusting form inputs.
-- [ ] Verify the transition matrix, malformed status requests, attempts to edit
+- [x] Verify the transition matrix, malformed status requests, attempts to edit
   locked tips directly, an approval while the tipster has an edit form open,
   deletion by a different tipster, and stale requests after tip/account deletion
   or account disabling. Verify permanent account deletion removes these tips
   and their files, while deleting a single tip preserves them for admins.
+
+Implemented the plan's initial transitions: submitted → discussion/approved,
+discussion → approved, approved → discussion with an explicit reopen checkbox.
+Edits stay in discussion. Owner deletion is allowed in all three statuses,
+hides the tip/files from the owner, and preserves everything for admins. No
+restoration or further status changes on deleted tips are exposed.
+Removed attachments remain private for admin review until full account deletion;
+please confirm this initial retention choice at the checkpoint.
+
+Local verification: 70 WordPress review checks and 42 HTTP review checks passed,
+including stale forms across approval/reopening, failed-save rollback, versioned
+history, replacement/five-active-file limits, owner isolation, disabled accounts,
+soft-deleted tips, and full purge of current/retained/pending files and replies.
+Existing 85 account, 64 submission, and 55 HTTP submission checks passed, as did
+site-shell/post/page-spacing/catalogue regressions. Twelve Chrome desktop/mobile
+layout checks plus real browser submission, admin review, and editing passed;
+screenshots were inspected. Your actual host/cache/plugin settings remain a
+review item. No production deployment was performed.
+
+Open **wp-admin → Tipy**, or `/wp-admin/admin.php?page=cammino-tips`.
+Existing Stage 2 tips appear immediately. Full review instructions:
+[tipsters/README.md](README.md#stage-3-behavior-and-review-checklist).
 
 **STOP / REVIEW 3 — Status workflow and form locking**
 
@@ -336,7 +358,8 @@ Delete a tip as its owner and confirm the admin still sees it and its files unde
 **Deleted by tipster**. Confirm disabling preserves it and deleting its account
 removes it and its files completely.
 
-- [ ] Demonstrate status changes, history, and editing/file restrictions.
+- [x] Implement and verify status changes, history, editing/file restrictions,
+  and admin retention; provide the exact review checklist.
 - [ ] Collect your feedback and wait before Stage 4.
 
 ### Stage 4 — Per-tip communication

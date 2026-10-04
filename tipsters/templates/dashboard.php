@@ -15,12 +15,13 @@ $statuses = cammino_tipsters_status_labels();
 	<?php else : ?>
 		<ul class="cammino-tipsters__list">
 			<?php foreach ( $tips->posts as $tip ) : ?>
+				<?php if ( ! cammino_tipsters_can_read_tip( $tip->ID ) ) { continue; } $record = cammino_tipsters_tip_record( $tip->ID ); ?>
 				<li class="cammino-tipsters__list-item">
 					<div>
-						<h3><a href="<?php echo esc_url( cammino_tipsters_url( 'tip', $tip->ID ) ); ?>"><?php echo esc_html( $tip->post_title ); ?></a></h3>
-						<p class="cammino-tipsters__dates"><?php echo esc_html( sprintf( __( 'Odoslané: %1$s · Aktualizované: %2$s', 'cammino' ), get_post_time( get_option( 'date_format' ) . ' H:i', false, $tip, true ), get_post_modified_time( get_option( 'date_format' ) . ' H:i', false, $tip, true ) ) ); ?></p>
+						<h3><a href="<?php echo esc_url( cammino_tipsters_url( 'tip', $tip->ID ) ); ?>"><?php echo esc_html( $record['title'] ); ?></a></h3>
+						<p class="cammino-tipsters__dates"><?php echo esc_html( sprintf( __( 'Odoslané: %1$s · Aktualizované: %2$s', 'cammino' ), get_post_time( get_option( 'date_format' ) . ' H:i', false, $tip, true ), get_date_from_gmt( $record['updated_at'], get_option( 'date_format' ) . ' H:i' ) ) ); ?></p>
 					</div>
-					<span class="cammino-tipsters__status"><?php echo esc_html( $statuses[ get_post_meta( $tip->ID, '_cammino_tip_status', true ) ] ); ?></span>
+					<span class="cammino-tipsters__status"><?php echo esc_html( $statuses[ $record['status'] ] ); ?></span>
 				</li>
 			<?php endforeach; ?>
 		</ul>

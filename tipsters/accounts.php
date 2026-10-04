@@ -101,7 +101,7 @@ function cammino_tipsters_account_records( int $id ): array {
 			'post_status' => array_keys( get_post_stati() ), 'numberposts' => -1, 'fields' => 'ids',
 			'meta_key' => CAMMINO_MESSAGE_TIP_META, 'meta_value' => $tip,
 		) ) );
-		foreach ( (array) get_post_meta( $tip, CAMMINO_TIP_FILES_META, true ) as $file ) {
+		foreach ( cammino_tipsters_all_tip_files( (int) $tip ) as $file ) {
 			if ( is_array( $file ) && isset( $file['path'] ) ) {
 				$files[] = $file;
 			}

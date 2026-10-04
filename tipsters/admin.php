@@ -182,6 +182,7 @@ function cammino_tipsters_admin_edit( $account, array $notice ): void {
 		<?php submit_button( $account ? __( 'Uložiť zmeny', 'cammino' ) : __( 'Vytvoriť účet', 'cammino' ) ); ?>
 	</form>
 	<?php if ( $account ) : ?>
+		<p><a class="button" href="<?php echo esc_url( cammino_tipsters_admin_tips_url( array( 'owner' => $id ) ) ); ?>"><?php esc_html_e( 'Zobraziť tipy tohto tipstera', 'cammino' ); ?></a></p>
 		<h2><?php esc_html_e( 'Prístup k účtu', 'cammino' ); ?></h2>
 		<p><?php echo esc_html( cammino_tipsters_admin_state_label( $id ) ); ?></p>
 		<?php if ( 'deleting' !== get_user_meta( $id, CAMMINO_TIPSTER_STATE_META, true ) ) : ?>

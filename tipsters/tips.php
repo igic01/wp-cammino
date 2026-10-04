@@ -7,7 +7,7 @@ function cammino_tipsters_status_labels(): array {
 }
 
 function cammino_tipsters_tip_ready( int $id ): bool {
-	return in_array( get_post_meta( $id, '_cammino_tip_status', true ), array_keys( cammino_tipsters_status_labels() ), true );
+	return in_array( cammino_tipsters_tip_status( $id ), array_keys( cammino_tipsters_status_labels() ), true );
 }
 
 function cammino_tipsters_validate_tip( array $input ) {
