@@ -71,6 +71,8 @@ try {
     document.getElementById('tip-short_description').value=${JSON.stringify('Krátky popis\nDruhý riadok')};
     document.getElementById('tip-long_description').value='Podrobný popis odoslaný cez prehliadač.';
     document.getElementById('tip-title').form.requestSubmit(); true;`);
+  await waitFor('!!document.getElementById("tipster-tips-title")');
+  await evaluate("document.querySelector('.cammino-tipsters__tip-actions .button').click();true;");
   await waitFor('!!document.querySelector(".cammino-tipsters__detail")');
   const tipPath = await evaluate('location.pathname');
   await screenshot('tip-detail-mobile', 390, 844);

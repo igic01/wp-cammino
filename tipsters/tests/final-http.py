@@ -31,7 +31,7 @@ try:
     check(b'footer-tipster-login' in request(guest, '/')[3], 'Footer offers tipster login on public pages')
     check(b'data-password-toggle' in request(guest, '/tipsters/login/')[3], 'Password visibility control is available on login')
     data = new_form(owner); data.update(title='Final review tip', short_description='Short', long_description='Long', file_link='https://drive.google.com/example')
-    tip = request(owner, '/tipsters/new/', data); path = tip[1]
+    tip = submit_tip(owner, data); path = tip[1]
     tip_id = re.search(r'/tip/(\d+)/', path).group(1)
     admin_path = '/wp-admin/admin.php?page=cammino-tips&tip_id=' + tip_id
     legacy = fixture('legacy', prefix)
@@ -73,7 +73,7 @@ try:
     request(admin, '/wp-admin/admin-post.php', dict(delete_form, confirm_title='Final review tip', confirm_delete='yes'))
     check(request(owner, path)[0] == 200, 'Stale permanent deletion form preserves changed tip')
     second = new_form(owner); second.update(title='Preserved other tip', short_description='Short', long_description='Long')
-    second_path = request(owner, '/tipsters/new/', second)[1]
+    second_path = submit_tip(owner, second)[1]
     result = request(admin, '/wp-admin/admin-post.php', dict(signed, confirm_title='Final review tip', confirm_delete='yes'))
     check(result[0] == 200 and 'tip_id=' not in result[1], 'Successful permanent deletion returns to admin list')
     check(request(owner, path)[0] == 404 and request(admin, admin_path)[0] == 404, 'Deleted tip is unavailable to owner and admin')

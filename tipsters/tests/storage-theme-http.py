@@ -32,7 +32,7 @@ ob_end_clean(); echo wp_json_encode($result);
         owner, guest = session(), session()
         login(owner, fixtures['users']['one']['username'], fixtures['password'])
         form = new_form(owner); form.update(title='Private theme-switch fixture', short_description='Short', long_description='Long')
-        tip = request(owner, '/tipsters/new/', form)
+        tip = submit_tip(owner, form)
         tip_id = re.search(r'/tip/(\d+)/', tip[1]).group(1)
         legacy = fixture('legacy', prefix)
         stored = fixture('snapshot', prefix)['one']['files'][0]

@@ -252,7 +252,7 @@ function cammino_tipsters_handle_frontend(): void {
 					'title' => cammino_tipsters_input( 'title' ), 'short_description' => cammino_tipsters_input( 'short_description' ), 'long_description' => cammino_tipsters_input( 'long_description' ), 'file_link' => cammino_tipsters_input( 'file_link' ),
 				), isset( $_FILES['tip_files'] ) && is_array( $_FILES['tip_files'] ) ? $_FILES['tip_files'] : array(), $token );
 				if ( ! is_wp_error( $result ) ) {
-					wp_safe_redirect( cammino_tipsters_url( 'tip', $result ), 303 );
+					wp_safe_redirect( cammino_tipsters_url(), 303 );
 					exit;
 				}
 				$GLOBALS['cammino_tipsters_form_errors'] = $result;

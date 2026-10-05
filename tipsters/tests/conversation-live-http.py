@@ -22,7 +22,7 @@ try:
     request(admin, '/wp-login.php')
     request(admin, '/wp-login.php', {'log': fixtures['users']['admin']['username'], 'pwd': fixtures['password'], 'redirect_to': base + '/wp-admin/', 'testcookie': '1'})
     form = new_form(owner); form.update(title='Live conversation', short_description='Short', long_description='Long')
-    tip = request(owner, '/tipsters/new/', form); path = tip[1]
+    tip = submit_tip(owner, form); path = tip[1]
     tip_id = re.search(r'/tip/(\d+)/', path).group(1)
     admin_path = '/wp-admin/admin.php?page=cammino-tips&tip_id=' + tip_id
     response, data = live(owner, tip[3])

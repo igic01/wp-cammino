@@ -23,7 +23,7 @@ try:
     rejected = request(one, '/tipsters/new/', form)
     check(b'aria-invalid="true"' in rejected[3] and b'Stage four private' in rejected[3] and fixture('snapshot', prefix)['one']['tips'] == 0, 'Unsafe link rejected with preserved form')
     form['file_link'] = 'https://drive.google.com/drive/folders/example?usp=sharing&key=abc'
-    submitted = request(one, '/tipsters/new/', form)
+    submitted = submit_tip(one, form)
     tip_url = submitted[1]; tip_id = re.search(r'/tip/(\d+)/', tip_url).group(1)
     admin_url = '/wp-admin/admin.php?page=cammino-tips&tip_id=' + tip_id
     check(b'name="operation" value="send_message"' not in submitted[3] and b'name="operation" value="send_message"' not in request(admin, admin_url)[3], 'Submitted conversations have no send form for either party')
@@ -56,7 +56,7 @@ try:
     check(request(two, tip_url)[0] == 404 and request(two, tip_url, owner_message)[0] == 404 and request(guest, tip_url)[1].endswith('/tipsters/login/'), 'Other owner and anonymous sessions cannot read or post')
     check(request(two, '/wp-admin/admin-post.php', admin_message)[0] == 403, 'Tipster cannot use administrator message action')
     other_form = new_form(one); other_form.update(title='Another conversation', short_description='Short', long_description='Long')
-    other = request(one, '/tipsters/new/', other_form); other_id = re.search(r'/tip/(\d+)/', other[1]).group(1)
+    other = submit_tip(one, other_form); other_id = re.search(r'/tip/(\d+)/', other[1]).group(1)
     other_admin_url = '/wp-admin/admin.php?page=cammino-tips&tip_id=' + other_id
     request(admin, '/wp-admin/admin-post.php', status_form(request(admin, other_admin_url)[3], 'discussion'))
     other_message = fields(request(one, other[1])[3], 'send_message'); other_message['message_body'] = 'Second conversation only'
@@ -65,7 +65,7 @@ try:
     request(one, other[1], other_message)
     check(b'Second conversation only' not in request(one, tip_url)[3] and b'Owner reply' not in request(admin, other_admin_url)[3], 'Two conversations remain separate')
     submitted_form = new_form(two); submitted_form.update(title='Still submitted', short_description='Short', long_description='Long')
-    closed = request(two, '/tipsters/new/', submitted_form)
+    closed = submit_tip(two, submitted_form)
     forged = dict(owner_message); forged['message_token'] = fields(request(two, closed[1])[3], 'delete_tip').get('tip_version', '')
     check(request(two, closed[1], forged)[0] == 403, 'Crafted send cannot open submitted conversation')
     request(admin, '/wp-admin/admin-post.php', status_form(request(admin, admin_url)[3], 'approved'))

@@ -77,6 +77,17 @@ def check(condition, message):
 def new_form(client):
     return fields(request(client, '/tipsters/new/')[3], 'submit_tip')
 
+def submit_tip(client, form):
+    """Submit, verify the dashboard redirect, then open its newest tip for further checks."""
+    dashboard = request(client, '/tipsters/new/', form)
+    check(dashboard[0] == 200 and dashboard[1].endswith('/tipsters/'), 'Successful submission redirects to the dashboard')
+    links = re.findall(r'<a\b[^>]*href="([^"]*)"', dashboard[3].decode())
+    link = next((html.unescape(link) for link in links if '/tipsters/tip/' in link), None)
+    if not link:
+        raise AssertionError('Dashboard open-tip button missing')
+    return request(client, link)
+
+
 def login(client, user, password):
     form = fields(request(client, '/tipsters/login/')[3])
     form.update(username=user, password=password)

@@ -161,6 +161,9 @@ subory** field: an HTTP/HTTPS URL up to 2,048 bytes. Use a shared folder for
 multiple files. Unsafe schemes, credentials, whitespace/control characters and
 malformed URLs are rejected. Invalid forms preserve entered values.
 
+Successful submissions return to the private dashboard (`/tipsters/`), where
+the owner opens the saved tip through its **Otvoriť tip** button. Invalid
+submissions stay on the form with errors and entered values preserved.
 Ownership and submitted status are assigned by the server. Signed form tokens
 prevent duplicate submissions. The dashboard lists only the enabled owner's
 non-deleted tips, ten per page. An account lock serializes submission, editing,

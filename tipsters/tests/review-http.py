@@ -23,10 +23,10 @@ try:
     request(admin, '/wp-login.php', {'log':fixtures['users']['admin']['username'], 'pwd':fixtures['password'], 'redirect_to':base+'/wp-admin/', 'testcookie':'1'})
     pdf = b'%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n'
     initial = texts(new_form(one), 'Stage three original'); initial['file_link'] = 'https://example.com/original-folder'
-    first = request(one, '/tipsters/new/', initial)
+    first = submit_tip(one, initial)
     tip_url = first[1]; tip_id = re.search(r'/tip/(\d+)/', tip_url).group(1)
     legacy = fixture('legacy', prefix); file_url = legacy['url']; pdf = legacy['body'].encode()
-    second = request(two, '/tipsters/new/', texts(new_form(two), 'Other owner private'))
+    second = submit_tip(two, texts(new_form(two), 'Other owner private'))
     admin_url = '/wp-admin/admin.php?page=cammino-tips&tip_id=' + tip_id
     listing = request(admin, '/wp-admin/admin.php?page=cammino-tips')
     check(listing[0] == 200 and b'toplevel_page_cammino-tips' in listing[3] and b'Stage three original' in listing[3] and b'Other owner private' in listing[3], 'Separate Tipy tab lists both owners')

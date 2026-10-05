@@ -22,8 +22,8 @@ try:
     form = new_form(one); form.update(title='Private stage two title', short_description='First line\nSecond line', long_description='Long description with a \\ backslash and "quotes".', owner=fixtures['users']['two']['id'], status='approved')
     pdf = b'%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n'
     form['file_link'] = 'https://drive.google.com/drive/folders/example?usp=sharing&key=abc'
-    result = request(one, '/tipsters/new/', form)
-    check(result[0] == 200 and '/tipsters/tip/' in result[1], 'Shared-link submission redirects to saved tip detail')
+    result = submit_tip(one, form)
+    check(result[0] == 200 and '/tipsters/tip/' in result[1], 'Saved tip opens from its dashboard button')
     tip_url = result[1]
     tip_id = re.search(r'/tip/(\d+)/', tip_url).group(1)
     check('Odoslaný'.encode() in result[3] and b'First line\nSecond line' in result[3] and b'&quot;quotes&quot;' in result[3] and b'\\ backslash' in result[3], 'Saved tip is submitted and text is safely preserved')
@@ -47,7 +47,7 @@ try:
     check(request(one, file_url.replace('/tip/' + tip_id + '/', '/tip/999999/'))[0] == 404, 'Altered tip ID denied')
     check(request(one, tip_url, {'title': 'Forged edit', 'status': 'discussion'})[0] == 403, 'Submitted form cannot be edited by crafted POST')
     check(request(one, file_url, {'operation': 'replace'})[0] == 405, 'Download route rejects writes')
-    check(request(one, '/tipsters/new/', form)[1] == tip_url, 'Repeated submission returns the original tip')
+    check(submit_tip(one, form)[1] == tip_url, 'Repeated submission returns to the dashboard without duplicating the tip')
     snapshot = fixture('snapshot', prefix)
     check(snapshot['one']['tips'] == 1 and len(snapshot['one']['files']) == 1 and snapshot['two']['tips'] == 0, 'Retry has no duplicate record or upload and cannot forge another owner')
     disk_file = snapshot['one']['files'][0]
@@ -69,11 +69,11 @@ try:
     check(b'role="alert"' in request(one, '/tipsters/new/', invalid, [('large.pdf', pdf + b'0' * (10 * 1024 * 1024))])[3], 'Oversized real upload rejected')
     check(fixture('snapshot', prefix)['one']['tips'] == 1, 'Rejected uploads leave no partial tips')
     other = new_form(two); other.update(title='Second owner private', short_description='Short', long_description='Long')
-    second_tip = request(two, '/tipsters/new/', other)
+    second_tip = submit_tip(two, other)
     check(second_tip[0] == 200 and '/tipsters/tip/' in second_tip[1], 'Second account submits without files')
     second = new_form(one); second.update(title='Another private tip', short_description='Short', long_description='Long')
     second['file_link'] = 'https://example.com/another-folder'
-    second_result = request(one, '/tipsters/new/', second)
+    second_result = submit_tip(one, second)
     check('/tipsters/tip/' in second_result[1] and b'https://example.com/another-folder' in second_result[3], 'First account submits multiple tips with independent shared links')
     for client, own, foreign in [(one, b'Private stage two title', b'Second owner private'), (two, b'Second owner private', b'Private stage two title')]:
         dashboard = request(client, '/tipsters/')

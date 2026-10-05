@@ -442,6 +442,7 @@ behavior using disposable test conversations.
   panels, own/other bubbles, latest history by default and older-page navigation.
   Preserve reading/draft position on incoming messages; show a new-message button.
 - [x] Add accessible show/hide-password control and shared-footer login link.
+- [x] Redirect successful new submissions to the tipster dashboard.
 - [x] Apply checkpoint feedback: center login, move contrasting logout to the
   top right, and add a dedicated dashboard button to open each tip.
 - [x] Limit new messages to 600 characters on both the page and server; on

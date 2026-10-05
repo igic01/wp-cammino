@@ -87,6 +87,9 @@ try {
   await wait(owner, '!!document.getElementById("tipster-tips-title")');
   await navigate(owner, '/tipsters/new/', '!!document.getElementById("tip-title")');
   await evaluate(owner, "document.getElementById('tip-title').value='Final browser tip';document.getElementById('tip-short_description').value='Short';document.getElementById('tip-long_description').value='Long';document.getElementById('tip-title').form.requestSubmit();true;");
+  await wait(owner, '!!document.getElementById("tipster-tips-title")');
+  check(await evaluate(owner, "location.pathname==='/tipsters/'"), 'Submission returns to the dashboard');
+  await evaluate(owner, "document.querySelector('.cammino-tipsters__tip-actions .button').click();true;");
   await wait(owner, '!!document.querySelector("#conversation[data-cursor]")');
   const id = await evaluate(owner, "document.getElementById('conversation').dataset.tip");
   const ownerPath = '/tipsters/tip/'+id+'/', adminPath = '/wp-admin/admin.php?page=cammino-tips&tip_id='+id;
