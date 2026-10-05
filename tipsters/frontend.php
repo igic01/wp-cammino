@@ -269,5 +269,6 @@ function cammino_tipsters_handle_frontend(): void {
 add_action( 'wp_enqueue_scripts', static function (): void {
 	if ( cammino_tipsters_route() ) {
 		cammino_enqueue_design_assets( 'cammino-tipsters', '/tipsters/assets/portal.css', '' );
+		if ( 'login' === cammino_tipsters_route() ) { wp_enqueue_script( 'cammino-tipster-login', get_template_directory_uri() . '/tipsters/assets/login.js', array(), CAMMINO_TIPSTERS_VERSION, true ); }
 	}
 }, 1003 );

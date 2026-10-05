@@ -11,10 +11,10 @@ $files = $record['files'];
 <article class="cammino-tipsters__card cammino-tipsters__detail">
 	<div class="cammino-tipsters__section-heading">
 		<h2><?php echo esc_html( $record['title'] ); ?></h2>
-		<span class="cammino-tipsters__status"><?php echo esc_html( $statuses[ $status ] ); ?></span>
+		<span class="cammino-tipsters__status" data-tip-status><?php echo esc_html( $statuses[ $status ] ); ?></span>
 	</div>
 	<p class="cammino-tipsters__dates"><?php echo esc_html( sprintf( __( 'Odoslané: %1$s · Aktualizované: %2$s', 'cammino' ), get_post_time( get_option( 'date_format' ) . ' H:i', false, $tip, true ), get_date_from_gmt( $record['updated_at'], get_option( 'date_format' ) . ' H:i' ) ) ); ?></p>
-	<p class="cammino-tipsters__notice"><?php echo esc_html( 'discussion' === $status ? __( 'Administrátor otvoril diskusiu. Formulár môžete upraviť a správu odoslať nižšie.', 'cammino' ) : ( 'approved' === $status ? __( 'Tip je schválený. Formulár je uzamknutý. Komunikácia zostáva otvorená.', 'cammino' ) : __( 'Tip čaká na kontrolu administrátorom. Formulár je uzamknutý.', 'cammino' ) ) ); ?></p>
+	<p class="cammino-tipsters__notice" data-tip-notice><?php echo esc_html( cammino_tipsters_status_notice( $status ) ); ?></p>
 	<?php if ( 'discussion' !== $status && ! empty( $GLOBALS['cammino_tipsters_form_errors'] ) ) : ?><p class="cammino-tipsters__error" role="alert"><?php echo esc_html( $GLOBALS['cammino_tipsters_form_errors']->get_error_message() ); ?></p><?php endif; ?>
 	<?php if ( ! empty( $GLOBALS['cammino_tipsters_tip_action_error'] ) ) : ?><p class="cammino-tipsters__error" role="alert"><?php echo esc_html( $GLOBALS['cammino_tipsters_tip_action_error']->get_error_message() ); ?></p><?php endif; ?>
 	<h3><?php esc_html_e( 'Krátky popis', 'cammino' ); ?></h3>

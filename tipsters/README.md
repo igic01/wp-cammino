@@ -1,9 +1,10 @@
 # Tipsters: accounts and private submissions
 
-Stages 1-4 provide account management, frontend login, private submissions,
+Stages 1-5 provide account management, frontend login, private submissions,
 shared-file links, administrator review/status history, discussion-only editing,
 tipster deletion with admin retention, and persistent per-tip conversations.
-Stage 4 is ready for your review; Stage 5 has not started.
+Stage 5 adds rejected tips, confirmed administrator tip deletion, compact chat,
+password visibility and a footer login link. Ready for review at checkpoint 5.
 
 ## Open the screens
 
@@ -35,7 +36,8 @@ On installations with plain permalinks, use `/?cammino_tipsters=login` and
 `/?cammino_tipsters=dashboard`. New submissions use `/?cammino_tipsters=new`;
 details use `/?cammino_tipsters=tip&cammino_tip_id={id}`. Download links are
 generated automatically and also work with plain permalinks.
-The admin list links to the correct login URL.
+The admin list and shared site footer link to the correct login URL. Login
+includes a show/hide-password button; passwords are masked again on submission.
 If pretty routes return 404 after installation, save **Settings -> Permalinks**
 once and check the site's normal rewrite configuration.
 
@@ -122,7 +124,7 @@ New submissions use an optional shared-file URL, so they require no private-file
 storage configuration. Use a Google Drive folder (or another provider) to share
 multiple documents through one link. The owner controls the provider's sharing
 permissions; WordPress stores the URL and does not upload, download, embed, or
-change permissions on external files. Full account deletion removes the saved
+change permissions on external files. Permanent administrator tip/account deletion removes the saved
 link, but does not delete files held by an external provider.
 
 Existing uploads remain available through the authenticated download handler.
@@ -145,7 +147,7 @@ the configured directory, and fails rather than deleting an unrecognized file.
 
 Deletion removes live application records and files. It does not erase hosting
 backups or unrelated infrastructure logs. Legal retention, backup schedules, and
-whether message retention overrides account deletion remain questions in
+whether message retention overrides permanent tip/account deletion remain questions in
 `todo.md`; the implementation does not establish legal compliance.
 
 ## Stage 2 behavior and review checklist
@@ -173,15 +175,17 @@ Open **wp-admin -> Tipy** to find all completed tips, twenty per page, with
 search, owner/status filters and a private detail screen. Admins can read fields,
 open the shared link, download legacy attachments and inspect change history.
 
-Allowed transitions: submitted -> discussion/approved, discussion -> approved,
-and approved -> discussion with explicit reopen confirmation. Owners can change
+Allowed transitions: submitted -> discussion/approved/rejected, discussion ->
+approved/rejected, approved -> discussion/rejected, and rejected -> discussion.
+Reopening from approved or rejected requires explicit confirmation. Owners can change
 text and the shared link only in discussion; saving keeps discussion status.
-Submitted/approved forms are locked on both the page and server. Version checks
+Submitted/approved/rejected forms are locked on both the page and server. Version checks
 reject stale forms, including forms left open through approval/reopening.
 
 Owner deletion requires confirmation, records deleted_by_tipster and hides the
 tip and its conversation/legacy downloads from that owner. Admins retain read
-access. No individual permanent tip deletion or restoration is exposed. Account
+access. Administrators can permanently delete a tip through the separate
+confirmed action; owner-deleted tips cannot be restored. Account
 disabling preserves records and revokes access; full account deletion purges
 all tips, conversations (including admin replies), private legacy files, history
 and temporary message drafts. External provider files are not removed.
@@ -200,13 +204,15 @@ it, and use a disposable account to check permanent deletion.
 
 Each frontend tip detail and **Tipy** admin detail contains **Komunikacia**.
 Messaging opens in discussion and stays open in approved, independently of the
-locked form. Submitted tips, owner-deleted tips, disabled accounts and accounts
+locked form. Submitted/rejected tips, owner-deleted tips, disabled accounts and tips/accounts
 being purged cannot receive new messages. Admins retain readable history for
 disabled/deleted tips; their owners lose access as appropriate.
 
 Messages are plain text, 1-5,000 characters, ordered oldest first with username,
-role and site-local time. Twenty historical messages appear per page. With JavaScript, new messages
-appear automatically in a separate live section and sending does not reload
+role and site-local time. Twenty historical messages appear per page, opening the latest page by
+default. Historical and live messages share a bounded scrollable panel;
+the reply box stays outside it. Own and other messages have separate bubbles.
+With JavaScript, new messages appear automatically and sending does not reload
 the page. Without JavaScript, standard forms and paginated history still work. No message attachments,
 email notifications, individual editing or individual deletion are provided.
 No tipster email is needed.
@@ -224,7 +230,9 @@ polls. Large backlogs drain in bounded batches. The initial watermark covers all
 history, so opening an older history page does not replay later historical
 messages as new. Up to 200 live messages remain in the DOM; all records remain
 in paginated history. New content uses text nodes, preserves drafts and does
-not force scrolling. Status changes automatically open/close the composer.
+not move the page. The message panel follows new messages when already at the
+bottom or after sending; reading older messages preserves the scroll position
+and offers a button to jump to the new replies. Status changes automatically open/close the composer.
 Session expiration or lost access stops polling and clears displayed messages.
 Sending uses the existing immutable, deduplicated persistence service; a failed
 network send retains its draft and retry token.
@@ -265,7 +273,80 @@ Use separate admin and tipster sessions and disposable accounts:
    Files on Google Drive or other providers stay under the provider's control.
 7. Check desktop/mobile forms, long messages, links and conversation pagination.
 
-**Stop at review checkpoint 4. Stage 5 waits for your feedback.**
+**Stage 4 review is complete enough to proceed under your Stage 5 instruction.**
+
+## Stage 5 behavior and final review checklist
+
+**Zamietnutý** (`rejected`) remains visible to its owner, with the existing
+conversation readable. Neither party can post new messages, and the tipster
+cannot edit the form/link. Administrators can reject submitted, discussion or
+approved tips. Reopening to discussion requires the confirmation checkbox.
+Already open pages receive the new status automatically, close the composer
+and disable content editing. Reload after reopening to obtain a fresh edit form.
+
+In **Tipy -> tip detail**, expand **Natrvalo odstrániť tip** beneath the change
+history. Enter the exact tip title and confirm the checkbox. This permanently
+removes that tip, all conversation messages (including admin replies), history,
+temporary admin drafts, and current/retained/pending legacy uploads. The account
+and its other tips remain active. External storage-provider files are unaffected.
+This is separate from the owner's retained **deleted_by_tipster** action.
+
+Deletion shares the account write lock and checks the displayed tip version.
+An interrupted cleanup hides/locks only that tip and lets the administrator
+repeat deletion after fixing the reported storage or database error. It reports
+success only after the tip itself has been removed. Individual messages still
+have no editing or deletion action.
+
+Use disposable records for this acceptance checklist:
+
+1. Follow **Prihlásenie tipstera** in the site footer. Toggle **Zobraziť heslo** /
+   **Skryť heslo**, then log in with an admin-created username/password.
+2. Submit two tips, open discussion on one, and edit its descriptions/shared link.
+   Exchange replies from separate admin and tipster sessions.
+3. Add enough replies for multiple history pages. Verify the latest page opens
+   initially; the scrollable panel stays bounded on desktop/mobile and its reply
+   box stays outside it. Navigate to older history and scroll with the keyboard.
+4. Keep an unsent draft while reading earlier messages. Send from the other
+   session: the draft/reading position must stay intact and a new-message button
+   must appear. Use the button to jump down; sending your own reply follows it.
+5. Approve the tip: editing locks and chat stays open. Reject it: **Zamietnutý**
+   appears, editing/chat lock, and prior messages remain readable. Confirmed
+   reopening restores discussion; reload the owner page before editing again.
+6. Delete a tip as its owner; it disappears from that dashboard and remains
+   visible in the admin's deleted-tip filter. Disable/re-enable the account and
+   change its password: records remain and revoked sessions must log in again.
+7. On a disposable tip, test an incorrect deletion title and then a correct
+   confirmed administrator deletion. Its history/messages/legacy downloads must
+   disappear while the account and second tip stay available.
+8. Permanently delete a disposable account with populated tips. Check full
+   cleanup and unrelated-account isolation. Settle the retention/backups question
+   in `todo.md` before using these destructive actions with real records.
+
+**STOP / REVIEW 5:** implementation and local checks are complete. Your acceptance
+and checks on your own hosting remain pending. No production deployment is included.
+
+## Upgrade, backups and rollback
+
+Version 1.4.0 initializes the existing role/capability and routing idempotently
+on the next request. It adds no pages, database tables, API keys, or service
+dependencies. Existing accounts, tips and conversations remain in place.
+
+Before a production update, back up the WordPress database and any configured
+private legacy storage together; shared-file URLs do not back up provider files.
+Keep the previous theme package and test restore procedures on a separate site.
+Turning off/changing the theme preserves database records, but the module's
+screens, authentication restrictions and application handlers stop running.
+Legacy storage must remain outside the served root independently of the theme.
+
+For rollback, first restrict feature access, then restore a compatible theme
+and, when needed, the matching database/private-storage backup. Do not delete
+the feature records or roles to roll back. Older versions do not understand
+`rejected` tips, so a blind downgrade can hide them or apply outdated workflow
+rules. Restore a tested backup or backport support for all stored statuses.
+
+On your host, verify HTTPS, cache/CDN exclusions, private-storage aliases,
+security/translation/editor plugins, and WooCommerce integration before rollout.
+The local disposable installation cannot verify those deployment settings.
 
 ## Hosting and login protection
 
@@ -296,10 +377,12 @@ php tipsters/tests/submissions-workflow.php /path/to/disposable/wordpress/wp-loa
 php tipsters/tests/review-workflow.php /path/to/disposable/wordpress/wp-load.php
 php tipsters/tests/messages-workflow.php /path/to/disposable/wordpress/wp-load.php
 php tipsters/tests/conversation-live-workflow.php /path/to/disposable/wordpress/wp-load.php
+php tipsters/tests/final-workflow.php /path/to/disposable/wordpress/wp-load.php
 python tipsters/tests/submissions-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 python tipsters/tests/review-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 python tipsters/tests/messages-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 python tipsters/tests/conversation-live-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
+python tipsters/tests/final-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765
 ```
 
 The test installation must activate this theme and explicitly define both
@@ -359,6 +442,25 @@ For browser review, start headless Chrome with a debugging port and use the
 guarded fixture helper to create a temporary credentials JSON, then run
 `node tipsters/tests/responsive-browser.mjs fixtures.json /path/to/screenshots http://127.0.0.1:8765 9225 review`.
 Clean the fixture prefix with `http-fixtures.php ... cleanup {prefix}` afterwards.
+
+Stage 5 passed 303 WordPress checks (85 accounts, 64 submissions, 81 review,
+45 messages, 7 live deltas and 21 rejection/per-tip purge), 200 HTTP checks
+(55 submissions, 41 review, 36 messages, 22 live updates, 29 final-stage and
+17 storage/theme-switch), and 42 Chrome checks (16 responsive, 8 live sessions,
+18 final UX). The 135 relevant site-shell/post/page-spacing/catalogue regression
+checks and PHP/JavaScript syntax checks passed. Desktop/mobile screenshots were
+inspected at 1280px, 390px and 360px widths.
+
+The local storage test switched to Twenty Twenty-Four and back, checked anonymous
+access, record/file preservation and restored authenticated downloads. It does
+not validate production server aliases, CDN rules or plugins. Run it alone using
+`python tipsters/tests/storage-theme-http.py --php /path/to/php --wp-load /path/to/disposable/wordpress/wp-load.php --url http://127.0.0.1:8765`.
+It temporarily changes only the explicitly opted-in disposable site's theme.
+
+Run the additional UX workflow using
+`node tipsters/tests/final-browser.mjs fixtures.json http://127.0.0.1:8765 9225 /path/to/disposable/wordpress/wp-load.php /path/to/php /path/to/screenshots`.
+This uses two isolated browser sessions and creates a long disposable conversation
+through the guarded CLI helper. Clean its fixture prefix afterwards.
 
 Production cache/proxy/plugin behavior and your own installation remain part of
 the user review checkpoint. No production deployment was performed.

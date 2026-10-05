@@ -3,7 +3,14 @@
 defined( 'ABSPATH' ) || exit;
 
 function cammino_tipsters_status_labels(): array {
-	return array( 'submitted' => __( 'Odoslaný', 'cammino' ), 'discussion' => __( 'Diskusia', 'cammino' ), 'approved' => __( 'Schválený', 'cammino' ), 'deleted_by_tipster' => __( 'Odstránený tipsterom', 'cammino' ) );
+	return array( 'submitted' => __( 'Odoslaný', 'cammino' ), 'discussion' => __( 'Diskusia', 'cammino' ), 'approved' => __( 'Schválený', 'cammino' ), 'rejected' => __( 'Zamietnutý', 'cammino' ), 'deleted_by_tipster' => __( 'Odstránený tipsterom', 'cammino' ) );
+}
+
+function cammino_tipsters_status_notice( string $status ): string {
+	if ( 'rejected' === $status ) { return __( 'Tip je zamietnutý. Formulár aj komunikácia sú uzamknuté. Doterajšie správy zostávajú dostupné.', 'cammino' ); }
+	if ( 'discussion' === $status ) { return __( 'Administrátor otvoril diskusiu. Úpravy sú povolené iba v diskusii. Ak bol tip znovu otvorený, obnovte stránku pred úpravou formulára.', 'cammino' ); }
+	if ( 'approved' === $status ) { return __( 'Tip je schválený. Formulár je uzamknutý. Komunikácia zostáva otvorená.', 'cammino' ); }
+	return __( 'Tip čaká na kontrolu administrátorom. Formulár je uzamknutý.', 'cammino' );
 }
 
 function cammino_tipsters_tip_ready( int $id ): bool {
@@ -157,6 +164,6 @@ function cammino_tipsters_own_tips( int $page = 1 ): WP_Query {
 		'post_type' => CAMMINO_TIP_POST_TYPE, 'post_status' => 'private', 'author' => get_current_user_id(),
 		'post__in' => cammino_tipsters_account_enabled( get_current_user_id() ) ? array() : array( 0 ),
 		'posts_per_page' => 10, 'paged' => max( 1, $page ), 'orderby' => array( 'date' => 'DESC', 'ID' => 'DESC' ),
-		'meta_query' => array( array( 'key' => '_cammino_tip_status', 'value' => array( 'submitted', 'discussion', 'approved' ), 'compare' => 'IN' ) ),
+		'meta_query' => array( array( 'key' => '_cammino_tip_status', 'value' => array( 'submitted', 'discussion', 'approved', 'rejected' ), 'compare' => 'IN' ), array( 'key' => '_cammino_tip_purging', 'compare' => 'NOT EXISTS' ) ),
 	) );
 }

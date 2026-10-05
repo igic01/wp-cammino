@@ -244,6 +244,7 @@ function cammino_render_site_footer(): void {
 			<div class="footer-links">
 				<h2><?php esc_html_e( 'Cammino', 'cammino' ); ?></h2>
 				<?php cammino_render_shared_menu(); ?>
+				<?php if ( function_exists( 'cammino_tipsters_url' ) ) : ?><a class="footer-tipster-login" href="<?php echo esc_url( cammino_tipsters_url( 'login' ) ); ?>"><?php esc_html_e( 'Prihlásenie tipstera', 'cammino' ); ?></a><?php endif; ?>
 			</div>
 
 			<div class="footer-contact">

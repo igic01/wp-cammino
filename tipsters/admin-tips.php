@@ -104,7 +104,7 @@ function cammino_tipsters_admin_tip_detail( int $id ): void {
 	<p><a href="<?php echo esc_url( cammino_tipsters_admin_tips_url() ); ?>">&larr; <?php esc_html_e( 'Všetky tipy', 'cammino' ); ?></a></p>
 	<div class="cammino-admin-tips__panel">
 		<h2><?php echo esc_html( $record['title'] ); ?></h2>
-		<p><strong><?php echo esc_html( $labels[ $record['status'] ] ); ?></strong> · <?php if ( $owner ) : ?><a href="<?php echo esc_url( cammino_tipsters_admin_url( array( 'account_id' => $owner->ID ) ) ); ?>"><?php echo esc_html( $owner->display_name . ' (' . $owner->user_login . ')' ); ?></a><?php endif; ?></p>
+		<p><strong data-tip-status><?php echo esc_html( $labels[ $record['status'] ] ); ?></strong> · <?php if ( $owner ) : ?><a href="<?php echo esc_url( cammino_tipsters_admin_url( array( 'account_id' => $owner->ID ) ) ); ?>"><?php echo esc_html( $owner->display_name . ' (' . $owner->user_login . ')' ); ?></a><?php endif; ?></p>
 		<p><?php echo esc_html( sprintf( __( 'Odoslané: %1$s · Aktualizované: %2$s', 'cammino' ), get_post_time( get_option( 'date_format' ) . ' H:i', false, $post, true ), get_date_from_gmt( $record['updated_at'], get_option( 'date_format' ) . ' H:i' ) ) ); ?></p>
 		<h3><?php esc_html_e( 'Krátky popis', 'cammino' ); ?></h3><div class="cammino-admin-tips__text"><?php echo esc_html( $record['short_description'] ); ?></div>
 		<h3><?php esc_html_e( 'Podrobný popis', 'cammino' ); ?></h3><div class="cammino-admin-tips__text"><?php echo esc_html( $record['long_description'] ); ?></div>
@@ -114,17 +114,19 @@ function cammino_tipsters_admin_tip_detail( int $id ): void {
 		<?php if ( $record['retained_files'] ) : ?><h3><?php esc_html_e( 'Prílohy odstránené z formulára', 'cammino' ); ?></h3><p><?php esc_html_e( 'Zachované pre administrátora; tipster ich už nemôže stiahnuť.', 'cammino' ); ?></p><?php cammino_tipsters_admin_file_list( $id, $record['retained_files'] ); ?><?php endif; ?>
 	</div>
 	<div class="cammino-admin-tips__panel"><h2><?php esc_html_e( 'Zmeniť stav', 'cammino' ); ?></h2>
-		<?php if ( $record['deleted'] ) : $actor = get_userdata( $record['deleted']['actor'] ); ?>
+		<?php if ( get_post_meta( $id, '_cammino_tip_purging', true ) ) : ?>
+			<p class="notice notice-error"><?php esc_html_e( 'Mazanie tipu nie je dokončené. Tipster nemá prístup. Zopakujte trvalé odstránenie nižšie.', 'cammino' ); ?></p>
+		<?php elseif ( $record['deleted'] ) : $actor = get_userdata( $record['deleted']['actor'] ); ?>
 			<p><?php echo esc_html( sprintf( __( 'Odstránil: %1$s · Čas: %2$s · Predchádzajúci stav: %3$s', 'cammino' ), $actor ? $actor->display_name : __( 'Tipster', 'cammino' ), get_date_from_gmt( $record['deleted']['time'], get_option( 'date_format' ) . ' H:i' ), $labels[ $record['deleted']['previous_status'] ] ) ); ?></p>
 			<p><?php esc_html_e( 'Tip zostáva zachovaný. Obnovenie ani nové zmeny nie sú povolené.', 'cammino' ); ?></p>
 		<?php else : ?>
-			<p><?php esc_html_e( 'Diskusia umožní tipsterovi upraviť formulár. Schválenie uzamkne formulár. Komunikácia zostáva otvorená aj po schválení.', 'cammino' ); ?></p>
+			<p><?php esc_html_e( 'Diskusia umožní úpravy a komunikáciu. Schválenie uzamkne formulár. Zamietnutie uzamkne formulár aj komunikáciu.', 'cammino' ); ?></p>
 			<?php foreach ( cammino_tipsters_tip_transitions( $record['status'] ) as $target ) : ?>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="cammino-admin-tips__status-form">
 					<input type="hidden" name="action" value="cammino_tip_status"><input type="hidden" name="tip_id" value="<?php echo esc_attr( $id ); ?>"><input type="hidden" name="tip_version" value="<?php echo esc_attr( $record['version'] ); ?>"><input type="hidden" name="status" value="<?php echo esc_attr( $target ); ?>">
 					<?php wp_nonce_field( 'cammino_tip_status_' . $id ); ?>
-					<?php if ( 'approved' === $record['status'] ) : ?><p><label><input type="checkbox" name="confirm_reopen" value="yes" required> <?php esc_html_e( 'Potvrdzujem opätovné otvorenie a povolenie úprav tipsterovi.', 'cammino' ); ?></label></p><?php endif; ?>
-					<?php submit_button( 'approved' === $target ? __( 'Schváliť tip', 'cammino' ) : ( 'approved' === $record['status'] ? __( 'Znovu otvoriť diskusiu', 'cammino' ) : __( 'Otvoriť diskusiu', 'cammino' ) ), 'primary', '', false ); ?>
+					<?php if ( 'discussion' === $target && in_array( $record['status'], array( 'approved', 'rejected' ), true ) ) : ?><p><label><input type="checkbox" name="confirm_reopen" value="yes" required> <?php esc_html_e( 'Potvrdzujem opätovné otvorenie a povolenie úprav tipsterovi.', 'cammino' ); ?></label></p><?php endif; ?>
+					<?php submit_button( 'rejected' === $target ? __( 'Zamietnuť tip', 'cammino' ) : ( 'approved' === $target ? __( 'Schváliť tip', 'cammino' ) : ( in_array( $record['status'], array( 'approved', 'rejected' ), true ) ? __( 'Znovu otvoriť diskusiu', 'cammino' ) : __( 'Otvoriť diskusiu', 'cammino' ) ) ), 'rejected' === $target ? 'secondary' : 'primary', '', false ); ?>
 				</form>
 			<?php endforeach; ?>
 		<?php endif; ?>
@@ -143,7 +145,32 @@ function cammino_tipsters_admin_tip_detail( int $id ): void {
 		<?php endforeach; ?></ol>
 	</div>
 	<?php
+	cammino_tipsters_admin_tip_delete_form( $id, $record );
 }
+
+function cammino_tipsters_admin_tip_delete_form( int $id, array $record ): void {
+	?>
+	<details class="cammino-admin-tips__panel cammino-admin-tips__danger"><summary><?php esc_html_e( 'Natrvalo odstrániť tip', 'cammino' ); ?></summary>
+		<p><?php esc_html_e( 'Odstráni sa tento tip, celá komunikácia, história a staršie nahrané prílohy. Operáciu nie je možné vrátiť. Účet tipstera, ostatné tipy a súbory v externom úložisku zostanú zachované.', 'cammino' ); ?></p>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<?php wp_nonce_field( 'cammino_admin_delete_tip_' . $id ); ?>
+			<input type="hidden" name="action" value="cammino_admin_delete_tip"><input type="hidden" name="tip_id" value="<?php echo esc_attr( $id ); ?>"><input type="hidden" name="tip_version" value="<?php echo esc_attr( $record['version'] ); ?>">
+			<label for="confirm-tip-title"><?php echo esc_html( sprintf( __( 'Zadajte presný názov: %s', 'cammino' ), $record['title'] ) ); ?></label>
+			<input type="text" id="confirm-tip-title" name="confirm_title" required maxlength="200" autocomplete="off">
+			<p><label><input type="checkbox" name="confirm_delete" value="yes" required> <?php esc_html_e( 'Potvrdzujem trvalé odstránenie tipu a celej komunikácie.', 'cammino' ); ?></label></p>
+			<?php submit_button( __( 'Natrvalo odstrániť tip', 'cammino' ), 'delete', '', false ); ?>
+		</form>
+	</details>
+	<?php
+}
+
+add_action( 'admin_post_cammino_admin_delete_tip', static function (): void {
+	if ( ! cammino_tipsters_can_manage() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) { wp_die( esc_html__( 'Nemáte oprávnenie odstrániť tip.', 'cammino' ), '', array( 'response' => 403 ) ); }
+	$id = absint( cammino_tipsters_input( 'tip_id' ) ); check_admin_referer( 'cammino_admin_delete_tip_' . $id );
+	$result = cammino_tipsters_admin_delete_tip( $id, cammino_tipsters_input( 'tip_version' ), cammino_tipsters_input( 'confirm_title' ), 'yes' === cammino_tipsters_input( 'confirm_delete' ) );
+	set_transient( 'cammino_tip_status_notice_' . get_current_user_id(), array( 'error' => is_wp_error( $result ), 'message' => is_wp_error( $result ) ? $result->get_error_message() : __( 'Tip a všetky jeho záznamy boli odstránené.', 'cammino' ) ), MINUTE_IN_SECONDS );
+	wp_safe_redirect( cammino_tipsters_admin_tips_url( is_wp_error( $result ) && get_post( $id ) ? array( 'tip_id' => $id ) : array() ), 303 ); exit;
+} );
 
 add_action( 'admin_enqueue_scripts', static function (): void {
 	if ( isset( $_GET['page'] ) && 'cammino-tips' === $_GET['page'] && cammino_tipsters_can_manage() ) {

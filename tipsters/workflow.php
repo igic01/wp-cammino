@@ -29,7 +29,7 @@ function cammino_tipsters_tip_status( int $id ): string {
 }
 
 function cammino_tipsters_tip_transitions( string $status ): array {
-	return array( 'submitted' => array( 'discussion', 'approved' ), 'discussion' => array( 'approved' ), 'approved' => array( 'discussion' ) )[ $status ] ?? array();
+	return array( 'submitted' => array( 'discussion', 'approved', 'rejected' ), 'discussion' => array( 'approved', 'rejected' ), 'approved' => array( 'discussion', 'rejected' ), 'rejected' => array( 'discussion' ) )[ $status ] ?? array();
 }
 
 function cammino_tipsters_tip_files( int $id, bool $include_retained = false ): array {
@@ -57,7 +57,7 @@ function cammino_tipsters_lock_owned( array $lock ): bool {
 }
 
 /** Every change shares the account lock with status changes, disabling, and purge. */
-function cammino_tipsters_mutate_tip( int $id, string $version, callable $operation ) {
+function cammino_tipsters_mutate_tip( int $id, string $version, callable $operation, bool $purge = false ) {
 	$post = get_post( $id );
 	if ( ! $post || CAMMINO_TIP_POST_TYPE !== $post->post_type ) {
 		return new WP_Error( 'not_found', __( 'Tip nie je dostupný.', 'cammino' ) );
@@ -80,6 +80,7 @@ function cammino_tipsters_mutate_tip( int $id, string $version, callable $operat
 			return new WP_Error( 'forbidden', __( 'Tento tip nemôžete zmeniť.', 'cammino' ) );
 		}
 		$record = cammino_tipsters_tip_record( $id );
+		if ( ! $purge && get_post_meta( $id, '_cammino_tip_purging', true ) ) { return new WP_Error( 'purging', __( 'Mazanie tipu nie je dokončené. Administrátor musí zopakovať odstránenie.', 'cammino' ) ); }
 		if ( ! cammino_tipsters_tip_ready( $id ) || ! preg_match( '/^[a-f0-9]{64}$/', $version ) || ! hash_equals( $record['version'], $version ) ) {
 			return new WP_Error( 'stale', __( 'Tip bol medzičasom zmenený. Obnovte jeho detail a skontrolujte aktuálny stav pred ďalšou zmenou.', 'cammino' ) );
 		}
@@ -137,8 +138,8 @@ function cammino_tipsters_change_status( int $id, string $status, string $versio
 		if ( ! in_array( $status, cammino_tipsters_tip_transitions( $old['status'] ), true ) ) {
 			return new WP_Error( 'transition', __( 'Táto zmena stavu nie je povolená.', 'cammino' ) );
 		}
-		if ( 'approved' === $old['status'] && ! $confirm_reopen ) {
-			return new WP_Error( 'confirmation', __( 'Potvrďte opätovné otvorenie schváleného tipu.', 'cammino' ) );
+		if ( 'discussion' === $status && in_array( $old['status'], array( 'approved', 'rejected' ), true ) && ! $confirm_reopen ) {
+			return new WP_Error( 'confirmation', __( 'Potvrďte opätovné otvorenie tipu.', 'cammino' ) );
 		}
 		$next = $old; $next['status'] = $status;
 		$next['history'][] = cammino_tipsters_history_event( 'status', array( 'from' => $old['status'], 'to' => $status ) );
@@ -174,4 +175,30 @@ function cammino_tipsters_edit_tip( int $id, array $input, array $files, array $
 		$next['history'][] = cammino_tipsters_history_event( 'edited', array( 'fields' => $fields, 'added' => array(), 'removed' => array() ) );
 		return cammino_tipsters_commit_record( $id, $old, $next, $lock );
 	} );
+}
+
+/** Explicit admin purge, serialized with writes/account cleanup and safe to retry. */
+function cammino_tipsters_admin_delete_tip( int $id, string $version, string $title, bool $confirmed = false ) {
+	if ( ! cammino_tipsters_can_manage() ) { return new WP_Error( 'forbidden', __( 'Tip môže natrvalo odstrániť iba administrátor.', 'cammino' ) ); }
+	if ( ! $confirmed ) { return new WP_Error( 'confirmation', __( 'Potvrďte trvalé odstránenie tipu.', 'cammino' ) ); }
+	return cammino_tipsters_mutate_tip( $id, $version, static function ( $record, $lock ) use ( $id, $title ) {
+		if ( $title !== $record['title'] ) { return new WP_Error( 'confirmation', __( 'Pre potvrdenie zadajte presný názov tipu.', 'cammino' ) ); }
+		update_post_meta( $id, '_cammino_tip_purging', 1 );
+		if ( ! get_post_meta( $id, '_cammino_tip_purging', true ) ) { return new WP_Error( 'save_failed', __( 'Tip sa nepodarilo zablokovať na odstránenie.', 'cammino' ) ); }
+		$paths = array();
+		foreach ( cammino_tipsters_all_tip_files( $id ) as $file ) {
+			$path = cammino_tipsters_private_file( (string) $file['path'] );
+			if ( is_wp_error( $path ) ) { return $path; }
+			$paths[] = $path;
+		}
+		if ( ! cammino_tipsters_lock_owned( $lock ) ) { return new WP_Error( 'busy', __( 'Operácia vypršala. Zopakujte odstránenie.', 'cammino' ) ); }
+		foreach ( array_unique( $paths ) as $path ) {
+			if ( file_exists( $path ) && ! unlink( $path ) ) { return new WP_Error( 'cleanup', __( 'Súbor sa nepodarilo odstrániť. Tip je zablokovaný; zopakujte odstránenie.', 'cammino' ) ); }
+		}
+		foreach ( cammino_tipsters_tip_message_ids( $id ) as $message ) {
+			if ( ! cammino_tipsters_delete_message_record( $message ) ) { return new WP_Error( 'cleanup', __( 'Správu sa nepodarilo odstrániť. Zopakujte odstránenie tipu.', 'cammino' ) ); }
+		}
+		foreach ( get_post_meta( $id, '_cammino_message_draft_user' ) as $sender ) { delete_transient( 'cammino_message_draft_' . (int) $sender . '_' . $id ); }
+		return wp_delete_post( $id, true ) ? true : new WP_Error( 'cleanup', __( 'Tip sa nepodarilo odstrániť. Zopakujte odstránenie.', 'cammino' ) );
+	}, true );
 }

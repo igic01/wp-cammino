@@ -5,6 +5,7 @@ defined( 'ABSPATH' ) || exit;
 function cammino_tipsters_can_message( int $id ): bool {
 	$tip = get_post( $id );
 	return $tip && CAMMINO_TIP_POST_TYPE === $tip->post_type && cammino_tipsters_can_read_tip( $id )
+		&& ! get_post_meta( $id, '_cammino_tip_purging', true )
 		&& cammino_tipsters_account_enabled( (int) $tip->post_author )
 		&& in_array( cammino_tipsters_tip_status( $id ), array( 'discussion', 'approved' ), true );
 }
@@ -78,7 +79,7 @@ function cammino_tipsters_messages( int $id, int $page = 1 ): WP_Query {
 	} finally { remove_filter( 'posts_where', $filter, 10 ); }
 }
 
-/** Internal cleanup only: full account purge or rollback of a failed insert. */
+/** Internal cleanup only: confirmed tip/account purge or failed-insert rollback. */
 function cammino_tipsters_delete_message_record( int $id ) {
 	$previous = $GLOBALS['cammino_tipsters_message_cleanup'] ?? 0;
 	$GLOBALS['cammino_tipsters_message_cleanup'] = $id;
@@ -123,6 +124,9 @@ function cammino_tipsters_render_conversation( int $id, bool $admin = false ): v
 	$cursor = cammino_tipsters_message_cursor( $id );
 	$page = isset( $_GET['messages_page'] ) && is_scalar( $_GET['messages_page'] ) ? max( 1, absint( $_GET['messages_page'] ) ) : 1;
 	$query = cammino_tipsters_messages( $id, $page );
+	if ( ! isset( $_GET['messages_page'] ) && $query->max_num_pages > 1 ) {
+		$page = (int) $query->max_num_pages; $query = cammino_tipsters_messages( $id, $page );
+	}
 	$url = $admin ? cammino_tipsters_admin_tips_url( array( 'tip_id' => $id ) ) : cammino_tipsters_url( 'tip', $id );
 	$error = $GLOBALS['cammino_tipsters_message_error'] ?? null;
 	$draft = $GLOBALS['cammino_tipsters_message_draft'] ?? array();
@@ -160,12 +164,13 @@ function cammino_tipsters_live_message_data( int $id, int $after ): array {
 	foreach ( array_slice( $rows, 0, 50 ) as $row ) {
 		$message = new WP_Post( $row );
 		$messages[] = array( 'id' => (int) $message->ID, 'body' => $message->post_content,
+			'own' => (int) $message->post_author === get_current_user_id(),
 			'sender' => ( $message->post_title ?: __( 'Odosielateľ', 'cammino' ) ) . ' · ' . ( (int) $message->post_author === $owner ? __( 'Tipster', 'cammino' ) : __( 'Administrátor', 'cammino' ) ),
 			'time' => get_post_time( get_option( 'date_format' ) . ' H:i:s', false, $message, true ),
 			'datetime' => str_replace( ' ', 'T', $message->post_date_gmt ) . 'Z' );
 		$after = (int) $message->ID;
 	}
-	return array( 'messages' => $messages, 'cursor' => $after, 'more' => $more, 'can_send' => cammino_tipsters_can_message( $id ) );
+	return array( 'messages' => $messages, 'cursor' => $after, 'more' => $more, 'can_send' => cammino_tipsters_can_message( $id ), 'status' => cammino_tipsters_tip_status( $id ), 'status_label' => cammino_tipsters_status_labels()[ cammino_tipsters_tip_status( $id ) ] ?? '', 'status_notice' => cammino_tipsters_status_notice( cammino_tipsters_tip_status( $id ) ) );
 }
 
 /** AJAX requests use the same authorization, account lock and persistence service as normal forms. */
@@ -193,6 +198,7 @@ add_action( 'wp_ajax_cammino_conversation', 'cammino_tipsters_conversation_ajax'
 add_action( 'wp_ajax_nopriv_cammino_conversation', 'cammino_tipsters_conversation_ajax' );
 
 function cammino_tipsters_enqueue_conversation(): void {
+	wp_enqueue_style( 'cammino-conversation', get_template_directory_uri() . '/tipsters/assets/conversation.css', array(), CAMMINO_TIPSTERS_VERSION );
 	wp_enqueue_script( 'cammino-conversation', get_template_directory_uri() . '/tipsters/assets/conversation.js', array(), CAMMINO_TIPSTERS_VERSION, true );
 }
 add_action( 'wp_enqueue_scripts', static function (): void {

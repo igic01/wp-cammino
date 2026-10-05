@@ -30,6 +30,18 @@ if ( 'setup' === $mode ) {
 		if ( ! $user ) { continue; }
 		if ( 'cleanup' === $mode ) {
 			if ( 'admin' === $suffix ) { wp_delete_user( $user->ID ); } else { cammino_tipsters_delete_account( $user->ID ); }
+		} elseif ( 'chat-history' === $mode && 'one' === $suffix ) {
+			$records = cammino_tipsters_account_records( (int) $user->ID );
+			$tip = (int) ( $records['tips'][0] ?? 0 );
+			$fixture_admin = get_user_by( 'login', $prefix . '_admin' );
+			if ( ! $tip || ! $fixture_admin ) { exit( 1 ); }
+			wp_set_current_user( $fixture_admin->ID );
+			for ( $i = 1; $i <= 45; ++$i ) {
+				$message = cammino_tipsters_send_message( $tip, 'Historical message ' . $i . "\n" . str_repeat( 'Readable conversation content. ', 5 ), cammino_tipsters_message_token( $tip ) );
+				if ( is_wp_error( $message ) ) { fwrite( STDERR, $message->get_error_message() ); exit( 1 ); }
+			}
+			$result = array( 'tip_id' => $tip, 'messages' => count( cammino_tipsters_tip_message_ids( $tip ) ) );
+			wp_set_current_user( $admin->ID );
 		} elseif ( 'legacy' === $mode && 'one' === $suffix ) {
 			$records = cammino_tipsters_account_records( (int) $user->ID );
 			$tip = (int) ( $records['tips'][0] ?? 0 );
@@ -42,7 +54,7 @@ if ( 'setup' === $mode ) {
 			$result = array( 'url' => cammino_tipsters_url( 'download', $tip, $file['id'] ), 'body' => $body );
 		} elseif ( 'snapshot' === $mode && 'admin' !== $suffix ) {
 			$records = cammino_tipsters_account_records( (int) $user->ID );
-			$result[ $suffix ] = array( 'tips' => count( $records['tips'] ), 'files' => array() );
+			$result[ $suffix ] = array( 'tips' => count( $records['tips'] ), 'messages' => count( $records['messages'] ), 'files' => array() );
 			foreach ( $records['files'] as $file ) {
 				$file['exists'] = is_file( cammino_tipsters_private_file( $file['path'] ) );
 				$result[ $suffix ]['files'][] = $file;

@@ -85,6 +85,14 @@ function cammino_tipsters_set_enabled_locked( int $id, bool $enabled ) {
 }
 
 /** Include drafts, trash, and soft-deleted tips in deletion totals. */
+function cammino_tipsters_tip_message_ids( int $id ): array {
+	$args = array( 'post_type' => CAMMINO_MESSAGE_POST_TYPE, 'post_status' => array_keys( get_post_stati() ), 'numberposts' => -1, 'fields' => 'ids' );
+	return array_unique( array_map( 'intval', array_merge(
+		get_posts( array_merge( $args, array( 'post_parent' => $id ) ) ),
+		get_posts( array_merge( $args, array( 'post_parent' => 0, 'meta_key' => CAMMINO_MESSAGE_TIP_META, 'meta_value' => $id ) ) )
+	) ) );
+}
+
 function cammino_tipsters_account_records( int $id ): array {
 	$tips = get_posts( array(
 		'post_type' => CAMMINO_TIP_POST_TYPE, 'author' => $id,
@@ -96,12 +104,7 @@ function cammino_tipsters_account_records( int $id ): array {
 	) );
 	$files = array();
 	foreach ( $tips as $tip ) {
-		$messages = array_merge( $messages, get_posts( array(
-			'post_type' => CAMMINO_MESSAGE_POST_TYPE,
-			'post_status' => array_keys( get_post_stati() ), 'numberposts' => -1, 'fields' => 'ids',
-			'meta_key' => CAMMINO_MESSAGE_TIP_META, 'meta_value' => $tip,
-		) ) );
-		$messages = array_merge( $messages, get_posts( array( 'post_type' => CAMMINO_MESSAGE_POST_TYPE, 'post_status' => array_keys( get_post_stati() ), 'numberposts' => -1, 'fields' => 'ids', 'post_parent' => $tip ) ) );
+		$messages = array_merge( $messages, cammino_tipsters_tip_message_ids( (int) $tip ) );
 		foreach ( cammino_tipsters_all_tip_files( (int) $tip ) as $file ) {
 			if ( is_array( $file ) && isset( $file['path'] ) ) {
 				$files[] = $file;

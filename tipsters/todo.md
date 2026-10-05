@@ -1,7 +1,9 @@
 # Tipsters feature: implementation plan
 
-Status: Stages 1-4 implemented. Stage 4 is ready for your review at checkpoint 4.
-Stage 4 also replaces new uploads with an optional shared-file URL, as requested.
+Status: Stages 1-5 implemented. Stage 5 is ready for your review at checkpoint 5.
+Stage 5 adds rejected tips, confirmed administrator tip deletion, compact chat,
+password visibility and a footer login link. Stage 4 replaced new uploads with
+an optional shared-file URL, as requested.
 Earlier upload checkpoints below describe the historical implementation.
 
 We will implement this in stages. At every **STOP / REVIEW** checkpoint, I will
@@ -30,25 +32,29 @@ separately at each review checkpoint.
 - A tip contains a title, short description, long description, and an optional
   shared-file/folder URL (Google Drive or another provider). Older private uploads
   remain preserved; new file uploads/removals are rejected.
-- The review statuses are `submitted`, `discussion`, and `approved`. There is
+- The review statuses are `submitted`, `discussion`, `approved`, and `rejected`
+  (Slovak: **Zamietnutý**). Rejection locks editing and communication. There is
   also a `deleted_by_tipster` status, displayed as **Deleted by tipster**.
 - A tipster can delete their own tip. This is a status change, not permanent
   deletion: the administrator can still see the tip, files, and conversation.
-- Tipsters cannot change a submitted or approved form. They can change the form
+- Administrators can permanently delete an individual tip with confirmation;
+  this removes its conversation, history and private legacy files, while keeping
+  the account and other tips. External-provider files are unaffected.
+- Tipsters cannot change a submitted, approved or rejected form. They can change the form
   when its status is discussion. This includes changes to its shared-file link.
 - Communication is enabled after an administrator reviews/accepts the tip; the
   implemented initial policy opens messages in discussion and keeps them open in approved.
 - Every message is saved persistently with its tip, sender, and timestamp.
   Neither administrators nor tipsters can edit or individually delete messages.
-  Full account deletion currently includes its conversations; the possible
+  Confirmed admin tip deletion and full account deletion include conversations; the possible
   conflict with a legal retention obligation is an open question below.
 
-## 2. Questions to settle at the first checkpoint
+## 2. Workflow decisions and remaining questions
 
-The proposals here are assumptions for reviewing the plan, not confirmed rules.
-Please answer or change them before the affected stage is implemented.
+The table records the implemented workflow and remaining product/hosting
+questions. Later user instructions take precedence over the original proposals.
 
-| Question | Proposed behavior |
+| Question | Current behavior / open question |
 | --- | --- |
 | Does “approved by admin” mean the admin first accepts the tip for discussion, or that messages can only start in the final approved status? | Admin moves a reviewed tip to discussion to open communication and form edits. Approved is the final acceptance and locks the form. Communication remains available in approved. |
 | Should admins be able to reopen approved tips, move discussion back to submitted, and approve a tip directly from submitted? | Allow submitted -> discussion, discussion -> approved, and submitted -> approved. Allow approved -> discussion as an explicit reopen action. Other backwards transitions need your decision. |
@@ -56,10 +62,10 @@ Please answer or change them before the affected stage is implemented.
 | Which form fields are required, and do descriptions need formatted text? | Title and both descriptions required; shared link optional. Descriptions are plain text with line breaks. Set length limits before implementing validation. |
 | How should external file access work? | One optional HTTP/HTTPS link, up to 2,048 bytes; use a shared folder for multiple files. Tipster grants the administrator access through the provider. WordPress does not verify provider permissions or delete external files. Existing uploads remain private and downloadable. |
 | Do messages need attachments or email notifications? | Saving messages and preventing individual edits/deletions are confirmed. Attachments and notifications are still undecided. Current version: automatic text-message updates and sending, no attachments or notifications. Username/password is sufficient for an account; if notifications are requested, decide whether to add an email field and who receives admin notifications. |
-| Should admins be able to edit tip content or permanently delete individual tips? | Tipster deletion is confirmed and preserves the tip for admins. Proposed first version: no admin content override or individual permanent tip deletion; full account deletion still removes all associated records. |
-| Can a tipster delete a tip in every review status, and what should they see afterwards? Can an admin restore it? | Proposed: allow deletion from submitted, discussion, and approved after confirmation; hide it from the tipster dashboard and block their direct tip/file/conversation access. Admin retains read access to everything. No new messages or restoration on a deleted tip initially. Confirm these details. |
-| How should legal message retention interact with deleting an account and its entire history? | Your product rules require saved, uneditable messages and full account deletion. Proposed technical scope: no individual message deletion, but a confirmed account deletion purges its conversations. We have not established a legal retention obligation or period. Confirm any applicable retention policy before using permanent deletion with real records, including whether backups must retain or erase data on a schedule. |
-| Which language, page URLs, and site-menu entry should we use? | Match the existing Cammino styling and Slovak frontend. Suggested URLs: `/tipsters/login/`, `/tipsters/`, `/tipsters/new/`, and `/tipsters/tip/{id}/`. Confirm the visible name and where the login link belongs. |
+| Should admins be able to edit tip content or permanently delete individual tips? | Stage 5: confirmed permanent administrator tip deletion is requested and implemented, including its conversation/history/legacy files. Tipster deletion remains a retained status change. No admin content override. |
+| Can a tipster delete a tip in every review status, and what should they see afterwards? Can an admin restore it? | Implemented: allow deletion from submitted, discussion, approved and rejected after confirmation; hide it from the tipster dashboard and block their direct tip/file/conversation access. Admin retains read access to everything. No new messages or restoration on a deleted tip initially. Confirm these details. |
+| How should legal message retention interact with permanent administrator tip/account deletion? | Your product rules require saved, uneditable messages and full account deletion. Proposed technical scope: no individual message deletion, but confirmed administrator tip/account deletion purges the affected conversations. We have not established a legal retention obligation or period. Confirm any applicable retention policy before using permanent deletion with real records, including whether backups must retain or erase data on a schedule. |
+| Which language, page URLs, and site-menu entry should we use? | Match the existing Cammino styling and Slovak frontend. Suggested URLs: `/tipsters/login/`, `/tipsters/`, `/tipsters/new/`, and `/tipsters/tip/{id}/`. Stage 5 adds the requested footer login link and password visibility toggle. |
 
 **STOP / REVIEW 0 — Plan and workflow**
 
@@ -160,6 +166,7 @@ This table follows the proposed answer to the communication question above.
 | submitted | Yes | Locked | Closed until admin review | Administrator |
 | discussion | Yes | Tipster can edit | Open | Administrator |
 | approved | Yes | Locked | Open; form stays locked | Administrator |
+| rejected (Zamietnutý) | Yes | Locked | Closed; existing history remains readable | Administrator; confirmed reopen to discussion |
 | deleted_by_tipster | Proposed: hidden from owner; admin retains access | Locked | Proposed: closed; admin retains message history | Owner deletes; restoration undecided |
 
 Proposed normal workflow:
@@ -168,7 +175,9 @@ Proposed normal workflow:
 2. Admin reviews it and moves it to discussion; messaging and tipster edits open.
 3. Tipster saves requested changes and replies; status remains discussion.
 4. Admin moves it to approved; the form and shared-link changes lock again.
-5. Admin may explicitly reopen it as discussion if agreed at checkpoint 0.
+5. Admin may reject from submitted, discussion or approved, locking both form
+   and communication. Approved/rejected tips can reopen as discussion with
+   explicit confirmation. Admin may permanently delete any tip with confirmation.
 
 An admin may also approve directly from submitted if that transition is agreed.
 Tipsters cannot change review statuses or choose a different owner, even through
@@ -421,34 +430,56 @@ edited or individually deleted by either party. Verify the agreed account-purge
 behavior using disposable test conversations.
 
 - [x] Implement and locally verify complete conversations and status-dependent behavior.
-- [ ] Collect your feedback and wait before Stage 5.
+- [x] Receive your instruction to proceed to Stage 5 with the five requested additions.
 
 ### Stage 5 — Full verification and handover
 
-- [ ] Finish responsive styling, keyboard navigation, labels, error messages,
+- [x] Add **Zamietnutý**; keep existing messages readable while blocking edits
+  and new messages. Allow confirmed admin reopening to discussion.
+- [x] Add confirmed permanent administrator tip deletion, scoped to that tip,
+  including retryable cleanup if files/messages/post deletion fail.
+- [x] Replace growing message lists with responsive, keyboard-accessible scroll
+  panels, own/other bubbles, latest history by default and older-page navigation.
+  Preserve reading/draft position on incoming messages; show a new-message button.
+- [x] Add accessible show/hide-password control and shared-footer login link.
+
+- [x] Finish responsive styling, keyboard navigation, labels, error messages,
   and the agreed menu/login entry using the existing Cammino design.
-- [ ] Add meaningful automated tests for permissions, ownership, transitions,
+- [x] Add meaningful automated tests for permissions, ownership, transitions,
   locked writes, stale saves, upload rejection, message persistence/isolation,
   blocked message edits/deletions, admin-only password changes, account
   disabling/purging, and preserved tipster-deleted tips, following
   the repository's PHP workflow-test style.
-- [ ] Run PHP syntax checks and relevant existing theme workflow tests after
+- [x] Run PHP syntax checks and relevant existing theme workflow tests after
   bootstrap/router changes. Verify the real WordPress paths on the agreed test
   installation; standalone fixtures alone cannot prove upload/auth behavior.
-- [ ] Run end-to-end checks with an administrator, two tipsters, an unrelated
+- [x] Run end-to-end checks with an administrator, two tipsters, an unrelated
   account, and an anonymous visitor, including blocked tipster password recovery,
   admin password changes, disabling/re-enabling, tipster deletion, and full
   account deletion with populated records and files.
-- [ ] Verify no private data leaks through public endpoints, attachment URLs,
-  page caching, the visual editor, or direct file access. Check private file
-  protection with the theme inactive and after reactivation.
-- [ ] Verify idempotent setup on an existing site, role permissions, final
+- [x] Verify private endpoint/download isolation, no-store responses and
+  exclusion from public/editor routes on the disposable installation.
+- [x] Switch the disposable installation to Twenty Twenty-Four and back;
+  verify private-file isolation, preserved records and restored downloads.
+- [ ] Verify production cache/CDN/plugin behavior and storage aliases, including
+  direct-file protection when the theme is inactive and after reactivation.
+  Local tests cannot establish protection on your host.
+- [x] Verify idempotent setup on an existing site, role permissions, final
   template routing, and no regressions to WooCommerce or existing page designs.
-- [ ] Document page setup, file-storage configuration, notification settings if
+- [x] Document page setup, file-storage configuration, notification settings if
   included, deletion/retention behavior, backups, and upgrade/rollback steps in
   `tipsters/README.md`. Feature rollback must preserve stored submissions.
-- [ ] Prepare a final acceptance checklist and report passed checks and any
+- [x] Prepare a final acceptance checklist and report passed checks and any
   environment-dependent checks still outstanding.
+
+Local verification: 303 WordPress, 200 HTTP, 42 Chrome and 135 relevant theme
+regression checks passed, plus PHP/JavaScript syntax checks. The browser checks
+cover long conversations, automatic incoming messages without losing drafts or
+reading position, mobile layouts, password visibility, rejection and confirmed
+admin deletion. Screenshots were inspected. The theme-switch check is local;
+production caches, aliases and plugins still require your host review.
+
+Review instructions: [Stage 5 acceptance checklist](README.md#stage-5-behavior-and-final-review-checklist).
 
 **STOP / REVIEW 5 — Final acceptance**
 
@@ -456,7 +487,8 @@ You run the full workflow: create an account -> login -> submit multiple tips ->
 admin review -> discussion and edits -> messages -> approval and locked form.
 Also check tipster deletion with admin visibility, account disabling with all
 records retained, administrator-only password changes, uneditable messages, and
-permanent account deletion under the settled retention policy.
+rejection (form/chat locked), confirmed reopening, permanent admin tip deletion,
+and permanent account deletion under the settled retention policy.
 
 - [ ] Resolve any feedback and complete the final acceptance checklist.
 - [ ] Obtain your acceptance before any production rollout. Production deployment
@@ -469,5 +501,6 @@ changed during review, there is no message attachment support,
 tip publication, administrator content override, or advanced reporting.
 Account CRUD with disabling and full deletion, administrator-controlled
 passwords, multiple private tips, shared-file links and preserved legacy uploads, administrator review statuses,
-tipster deletion with admin retention, persistent messages without individual
+tipster deletion with admin retention, confirmed administrator tip deletion,
+rejected tips, persistent messages without individual
 editing/deletion, and enforced form locking are all part of the first version.

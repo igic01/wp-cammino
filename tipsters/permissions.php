@@ -35,6 +35,7 @@ function cammino_tipsters_can_read_tip( int $id ): bool {
 	$user = wp_get_current_user();
 	return cammino_tipsters_account_enabled( (int) $user->ID )
 		&& (int) $post->post_author === (int) $user->ID
+		&& ! get_post_meta( $id, '_cammino_tip_purging', true )
 		&& 'deleted_by_tipster' !== cammino_tipsters_tip_status( $id );
 }
 

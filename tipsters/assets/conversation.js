@@ -9,6 +9,19 @@
   const status = root.querySelector('[data-live-status]');
   const live = root.querySelector('[data-live-messages]');
   const list = live.querySelector('ol');
+  const scroller = root.querySelector('[data-chat-scroll]');
+  const unreadButton = root.querySelector('[data-new-messages]');
+  let unread = 0, followLatest = scroller.dataset.latest === 'yes';
+  function toLatest() {
+    scroller.scrollTop = scroller.scrollHeight;
+    followLatest = true; unread = 0; unreadButton.hidden = true;
+  }
+  unreadButton.addEventListener('click', toLatest);
+  scroller.addEventListener('scroll', () => {
+    followLatest = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 70;
+    if (followLatest) { unread = 0; unreadButton.hidden = true; }
+  });
+  if (followLatest) requestAnimationFrame(toLatest);
   const seen = new Set([...root.querySelectorAll('[data-message-id]')].map(node => Number(node.dataset.messageId)));
   let cursor = Number(root.dataset.cursor), timer, controller;
   let stopped = false, busy = false, sending = false, writable = !form.hidden, idle = 0, failures = 0;
@@ -21,14 +34,23 @@
     root.querySelector('[data-closed]').hidden = value;
     button.disabled = !value || sending || stopped;
   }
-  function append(data) {
+  function append(data, sent = false) {
     availability(data.can_send);
+    root.querySelector('[data-chat-state]').textContent = data.can_send ? 'Otvorená' : (data.status_label || 'Uzamknutá');
+    document.querySelector('[data-tip-status]')?.replaceChildren(document.createTextNode(data.status_label || ''));
+    document.querySelector('[data-tip-notice]')?.replaceChildren(document.createTextNode(data.status_notice || ''));
+    // A status change locks any open content form immediately; version checks still protect its save.
+    if (data.status && data.status !== 'discussion') {
+      const edit = document.querySelector('input[name=operation][value=edit_tip]')?.form;
+      edit?.querySelectorAll('input:not([type=hidden]),textarea,button[type=submit]').forEach(control => { control.disabled = true; });
+    }
     const fragment = document.createDocumentFragment();
     let added = 0;
     for (const message of data.messages || []) {
       if (seen.has(message.id)) continue;
       seen.add(message.id); ++added;
       const item = document.createElement('li'); item.dataset.messageId = message.id;
+      item.className = message.own ? 'is-own' : 'is-other';
       const sender = document.createElement('strong'); sender.textContent = message.sender;
       const time = document.createElement('time'); time.dateTime = message.datetime; time.textContent = message.time;
       const body = document.createElement('div'); body.className = 'cammino-conversation__text'; body.textContent = message.body;
@@ -38,7 +60,12 @@
     if (added) {
       live.hidden = false;
       root.querySelector('[data-empty]')?.remove();
-      status.textContent = 'Nové správy sú dostupné nižšie.';
+      if (sent || followLatest) { toLatest(); }
+      else {
+        unread += added; unreadButton.hidden = false;
+        unreadButton.textContent = `Nové správy: ${unread} · Prejsť nadol`;
+      }
+      status.textContent = 'Prišli nové správy.';
     }
     // Bound live DOM and duplicate tracking; older messages remain in paginated history.
     while (list.children.length > 200) list.firstElementChild.remove();
@@ -110,7 +137,7 @@
     status.textContent = 'Odosielanie…';
     try {
       const data = await request('send_message', {message_body: body, message_token: form.elements.message_token.value});
-      append(data); form.elements.message_token.value = data.message_token;
+      append(data, true); form.elements.message_token.value = data.message_token;
       if (textarea.value === body) textarea.value = '';
       status.textContent = 'Správa bola odoslaná.'; idle = 0;
     } catch (error) { errorState(error, true); }

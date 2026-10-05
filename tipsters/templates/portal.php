@@ -25,6 +25,7 @@ $titles = array( 'login' => __( 'Prihlásenie tipstera', 'cammino' ), 'dashboard
 					<input id="tipster-username" name="username" type="text" maxlength="60" autocomplete="username" required value="<?php echo esc_attr( cammino_tipsters_input( 'username' ) ); ?>">
 					<label for="tipster-password"><?php esc_html_e( 'Heslo', 'cammino' ); ?></label>
 					<input id="tipster-password" name="password" type="password" maxlength="4096" autocomplete="current-password" required>
+					<button type="button" class="cammino-tipsters__password-toggle" aria-controls="tipster-password" aria-pressed="false" data-password-toggle hidden><?php esc_html_e( 'Zobraziť heslo', 'cammino' ); ?></button>
 					<button type="submit" class="button button--coral"><?php esc_html_e( 'Prihlásiť sa', 'cammino' ); ?></button>
 				</form>
 				<p class="cammino-tipsters__help"><?php esc_html_e( 'Ak nemáte prístupové údaje alebo potrebujete nové heslo, kontaktujte administrátora. Účty a heslá spravuje administrátor.', 'cammino' ); ?></p>
