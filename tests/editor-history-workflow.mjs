@@ -37,6 +37,28 @@ confirmSaveConflicts:'Review unmatched content. Save anyway?',mergeWarning:'Revi
 noHistory:'No saved versions.',currentVersion:'Current save',loadingHistory:'Loading',saved:'Saved',unsaved:'Unsaved',error:'Failed',regenerated:'Reset',copyLink:'Copy link',hideSocialLinks:'Hide all',editSectionVariable:'Edit section variable'}};</script>
 <script src="/editor.js"></script></body></html>`.replaceAll('<button ', '<button type="button" ');
 const requests = [];
+const personDialog = `<dialog class="nstarter-person-dialog" data-nstarter-person-dialog><form data-nstarter-person-form>
+<h2>Edit team member</h2><input name="name" required><input name="role" required><input name="email" type="email" required>
+<select name="media_type"><option value="icon">Icon</option><option value="image">Photo</option></select>
+<label data-nstarter-person-icon-preset><select name="icon_preset"><option value="fa-solid fa-user">User</option><option value="custom">Custom</option></select></label>
+<label data-nstarter-person-icon-field hidden><input name="icon"></label>
+<div data-nstarter-person-image-field hidden><input name="image_url" type="url"><button type="button" data-nstarter-person-image-picker>Choose photo</button></div>
+<button type="button" data-nstarter-person-cancel>Cancel</button><button type="submit">Apply</button></form></dialog>`;
+// Model WordPress's ordinary DOM modal, including both close/select event orders.
+const personMediaStub = `<script>window.wp={media(options){
+    window.pickerOptions=options;
+    const handlers={};const modal=document.createElement('div');
+    modal.style.cssText='position:fixed;inset:0;z-index:160000;background:white;display:grid;place-content:center;gap:20px';
+    modal.innerHTML='<button type="button" id="choose-photo">Select photo</button><button type="button" id="cancel-photo">Cancel</button>';
+    const picker={on(name,handler){handlers[name]=handler;return this;},
+        state(){return {get(){return {first(){return {toJSON(){return {url:'https://example.org/team-photo.jpg'};}};}};}};},
+        open(){document.body.append(modal);modal.querySelector('button').focus();},
+        close(){modal.remove();handlers.close?.();}};
+    modal.querySelector('#choose-photo').onclick=()=>{if(window.selectBeforeClose){handlers.select?.();picker.close();}else{picker.close();handlers.select?.();}};
+    modal.querySelector('#cancel-photo').onclick=()=>picker.close();
+    modal.onkeydown=(event)=>{if(event.key==='Escape')picker.close();};
+    return picker;
+}};</script>`;
 
 const server = createServer(async (req, res) => {
     const pathname = new URL(req.url, 'http://localhost').pathname;
@@ -56,6 +78,9 @@ const server = createServer(async (req, res) => {
         const selected = state.social.split(',');
         const items = ['facebook', 'instagram', 'copy'].map(item => `<button data-cammino-social="${item}" ${selected.includes(item) ? '' : 'hidden'}>${item}</button>`).join('');
         res.end(`<!doctype html><html><body class="nstarter-editor-preview"><aside data-cammino-post-social data-nstarter-variable-section="cammino_post_social" data-nstarter-variable-label="Social links" data-nstarter-variable-type="text" data-nstarter-variable-control="social-picker" data-nstarter-variable-value="${state.social}">${items}</aside><div data-nstarter-snapshot-root><p>Post content</p></div></body></html>`);
+    } else if (pathname === '/person-preview') {
+        res.setHeader('Content-Type', 'text/html');
+        res.end(`<!doctype html><html><body><div data-nstarter-snapshot-root><section data-nstarter-variable-section="about_people_count" data-nstarter-variable-control="repeat" data-nstarter-variable-type="number" data-nstarter-variable-value="1"><div class="contact-people" data-nstarter-variable-items><article class="contact-person" data-nstarter-variable-item><div class="contact-person__icon"><i class="fa-solid fa-user"></i></div><div><span>Original role</span><h3>Original name</h3><a href="mailto:team@example.org">team@example.org</a></div></article></div></section></div></body></html>`);
     } else if (pathname === '/preview') {
         res.setHeader('Content-Type', 'text/html');
         const url = new URL(req.url, 'http://localhost');
@@ -101,6 +126,13 @@ const server = createServer(async (req, res) => {
         default: throw new Error('Unexpected action: ' + form.get('action'));
         }
         res.end(JSON.stringify({ success: true, data }));
+    } else if (pathname === '/person-editor') {
+        res.setHeader('Content-Type', 'text/html');
+        // Start the preview after editor.js has installed its load listener.
+        res.end(fixture.replaceAll('/preview', '/person-preview')
+            .replace('<iframe data-nstarter-frame src="/person-preview">', '<iframe data-nstarter-frame>')
+            .replace('<script src="/editor.js">', personDialog + personMediaStub + '<script src="/editor.js">')
+            .replace('</body>', '<script>document.querySelector("[data-nstarter-frame]").src="/person-preview";</script></body>'));
     } else {
         res.setHeader('Content-Type', 'text/html');
         res.end(pathname === '/button-editor' ? fixture.replaceAll('/preview', '/button-preview').replace('isPost:false', 'isPost:true') : pathname === '/social-editor' ? fixture.replaceAll('/preview', '/social-preview').replace('isPost:false', 'isPost:true') : fixture);
@@ -255,6 +287,41 @@ try {
     await check(`Array.from(document.querySelector('[data-nstarter-frame]').contentDocument.querySelectorAll('[data-nstarter-content-item] a')).length===2 && Array.from(document.querySelector('[data-nstarter-frame]').contentDocument.querySelectorAll('[data-nstarter-content-item] a')).every(link=>link.getAttribute('contenteditable')==='true')`, 'New buttons also have isolated editable labels');
     await call('Input.insertText', { text: ' today' });
     await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelectorAll('[data-nstarter-content-item] a')[1].textContent==='Donate today'`, 'New buttons focus their label and keep typing inside');
+    await evaluate(`document.querySelector('[data-nstarter-save]').click()`);
+    await check(`document.querySelector('[data-nstarter-status]').classList.contains('is-success')`, 'Save button draft before navigating to the team fixture');
+    await call('Page.navigate', { url: address + '/person-editor' });
+    await check(`!!document.querySelector('[data-nstarter-frame]')?.contentDocument?.querySelector('[data-nstarter-person-edit]')`, 'Team members have an edit control');
+    await evaluate(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('[data-nstarter-person-edit]').click()`);
+    await check(`document.querySelector('[data-nstarter-person-dialog]').matches(':modal')`, 'Team editor opens as a native modal');
+    await evaluate(`const form=document.querySelector('[data-nstarter-person-form]');form.elements.name.value='Draft name';form.elements.role.value='Draft role';form.elements.media_type.value='image';form.elements.media_type.dispatchEvent(new Event('change'));form.elements.image_url.value='https://example.org/original.jpg'`);
+    const clickMediaButton = async (selector) => {
+        const reachable = await evaluate(`(() => {const button=document.querySelector('${selector}');const rect=button.getBoundingClientRect();return document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2)===button;})()`);
+        if (!reachable) throw new Error('Media button is covered: ' + selector);
+        checks++;
+        await evaluate(`document.querySelector('${selector}').click()`);
+    };
+    for (const selectBeforeClose of [false, true]) {
+        await evaluate(`window.selectBeforeClose=${selectBeforeClose};document.querySelector('[data-nstarter-person-image-picker]').click()`);
+        await check(`!document.querySelector('[data-nstarter-person-dialog]').open && document.activeElement.id==='choose-photo'`, 'Library receives focus without a blocking native dialog');
+        await check(`window.pickerOptions.library.type==='image' && window.pickerOptions.multiple===false`, 'Team photo picker accepts a single image');
+        await clickMediaButton('#choose-photo');
+        await check(`document.querySelector('[data-nstarter-person-dialog]').matches(':modal') && document.querySelector('[data-nstarter-person-form]').elements.image_url.value==='https://example.org/team-photo.jpg'`, 'Selecting a photo restores the form in either event order');
+        await check(`document.querySelector('[data-nstarter-person-form]').elements.name.value==='Draft name' && document.querySelector('[data-nstarter-person-form]').elements.role.value==='Draft role'`, 'Photo selection preserves unsaved member fields');
+    }
+    for (const cancelWithEscape of [false, true]) {
+        await evaluate(`document.querySelector('[data-nstarter-person-image-picker]').click()`);
+        await check(`!document.querySelector('[data-nstarter-person-dialog]').open && !!document.querySelector('#cancel-photo')`, 'Library reopens for another choice');
+        if (cancelWithEscape) {
+            await call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+            await call('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+        } else {
+            await clickMediaButton('#cancel-photo');
+        }
+        await check(`document.querySelector('[data-nstarter-person-dialog]').matches(':modal') && document.activeElement.name==='image_url' && document.querySelector('[data-nstarter-person-form]').elements.image_url.value==='https://example.org/team-photo.jpg'`, 'Cancelling the library restores focus and preserves the photo');
+    }
+    await check(`document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.contact-person h3').textContent==='Original name' && !document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.contact-person img')`, 'Library changes remain draft until Apply');
+    await evaluate(`document.querySelector('[data-nstarter-person-form]').requestSubmit()`);
+    await check(`!document.querySelector('[data-nstarter-person-dialog]').open && document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.contact-person h3').textContent==='Draft name' && document.querySelector('[data-nstarter-frame]').contentDocument.querySelector('.contact-person img')?.src==='https://example.org/team-photo.jpg'`, 'Apply updates the member and selected photo after library use');
     if (errors.length) throw new Error(JSON.stringify(errors));
     console.log(`Passed ${checks} editor history browser checks.`);
 } finally {

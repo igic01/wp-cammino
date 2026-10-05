@@ -2894,10 +2894,23 @@
             if (!window.wp?.media) return;
             const picker = window.wp.media({ title: 'Vybrať fotografiu', button: { text: 'Použiť fotografiu' }, library: { type: 'image' }, multiple: false });
             picker.on('select', function () {
-                const image = picker.state().get('selection').first().toJSON();
+                const selection = picker.state().get('selection').first();
+                if (!selection) return;
+                const image = selection.toJSON();
                 personForm.elements.image_url.value = image.url || '';
                 personForm.elements.image_url.setCustomValidity('');
             });
+            picker.on('close', function () {
+                // Let WordPress finish closing and dispatch its selection first.
+                window.setTimeout(function () {
+                    if (!activePerson || personDialog.open) return;
+                    personDialog.showModal();
+                    personForm.elements.image_url.focus();
+                }, 0);
+            });
+            // A native modal makes WordPress's Media Library inert behind it.
+            // Keep the active member and draft fields while releasing that modal.
+            personDialog.close();
             picker.open();
         });
     }
