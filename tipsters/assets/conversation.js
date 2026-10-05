@@ -26,6 +26,12 @@
   let cursor = Number(root.dataset.cursor), timer, controller;
   let stopped = false, busy = false, sending = false, writable = !form.hidden, idle = 0, failures = 0;
   let pollFinished = Promise.resolve(), finishPoll, connectionError = false;
+  let pendingSend = null;
+  const trackPendingEdit = () => {
+    if (pendingSend && (textarea.selectionStart < pendingSend.body.length || !textarea.value.startsWith(pendingSend.body))) pendingSend.edited = true;
+  };
+  textarea.addEventListener('beforeinput', trackPendingEdit);
+  textarea.addEventListener('input', trackPendingEdit);
   let feedbackTimer;
   function showStatus(text, error = false) {
     clearTimeout(feedbackTimer);
@@ -147,18 +153,33 @@
   form.addEventListener('submit', async event => {
     event.preventDefault();
     if (sending || stopped || !writable) return;
-    const body = textarea.value;
+    // An uncertain response must retry the same payload/token, even if typing continued.
+    const attempt = pendingSend || {body: textarea.value, token: form.elements.message_token.value, edited: false, uncertain: false};
+    pendingSend = attempt;
+    const {body, token} = attempt;
     sending = true; clearTimeout(timer); button.disabled = true;
     controller?.abort(); await pollFinished;
-    if (stopped || !writable) { sending = false; button.disabled = true; return; }
+    if (stopped || !writable) { if (!attempt.uncertain) pendingSend = null; sending = false; button.disabled = true; return; }
     busy = true;
     showStatus('Odosielanie…');
     try {
-      const data = await request('send_message', {message_body: body, message_token: form.elements.message_token.value});
+      const data = await request('send_message', {message_body: body, message_token: token});
       append(data, true); form.elements.message_token.value = data.message_token;
-      if (textarea.value === body) textarea.value = '';
+      // Remove the confirmed message even when typing continued while it was in flight.
+      // Keep appended text as the next draft; preserve a deliberately replaced/edited draft.
+      if (!attempt.edited && textarea.value.startsWith(body)) {
+        const start = Math.max(0, textarea.selectionStart - body.length), end = Math.max(0, textarea.selectionEnd - body.length);
+        const direction = textarea.selectionDirection;
+        textarea.value = textarea.value.slice(body.length);
+        textarea.setSelectionRange(start, end, direction);
+      }
+      pendingSend = null;
       showStatus('Správa bola odoslaná.'); idle = 0;
-    } catch (error) { errorState(error, true); }
+    } catch (error) {
+      if (!error.code || error.code >= 500) attempt.uncertain = true;
+      if (!attempt.uncertain) pendingSend = null;
+      errorState(error, true);
+    }
     finally { busy = sending = false; button.disabled = !writable || stopped; schedule(250); }
   });
   document.addEventListener('visibilitychange', () => {

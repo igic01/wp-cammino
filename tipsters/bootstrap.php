@@ -2,7 +2,7 @@
 /** Private tipster account module. @package Cammino */
 defined( 'ABSPATH' ) || exit;
 
-const CAMMINO_TIPSTERS_VERSION = '1.4.1';
+const CAMMINO_TIPSTERS_VERSION = '1.4.2';
 const CAMMINO_TIPSTER_ROLE = 'cammino_tipster';
 const CAMMINO_TIPSTERS_CAP = 'manage_cammino_tipsters';
 const CAMMINO_TIP_POST_TYPE = 'cammino_tip';

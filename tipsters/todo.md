@@ -443,6 +443,8 @@ behavior using disposable test conversations.
   Preserve reading/draft position on incoming messages; show a new-message button.
 - [x] Add accessible show/hide-password control and shared-footer login link.
 - [x] Redirect successful new submissions to the tipster dashboard.
+- [x] Fix typing during message sending: remove the confirmed message prefix,
+  keep the next/replaced draft and caret position, and retain text on failure.
 - [x] Apply checkpoint feedback: center login, move contrasting logout to the
   top right, and add a dedicated dashboard button to open each tip.
 - [x] Limit new messages to 600 characters on both the page and server; on
@@ -491,6 +493,10 @@ production caches, aliases and plugins still require your host review.
 Checkpoint refinements: 49 message WordPress, 36 message HTTP, 24 live AJAX
 and 38 browser UX checks passed, together with the 7 delta, 21 rejection/purge
 and 41 relevant theme checks. Desktop/mobile screenshots were inspected.
+
+Send-race fix: 25 two-session Chrome checks passed for admin and tipster,
+including typing/replacing a draft during sends, failed/lost responses and
+safe retries that preserve the next draft. JavaScript/PHP syntax checks passed.
 
 Review instructions: [Stage 5 acceptance checklist](README.md#stage-5-behavior-and-final-review-checklist).
 

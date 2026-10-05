@@ -248,6 +248,13 @@ automatically open/close the composer.
 Session expiration or lost access stops polling and clears displayed messages.
 Sending uses the existing immutable, deduplicated persistence service; a failed
 network send retains its draft and retry token.
+When typing continues before a successful send response, only the submitted
+prefix is removed; newly appended text and its caret position stay as the next
+draft. Replacing/editing the submitted portion preserves the changed draft.
+Failure leaves all current text and the retry token intact on both screens.
+After an uncertain network response, retry confirms the original message using
+its original text/token first, leaving subsequent typing for a separate send.
+This also handles a lost response after the server already saved the message.
 
 Messages persist as private database records. Standard editors/REST are disabled,
 native edit/delete capabilities are denied, and ordinary core update/trash/delete
@@ -342,7 +349,7 @@ and checks on your own hosting remain pending. No production deployment is inclu
 
 ## Upgrade, backups and rollback
 
-Version 1.4.1 initializes the existing role/capability and routing idempotently
+Version 1.4.2 initializes the existing role/capability and routing idempotently
 on the next request. It adds no pages, database tables, API keys, or service
 dependencies. Existing accounts, tips and conversations remain in place.
 
@@ -485,6 +492,12 @@ composer at 1280/390/360px, desktop Enter/Shift+Enter, touch-device newlines and
 notifications inside the message panel without moving the composer. Exactly
 600 Unicode characters persist for both parties; 601 are rejected. PHP/JS
 syntax checks passed and desktop/mobile screenshots were inspected.
+
+The 1.4.2 send-race fix passed 25 checks in two isolated Chrome sessions.
+Both admin and tipster were checked while typing during delayed sends,
+replacing a draft, failing before persistence, losing a response after
+persistence, and retrying without duplicating messages or losing the next
+draft. JavaScript/PHP syntax checks also passed.
 
 Production cache/proxy/plugin behavior and your own installation remain part of
 the user review checkpoint. No production deployment was performed.

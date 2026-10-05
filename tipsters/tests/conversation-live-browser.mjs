@@ -93,5 +93,45 @@ try {
   await wait(owner, "[...document.querySelectorAll('.cammino-conversation__text')].some(n=>n.textContent==='Reply while offline')", 6000);
   check(await evaluate(owner, "liveSentinel==='owner'"), 'Reconnection resumes automatic updates without reload');
   check(polls.filter(p=>p.session===owner).length < 15, 'Polling remains bounded across the whole browser workflow');
+  // Hold send responses so typing can deterministically race the acknowledgment.
+  for (const [session, name] of [[owner,'tipster'],[admin,'admin']]) {
+    const sent = `Send race ${name}`, draft = ` Next draft ${name}`;
+    await evaluate(session, `window.testOriginalFetch=window.fetch;window.sendHeld=false;
+      window.fetch=async (...args)=>{const response=await window.testOriginalFetch(...args);if(args[1]?.body?.get('operation')==='send_message'){window.sendHeld=true;await new Promise(resolve=>{window.releaseSend=resolve;});}return response;};
+      document.getElementById('message-body').value=${JSON.stringify(sent)};document.getElementById('message-body').form.requestSubmit();true;`);
+    await wait(session, 'window.sendHeld');
+    await evaluate(session, "(()=>{const input=document.getElementById('message-body');input.focus();input.setSelectionRange(input.value.length,input.value.length);return true;})()");
+    await cdp('Input.insertText', {text:draft}, session);
+    await evaluate(session, 'window.releaseSend();true;');
+    await wait(session, '!document.querySelector("[data-message-form] button[type=submit]").disabled');
+    check(await evaluate(session, `document.getElementById('message-body').value===${JSON.stringify(draft)} && [...document.querySelectorAll('.cammino-conversation__text')].filter(n=>n.textContent===${JSON.stringify(sent)}).length===1`), `${name}: successful send clears the sent prefix and preserves text typed while waiting`);
+    const replacementSent = `Replacement race ${name}`, replacementDraft = replacementSent + ' rewritten draft';
+    await evaluate(session, `window.sendHeld=false;document.getElementById('message-body').value=${JSON.stringify(replacementSent)};document.getElementById('message-body').form.requestSubmit();true;`);
+    await wait(session, 'window.sendHeld');
+    await evaluate(session, "document.getElementById('message-body').focus();document.getElementById('message-body').select();true;");
+    await cdp('Input.insertText', {text:replacementDraft}, session);
+    await evaluate(session, 'window.releaseSend();true;');
+    await wait(session, '!document.querySelector("[data-message-form] button[type=submit]").disabled');
+    check(await evaluate(session, `document.getElementById('message-body').value===${JSON.stringify(replacementDraft)}`), `${name}: replacing the draft preserves all text even when it starts with the sent message`);
+    await evaluate(session, 'window.fetch=window.testOriginalFetch;true;');
+    for (const persisted of [false,true]) {
+      const failed = `Failed send ${name} ${persisted ? 'saved' : 'unsaved'}`, continuation = ' Continued during failure';
+      await evaluate(session, `window.sendHeld=false;window.savedRetryToken=document.querySelector('[data-message-form]').elements.message_token.value;
+        window.fetch=async (...args)=>{if(args[1]?.body?.get('operation')==='send_message'){if(${persisted}) await window.testOriginalFetch(...args);window.sendHeld=true;await new Promise(resolve=>{window.releaseSend=resolve;});throw new TypeError('Simulated failed send');}return window.testOriginalFetch(...args);};
+        document.getElementById('message-body').value=${JSON.stringify(failed)};document.getElementById('message-body').form.requestSubmit();true;`);
+      await wait(session, 'window.sendHeld');
+      await evaluate(session, "(()=>{const input=document.getElementById('message-body');input.focus();input.setSelectionRange(input.value.length,input.value.length);return true;})()");
+      await cdp('Input.insertText', {text:continuation}, session);
+      await evaluate(session, 'window.releaseSend();true;');
+      await wait(session, '!document.querySelector("[data-message-form] button[type=submit]").disabled');
+      check(await evaluate(session, `document.getElementById('message-body').value===${JSON.stringify(failed+continuation)} && document.querySelector('[data-message-form]').elements.message_token.value===savedRetryToken`), `${name}: failed ${persisted ? 'saved' : 'unsaved'} send preserves all text and its retry token`);
+      await evaluate(session, 'window.fetch=window.testOriginalFetch;document.getElementById("message-body").form.requestSubmit();true;');
+      await wait(session, `!document.querySelector('[data-message-form] button[type=submit]').disabled && document.getElementById('message-body').value===${JSON.stringify(continuation)}`);
+      check(await evaluate(session, `[...document.querySelectorAll('.cammino-conversation__text')].filter(n=>n.textContent===${JSON.stringify(failed)}).length===1`), `${name}: retry confirms only the original message once and keeps the next draft`);
+      await evaluate(session, 'document.getElementById("message-body").form.requestSubmit();true;');
+      await wait(session, `!document.querySelector('[data-message-form] button[type=submit]').disabled && document.getElementById('message-body').value===''`);
+      check(await evaluate(session, `[...document.querySelectorAll('.cammino-conversation__text')].some(n=>n.textContent===${JSON.stringify(continuation.trim())})`), `${name}: the preserved continuation can then be sent separately`);
+    }
+  }
   console.log(`Passed ${checks} two-session live conversation browser checks.`);
 } finally { await cdp('Browser.close'); }
