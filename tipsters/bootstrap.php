@@ -2,11 +2,12 @@
 /** Private tipster account module. @package Cammino */
 defined( 'ABSPATH' ) || exit;
 
-const CAMMINO_TIPSTERS_VERSION = '1.4.0';
+const CAMMINO_TIPSTERS_VERSION = '1.4.1';
 const CAMMINO_TIPSTER_ROLE = 'cammino_tipster';
 const CAMMINO_TIPSTERS_CAP = 'manage_cammino_tipsters';
 const CAMMINO_TIP_POST_TYPE = 'cammino_tip';
 const CAMMINO_MESSAGE_POST_TYPE = 'cammino_tip_message';
+const CAMMINO_MESSAGE_MAX_LENGTH = 600;
 const CAMMINO_TIPSTER_STATE_META = '_cammino_tipster_state';
 const CAMMINO_TIP_FILES_META = '_cammino_tip_files';
 const CAMMINO_MESSAGE_TIP_META = '_cammino_tip_id';

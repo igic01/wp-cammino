@@ -54,6 +54,9 @@ try:
     check(len(incoming['data']['messages']) == 1 and incoming['data']['messages'][0]['body'] == 'Live admin reply' and 'admin' in incoming['data']['messages'][0]['sender'], 'Owner receives only new admin reply with its sender')
     response, empty = live(owner, own[3], after=incoming['data']['cursor'])
     check(empty['data']['messages'] == [], 'Advancing cursor prevents redisplaying previous replies')
+    for client, page, send_token in [(owner, own[3], token), (admin, adm[3], admin_send['message_token'])]:
+        response, oversized = live(client, page, operation='send_message', message_body='x' * 601, message_token=send_token)
+        check(response[0] == 422 and not oversized['success'], 'Both parties reject 601 characters through AJAX')
     response, invalid = live(owner, own[3], operation='send_message', message_body=' ', message_token=token)
     check(response[0] == 422 and not invalid['success'], 'AJAX validation rejects empty sends')
     account_path = '/wp-admin/admin.php?page=cammino-tipsters&account_id=' + str(fixtures['users']['one']['id'])

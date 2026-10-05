@@ -1,11 +1,13 @@
-.cammino-conversation { --chat-plum: #592b42; --chat-border: #e5dfe1; margin-top: 1.5rem; min-width: 0; }
+.cammino-conversation { --chat-plum: #592b42; --chat-border: #e5dfe1; margin-top: 1.5rem; min-width: 0; scroll-margin-top: 100px; }
 .cammino-conversation [hidden] { display: none !important; }
 .cammino-conversation__heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .cammino-conversation__heading h2 { margin: 0; }
 .cammino-conversation [data-chat-state] { padding: .3rem .7rem; border-radius: 2rem; background: #f3edef; color: var(--chat-plum); font-size: .8em; font-weight: 600; }
 .cammino-conversation > p { font-size: .9em; }
 .cammino-conversation [data-live-status]:empty { display: none; }
-.cammino-conversation [data-live-status] { color: var(--chat-plum); }
+.cammino-conversation__viewport { position: relative; isolation: isolate; }
+.cammino-conversation .cammino-conversation__feedback { position: absolute; z-index: 2; top: .75rem; left: .75rem; right: .75rem; margin: 0; padding: .65rem .9rem; border-radius: 8px; background: var(--chat-plum); color: #fff; font-size: .85em; box-shadow: 0 3px 12px #0002; overflow-wrap: anywhere; pointer-events: none; }
+.cammino-conversation .cammino-conversation__feedback.is-error { background: #8a2222; }
 .cammino-conversation__scroll { height: clamp(260px, 45vh, 480px); height: clamp(260px, 45dvh, 480px); overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; border: 1px solid var(--chat-border); border-radius: 12px; background: #faf8f7; padding: 1rem; box-sizing: border-box; }
 .cammino-conversation__scroll:focus-visible, .cammino-conversation__unread:focus-visible { outline: 3px solid var(--chat-plum); outline-offset: 3px; }
 .cammino-conversation__messages { list-style: none; margin: 0; padding: 0; }
@@ -19,12 +21,15 @@
 .cammino-conversation nav .page-numbers { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; min-height: 36px; padding: .2rem; }
 .cammino-conversation [data-message-form] { margin-top: 1rem; }
 .cammino-conversation [data-message-form] label { display: block; margin-bottom: .5rem; font-weight: 600; }
-.cammino-conversation [data-message-form] textarea { display: block; width: 100%; min-height: 88px; max-height: 180px; padding: .75rem; box-sizing: border-box; resize: vertical; border: 1px solid var(--chat-border); border-radius: 8px; font: inherit; }
+.cammino-conversation__composer { display: flex; align-items: flex-end; gap: .75rem; }
+.cammino-conversation [data-message-form] textarea { display: block; flex: 1; min-width: 0; width: 100%; min-height: 60px; max-height: 150px; padding: .75rem; box-sizing: border-box; resize: vertical; border: 1px solid var(--chat-border); border-radius: 8px; font: inherit; }
+.cammino-conversation .cammino-conversation__composer button { flex-shrink: 0; min-height: 44px; margin: 0; }
 .cammino-conversation [data-message-form] p { margin: .4rem 0 .7rem; font-size: .8em; color: #686064; }
-.cammino-conversation__unread { display: block; margin: .6rem auto; border: 1px solid var(--chat-border); border-radius: 2rem; padding: .6rem 1rem; min-height: 44px; background: #fff; color: var(--chat-plum); font: inherit; cursor: pointer; }
+.cammino-conversation__unread { position: absolute; z-index: 2; bottom: .75rem; left: 50%; transform: translateX(-50%); display: block; width: max-content; max-width: calc(100% - 1.5rem); margin: 0; border: 1px solid var(--chat-border); border-radius: 2rem; padding: .6rem 1rem; min-height: 44px; background: var(--chat-plum); color: #fff; box-shadow: 0 3px 12px #0002; font: inherit; font-size: .85em; cursor: pointer; }
 @media (max-width: 600px) {
   .cammino-conversation__scroll { padding: .6rem; }
   .cammino-conversation__messages li { max-width: 95%; grid-template-columns: minmax(0, 1fr); padding: .7rem; }
   .cammino-conversation__text { grid-column: 1; }
-  .cammino-conversation [data-message-form] button { width: 100%; min-height: 44px; }
+  .cammino-conversation__composer { gap: .5rem; }
+  .cammino-conversation__composer button { padding: .6rem .8rem; font-size: .85em; }
 }

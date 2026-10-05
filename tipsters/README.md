@@ -38,6 +38,9 @@ details use `/?cammino_tipsters=tip&cammino_tip_id={id}`. Download links are
 generated automatically and also work with plain permalinks.
 The admin list and shared site footer link to the correct login URL. Login
 includes a show/hide-password button; passwords are masked again on submission.
+The login card and heading are centered. Tipster pages have a contrasting logout
+button at the top right and each dashboard tip has an **Otvoriť tip** button;
+titles are plain text.
 If pretty routes return 404 after installation, save **Settings -> Permalinks**
 once and check the site's normal rewrite configuration.
 
@@ -208,10 +211,14 @@ locked form. Submitted/rejected tips, owner-deleted tips, disabled accounts and 
 being purged cannot receive new messages. Admins retain readable history for
 disabled/deleted tips; their owners lose access as appropriate.
 
-Messages are plain text, 1-5,000 characters, ordered oldest first with username,
+Messages are plain text, 1-600 characters, ordered oldest first with username,
 role and site-local time. Twenty historical messages appear per page, opening the latest page by
 default. Historical and live messages share a bounded scrollable panel;
-the reply box stays outside it. Own and other messages have separate bubbles.
+the reply box stays outside it, with Send beside the textarea on both admin
+and tipster screens, including mobile. Desktop Enter sends; Shift+Enter inserts
+a newline. On touch devices Enter remains a newline, with the button for sending.
+Own and other messages have separate bubbles. Previously saved longer messages
+remain readable; the 600-character limit applies to new sends.
 With JavaScript, new messages appear automatically and sending does not reload
 the page. Without JavaScript, standard forms and paginated history still work. No message attachments,
 email notifications, individual editing or individual deletion are provided.
@@ -232,7 +239,9 @@ messages as new. Up to 200 live messages remain in the DOM; all records remain
 in paginated history. New content uses text nodes, preserves drafts and does
 not move the page. The message panel follows new messages when already at the
 bottom or after sending; reading older messages preserves the scroll position
-and offers a button to jump to the new replies. Status changes automatically open/close the composer.
+and offers a button to jump to the new replies. Notifications appear as overlays
+inside the message panel and do not move the reply box. Status changes
+automatically open/close the composer.
 Session expiration or lost access stops polling and clears displayed messages.
 Sending uses the existing immutable, deduplicated persistence service; a failed
 network send retains its draft and retry token.
@@ -245,7 +254,7 @@ requests and duplicate retries. The same account lock protects posting against
 status/account changes and purges. Trusted code with direct database access is
 outside these application protections.
 
-Admin validation errors preserve at most 5,000 draft characters in a transient
+Admin validation errors preserve at most 600 draft characters in a transient
 bound to that admin and tip for five minutes, consumed on the next detail view.
 The draft is tracked for removal during account purging. These drafts are not
 accepted conversation messages. Conversation records are the persistent log;
@@ -302,13 +311,16 @@ Use disposable records for this acceptance checklist:
 1. Follow **Prihlásenie tipstera** in the site footer. Toggle **Zobraziť heslo** /
    **Skryť heslo**, then log in with an admin-created username/password.
 2. Submit two tips, open discussion on one, and edit its descriptions/shared link.
-   Exchange replies from separate admin and tipster sessions.
+   Exchange replies from separate admin and tipster sessions. Check the 600-character
+   limit and desktop Enter/Shift+Enter shortcuts. The send button stays beside
+   the message field. Touch-device Enter inserts a new line.
 3. Add enough replies for multiple history pages. Verify the latest page opens
    initially; the scrollable panel stays bounded on desktop/mobile and its reply
    box stays outside it. Navigate to older history and scroll with the keyboard.
 4. Keep an unsent draft while reading earlier messages. Send from the other
    session: the draft/reading position must stay intact and a new-message button
-   must appear. Use the button to jump down; sending your own reply follows it.
+   must appear inside the message panel without shifting the writing box.
+   Use the button to jump down; sending your own reply follows it.
 5. Approve the tip: editing locks and chat stays open. Reject it: **Zamietnutý**
    appears, editing/chat lock, and prior messages remain readable. Confirmed
    reopening restores discussion; reload the owner page before editing again.
@@ -327,7 +339,7 @@ and checks on your own hosting remain pending. No production deployment is inclu
 
 ## Upgrade, backups and rollback
 
-Version 1.4.0 initializes the existing role/capability and routing idempotently
+Version 1.4.1 initializes the existing role/capability and routing idempotently
 on the next request. It adds no pages, database tables, API keys, or service
 dependencies. Existing accounts, tips and conversations remain in place.
 
@@ -461,6 +473,15 @@ Run the additional UX workflow using
 `node tipsters/tests/final-browser.mjs fixtures.json http://127.0.0.1:8765 9225 /path/to/disposable/wordpress/wp-load.php /path/to/php /path/to/screenshots`.
 This uses two isolated browser sessions and creates a long disposable conversation
 through the guarded CLI helper. Clean its fixture prefix afterwards.
+
+Checkpoint refinements in 1.4.1 passed 49 message WordPress checks, 36 message
+HTTP checks, 24 live AJAX checks and 38 browser UX checks, plus the 7 live-delta,
+21 rejection/purge and 41 relevant theme checks. Browser verification covers
+centered login, top-right logout, dedicated open-tip buttons, a side-by-side
+composer at 1280/390/360px, desktop Enter/Shift+Enter, touch-device newlines and
+notifications inside the message panel without moving the composer. Exactly
+600 Unicode characters persist for both parties; 601 are rejected. PHP/JS
+syntax checks passed and desktop/mobile screenshots were inspected.
 
 Production cache/proxy/plugin behavior and your own installation remain part of
 the user review checkpoint. No production deployment was performed.

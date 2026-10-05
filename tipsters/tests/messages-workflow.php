@@ -41,7 +41,16 @@ try {
 	$amp_tip = cammino_tipsters_create_tip( array_merge( $input, array( 'title' => 'Title & plain', 'short_description' => 'Short & plain', 'long_description' => 'Long & plain' ) ), array(), cammino_tipsters_submission_token() );
 	expect_message( is_int( $amp_tip ) && 'Title & plain' === get_post( $amp_tip )->post_title && 'Short & plain' === get_post( $amp_tip )->post_excerpt && 'Long & plain' === get_post( $amp_tip )->post_content, 'Plain submission preserves literal ampersands.' );
 	expect_message( $filters_before === array( has_filter( 'title_save_pre', 'wp_filter_kses' ), has_filter( 'content_save_pre', 'wp_filter_post_kses' ), has_filter( 'excerpt_save_pre', 'wp_filter_post_kses' ) ), 'Core HTML filters restored after private plain-text write.' );
-	expect_message( is_wp_error( cammino_tipsters_send_message( $id, '  ', cammino_tipsters_message_token( $id ) ) ) && is_wp_error( cammino_tipsters_send_message( $id, str_repeat( 'x', 5001 ), cammino_tipsters_message_token( $id ) ) ), 'Empty and oversized messages rejected.' );
+	expect_message( is_wp_error( cammino_tipsters_send_message( $id, '  ', cammino_tipsters_message_token( $id ) ) ) && is_wp_error( cammino_tipsters_send_message( $id, str_repeat( 'x', 601 ), cammino_tipsters_message_token( $id ) ) ), 'Empty and 601-character messages rejected.' );
+	wp_set_current_user( $admin->ID ); cammino_tipsters_change_status( $amp_tip, 'discussion', message_version( $amp_tip ) );
+	foreach ( array( $one, $admin->ID ) as $actor ) {
+		wp_set_current_user( $actor );
+		$boundary = str_repeat( 'é', 600 );
+		$boundary_id = cammino_tipsters_send_message( $amp_tip, $boundary, cammino_tipsters_message_token( $amp_tip ) );
+		expect_message( is_int( $boundary_id ) && get_post( $boundary_id )->post_content === $boundary, 'Both parties can persist exactly 600 Unicode characters.' );
+		expect_message( is_wp_error( cammino_tipsters_send_message( $amp_tip, $boundary . 'é', cammino_tipsters_message_token( $amp_tip ) ) ), 'Both parties reject 601 Unicode characters.' );
+	}
+	wp_set_current_user( $one );
 	$another = cammino_tipsters_create_tip( $input, array(), cammino_tipsters_submission_token() );
 	wp_set_current_user( $admin->ID ); cammino_tipsters_change_status( $another, 'discussion', message_version( $another ) );
 	wp_set_current_user( $one );

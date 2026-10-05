@@ -198,7 +198,7 @@ add_action( 'admin_post_cammino_tip_message', static function (): void {
 			wp_die( esc_html( $result->get_error_message() ), '', array( 'response' => 500, 'back_link' => true ) );
 		}
 		set_transient( 'cammino_message_draft_' . get_current_user_id() . '_' . $id, array(
-		'error' => $result->get_error_message(), 'body' => mb_substr( cammino_tipsters_input( 'message_body' ), 0, 5000, 'UTF-8' ),
+		'error' => $result->get_error_message(), 'body' => mb_substr( cammino_tipsters_input( 'message_body' ), 0, CAMMINO_MESSAGE_MAX_LENGTH, 'UTF-8' ),
 		'token' => cammino_tipsters_input( 'message_token' ),
 		), 5 * MINUTE_IN_SECONDS );
 	} finally { cammino_tipsters_release_lock( $lock ); }

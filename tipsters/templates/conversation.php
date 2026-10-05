@@ -6,8 +6,9 @@ defined( 'ABSPATH' ) || exit;
 	<div class="cammino-conversation__heading"><h2 id="conversation-title"><?php esc_html_e( 'Komunikácia', 'cammino' ); ?></h2><span data-chat-state><?php echo esc_html( cammino_tipsters_can_message( $id ) ? __( 'Otvorená', 'cammino' ) : __( 'Uzamknutá', 'cammino' ) ); ?></span></div>
 	<p><?php esc_html_e( 'Správy sa ukladajú s odosielateľom a časom. Odoslané správy nie je možné upraviť ani odstrániť. Nové správy sa zobrazujú automaticky.', 'cammino' ); ?></p>
 	<noscript><p><?php esc_html_e( 'Bez JavaScriptu zobrazíte nové správy obnovením stránky.', 'cammino' ); ?></p></noscript>
-	<p data-live-status role="status" aria-live="polite"></p>
 	<?php if ( $error instanceof WP_Error ) : ?><p class="cammino-tipsters__error" role="alert"><?php echo esc_html( $error->get_error_message() ); ?></p><?php endif; ?>
+	<div class="cammino-conversation__viewport">
+	<p class="cammino-conversation__feedback" data-live-status role="status" aria-live="polite"></p>
 	<div class="cammino-conversation__scroll" data-chat-scroll data-latest="<?php echo $page >= max( 1, (int) $query->max_num_pages ) ? 'yes' : 'no'; ?>" tabindex="0" role="region" aria-label="<?php esc_attr_e( 'Správy v konverzácii', 'cammino' ); ?>">
 	<?php if ( ! $query->found_posts ) : ?><p data-empty><?php esc_html_e( 'Zatiaľ bez správ.', 'cammino' ); ?></p><?php endif; ?>
 	<ol class="cammino-conversation__messages">
@@ -23,15 +24,18 @@ defined( 'ABSPATH' ) || exit;
 	<div data-live-messages hidden><h3><?php esc_html_e( 'Nové správy', 'cammino' ); ?></h3><ol class="cammino-conversation__messages" aria-live="polite" aria-relevant="additions"></ol></div>
 	</div>
 	<button type="button" class="cammino-conversation__unread" data-new-messages hidden><?php esc_html_e( 'Prejsť na nové správy', 'cammino' ); ?></button>
+	</div>
 	<?php $can_send = cammino_tipsters_can_message( $id ); ?>
 		<form data-message-form <?php echo $can_send ? '' : 'hidden'; ?> method="post" action="<?php echo esc_url( $admin ? admin_url( 'admin-post.php' ) : $url ); ?>">
 			<?php wp_nonce_field( 'cammino_send_message_' . $id ); ?>
 			<input type="hidden" name="operation" value="<?php echo $can_send ? 'send_message' : ''; ?>"><input type="hidden" name="message_token" value="<?php echo esc_attr( $token ); ?>">
 			<?php if ( $admin ) : ?><input type="hidden" name="action" value="cammino_tip_message"><input type="hidden" name="tip_id" value="<?php echo esc_attr( $id ); ?>"><?php endif; ?>
 			<label for="message-body"><?php esc_html_e( 'Nová správa', 'cammino' ); ?></label>
-			<textarea id="message-body" name="message_body" rows="3" maxlength="5000" required aria-describedby="message-help"><?php echo esc_textarea( $body ); ?></textarea>
-			<p id="message-help"><?php esc_html_e( 'Najviac 5 000 znakov. Bez formátovania.', 'cammino' ); ?></p>
-			<button type="submit" class="<?php echo $admin ? 'button button-primary' : 'button button--coral'; ?>"><?php esc_html_e( 'Odoslať správu', 'cammino' ); ?></button>
+			<div class="cammino-conversation__composer">
+				<textarea id="message-body" name="message_body" rows="2" maxlength="<?php echo esc_attr( CAMMINO_MESSAGE_MAX_LENGTH ); ?>" required aria-describedby="message-help"><?php echo esc_textarea( $body ); ?></textarea>
+				<button type="submit" class="<?php echo $admin ? 'button button-primary' : 'button button--coral'; ?>"><?php esc_html_e( 'Odoslať', 'cammino' ); ?></button>
+			</div>
+			<p id="message-help"><?php echo esc_html( sprintf( __( 'Najviac %d znakov.', 'cammino' ), CAMMINO_MESSAGE_MAX_LENGTH ) ); ?> <span data-keyboard-help hidden><?php esc_html_e( 'Enter odošle správu, Shift+Enter pridá nový riadok.', 'cammino' ); ?></span></p>
 		</form>
 	<p data-closed <?php echo $can_send ? 'hidden' : ''; ?>><?php esc_html_e( 'Komunikácia je otvorená iba v diskusii a pri schválenom tipe s aktívnym účtom. História zostáva uložená.', 'cammino' ); ?></p>
 </section>

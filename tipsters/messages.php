@@ -28,7 +28,7 @@ function cammino_tipsters_send_message( int $id, string $body, string $token ) {
 	if ( ! cammino_tipsters_can_message( $id ) ) { return new WP_Error( 'closed', __( 'Komunikácia pri tomto tipe nie je dostupná.', 'cammino' ) ); }
 	if ( ! cammino_tipsters_valid_message_token( $id, $token ) ) { return new WP_Error( 'expired', __( 'Platnosť formulára vypršala. Obnovte stránku.', 'cammino' ) ); }
 	$text = trim( sanitize_textarea_field( $body ) );
-	if ( '' === $text || mb_strlen( $body, 'UTF-8' ) > 5000 ) { return new WP_Error( 'message', __( 'Správa musí obsahovať 1 až 5 000 znakov.', 'cammino' ) ); }
+	if ( '' === $text || mb_strlen( $body, 'UTF-8' ) > CAMMINO_MESSAGE_MAX_LENGTH ) { return new WP_Error( 'message', sprintf( __( 'Správa musí obsahovať 1 až %d znakov.', 'cammino' ), CAMMINO_MESSAGE_MAX_LENGTH ) ); }
 	$tip = get_post( $id ); $owner = (int) $tip->post_author;
 	$lock = cammino_tipsters_write_lock( $owner );
 	if ( is_wp_error( $lock ) ) { return $lock; }

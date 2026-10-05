@@ -45,7 +45,7 @@ try:
     owner_message = fields(own[3], 'send_message'); owner_message['message_body'] = 'Owner reply <script>alert("bad")</script> & text'
     bad = dict(owner_message); bad['_wpnonce'] = 'bad'
     check(request(one, tip_url, bad)[0] == 403, 'Invalid owner nonce rejected')
-    bad = dict(owner_message); bad['message_body'] = 'x' * 5001
+    bad = dict(owner_message); bad['message_body'] = 'x' * 601
     oversized = request(one, tip_url, bad)
     check(b'role="alert"' in oversized[3] and b'x' * 100 in oversized[3], 'Oversized message rejected and text preserved')
     check(fields(oversized[3], 'edit_tip').get('title') == 'Stage four private' and fields(oversized[3], 'edit_tip').get('tip_version'), 'Message errors preserve discussion edit form values and version')

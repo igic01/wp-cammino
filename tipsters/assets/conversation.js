@@ -26,6 +26,23 @@
   let cursor = Number(root.dataset.cursor), timer, controller;
   let stopped = false, busy = false, sending = false, writable = !form.hidden, idle = 0, failures = 0;
   let pollFinished = Promise.resolve(), finishPoll, connectionError = false;
+  let feedbackTimer;
+  function showStatus(text, error = false) {
+    clearTimeout(feedbackTimer);
+    status.classList.toggle('is-error', error);
+    status.textContent = text;
+    if (!error) feedbackTimer = setTimeout(() => { status.textContent = ''; }, 3500);
+  }
+  // Keep mobile Enter available for line breaks; desktop keyboard users can send directly.
+  const desktopKeyboard = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const keyboardHelp = root.querySelector('[data-keyboard-help]');
+  const updateKeyboardHelp = () => { keyboardHelp.hidden = !desktopKeyboard.matches; };
+  updateKeyboardHelp(); desktopKeyboard.addEventListener('change', updateKeyboardHelp);
+  textarea.addEventListener('keydown', event => {
+    if (!desktopKeyboard.matches || event.key !== 'Enter' || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || event.isComposing || event.keyCode === 229) return;
+    event.preventDefault();
+    if (!event.repeat && !sending && !stopped && writable) form.requestSubmit();
+  });
 
   function availability(value) {
     writable = value;
@@ -65,7 +82,7 @@
         unread += added; unreadButton.hidden = false;
         unreadButton.textContent = `Nové správy: ${unread} · Prejsť nadol`;
       }
-      status.textContent = 'Prišli nové správy.';
+      if (unreadButton.hidden) showStatus('Prišli nové správy.');
     }
     // Bound live DOM and duplicate tracking; older messages remain in paginated history.
     while (list.children.length > 200) list.firstElementChild.remove();
@@ -102,11 +119,12 @@
       stopped = true; availability(false);
       // Remove private content after the current session loses access.
       root.querySelectorAll('.cammino-conversation__messages').forEach(node => node.replaceChildren());
+      unread = 0; unreadButton.hidden = true;
     }
     if (typeof error.data?.can_send === 'boolean') availability(error.data.can_send);
     connectionError = !error.code || error.code >= 500;
-    status.textContent = error.message && error.code ? error.message :
-      (send ? 'Odoslanie sa nepodarilo potvrdiť. Skúste znova; správa sa neodošle dvakrát.' : 'Spojenie bolo prerušené. Nové správy sa načítajú po obnovení spojenia.');
+    showStatus(error.message && error.code ? error.message :
+      (send ? 'Odoslanie sa nepodarilo potvrdiť. Skúste znova; správa sa neodošle dvakrát.' : 'Spojenie bolo prerušené. Nové správy sa načítajú po obnovení spojenia.'), true);
   }
   async function poll() {
     if (busy || sending || stopped || document.hidden || !navigator.onLine) return;
@@ -115,7 +133,7 @@
     let more = false;
     try {
       const data = await request('poll');
-      if (connectionError) { status.textContent = 'Spojenie bolo obnovené.'; connectionError = false; }
+      if (connectionError) { showStatus('Spojenie bolo obnovené.'); connectionError = false; }
       idle = append(data) ? 0 : idle + 1; more = data.more;
     } catch (error) {
       if (error.name !== 'AbortError' || (!document.hidden && !sending)) { ++failures; errorState(error); }
@@ -134,12 +152,12 @@
     controller?.abort(); await pollFinished;
     if (stopped || !writable) { sending = false; button.disabled = true; return; }
     busy = true;
-    status.textContent = 'Odosielanie…';
+    showStatus('Odosielanie…');
     try {
       const data = await request('send_message', {message_body: body, message_token: form.elements.message_token.value});
       append(data, true); form.elements.message_token.value = data.message_token;
       if (textarea.value === body) textarea.value = '';
-      status.textContent = 'Správa bola odoslaná.'; idle = 0;
+      showStatus('Správa bola odoslaná.'); idle = 0;
     } catch (error) { errorState(error, true); }
     finally { busy = sending = false; button.disabled = !writable || stopped; schedule(250); }
   });
@@ -150,6 +168,6 @@
   });
   window.addEventListener('offline', () => { clearTimeout(timer); if (!sending) controller?.abort(); });
   window.addEventListener('online', () => { idle = failures = 0; schedule(0); });
-  window.addEventListener('pagehide', () => { clearTimeout(timer); controller?.abort(); });
+  window.addEventListener('pagehide', () => { clearTimeout(timer); clearTimeout(feedbackTimer); controller?.abort(); });
   schedule(0);
 })();

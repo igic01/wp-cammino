@@ -6,12 +6,21 @@ $login = 'login' === cammino_tipsters_route();
 $user = wp_get_current_user();
 $titles = array( 'login' => __( 'Prihlásenie tipstera', 'cammino' ), 'dashboard' => __( 'Môj účet', 'cammino' ), 'new' => __( 'Nový tip', 'cammino' ), 'tip' => __( 'Detail tipu', 'cammino' ) );
 ?>
-<main id="main-content" class="cammino-tipsters">
+<main id="main-content" class="cammino-tipsters<?php echo $login ? ' cammino-tipsters--login' : ''; ?>">
 	<div class="container">
-		<div class="cammino-tipsters__heading">
-			<p class="cammino-tipsters__eyebrow"><?php esc_html_e( 'Cammino · Tipsteri', 'cammino' ); ?></p>
-			<h1><?php echo esc_html( $titles[ cammino_tipsters_route() ] ?? __( 'Môj účet', 'cammino' ) ); ?></h1>
-			<p><?php echo esc_html( $login ? __( 'Prihláste sa údajmi, ktoré vám poskytol administrátor.', 'cammino' ) : sprintf( __( 'Vitajte, %s.', 'cammino' ), $user->display_name ) ); ?></p>
+		<div class="cammino-tipsters__topbar">
+			<div class="cammino-tipsters__heading">
+				<p class="cammino-tipsters__eyebrow"><?php esc_html_e( 'Cammino · Tipsteri', 'cammino' ); ?></p>
+				<h1><?php echo esc_html( $titles[ cammino_tipsters_route() ] ?? __( 'Môj účet', 'cammino' ) ); ?></h1>
+				<p><?php echo esc_html( $login ? __( 'Prihláste sa údajmi, ktoré vám poskytol administrátor.', 'cammino' ) : sprintf( __( 'Vitajte, %s.', 'cammino' ), $user->display_name ) ); ?></p>
+			</div>
+		<?php if ( ! $login ) : ?>
+			<form class="cammino-tipsters__logout" method="post" action="<?php echo esc_url( cammino_tipsters_url() ); ?>">
+				<?php wp_nonce_field( 'cammino_tipster_logout' ); ?>
+				<input type="hidden" name="operation" value="logout">
+				<button type="submit" class="button"><?php esc_html_e( 'Odhlásiť sa', 'cammino' ); ?></button>
+			</form>
+		<?php endif; ?>
 		</div>
 		<?php if ( $login ) : ?>
 			<div class="cammino-tipsters__card cammino-tipsters__login">
@@ -32,11 +41,6 @@ $titles = array( 'login' => __( 'Prihlásenie tipstera', 'cammino' ), 'dashboard
 			</div>
 		<?php else : ?>
 			<?php require __DIR__ . '/' . ( 'new' === cammino_tipsters_route() ? 'new-tip' : ( 'tip' === cammino_tipsters_route() ? 'tip-detail' : 'dashboard' ) ) . '.php'; ?>
-			<form class="cammino-tipsters__logout" method="post" action="<?php echo esc_url( cammino_tipsters_url() ); ?>">
-				<?php wp_nonce_field( 'cammino_tipster_logout' ); ?>
-				<input type="hidden" name="operation" value="logout">
-				<button type="submit" class="button button--cream"><?php esc_html_e( 'Odhlásiť sa', 'cammino' ); ?></button>
-			</form>
 		<?php endif; ?>
 	</div>
 </main>

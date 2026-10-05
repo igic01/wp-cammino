@@ -442,6 +442,14 @@ behavior using disposable test conversations.
   panels, own/other bubbles, latest history by default and older-page navigation.
   Preserve reading/draft position on incoming messages; show a new-message button.
 - [x] Add accessible show/hide-password control and shared-footer login link.
+- [x] Apply checkpoint feedback: center login, move contrasting logout to the
+  top right, and add a dedicated dashboard button to open each tip.
+- [x] Limit new messages to 600 characters on both the page and server; on
+  desktop Enter sends and Shift+Enter inserts a newline. Mobile Enter stays
+  a newline. Preserve existing longer messages.
+- [x] Place textarea and Send beside each other for admin and tipster, including
+  mobile. Keep incoming-message/status notifications inside the message panel
+  as overlays, without moving the composer.
 
 - [x] Finish responsive styling, keyboard navigation, labels, error messages,
   and the agreed menu/login entry using the existing Cammino design.
@@ -478,6 +486,10 @@ cover long conversations, automatic incoming messages without losing drafts or
 reading position, mobile layouts, password visibility, rejection and confirmed
 admin deletion. Screenshots were inspected. The theme-switch check is local;
 production caches, aliases and plugins still require your host review.
+
+Checkpoint refinements: 49 message WordPress, 36 message HTTP, 24 live AJAX
+and 38 browser UX checks passed, together with the 7 delta, 21 rejection/purge
+and 41 relevant theme checks. Desktop/mobile screenshots were inspected.
 
 Review instructions: [Stage 5 acceptance checklist](README.md#stage-5-behavior-and-final-review-checklist).
 
