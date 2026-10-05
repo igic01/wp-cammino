@@ -1,6 +1,7 @@
 // Two isolated Chrome sessions: incoming updates, draft preservation, sending and reconnects.
 // node conversation-live-browser.mjs fixtures.json [base-url] [debug-port]
-import {readFileSync} from 'node:fs';
+import {readFileSync, writeFileSync} from 'node:fs';
+import {join} from 'node:path';
 const fixtures = JSON.parse(readFileSync(process.argv[2], 'utf8').replace(/^\uFEFF/, ''));
 const base = process.argv[3] || 'http://127.0.0.1:8765';
 const port = process.argv[4] || '9225';
@@ -63,8 +64,8 @@ try {
   await evaluate(admin, `document.getElementById('user_login').value=${JSON.stringify(fixtures.users.admin.username)};document.getElementById('user_pass').value=${JSON.stringify(fixtures.password)};document.getElementById('loginform').requestSubmit();true;`);
   await wait(admin, '!!document.getElementById("toplevel_page_cammino-tips")');
   await navigate(admin, '/wp-admin/admin.php?page=cammino-tips&tip_id='+id, '!!document.getElementById("conversation")');
-  await evaluate(admin, "document.querySelector('input[name=status][value=discussion]').form.requestSubmit();true;");
-  await wait(admin, '!!document.querySelector("input[name=status][value=approved]")');
+  await evaluate(admin, "window.changingStatus=true;document.querySelector('input[name=status][value=discussion]').form.requestSubmit();true;");
+  await wait(admin, 'document.readyState === "complete" && !window.changingStatus && !!document.querySelector("input[name=status][value=approved]")');
   await wait(owner, '!document.querySelector("[data-message-form]").hidden');
   check(await evaluate(owner, "liveSentinel==='owner' && document.getElementById('message-body').value==='Unsent draft'"), 'Discussion opens without reloading or destroying the draft');
   await evaluate(admin, "window.liveSentinel='admin';document.getElementById('message-body').value='Automatic incoming reply';document.getElementById('message-body').form.requestSubmit();true;");
@@ -93,45 +94,65 @@ try {
   await wait(owner, "[...document.querySelectorAll('.cammino-conversation__text')].some(n=>n.textContent==='Reply while offline')", 6000);
   check(await evaluate(owner, "liveSentinel==='owner'"), 'Reconnection resumes automatic updates without reload');
   check(polls.filter(p=>p.session===owner).length < 15, 'Polling remains bounded across the whole browser workflow');
-  // Hold send responses so typing can deterministically race the acknowledgment.
+  // Hold responses to prove the composer clears synchronously, before any await.
   for (const [session, name] of [[owner,'tipster'],[admin,'admin']]) {
-    const sent = `Send race ${name}`, draft = ` Next draft ${name}`;
-    await evaluate(session, `window.testOriginalFetch=window.fetch;window.sendHeld=false;
+    await wait(session, '!document.querySelector("[data-message-form] button[type=submit]").disabled');
+    const sent = `Send race ${name}`, draft = `Hello ${name}`;
+    check(await evaluate(session, `window.testOriginalFetch=window.fetch;window.sendHeld=false;
       window.fetch=async (...args)=>{const response=await window.testOriginalFetch(...args);if(args[1]?.body?.get('operation')==='send_message'){window.sendHeld=true;await new Promise(resolve=>{window.releaseSend=resolve;});}return response;};
-      document.getElementById('message-body').value=${JSON.stringify(sent)};document.getElementById('message-body').form.requestSubmit();true;`);
+      document.getElementById('message-body').value=${JSON.stringify(sent)};document.getElementById('message-body').form.requestSubmit();
+      document.getElementById('message-body').value==='' && [...document.querySelectorAll('[data-local-message].is-pending .cammino-conversation__text')].some(n=>n.textContent===${JSON.stringify(sent)})`), `${name}: clears immediately and renders a pending bubble`);
     await wait(session, 'window.sendHeld');
-    await evaluate(session, "(()=>{const input=document.getElementById('message-body');input.focus();input.setSelectionRange(input.value.length,input.value.length);return true;})()");
+    await evaluate(session, "document.getElementById('message-body').focus();true;");
     await cdp('Input.insertText', {text:draft}, session);
+    check(await evaluate(session, `document.getElementById('message-body').value===${JSON.stringify(draft)}`), `${name}: new typing never contains the submitted text`);
     await evaluate(session, 'window.releaseSend();true;');
     await wait(session, '!document.querySelector("[data-message-form] button[type=submit]").disabled');
-    check(await evaluate(session, `document.getElementById('message-body').value===${JSON.stringify(draft)} && [...document.querySelectorAll('.cammino-conversation__text')].filter(n=>n.textContent===${JSON.stringify(sent)}).length===1`), `${name}: successful send clears the sent prefix and preserves text typed while waiting`);
-    const replacementSent = `Replacement race ${name}`, replacementDraft = replacementSent + ' rewritten draft';
-    await evaluate(session, `window.sendHeld=false;document.getElementById('message-body').value=${JSON.stringify(replacementSent)};document.getElementById('message-body').form.requestSubmit();true;`);
-    await wait(session, 'window.sendHeld');
-    await evaluate(session, "document.getElementById('message-body').focus();document.getElementById('message-body').select();true;");
-    await cdp('Input.insertText', {text:replacementDraft}, session);
-    await evaluate(session, 'window.releaseSend();true;');
-    await wait(session, '!document.querySelector("[data-message-form] button[type=submit]").disabled');
-    check(await evaluate(session, `document.getElementById('message-body').value===${JSON.stringify(replacementDraft)}`), `${name}: replacing the draft preserves all text even when it starts with the sent message`);
+    check(await evaluate(session, `document.getElementById('message-body').value===${JSON.stringify(draft)} && [...document.querySelectorAll('[data-message-id] .cammino-conversation__text')].filter(n=>n.textContent===${JSON.stringify(sent)}).length===1 && !document.querySelector('[data-local-message]')`), `${name}: confirms the bubble once without touching the composer`);
     await evaluate(session, 'window.fetch=window.testOriginalFetch;true;');
     for (const persisted of [false,true]) {
-      const failed = `Failed send ${name} ${persisted ? 'saved' : 'unsaved'}`, continuation = ' Continued during failure';
-      await evaluate(session, `window.sendHeld=false;window.savedRetryToken=document.querySelector('[data-message-form]').elements.message_token.value;
+      const failed = `Failed send ${name} ${persisted ? 'saved' : 'unsaved'}`, continuation = `Another message ${name} ${persisted}`;
+      check(await evaluate(session, `window.sendHeld=false;
         window.fetch=async (...args)=>{if(args[1]?.body?.get('operation')==='send_message'){if(${persisted}) await window.testOriginalFetch(...args);window.sendHeld=true;await new Promise(resolve=>{window.releaseSend=resolve;});throw new TypeError('Simulated failed send');}return window.testOriginalFetch(...args);};
-        document.getElementById('message-body').value=${JSON.stringify(failed)};document.getElementById('message-body').form.requestSubmit();true;`);
+        document.getElementById('message-body').value=${JSON.stringify(failed)};document.getElementById('message-body').form.requestSubmit();document.getElementById('message-body').value===''`), `${name}: failed send also starts with an empty composer`);
       await wait(session, 'window.sendHeld');
-      await evaluate(session, "(()=>{const input=document.getElementById('message-body');input.focus();input.setSelectionRange(input.value.length,input.value.length);return true;})()");
+      await evaluate(session, "document.getElementById('message-body').focus();true;");
       await cdp('Input.insertText', {text:continuation}, session);
       await evaluate(session, 'window.releaseSend();true;');
       await wait(session, '!document.querySelector("[data-message-form] button[type=submit]").disabled');
-      check(await evaluate(session, `document.getElementById('message-body').value===${JSON.stringify(failed+continuation)} && document.querySelector('[data-message-form]').elements.message_token.value===savedRetryToken`), `${name}: failed ${persisted ? 'saved' : 'unsaved'} send preserves all text and its retry token`);
-      await evaluate(session, 'window.fetch=window.testOriginalFetch;document.getElementById("message-body").form.requestSubmit();true;');
-      await wait(session, `!document.querySelector('[data-message-form] button[type=submit]').disabled && document.getElementById('message-body').value===${JSON.stringify(continuation)}`);
-      check(await evaluate(session, `[...document.querySelectorAll('.cammino-conversation__text')].filter(n=>n.textContent===${JSON.stringify(failed)}).length===1`), `${name}: retry confirms only the original message once and keeps the next draft`);
+      check(await evaluate(session, `(()=>{const bubble=[...document.querySelectorAll('[data-local-message].is-failed')].find(n=>n.querySelector('.cammino-conversation__text').textContent===${JSON.stringify(failed)});return document.getElementById('message-body').value===${JSON.stringify(continuation)} && !!bubble && bubble.querySelector('[role=status]').textContent.startsWith('! ') && bubble.querySelector('[role=status]').textContent.length>20 && !bubble.querySelector('button').hidden;})()`), `${name}: failure stays in the scroll panel with !, a reason and retry`);
+      await evaluate(session, 'window.fetch=window.testOriginalFetch;true;');
+      if (persisted) {
+        await wait(session, `![...document.querySelectorAll('[data-local-message] .cammino-conversation__text')].some(n=>n.textContent===${JSON.stringify(failed)})`, 6000);
+        check(await evaluate(session, `[...document.querySelectorAll('[data-message-id] .cammino-conversation__text')].filter(n=>n.textContent===${JSON.stringify(failed)}).length===1 && document.getElementById('message-body').value===${JSON.stringify(continuation)}`), `${name}: polling reconciles a saved message after a lost response`);
+      }
+      // A new send gets a fresh token even while a different message has failed.
       await evaluate(session, 'document.getElementById("message-body").form.requestSubmit();true;');
-      await wait(session, `!document.querySelector('[data-message-form] button[type=submit]').disabled && document.getElementById('message-body').value===''`);
-      check(await evaluate(session, `[...document.querySelectorAll('.cammino-conversation__text')].some(n=>n.textContent===${JSON.stringify(continuation.trim())})`), `${name}: the preserved continuation can then be sent separately`);
+      await wait(session, `!document.querySelector('[data-message-form] button[type=submit]').disabled && [...document.querySelectorAll('[data-message-id] .cammino-conversation__text')].some(n=>n.textContent===${JSON.stringify(continuation)})`);
+      check(await evaluate(session, `document.getElementById('message-body').value===''`), `${name}: another message sends independently of the failed message`);
+      if (!persisted) {
+        const nextDraft = `Typing during retry ${name}`;
+        await evaluate(session, `document.getElementById('message-body').value=${JSON.stringify(nextDraft)};document.querySelector('[data-local-message].is-failed button').click();true;`);
+        await wait(session, `!document.querySelector('[data-message-form] button[type=submit]').disabled && !document.querySelector('[data-local-message]')`);
+        check(await evaluate(session, `[...document.querySelectorAll('[data-message-id] .cammino-conversation__text')].filter(n=>n.textContent===${JSON.stringify(failed)}).length===1 && document.getElementById('message-body').value===${JSON.stringify(nextDraft)}`), `${name}: retry sends the original body once without changing the composer`);
+      }
     }
+    // Server errors explain the actual reason inline; retry never creates a second record.
+    const invalid = `Rejected send ${name}`;
+    await evaluate(session, `window.fetch=async (...args)=>args[1]?.body?.get('operation')==='send_message'?new Response(JSON.stringify({success:false,data:{message:'Server validation reason',can_send:true}}),{status:422,headers:{'Content-Type':'application/json'}}):window.testOriginalFetch(...args);
+      document.getElementById('message-body').value=${JSON.stringify(invalid)};document.getElementById('message-body').form.requestSubmit();true;`);
+    await wait(session, "!!document.querySelector('[data-local-message].is-failed')");
+    check(await evaluate(session, "document.querySelector('[data-local-message].is-failed [role=status]').textContent.includes('Server validation reason') && document.getElementById('message-body').value===''") , `${name}: server failure reason appears on the failed bubble`);
+    for (const width of [1280,390]) {
+      await cdp('Emulation.setDeviceMetricsOverride', {width,height:900,deviceScaleFactor:1,mobile:width<600},session);
+      await evaluate(session, "(()=>{document.getElementById('conversation').scrollIntoView({block:'start',behavior:'instant'});const s=document.querySelector('[data-chat-scroll]');s.scrollTop=s.scrollHeight;return true;})()");
+      await sleep(200);
+      check(await evaluate(session, `(()=>{const s=document.querySelector('[data-chat-scroll]').getBoundingClientRect(), b=document.querySelector('[data-local-message].is-failed button').getBoundingClientRect(),f=document.querySelector('[data-message-form]').getBoundingClientRect();return b.left>=s.left && b.right<=s.right && f.top>=s.bottom && document.documentElement.scrollWidth<=${width}+1;})()`), `${name}: failed bubble and retry fit inside the scroll panel at ${width}px`);
+      const shot = await cdp('Page.captureScreenshot', {format:'png',captureBeyondViewport:false},session);
+      writeFileSync(join(process.env.TEMP, `cammino-chat-failed-${name}-${width}.png`),Buffer.from(shot.data,'base64'));
+    }
+    await evaluate(session, "window.fetch=window.testOriginalFetch;document.querySelector('[data-local-message].is-failed button').click();true;");
+    await wait(session, "!document.querySelector('[data-local-message]') && !document.querySelector('[data-message-form] button[type=submit]').disabled");
   }
   console.log(`Passed ${checks} two-session live conversation browser checks.`);
 } finally { await cdp('Browser.close'); }

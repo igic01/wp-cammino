@@ -61,7 +61,7 @@ async function viewport(session, width) {
 }
 async function send(session, text) {
   await evaluate(session, `document.getElementById('message-body').value=${JSON.stringify(text)};document.getElementById('message-body').form.requestSubmit();true;`);
-  await wait(session, `[...document.querySelectorAll('.cammino-conversation__text')].some(n=>n.textContent===${JSON.stringify(text)})`);
+  await wait(session, `!document.querySelector('[data-message-form] button[type=submit]').disabled && [...document.querySelectorAll('[data-message-id] .cammino-conversation__text')].some(n=>n.textContent===${JSON.stringify(text)})`);
 }
 async function enter(session, shift = false) {
   await cdp('Input.dispatchKeyEvent', {type:'keyDown', key:'Enter', code:'Enter', windowsVirtualKeyCode:13, nativeVirtualKeyCode:13, text:'\r', unmodifiedText:'\r', modifiers:shift ? 8 : 0}, session);
@@ -106,8 +106,8 @@ try {
   await evaluate(admin, `document.getElementById('user_login').value=${JSON.stringify(fixtures.users.admin.username)};document.getElementById('user_pass').value=${JSON.stringify(fixtures.password)};document.getElementById('loginform').requestSubmit();true;`);
   await wait(admin, '!!document.getElementById("toplevel_page_cammino-tips")');
   await navigate(admin, adminPath, '!!document.getElementById("conversation")');
-  await evaluate(admin, "document.querySelector('input[name=status][value=discussion]').form.requestSubmit();true;");
-  await wait(admin, '!!document.querySelector("input[name=status][value=rejected]")');
+  await evaluate(admin, "window.changingStatus=true;document.querySelector('input[name=status][value=discussion]').form.requestSubmit();true;");
+  await wait(admin, 'document.readyState === "complete" && !window.changingStatus && !!document.querySelector("input[name=status][value=rejected]")');
   const helper = resolve(dirname(fileURLToPath(import.meta.url)), 'http-fixtures.php');
   const seed = JSON.parse(execFileSync(process.argv[6], [helper, process.argv[5], 'chat-history', fixtures.prefix], {encoding:'utf8'}));
   check(String(seed.tip_id)===id && seed.messages===45, 'Conversation contains more than two pages of persisted history');
@@ -133,7 +133,7 @@ try {
     const keyboardBody = await evaluate(session, "document.getElementById('message-body').value");
     check(keyboardBody===`Keyboard ${name} first\nSecond line`, `${name}: Shift+Enter inserts a line break without sending`);
     await enter(session);
-    await wait(session, `[...document.querySelectorAll('.cammino-conversation__text')].some(n=>n.textContent===${JSON.stringify(keyboardBody)})`);
+    await wait(session, `!document.querySelector('[data-message-form] button[type=submit]').disabled && [...document.querySelectorAll('[data-message-id] .cammino-conversation__text')].some(n=>n.textContent===${JSON.stringify(keyboardBody)})`);
     check(await evaluate(session, "keyboardSentinel && document.getElementById('message-body').value===''"), `${name}: Enter sends the multiline message without navigation`);
   }
   await viewport(owner,390);

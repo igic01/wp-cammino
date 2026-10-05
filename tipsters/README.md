@@ -246,15 +246,19 @@ and offers a button to jump to the new replies. Notifications appear as overlays
 inside the message panel and do not move the reply box. Status changes
 automatically open/close the composer.
 Session expiration or lost access stops polling and clears displayed messages.
-Sending uses the existing immutable, deduplicated persistence service; a failed
-network send retains its draft and retry token.
-When typing continues before a successful send response, only the submitted
-prefix is removed; newly appended text and its caret position stay as the next
-draft. Replacing/editing the submitted portion preserves the changed draft.
-Failure leaves all current text and the retry token intact on both screens.
-After an uncertain network response, retry confirms the original message using
-its original text/token first, leaving subsequent typing for a separate send.
-This also handles a lost response after the server already saved the message.
+Enter/Send clears the composer immediately, before any network wait, and places
+the outgoing message in the scroll panel with **Odosielanie…**. Confirmation
+replaces that bubble with the saved sender/time. A failed send stays in the panel
+with **! Neodoslané**, its error reason and **Skúsiť znova**; it never restores
+text to the composer. Subsequent typing is unaffected by either outcome.
+Retry uses the exact original body and signed token. A new message gets an
+independent token even while another message has failed. Send acknowledgments
+include the saved record independently of the incremental cursor; own-message
+hash keys let polling confirm delivery after a lost response without duplicate
+bubbles. Ordinary idle polls do not generate additional tokens.
+Failed outgoing bubbles live only in the current browser page until delivery is
+confirmed; they are not saved conversation records and disappear on reload.
+Confirmed messages retain the existing immutable database persistence.
 
 Messages persist as private database records. Standard editors/REST are disabled,
 native edit/delete capabilities are denied, and ordinary core update/trash/delete
@@ -349,7 +353,7 @@ and checks on your own hosting remain pending. No production deployment is inclu
 
 ## Upgrade, backups and rollback
 
-Version 1.4.2 initializes the existing role/capability and routing idempotently
+Version 1.4.3 initializes the existing role/capability and routing idempotently
 on the next request. It adds no pages, database tables, API keys, or service
 dependencies. Existing accounts, tips and conversations remain in place.
 
@@ -493,11 +497,19 @@ notifications inside the message panel without moving the composer. Exactly
 600 Unicode characters persist for both parties; 601 are rejected. PHP/JS
 syntax checks passed and desktop/mobile screenshots were inspected.
 
-The 1.4.2 send-race fix passed 25 checks in two isolated Chrome sessions.
-Both admin and tipster were checked while typing during delayed sends,
-replacing a draft, failing before persistence, losing a response after
-persistence, and retrying without duplicating messages or losing the next
-draft. JavaScript/PHP syntax checks also passed.
+Version 1.4.3 replaces the earlier response-time clearing with immediate
+composer clearing and pending/failed bubbles. Review on both screens: type
+`test`, press Enter and immediately type `hello`; only `hello` should be in the
+composer even before the server responds. Disconnect and send another message:
+it should stay in the scroll panel with **!**, a reason and retry. Reconnect and
+retry; the saved message must appear once, and the composer must be unaffected.
+
+Local verification for 1.4.3 passed 37 two-session send/update browser checks,
+39 complete desktop/mobile UX checks, 29 AJAX HTTP checks, 49 message workflow
+checks and 7 incremental-query checks. This covers immediate clearing, typing
+during delayed responses, failed sends, independent new sends, safe retries,
+lost-response reconciliation, inline server errors and responsive failure bubbles.
+Desktop/mobile screenshots were inspected; PHP/JavaScript syntax checks passed.
 
 Production cache/proxy/plugin behavior and your own installation remain part of
 the user review checkpoint. No production deployment was performed.

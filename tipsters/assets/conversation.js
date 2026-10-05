@@ -26,12 +26,7 @@
   let cursor = Number(root.dataset.cursor), timer, controller;
   let stopped = false, busy = false, sending = false, writable = !form.hidden, idle = 0, failures = 0;
   let pollFinished = Promise.resolve(), finishPoll, connectionError = false;
-  let pendingSend = null;
-  const trackPendingEdit = () => {
-    if (pendingSend && (textarea.selectionStart < pendingSend.body.length || !textarea.value.startsWith(pendingSend.body))) pendingSend.edited = true;
-  };
-  textarea.addEventListener('beforeinput', trackPendingEdit);
-  textarea.addEventListener('input', trackPendingEdit);
+  const outgoing = new Set();
   let feedbackTimer;
   function showStatus(text, error = false) {
     clearTimeout(feedbackTimer);
@@ -56,6 +51,48 @@
     form.elements.operation.value = value ? 'send_message' : '';
     root.querySelector('[data-closed]').hidden = value;
     button.disabled = !value || sending || stopped;
+    outgoing.forEach(attempt => { attempt.retry.disabled = !value || sending || stopped; });
+  }
+  function messageItem(message) {
+    const item = document.createElement('li');
+    item.className = message.own ? 'is-own' : 'is-other';
+    const sender = document.createElement('strong'); sender.textContent = message.sender;
+    const time = document.createElement('time'); time.dateTime = message.datetime || ''; time.textContent = message.time || '';
+    const body = document.createElement('div'); body.className = 'cammino-conversation__text'; body.textContent = message.body;
+    item.append(sender, time, body);
+    return item;
+  }
+  function confirm(attempt, message) {
+    if (!attempt) return;
+    outgoing.delete(attempt);
+    // A poll can confirm delivery before the retry response arrives.
+    if (seen.has(message.id)) { attempt.item.remove(); return; }
+    seen.add(message.id);
+    const item = messageItem(message); item.dataset.messageId = message.id;
+    attempt.item.replaceWith(item);
+  }
+  function delivery(attempt, error) {
+    attempt.item.classList.toggle('is-pending', !error);
+    attempt.item.classList.toggle('is-failed', !!error);
+    attempt.notice.textContent = error ? `! Neodoslané: ${error}` : 'Odosielanie…';
+    attempt.retry.hidden = !error;
+    attempt.retry.disabled = sending || stopped || !writable;
+  }
+  function outgoingMessage(body) {
+    const item = messageItem({body, own: true, sender: 'Vy'});
+    item.dataset.localMessage = '';
+    const notice = document.createElement('span'); notice.setAttribute('role', 'status');
+    const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Skúsiť znova';
+    const state = document.createElement('div'); state.className = 'cammino-conversation__delivery';
+    state.append(notice, retry); item.append(state);
+    const attempt = {body, token: form.elements.message_token.value, item, notice, retry};
+    // Reserve this token for this exact message, including all subsequent retries.
+    form.elements.message_token.value = '';
+    outgoing.add(attempt); list.append(item); live.hidden = false;
+    root.querySelector('[data-empty]')?.remove();
+    delivery(attempt); toLatest();
+    retry.addEventListener('click', () => send(attempt));
+    return attempt;
   }
   function append(data, sent = false) {
     availability(data.can_send);
@@ -68,16 +105,13 @@
       edit?.querySelectorAll('input:not([type=hidden]),textarea,button[type=submit]').forEach(control => { control.disabled = true; });
     }
     const fragment = document.createDocumentFragment();
-    let added = 0;
+    let added = 0, confirmed = 0;
     for (const message of data.messages || []) {
+      const attempt = [...outgoing].find(value => value.key && value.key === message.request_key);
+      if (attempt) { confirm(attempt, message); ++confirmed; continue; }
       if (seen.has(message.id)) continue;
       seen.add(message.id); ++added;
-      const item = document.createElement('li'); item.dataset.messageId = message.id;
-      item.className = message.own ? 'is-own' : 'is-other';
-      const sender = document.createElement('strong'); sender.textContent = message.sender;
-      const time = document.createElement('time'); time.dateTime = message.datetime; time.textContent = message.time;
-      const body = document.createElement('div'); body.className = 'cammino-conversation__text'; body.textContent = message.body;
-      item.append(sender, time, body); fragment.append(item);
+      const item = messageItem(message); item.dataset.messageId = message.id; fragment.append(item);
     }
     list.append(fragment);
     if (added) {
@@ -90,8 +124,10 @@
       }
       if (unreadButton.hidden) showStatus('Prišli nové správy.');
     }
+    if (!added && (sent || (confirmed && followLatest))) toLatest();
     // Bound live DOM and duplicate tracking; older messages remain in paginated history.
-    while (list.children.length > 200) list.firstElementChild.remove();
+    const saved = [...list.querySelectorAll('[data-message-id]')];
+    saved.slice(0, Math.max(0, saved.length - 200)).forEach(item => item.remove());
     if (seen.size > 300) {
       seen.clear();
       root.querySelectorAll('[data-message-id]').forEach(node => seen.add(Number(node.dataset.messageId)));
@@ -125,12 +161,18 @@
       stopped = true; availability(false);
       // Remove private content after the current session loses access.
       root.querySelectorAll('.cammino-conversation__messages').forEach(node => node.replaceChildren());
+      outgoing.clear();
       unread = 0; unreadButton.hidden = true;
     }
     if (typeof error.data?.can_send === 'boolean') availability(error.data.can_send);
     connectionError = !error.code || error.code >= 500;
     showStatus(error.message && error.code ? error.message :
       (send ? 'Odoslanie sa nepodarilo potvrdiť. Skúste znova; správa sa neodošle dvakrát.' : 'Spojenie bolo prerušené. Nové správy sa načítajú po obnovení spojenia.'), true);
+  }
+  function sendError(error) {
+    if (error.code && error.message) return error.message;
+    if (error.name === 'AbortError') return 'Server neodpovedal včas. Doručenie sa nepodarilo potvrdiť.';
+    return navigator.onLine ? 'Spojenie so serverom zlyhalo. Doručenie sa nepodarilo potvrdiť.' : 'Nemáte pripojenie na internet.';
   }
   async function poll() {
     if (busy || sending || stopped || document.hidden || !navigator.onLine) return;
@@ -150,37 +192,44 @@
         document.activeElement === textarea ? 5000 : Math.min(15000, 5000 + idle * 2500));
     }
   }
-  form.addEventListener('submit', async event => {
-    event.preventDefault();
+  async function send(attempt) {
     if (sending || stopped || !writable) return;
-    // An uncertain response must retry the same payload/token, even if typing continued.
-    const attempt = pendingSend || {body: textarea.value, token: form.elements.message_token.value, edited: false, uncertain: false};
-    pendingSend = attempt;
-    const {body, token} = attempt;
-    sending = true; clearTimeout(timer); button.disabled = true;
+    sending = true; clearTimeout(timer); showStatus(''); availability(writable); delivery(attempt);
     controller?.abort(); await pollFinished;
-    if (stopped || !writable) { if (!attempt.uncertain) pendingSend = null; sending = false; button.disabled = true; return; }
     busy = true;
-    showStatus('Odosielanie…');
     try {
-      const data = await request('send_message', {message_body: body, message_token: token});
-      append(data, true); form.elements.message_token.value = data.message_token;
-      // Remove the confirmed message even when typing continued while it was in flight.
-      // Keep appended text as the next draft; preserve a deliberately replaced/edited draft.
-      if (!attempt.edited && textarea.value.startsWith(body)) {
-        const start = Math.max(0, textarea.selectionStart - body.length), end = Math.max(0, textarea.selectionEnd - body.length);
-        const direction = textarea.selectionDirection;
-        textarea.value = textarea.value.slice(body.length);
-        textarea.setSelectionRange(start, end, direction);
+      if (stopped || !writable) throw Object.assign(new Error('Komunikácia pri tomto tipe nie je dostupná.'), {code: 422});
+      if (!attempt.token) {
+        // After a failed request a new message needs its own signed token.
+        const data = await request('poll', {need_message_token: 'yes'});
+        append(data); attempt.token = data.message_token;
+        if (!writable) throw Object.assign(new Error('Komunikácia pri tomto tipe nie je dostupná.'), {code: 422});
       }
-      pendingSend = null;
+      if (window.crypto?.subtle) {
+        const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(attempt.token));
+        attempt.key = 'message-' + [...new Uint8Array(hash)].map(value => value.toString(16).padStart(2, '0')).join('');
+      }
+      const data = await request('send_message', {message_body: attempt.body, message_token: attempt.token});
+      confirm(attempt, data.sent_message);
+      append(data, true); form.elements.message_token.value = data.message_token;
       showStatus('Správa bola odoslaná.'); idle = 0;
     } catch (error) {
-      if (!error.code || error.code >= 500) attempt.uncertain = true;
-      if (!attempt.uncertain) pendingSend = null;
-      errorState(error, true);
+      // Keep the failed message in the conversation; never put it back in the composer.
+      if (outgoing.has(attempt)) delivery(attempt, sendError(error));
+      if (error.code === 403 || error.code === 404) errorState(error, true);
+      else {
+        if (typeof error.data?.can_send === 'boolean') availability(error.data.can_send);
+        connectionError = !error.code || error.code >= 500;
+      }
     }
-    finally { busy = sending = false; button.disabled = !writable || stopped; schedule(250); }
+    finally { busy = sending = false; availability(writable); schedule(250); }
+  }
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (sending || stopped || !writable || !textarea.value.trim() || !form.reportValidity()) return;
+    const body = textarea.value;
+    textarea.value = ''; // Clear synchronously, before waiting for the poll or network.
+    send(outgoingMessage(body));
   });
   document.addEventListener('visibilitychange', () => {
     clearTimeout(timer);

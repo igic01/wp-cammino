@@ -157,17 +157,23 @@ function cammino_tipsters_message_cursor( int $id ): int {
 	return $rows ? (int) $rows[0]->ID : 0;
 }
 
+/** Own-message keys let the browser reconcile an outgoing bubble after a lost response. */
+function cammino_tipsters_live_message( WP_Post $message, int $owner ): array {
+	$own = (int) $message->post_author === get_current_user_id();
+	return array( 'id' => (int) $message->ID, 'body' => $message->post_content, 'own' => $own,
+		'request_key' => $own ? $message->post_name : '',
+		'sender' => ( $message->post_title ?: __( 'Odosielateľ', 'cammino' ) ) . ' · ' . ( (int) $message->post_author === $owner ? __( 'Tipster', 'cammino' ) : __( 'Administrátor', 'cammino' ) ),
+		'time' => get_post_time( get_option( 'date_format' ) . ' H:i:s', false, $message, true ),
+		'datetime' => str_replace( ' ', 'T', $message->post_date_gmt ) . 'Z' );
+}
+
 function cammino_tipsters_live_message_data( int $id, int $after ): array {
 	$rows = cammino_tipsters_live_message_rows( $id, $after );
 	$more = count( $rows ) > 50;
 	$messages = array(); $owner = (int) get_post( $id )->post_author;
 	foreach ( array_slice( $rows, 0, 50 ) as $row ) {
 		$message = new WP_Post( $row );
-		$messages[] = array( 'id' => (int) $message->ID, 'body' => $message->post_content,
-			'own' => (int) $message->post_author === get_current_user_id(),
-			'sender' => ( $message->post_title ?: __( 'Odosielateľ', 'cammino' ) ) . ' · ' . ( (int) $message->post_author === $owner ? __( 'Tipster', 'cammino' ) : __( 'Administrátor', 'cammino' ) ),
-			'time' => get_post_time( get_option( 'date_format' ) . ' H:i:s', false, $message, true ),
-			'datetime' => str_replace( ' ', 'T', $message->post_date_gmt ) . 'Z' );
+		$messages[] = cammino_tipsters_live_message( $message, $owner );
 		$after = (int) $message->ID;
 	}
 	return array( 'messages' => $messages, 'cursor' => $after, 'more' => $more, 'can_send' => cammino_tipsters_can_message( $id ), 'status' => cammino_tipsters_tip_status( $id ), 'status_label' => cammino_tipsters_status_labels()[ cammino_tipsters_tip_status( $id ) ] ?? '', 'status_notice' => cammino_tipsters_status_notice( cammino_tipsters_tip_status( $id ) ) );
@@ -191,7 +197,13 @@ function cammino_tipsters_conversation_ajax(): void {
 		if ( is_wp_error( $result ) ) { wp_send_json_error( array( 'message' => $result->get_error_message(), 'can_send' => cammino_tipsters_can_message( $id ) ), 'busy' === $result->get_error_code() ? 409 : 422 ); }
 	}
 	$data = cammino_tipsters_live_message_data( $id, absint( cammino_tipsters_input( 'after' ) ) );
-	if ( 'send_message' === $operation ) { $data['message_token'] = cammino_tipsters_message_token( $id ); }
+	if ( 'send_message' === $operation || 'yes' === cammino_tipsters_input( 'need_message_token' ) ) {
+		$data['message_token'] = cammino_tipsters_message_token( $id );
+	}
+	if ( 'send_message' === $operation ) {
+		// An acknowledged retry may already be behind the incremental cursor.
+		$data['sent_message'] = cammino_tipsters_live_message( get_post( $result ), (int) get_post( $id )->post_author );
+	}
 	wp_send_json_success( $data );
 }
 add_action( 'wp_ajax_cammino_conversation', 'cammino_tipsters_conversation_ajax' );

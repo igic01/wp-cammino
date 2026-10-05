@@ -44,14 +44,21 @@ try:
     response, data = live(owner, own[3], operation='send_message', message_body='Live owner & text', message_token=owner_send['message_token'])
     check(response[0] == 200 and len(data['data']['messages']) == 1 and data['data']['messages'][0]['body'] == 'Live owner & text', 'AJAX sends and returns persisted plain message')
     cursor = data['data']['cursor']; token = data['data']['message_token']
+    sent = data['data']['sent_message']
+    check(sent['id'] == cursor and sent['request_key'] and sent['own'], 'Send explicitly acknowledges the persisted record and sender key')
     response, retry = live(owner, own[3], operation='send_message', message_body='Live owner & text', message_token=owner_send['message_token'])
     check(retry['data']['cursor'] == cursor and len(retry['data']['messages']) == 1, 'AJAX retry cannot duplicate a message')
+    response, acknowledged = live(owner, own[3], after=cursor, operation='send_message', message_body='Live owner & text', message_token=owner_send['message_token'])
+    check(acknowledged['data']['messages'] == [] and acknowledged['data']['sent_message']['id'] == cursor, 'Retry acknowledges a record even after the polling cursor advanced')
+    response, fresh = live(owner, own[3], after=cursor, need_message_token='yes')
+    check(fresh['data']['message_token'] != owner_send['message_token'] and fresh['data']['messages'] == [], 'A new send can obtain an independent token after a failed request')
     response, empty = live(owner, own[3], after=cursor)
     check(empty['data']['messages'] == [] and empty['data']['cursor'] == cursor and not empty['data']['more'], 'Unchanged polls return only a small empty delta')
     adm = request(admin, admin_path); admin_send = fields(adm[3], 'send_message')
     response, reply = live(admin, adm[3], operation='send_message', message_body='Live admin reply', message_token=admin_send['message_token'])
     response, incoming = live(owner, own[3], after=cursor)
     check(len(incoming['data']['messages']) == 1 and incoming['data']['messages'][0]['body'] == 'Live admin reply' and 'admin' in incoming['data']['messages'][0]['sender'], 'Owner receives only new admin reply with its sender')
+    check(incoming['data']['messages'][0]['request_key'] == '', 'Another sender never receives the outgoing reconciliation key')
     response, empty = live(owner, own[3], after=incoming['data']['cursor'])
     check(empty['data']['messages'] == [], 'Advancing cursor prevents redisplaying previous replies')
     for client, page, send_token in [(owner, own[3], token), (admin, adm[3], admin_send['message_token'])]:

@@ -443,8 +443,10 @@ behavior using disposable test conversations.
   Preserve reading/draft position on incoming messages; show a new-message button.
 - [x] Add accessible show/hide-password control and shared-footer login link.
 - [x] Redirect successful new submissions to the tipster dashboard.
-- [x] Fix typing during message sending: remove the confirmed message prefix,
-  keep the next/replaced draft and caret position, and retain text on failure.
+- [x] Clear the composer immediately on Enter/Send. Show pending outgoing bubbles;
+  keep failed messages in the scroll panel with **!**, a reason and retry.
+  Retry the exact original body/token, reconcile lost responses without duplicates,
+  and allow independent new messages without changing current composer text.
 - [x] Apply checkpoint feedback: center login, move contrasting logout to the
   top right, and add a dedicated dashboard button to open each tip.
 - [x] Limit new messages to 600 characters on both the page and server; on
@@ -494,9 +496,14 @@ Checkpoint refinements: 49 message WordPress, 36 message HTTP, 24 live AJAX
 and 38 browser UX checks passed, together with the 7 delta, 21 rejection/purge
 and 41 relevant theme checks. Desktop/mobile screenshots were inspected.
 
-Send-race fix: 25 two-session Chrome checks passed for admin and tipster,
-including typing/replacing a draft during sends, failed/lost responses and
-safe retries that preserve the next draft. JavaScript/PHP syntax checks passed.
+Immediate-send review: on both admin and tipster screens, type `test`, press
+Enter and immediately type `hello`. The box must show only `hello` while the
+original message appears in the scroll panel. Test a failed send: it must show
+**!**, the reason and retry in the panel, without restoring submitted text.
+Retry and independent new sends must not duplicate or combine messages.
+Verification: 37 two-session send/update browser, 39 desktop/mobile UX, 29 AJAX
+HTTP, 49 message workflow and 7 incremental-query checks passed. Failure-bubble
+screenshots were inspected and PHP/JavaScript syntax checks passed.
 
 Review instructions: [Stage 5 acceptance checklist](README.md#stage-5-behavior-and-final-review-checklist).
 
